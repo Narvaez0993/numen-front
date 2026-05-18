@@ -5,7 +5,37 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "save": "Save",
-    "continue": "Continue"
+    "continue": "Continue",
+    "all": "All"
+  },
+  "movements": {
+    "currentMonth": "May",
+    "searchPlaceholder": "Search expense, merchant, amount…",
+    "results": "{{count}} results",
+    "resultsOne": "{{count}} result",
+    "clear": "Clear",
+    "filters": {
+      "month": "Month",
+      "monthAll": "This month (May)",
+      "account": "Account",
+      "category": "Category",
+      "type": "Type"
+    },
+    "months": {
+      "april": "April",
+      "march": "March",
+      "last90": "Last 90 days",
+      "thisYear": "This year"
+    },
+    "types": {
+      "expenses": "Expenses only",
+      "recurring": "Recurring",
+      "transfers": "Transfers"
+    },
+    "empty": {
+      "title": "No results",
+      "hint": "Try changing the filters or the search"
+    }
   },
   "tabs": {
     "home": "Home",

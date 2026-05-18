@@ -5,7 +5,37 @@
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "save": "Guardar",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "all": "Todas"
+  },
+  "movements": {
+    "currentMonth": "Mayo",
+    "searchPlaceholder": "Buscar gasto, merchant, monto…",
+    "results": "{{count}} resultados",
+    "resultsOne": "{{count}} resultado",
+    "clear": "Limpiar",
+    "filters": {
+      "month": "Mes",
+      "monthAll": "Este mes (mayo)",
+      "account": "Cuenta",
+      "category": "Categoría",
+      "type": "Tipo"
+    },
+    "months": {
+      "april": "Abril",
+      "march": "Marzo",
+      "last90": "Últimos 90 días",
+      "thisYear": "Este año"
+    },
+    "types": {
+      "expenses": "Solo gastos",
+      "recurring": "Recurrentes",
+      "transfers": "Transferencias"
+    },
+    "empty": {
+      "title": "Sin resultados",
+      "hint": "Probá cambiar los filtros o la búsqueda"
+    }
   },
   "tabs": {
     "home": "Inicio",

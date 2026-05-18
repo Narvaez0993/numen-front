@@ -16,3 +16,4 @@ export * from './SubScreenHeader';
 export * from './ThemedStatusBar';
 export * from './BottomSheet';
 export * from './Toast';
+export * from './FilterChip';
