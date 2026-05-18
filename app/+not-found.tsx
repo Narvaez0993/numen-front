@@ -11,7 +11,7 @@ export default function NotFoundScreen() {
     <>
       <Stack.Screen options={{ title: t('notFound.title') }} />
       <View style={styles.container}>
-        <Text variant="title">{t('notFound.title')}</Text>
+        <Text variant="h1">{t('notFound.title')}</Text>
         <Link href="/" style={styles.link}>
           <Text variant="body">{t('notFound.backHome')}</Text>
         </Link>

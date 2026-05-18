@@ -1,7 +1,8 @@
-import { forwardRef } from 'react';
-import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
+import { forwardRef, useState } from 'react';
+import { TextInput, TextInputProps, View } from 'react-native';
 
 import { useTheme } from '../theme';
+
 import { Text } from './Text';
 
 type Props = TextInputProps & {
@@ -10,53 +11,57 @@ type Props = TextInputProps & {
 };
 
 export const Input = forwardRef<TextInput, Props>(function Input(
-  { label, error, style, ...rest },
+  { label, error, style, onFocus, onBlur, ...rest },
   ref,
 ) {
   const { theme } = useTheme();
+  const [focused, setFocused] = useState(false);
+
+  const borderColor = error
+    ? theme.colors.accentCoral
+    : focused
+      ? theme.colors.accentMint
+      : theme.colors.borderSubtle;
 
   return (
-    <View style={styles.wrapper}>
+    <View style={{ width: '100%' }}>
       {label ? (
-        <Text variant="label" style={{ marginBottom: theme.spacing.xs }}>
+        <Text variant="label" muted style={{ marginBottom: theme.spacing.xs }}>
           {label}
         </Text>
       ) : null}
       <TextInput
         ref={ref}
-        placeholderTextColor={theme.colors.textSecondary}
         {...rest}
+        onFocus={(e) => {
+          setFocused(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          onBlur?.(e);
+        }}
+        placeholderTextColor={theme.colors.textTertiary}
         style={[
-          styles.input,
           {
-            color: theme.colors.textPrimary,
-            backgroundColor: theme.colors.surface,
-            borderColor: error ? theme.colors.danger : theme.colors.border,
+            backgroundColor: theme.colors.bgSurface,
+            borderColor,
+            borderWidth: 1,
             borderRadius: theme.radius.md,
-            paddingHorizontal: theme.spacing.md,
-            paddingVertical: theme.spacing.sm,
-            fontSize: theme.typography.sizes.base,
+            paddingHorizontal: 14,
+            paddingVertical: 12,
+            color: theme.colors.textPrimary,
+            fontSize: 14,
+            fontFamily: 'Geist_400Regular',
           },
           style,
         ]}
       />
       {error ? (
-        <Text
-          variant="caption"
-          style={{ color: theme.colors.danger, marginTop: theme.spacing.xs }}
-        >
+        <Text variant="caption" color={theme.colors.accentCoral} style={{ marginTop: 4 }}>
           {error}
         </Text>
       ) : null}
     </View>
   );
-});
-
-const styles = StyleSheet.create({
-  wrapper: {
-    width: '100%',
-  },
-  input: {
-    borderWidth: 1,
-  },
 });

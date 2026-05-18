@@ -15,7 +15,8 @@ type Props = { children: ReactNode };
 export function ThemeProvider({ children }: Props) {
   const systemScheme = useColorScheme();
   const value = useMemo<ThemeContextValue>(() => {
-    const mode: ThemeMode = systemScheme === 'dark' ? 'dark' : 'light';
+    // Dark is the product's default per the brief; light only when explicitly set.
+    const mode: ThemeMode = systemScheme === 'light' ? 'light' : 'dark';
     return { theme: themes[mode], mode };
   }, [systemScheme]);
 

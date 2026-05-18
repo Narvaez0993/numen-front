@@ -7,9 +7,47 @@
     "save": "Guardar",
     "continue": "Continuar"
   },
+  "tabs": {
+    "home": "Inicio",
+    "movements": "Movimientos",
+    "budgets": "Presupuestos",
+    "assistant": "Asistente"
+  },
+  "placeholder": {
+    "hint": "Esta pantalla llega en una próxima iteración"
+  },
   "home": {
-    "title": "Bienvenido a numen",
-    "subtitle": "Tu app de gastos personal"
+    "greeting": {
+      "morning": "Buenos días",
+      "day": "Hola",
+      "night": "Buenas noches"
+    },
+    "daily": {
+      "label": "Para hoy",
+      "availableToday": "disponibles hoy",
+      "spent": "gastado",
+      "of": "de",
+      "suggested": "sugeridos"
+    },
+    "saldo": {
+      "label": "Saldo neto",
+      "viewAccounts": "Ver cuentas"
+    },
+    "categories": {
+      "title": "Tus categorías",
+      "thisMonth": "este mes"
+    },
+    "upcoming": {
+      "title": "Próximos cobros",
+      "window": "7 días",
+      "inDays_one": "en {{count}} día",
+      "inDays_other": "en {{count}} días"
+    },
+    "recent": {
+      "title": "Últimos gastos",
+      "seeAll": "Ver todos",
+      "transferTag": "Transferencia · no es gasto"
+    }
   },
   "notFound": {
     "title": "Pantalla no encontrada",

@@ -36,7 +36,7 @@ const config: ExpoConfig = {
     favicon: './assets/favicon.png',
     bundler: 'metro',
   },
-  plugins: ['expo-router', 'expo-secure-store', 'expo-localization'],
+  plugins: ['expo-router', 'expo-secure-store', 'expo-localization', 'expo-font'],
   extra: {
     apiUrl,
     environment,

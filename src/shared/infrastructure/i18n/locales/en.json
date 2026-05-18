@@ -7,9 +7,47 @@
     "save": "Save",
     "continue": "Continue"
   },
+  "tabs": {
+    "home": "Home",
+    "movements": "Movements",
+    "budgets": "Budgets",
+    "assistant": "Assistant"
+  },
+  "placeholder": {
+    "hint": "This screen is coming in a future iteration"
+  },
   "home": {
-    "title": "Welcome to numen",
-    "subtitle": "Your personal expense app"
+    "greeting": {
+      "morning": "Good morning",
+      "day": "Hello",
+      "night": "Good evening"
+    },
+    "daily": {
+      "label": "For today",
+      "availableToday": "available today",
+      "spent": "spent",
+      "of": "of",
+      "suggested": "suggested"
+    },
+    "saldo": {
+      "label": "Net balance",
+      "viewAccounts": "View accounts"
+    },
+    "categories": {
+      "title": "Your categories",
+      "thisMonth": "this month"
+    },
+    "upcoming": {
+      "title": "Upcoming charges",
+      "window": "7 days",
+      "inDays_one": "in {{count}} day",
+      "inDays_other": "in {{count}} days"
+    },
+    "recent": {
+      "title": "Recent expenses",
+      "seeAll": "See all",
+      "transferTag": "Transfer · not an expense"
+    }
   },
   "notFound": {
     "title": "Screen not found",
