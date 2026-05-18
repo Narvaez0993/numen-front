@@ -49,6 +49,55 @@
       "transferTag": "Transfer · not an expense"
     }
   },
+  "profile": {
+    "title": "Profile",
+    "edit": "Edit",
+    "signOut": "Sign out",
+    "groups": {
+      "myData": "My data",
+      "app": "App",
+      "account": "Account"
+    },
+    "rows": {
+      "accounts": {
+        "title": "Accounts and sources",
+        "subtitle": "4 active · net balance $5,245,000"
+      },
+      "subs": {
+        "title": "Subscriptions",
+        "subtitle": "3 active · $92,800/month"
+      },
+      "categories": {
+        "title": "Categories",
+        "subtitle": "12 standard · 0 custom"
+      },
+      "notifications": {
+        "title": "Notifications"
+      },
+      "appearance": {
+        "title": "Appearance"
+      },
+      "assistant": {
+        "title": "Assistant",
+        "value": "Proactive"
+      },
+      "security": {
+        "title": "Security and PIN"
+      },
+      "plan": {
+        "title": "Plan",
+        "value": "Free"
+      },
+      "export": {
+        "title": "Export data"
+      }
+    },
+    "appearance": {
+      "dark": "Dark",
+      "light": "Light",
+      "auto": "Automatic"
+    }
+  },
   "notFound": {
     "title": "Screen not found",
     "backHome": "Back to home"

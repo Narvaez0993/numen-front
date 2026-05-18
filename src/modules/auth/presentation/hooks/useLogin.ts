@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { router } from 'expo-router';
 
 import { loginUseCase } from '@/core/di/container';
 
@@ -23,6 +24,7 @@ export function useLogin() {
         displayName: data.displayName,
         accessToken: data.accessToken,
       });
+      router.replace('/');
     },
   });
 }

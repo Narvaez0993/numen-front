@@ -49,6 +49,55 @@
       "transferTag": "Transferencia · no es gasto"
     }
   },
+  "profile": {
+    "title": "Perfil",
+    "edit": "Editar",
+    "signOut": "Cerrar sesión",
+    "groups": {
+      "myData": "Mis datos",
+      "app": "App",
+      "account": "Cuenta"
+    },
+    "rows": {
+      "accounts": {
+        "title": "Fuentes y cuentas",
+        "subtitle": "4 activas · saldo neto $5.245.000"
+      },
+      "subs": {
+        "title": "Suscripciones",
+        "subtitle": "3 activas · $92.800/mes"
+      },
+      "categories": {
+        "title": "Categorías",
+        "subtitle": "12 estándar · 0 personalizadas"
+      },
+      "notifications": {
+        "title": "Notificaciones"
+      },
+      "appearance": {
+        "title": "Apariencia"
+      },
+      "assistant": {
+        "title": "Asistente",
+        "value": "Proactivo"
+      },
+      "security": {
+        "title": "Seguridad y PIN"
+      },
+      "plan": {
+        "title": "Plan",
+        "value": "Free"
+      },
+      "export": {
+        "title": "Exportar datos"
+      }
+    },
+    "appearance": {
+      "dark": "Oscuro",
+      "light": "Claro",
+      "auto": "Automático"
+    }
+  },
   "notFound": {
     "title": "Pantalla no encontrada",
     "backHome": "Volver al inicio"

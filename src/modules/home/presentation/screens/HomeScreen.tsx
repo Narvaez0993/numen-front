@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -44,7 +45,10 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={{ gap: 18 }}>
-          <HomeHeader name={data.greeting} />
+          <HomeHeader
+            name={data.greeting}
+            onAvatarPress={() => router.push('/profile')}
+          />
           <DailyHero daily={data.daily} />
           <SaldoCompact saldo={data.saldo} />
           <TopCategoriesCard categories={data.topCategories} />

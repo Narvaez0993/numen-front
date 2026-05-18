@@ -10,3 +10,6 @@ export * from './Chip';
 export * from './SectionLabel';
 export * from './Row';
 export * from './FAB';
+export * from './SettingsGroup';
+export * from './SettingsRow';
+export * from './SubScreenHeader';

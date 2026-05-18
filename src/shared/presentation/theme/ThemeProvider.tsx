@@ -2,6 +2,7 @@ import { createContext, ReactNode, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { Theme, ThemeMode, themes } from './tokens';
+import { useThemePreference } from './useThemePreference';
 
 export type ThemeContextValue = {
   theme: Theme;
@@ -14,11 +15,18 @@ type Props = { children: ReactNode };
 
 export function ThemeProvider({ children }: Props) {
   const systemScheme = useColorScheme();
+  const preference = useThemePreference((state) => state.mode);
+
   const value = useMemo<ThemeContextValue>(() => {
-    // Dark is the product's default per the brief; light only when explicitly set.
-    const mode: ThemeMode = systemScheme === 'light' ? 'light' : 'dark';
+    let mode: ThemeMode;
+    if (preference === 'dark' || preference === 'light') {
+      mode = preference;
+    } else {
+      // 'auto' → follow system; dark is the product default when unknown.
+      mode = systemScheme === 'light' ? 'light' : 'dark';
+    }
     return { theme: themes[mode], mode };
-  }, [systemScheme]);
+  }, [preference, systemScheme]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
