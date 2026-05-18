@@ -25,10 +25,9 @@ export const useOnboardingStore = create<State>()(
       name: 'numen.onboarding',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ completed: state.completed, profile: state.profile }),
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.hydrated = true;
-        }
+      onRehydrateStorage: () => () => {
+        // Triggers re-renders for subscribers reading `hydrated`.
+        useOnboardingStore.setState({ hydrated: true });
       },
     },
   ),

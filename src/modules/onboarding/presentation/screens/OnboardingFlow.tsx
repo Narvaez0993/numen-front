@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,16 +16,15 @@ import { PersoNameScreen } from './PersoNameScreen';
 import { SetupScreen } from './SetupScreen';
 import { WelcomeScreen } from './WelcomeScreen';
 
-type Props = {
-  onComplete: () => void;
-};
-
-export function OnboardingFlow({ onComplete }: Props) {
+export function OnboardingFlow() {
   const { theme } = useTheme();
   const flow = useOnboardingFlow();
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
+  const finishingRef = useRef(false);
 
   const finish = useCallback(async () => {
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     const profile = {
       name: flow.ctx.name,
       goal: flow.ctx.goal,
@@ -35,8 +34,15 @@ export function OnboardingFlow({ onComplete }: Props) {
     const result = await completeOnboardingUseCase.execute(profile);
     const persisted = result.ok ? result.value : profile;
     markCompleted(persisted);
-    onComplete();
-  }, [flow.ctx, markCompleted, onComplete]);
+  }, [flow.ctx, markCompleted]);
+
+  // Safety net: if we ever reach `confirm` without an expense (e.g. via dev
+  // tweaks), finish from an effect, not during render.
+  useEffect(() => {
+    if (flow.screen === 'confirm' && !flow.ctx.expense) {
+      void finish();
+    }
+  }, [flow.screen, flow.ctx.expense, finish]);
 
   const renderScreen = () => {
     switch (flow.screen) {
@@ -112,15 +118,14 @@ export function OnboardingFlow({ onComplete }: Props) {
         );
       case 'confirm': {
         const expense = flow.ctx.expense;
-        const transcript = flow.ctx.transcript ?? '';
         if (!expense) {
-          void finish();
+          // Safety effect above will finish; render nothing meanwhile.
           return null;
         }
         return (
           <ConfirmScreen
             expense={expense}
-            transcript={transcript}
+            transcript={flow.ctx.transcript ?? ''}
             accountValue={flow.ctx.bankId ? flow.ctx.bankId : null}
             onContinue={() => {
               void finish();
