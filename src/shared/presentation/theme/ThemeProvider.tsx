@@ -1,5 +1,6 @@
-import { createContext, ReactNode, useMemo } from 'react';
-import { useColorScheme } from 'react-native';
+import * as SystemUI from 'expo-system-ui';
+import { createContext, ReactNode, useEffect, useMemo } from 'react';
+import { Appearance, useColorScheme } from 'react-native';
 
 import { Theme, ThemeMode, themes } from './tokens';
 import { useThemePreference } from './useThemePreference';
@@ -17,16 +18,34 @@ export function ThemeProvider({ children }: Props) {
   const systemScheme = useColorScheme();
   const preference = useThemePreference((state) => state.mode);
 
-  const value = useMemo<ThemeContextValue>(() => {
-    let mode: ThemeMode;
+  const { theme, mode } = useMemo<ThemeContextValue>(() => {
+    let resolved: ThemeMode;
     if (preference === 'dark' || preference === 'light') {
-      mode = preference;
+      resolved = preference;
     } else {
       // 'auto' → follow system; dark is the product default when unknown.
-      mode = systemScheme === 'light' ? 'light' : 'dark';
+      resolved = systemScheme === 'light' ? 'light' : 'dark';
     }
-    return { theme: themes[mode], mode };
+    return { theme: themes[resolved], mode: resolved };
   }, [preference, systemScheme]);
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  // Force React Native's appearance to match the user's preference. On
+  // Android, also set the native window background — otherwise the OS's
+  // dark window bleeds gray under the React layout when the user forces
+  // light on top of an OS in dark mode.
+  useEffect(() => {
+    if (preference === 'light' || preference === 'dark') {
+      Appearance.setColorScheme(preference);
+    } else {
+      Appearance.setColorScheme(null);
+    }
+  }, [preference]);
+
+  useEffect(() => {
+    void SystemUI.setBackgroundColorAsync(theme.colors.bgBase);
+  }, [theme.colors.bgBase]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, mode }}>{children}</ThemeContext.Provider>
+  );
 }
