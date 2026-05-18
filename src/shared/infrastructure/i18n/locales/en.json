@@ -68,6 +68,14 @@
       "cta": "View plan"
     }
   },
+  "assistant": {
+    "title": "Assistant",
+    "greeting": "How can I help, Sebastián?",
+    "thisWeek": "This week",
+    "suggestions": "Suggestions",
+    "conversation": "Conversation",
+    "inputPlaceholder": "Ask me anything…"
+  },
   "tabs": {
     "home": "Home",
     "movements": "Movements",

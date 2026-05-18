@@ -1,14 +1,5 @@
-import { useTranslation } from 'react-i18next';
-
-import { PlaceholderScreen } from './_components/PlaceholderScreen';
+import { AssistantScreen } from '@/modules/assistant/presentation/screens/AssistantScreen';
 
 export default function AssistantTab() {
-  const { t } = useTranslation();
-  return (
-    <PlaceholderScreen
-      icon="sparkles"
-      title={t('tabs.assistant')}
-      hint={t('placeholder.hint')}
-    />
-  );
+  return <AssistantScreen />;
 }

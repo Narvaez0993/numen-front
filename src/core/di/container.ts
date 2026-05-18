@@ -1,3 +1,6 @@
+import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
+import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUseCase';
+import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
 import { LoginUseCase } from '@/modules/auth/application';
 import { AuthRepository } from '@/modules/auth/domain';
 import { InMemoryAuthRepository } from '@/modules/auth/infrastructure';
@@ -23,6 +26,7 @@ const profileRepository: ProfileRepository = new InMemoryProfileRepository();
 const expenseRepository: ExpenseRepository = new InMemoryExpenseRepository();
 const movementsRepository: MovementsRepository = new InMemoryMovementsRepository();
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
+const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);
@@ -30,6 +34,7 @@ export const getProfileUseCase = new GetProfileUseCase(profileRepository);
 export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository);
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
+export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
 
 export const container = {
   authRepository,
@@ -38,10 +43,12 @@ export const container = {
   expenseRepository,
   movementsRepository,
   budgetsRepository,
+  assistantRepository,
   loginUseCase,
   getHomeOverviewUseCase,
   getProfileUseCase,
   createExpensesUseCase,
   getMovementsUseCase,
   getBudgetsUseCase,
+  getAssistantUseCase,
 };
