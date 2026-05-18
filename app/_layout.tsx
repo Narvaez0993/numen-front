@@ -21,7 +21,7 @@ function OnboardingGate() {
     if (!completed && !inOnboarding) {
       router.replace('/(onboarding)');
     } else if (completed && inOnboarding) {
-      router.replace('/');
+      router.replace('/(tabs)');
     }
   }, [hydrated, completed, segments, router]);
 

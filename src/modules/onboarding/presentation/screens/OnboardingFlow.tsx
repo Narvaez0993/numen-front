@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useCallback, useEffect, useRef } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,6 +35,9 @@ export function OnboardingFlow() {
     const result = await completeOnboardingUseCase.execute(profile);
     const persisted = result.ok ? result.value : profile;
     markCompleted(persisted);
+    // Navigate explicitly to the tabs group. Expo Router v4 cross-group
+    // imperative navigation works best with an explicit group path.
+    router.replace('/(tabs)');
   }, [flow.ctx, markCompleted]);
 
   // Safety net: if we ever reach `confirm` without an expense (e.g. via dev
