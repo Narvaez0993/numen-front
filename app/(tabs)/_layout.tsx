@@ -1,6 +1,8 @@
 import { Tabs, usePathname } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { ExpenseSheet } from '@/modules/expenses/presentation/components/ExpenseSheet';
+import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { Icon, FAB } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -8,6 +10,7 @@ export default function TabsLayout() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const pathname = usePathname();
+  const openSheet = useExpenseSheetStore((s) => s.openSheet);
 
   // Hide FAB on assistant per the brief
   const hideFab = pathname.endsWith('/assistant');
@@ -81,7 +84,8 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-      {!hideFab ? <FAB onPress={() => {}} /> : null}
+      {!hideFab ? <FAB onPress={openSheet} /> : null}
+      <ExpenseSheet />
     </>
   );
 }

@@ -98,6 +98,40 @@
       "auto": "Auto"
     }
   },
+  "expenses": {
+    "sheet": {
+      "title": {
+        "entry": "New expense",
+        "recording": "Listening…",
+        "processing": "Processing…",
+        "confirm": "{{count}} expenses detected",
+        "confirmOne": "{{count}} expense detected"
+      },
+      "sub": {
+        "entry": "The fastest way",
+        "recording": "Tap again when you're done",
+        "processing": "Identifying expenses",
+        "confirm": "Review and edit before saving"
+      },
+      "tapAndSpeak": "Tap and speak",
+      "talking": "Speaking…",
+      "wait": "One moment",
+      "hint": "e.g. \"taxi to work, nine thousand\"",
+      "photoReceipt": "Photo receipt",
+      "write": "Write",
+      "quote": "\"taxi to work, nine thousand and lunch at juan valdez eighteen thousand\"",
+      "detectedAuto": "Auto-detected",
+      "amount": "Amount",
+      "addAnother": "Add another",
+      "total": "Total",
+      "save": "Save expenses"
+    },
+    "toast": {
+      "saved": "{{count}} expenses saved · {{total}}",
+      "savedOne": "{{count}} expense saved · {{total}}",
+      "undo": "Undo"
+    }
+  },
   "notFound": {
     "title": "Screen not found",
     "backHome": "Back to home"

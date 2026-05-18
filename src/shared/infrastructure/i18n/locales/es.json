@@ -98,6 +98,40 @@
       "auto": "Auto"
     }
   },
+  "expenses": {
+    "sheet": {
+      "title": {
+        "entry": "Nuevo gasto",
+        "recording": "Escuchando…",
+        "processing": "Procesando…",
+        "confirm": "{{count}} gastos detectados",
+        "confirmOne": "{{count}} gasto detectado"
+      },
+      "sub": {
+        "entry": "La forma más rápida",
+        "recording": "Toca de nuevo cuando termines",
+        "processing": "Identificando los gastos",
+        "confirm": "Revisa y edita antes de guardar"
+      },
+      "tapAndSpeak": "Toca y habla",
+      "talking": "Hablando…",
+      "wait": "Un momento",
+      "hint": "ej: \"taxi al trabajo, nueve mil\"",
+      "photoReceipt": "Foto recibo",
+      "write": "Escribir",
+      "quote": "\"taxi al trabajo, nueve mil y almuerzo en juan valdez dieciocho mil\"",
+      "detectedAuto": "Detectado automáticamente",
+      "amount": "Monto",
+      "addAnother": "Agregar otro",
+      "total": "Total",
+      "save": "Guardar gastos"
+    },
+    "toast": {
+      "saved": "{{count}} gastos guardados · {{total}}",
+      "savedOne": "{{count}} gasto guardado · {{total}}",
+      "undo": "Deshacer"
+    }
+  },
   "notFound": {
     "title": "Pantalla no encontrada",
     "backHome": "Volver al inicio"
