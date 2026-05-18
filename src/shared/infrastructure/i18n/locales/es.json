@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "continue": "Continuar"
+  },
+  "home": {
+    "title": "Bienvenido a numen",
+    "subtitle": "Tu app de gastos personal"
+  },
+  "notFound": {
+    "title": "Pantalla no encontrada",
+    "backHome": "Volver al inicio"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Ingresa con tu cuenta",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@correo.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Tu contraseña",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "errors": {
+        "invalidEmail": "Correo no válido",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+        "invalidCredentials": "Correo o contraseña incorrectos"
+      }
+    }
+  }
+}

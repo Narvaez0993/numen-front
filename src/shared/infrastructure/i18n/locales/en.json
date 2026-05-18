@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "continue": "Continue"
+  },
+  "home": {
+    "title": "Welcome to numen",
+    "subtitle": "Your personal expense app"
+  },
+  "notFound": {
+    "title": "Screen not found",
+    "backHome": "Back to home"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Log in to your account",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Your password",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "errors": {
+        "invalidEmail": "Invalid email",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "invalidCredentials": "Invalid email or password"
+      }
+    }
+  }
+}
