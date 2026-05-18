@@ -76,6 +76,107 @@
     "conversation": "Conversation",
     "inputPlaceholder": "Ask me anything…"
   },
+  "onboarding": {
+    "skip": "Skip",
+    "welcome": {
+      "title1": "Forget Excel.",
+      "subtitle1": "Track expenses by saying them out loud. AI does the rest.",
+      "title2": "Speak. Don't type.",
+      "subtitle2": "Tell Numen \"coffee three thousand five hundred\" and it lands instantly. No forms.",
+      "title3": "Your money, in real time.",
+      "subtitle3": "Balances, budgets and debts on a single screen. No Excel, no formulas.",
+      "start": "Get started",
+      "haveAccount": "I already have an account"
+    },
+    "auth": {
+      "signup": {
+        "title": "Create your account",
+        "subtitle": "In under a minute and without passwords."
+      },
+      "login": {
+        "title": "Welcome back",
+        "subtitle": "Let's continue where you left off."
+      },
+      "apple": "Continue with Apple",
+      "google": "Continue with Google",
+      "email": "Continue with email",
+      "signupHint": "Already have an account?",
+      "loginHint": "Don't have an account?",
+      "signupLink": "Sign in",
+      "loginLink": "Create one",
+      "terms": "By continuing you accept Numen's Terms and Privacy policy."
+    },
+    "perso": {
+      "step1": "Step 1 of 2",
+      "step2": "Step 2 of 2",
+      "continue": "Continue",
+      "skip": "Skip this step",
+      "name": {
+        "title": "What's your name?",
+        "subtitle": "Numen will call you this.",
+        "placeholder": "Your name"
+      },
+      "goal": {
+        "title": "Hi, {{name}}. What do you want to achieve with Numen?",
+        "subtitle": "This helps us give you relevant suggestions.",
+        "friend": "friend",
+        "gastos": {
+          "title": "Know where my money goes",
+          "sub": "Income is fine but I don't know what I spend on."
+        },
+        "ahorrar": {
+          "title": "Save for something specific",
+          "sub": "I have a goal and want to reach it."
+        },
+        "deudas": {
+          "title": "Get out of debt",
+          "sub": "I want to pay off cards and stop owing."
+        }
+      }
+    },
+    "setup": {
+      "title": "Your main account",
+      "subtitle": "To start tracking the balance. You can add more later.",
+      "banks": {
+        "bbva": "BBVA",
+        "bancolombia": "Bancolombia",
+        "davivienda": "Davivienda",
+        "nu": "Nu",
+        "daviplata": "Daviplata",
+        "nequi": "Nequi",
+        "efectivo": "Cash",
+        "otro": "Other"
+      },
+      "sheet": {
+        "title": "Approximate balance in {{bank}}",
+        "hint": "An estimate is fine. You can adjust later.",
+        "save": "Save and continue",
+        "skip": "Not sure, skip"
+      }
+    },
+    "magic": {
+      "step": "Step 5 of 5",
+      "title": "Let's try the magic.",
+      "subtitle": "Tap the mic and tell me an expense you made today.",
+      "recording": "Listening…",
+      "processing": "Processing…",
+      "exampleLabel": "Example",
+      "example": "Coffee three thousand five hundred",
+      "preferText": "I'd rather type it"
+    },
+    "confirm": {
+      "pill": "Logged",
+      "title": "Just like that.",
+      "subtitle": "Numen understood what you said. Edit if something is off.",
+      "dijiste": "You said",
+      "when": "Today · 9:41 a.m.",
+      "category": "Category",
+      "account": "Account",
+      "defaultAccount": "Main account",
+      "continue": "On to Home",
+      "edit": "Edit this expense"
+    }
+  },
   "tabs": {
     "home": "Home",
     "movements": "Movements",
@@ -125,7 +226,8 @@
     "groups": {
       "myData": "My data",
       "app": "App",
-      "account": "Account"
+      "account": "Account",
+      "developer": "Developer"
     },
     "rows": {
       "accounts": {
@@ -159,6 +261,10 @@
       },
       "export": {
         "title": "Export data"
+      },
+      "resetOnboarding": {
+        "title": "Reset onboarding",
+        "subtitle": "Development only"
       }
     },
     "appearance": {

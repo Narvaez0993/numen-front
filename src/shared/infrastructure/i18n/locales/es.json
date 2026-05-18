@@ -76,6 +76,107 @@
     "conversation": "Conversación",
     "inputPlaceholder": "Pregúntame lo que sea…"
   },
+  "onboarding": {
+    "skip": "Saltar",
+    "welcome": {
+      "title1": "Olvídate de Excel.",
+      "subtitle1": "Lleva tus gastos diciéndolos en voz alta. La IA hace el resto.",
+      "title2": "Habla. No escribas.",
+      "subtitle2": "Dile a Numen \"café tres mil quinientos\" y queda registrado al instante. Sin formularios.",
+      "title3": "Tu plata, en tiempo real.",
+      "subtitle3": "Saldos, presupuestos y deudas en una sola pantalla. Sin Excel, sin fórmulas.",
+      "start": "Empezar",
+      "haveAccount": "Ya tengo cuenta"
+    },
+    "auth": {
+      "signup": {
+        "title": "Crea tu cuenta",
+        "subtitle": "En menos de un minuto y sin contraseñas."
+      },
+      "login": {
+        "title": "Bienvenido de vuelta",
+        "subtitle": "Continuemos donde lo dejaste."
+      },
+      "apple": "Continuar con Apple",
+      "google": "Continuar con Google",
+      "email": "Continuar con email",
+      "signupHint": "¿Ya tienes cuenta?",
+      "loginHint": "¿No tienes cuenta?",
+      "signupLink": "Iniciar sesión",
+      "loginLink": "Crear una",
+      "terms": "Al continuar aceptas los Términos y la Política de privacidad de Numen."
+    },
+    "perso": {
+      "step1": "Paso 1 de 2",
+      "step2": "Paso 2 de 2",
+      "continue": "Continuar",
+      "skip": "Saltar este paso",
+      "name": {
+        "title": "¿Cómo te llamas?",
+        "subtitle": "Numen te llamará así.",
+        "placeholder": "Tu nombre"
+      },
+      "goal": {
+        "title": "Hola, {{name}}. ¿Qué quieres lograr con Numen?",
+        "subtitle": "Esto nos ayuda a darte sugerencias relevantes.",
+        "friend": "amigo",
+        "gastos": {
+          "title": "Saber dónde se va mi plata",
+          "sub": "Tengo ingresos OK pero no sé en qué gasto."
+        },
+        "ahorrar": {
+          "title": "Ahorrar para algo específico",
+          "sub": "Tengo una meta y quiero llegar a ella."
+        },
+        "deudas": {
+          "title": "Salir de deudas",
+          "sub": "Quiero pagar tarjetas y dejar de deber."
+        }
+      }
+    },
+    "setup": {
+      "title": "Tu cuenta principal",
+      "subtitle": "Para empezar a llevar el saldo. Puedes agregar más después.",
+      "banks": {
+        "bbva": "BBVA",
+        "bancolombia": "Bancolombia",
+        "davivienda": "Davivienda",
+        "nu": "Nu",
+        "daviplata": "Daviplata",
+        "nequi": "Nequi",
+        "efectivo": "Efectivo",
+        "otro": "Otro"
+      },
+      "sheet": {
+        "title": "Saldo aproximado en {{bank}}",
+        "hint": "Estimado está bien. Lo puedes ajustar después.",
+        "save": "Guardar y continuar",
+        "skip": "No sé, saltar"
+      }
+    },
+    "magic": {
+      "step": "Paso 5 de 5",
+      "title": "Probemos la magia.",
+      "subtitle": "Toca el mic y dime un gasto que hiciste hoy.",
+      "recording": "Te escucho…",
+      "processing": "Procesando…",
+      "exampleLabel": "Ejemplo",
+      "example": "Café tres mil quinientos",
+      "preferText": "Prefiero escribirlo"
+    },
+    "confirm": {
+      "pill": "Registrado",
+      "title": "Así de fácil.",
+      "subtitle": "Numen entendió lo que dijiste. Edita si algo está mal.",
+      "dijiste": "Dijiste",
+      "when": "Hoy · 9:41 a.m.",
+      "category": "Categoría",
+      "account": "Cuenta",
+      "defaultAccount": "Cuenta principal",
+      "continue": "Sigamos a Inicio",
+      "edit": "Editar este gasto"
+    }
+  },
   "tabs": {
     "home": "Inicio",
     "movements": "Movimientos",
@@ -125,7 +226,8 @@
     "groups": {
       "myData": "Mis datos",
       "app": "App",
-      "account": "Cuenta"
+      "account": "Cuenta",
+      "developer": "Developer"
     },
     "rows": {
       "accounts": {
@@ -159,6 +261,10 @@
       },
       "export": {
         "title": "Exportar datos"
+      },
+      "resetOnboarding": {
+        "title": "Resetear onboarding",
+        "subtitle": "Solo en desarrollo"
       }
     },
     "appearance": {

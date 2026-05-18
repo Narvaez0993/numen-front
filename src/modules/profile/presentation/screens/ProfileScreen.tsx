@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import {
   SettingsGroup,
   SettingsRow,
@@ -94,6 +95,23 @@ export function ProfileScreen() {
           />
           <SettingsRow icon="download" title={t('profile.rows.export.title')} last />
         </SettingsGroup>
+
+        {__DEV__ ? (
+          <SettingsGroup label={t('profile.groups.developer')}>
+            <SettingsRow
+              icon="refresh"
+              iconColor="coral"
+              title={t('profile.rows.resetOnboarding.title')}
+              subtitle={t('profile.rows.resetOnboarding.subtitle')}
+              chevron={false}
+              last
+              onPress={() => {
+                useOnboardingStore.getState().reset();
+                router.replace('/(onboarding)');
+              }}
+            />
+          </SettingsGroup>
+        ) : null}
 
         <Pressable
           style={({ pressed }) => ({

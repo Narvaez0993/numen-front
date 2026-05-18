@@ -16,6 +16,9 @@ import { InMemoryHomeRepository } from '@/modules/home/infrastructure/repositori
 import type { MovementsRepository } from '@/modules/movements/application/ports/MovementsRepository';
 import { GetMovementsUseCase } from '@/modules/movements/application/use-cases/GetMovementsUseCase';
 import { InMemoryMovementsRepository } from '@/modules/movements/infrastructure/repositories/InMemoryMovementsRepository';
+import type { OnboardingRepository } from '@/modules/onboarding/application/ports/OnboardingRepository';
+import { CompleteOnboardingUseCase } from '@/modules/onboarding/application/use-cases/CompleteOnboardingUseCase';
+import { InMemoryOnboardingRepository } from '@/modules/onboarding/infrastructure/repositories/InMemoryOnboardingRepository';
 import type { ProfileRepository } from '@/modules/profile/application/ports/ProfileRepository';
 import { GetProfileUseCase } from '@/modules/profile/application/use-cases/GetProfileUseCase';
 import { InMemoryProfileRepository } from '@/modules/profile/infrastructure/repositories/InMemoryProfileRepository';
@@ -27,6 +30,7 @@ const expenseRepository: ExpenseRepository = new InMemoryExpenseRepository();
 const movementsRepository: MovementsRepository = new InMemoryMovementsRepository();
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
+const onboardingRepository: OnboardingRepository = new InMemoryOnboardingRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);
@@ -35,6 +39,9 @@ export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
+export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
+  onboardingRepository,
+);
 
 export const container = {
   authRepository,
@@ -44,6 +51,7 @@ export const container = {
   movementsRepository,
   budgetsRepository,
   assistantRepository,
+  onboardingRepository,
   loginUseCase,
   getHomeOverviewUseCase,
   getProfileUseCase,
@@ -51,4 +59,5 @@ export const container = {
   getMovementsUseCase,
   getBudgetsUseCase,
   getAssistantUseCase,
+  completeOnboardingUseCase,
 };

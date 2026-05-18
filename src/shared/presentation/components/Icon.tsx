@@ -140,6 +140,40 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M12 14l0 3',
     'M16 14l0 3',
   ],
+  cash: [
+    'M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z',
+    'M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+    'M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2',
+  ],
+
+  // Onboarding
+  'brand-apple': [
+    'M9 7c-3 0-4 3-4 5.5 0 3 2 7.5 4 7.5 1.088-.046 1.679-.5 3-.5 1.312 0 1.5.5 3 .5s4-3 4-5c-.028-.01-2.472-.403-2.5-3-.019-2.17 2.416-2.954 2.5-3-1.023-1.492-2.951-1.963-3.5-2-1.433-.111-2.83 1-3.5 1-.68 0-1.9-1-3-1z',
+    'M12 4a2 2 0 0 0 2-2a2 2 0 0 0-2 2',
+  ],
+  'brand-google': [
+    'M20.945 11a9 9 0 1 1 -3.284 -5.997l-2.655 2.392a5.5 5.5 0 1 0 2.585 6.605h-5.591v-3h8.945z',
+  ],
+  mail: [
+    'M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z',
+    'M3 7l9 6l9 -6',
+  ],
+  'pig-money': [
+    'M15 11v.01',
+    'M5.173 8.378a3 3 0 1 1 4.656 -1.377',
+    'M16 4v3.803a6.019 6.019 0 0 1 2.658 3.197h1.341a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-1.342c-.336 .95 -.907 1.8 -1.658 2.473v2.027a1.5 1.5 0 0 1 -3 0v-.583a6.04 6.04 0 0 1 -1 .083h-4a6.04 6.04 0 0 1 -1 -.083v.583a1.5 1.5 0 0 1 -3 0v-2.027a6 6 0 0 1 3 -10.473h2.5l4.5 -3z',
+  ],
+  'chain-off': [
+    'M3 3l18 18',
+    'M9 8h-1a4 4 0 0 0 -3.995 3.8l-.005 .2c0 .12 .005 .24 .015 .36',
+    'M16 8h2a4 4 0 0 1 4 4a4 4 0 0 1 -2 3.464',
+    'M9 12h2m4 0h1',
+  ],
+  'receipt-off': [
+    'M5 21v-13m0 -4h14v6m0 4v7l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2',
+    'M9 7h1m4 0h1',
+    'M3 3l18 18',
+  ],
 };
 
 export type IconName = keyof typeof TABLER_PATHS | string;
@@ -149,9 +183,16 @@ type IconProps = {
   size?: number;
   color?: string;
   stroke?: number;
+  filled?: boolean;
 };
 
-export function Icon({ name, size = 18, color = 'currentColor', stroke = 2 }: IconProps) {
+export function Icon({
+  name,
+  size = 18,
+  color = 'currentColor',
+  stroke = 2,
+  filled = false,
+}: IconProps) {
   const paths = TABLER_PATHS[name];
   if (!paths) return null;
   return (
@@ -159,7 +200,7 @@ export function Icon({ name, size = 18, color = 'currentColor', stroke = 2 }: Ic
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
+      fill={filled ? color : 'none'}
       stroke={color}
       strokeWidth={stroke}
       strokeLinecap="round"
