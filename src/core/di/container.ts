@@ -1,6 +1,9 @@
 import { LoginUseCase } from '@/modules/auth/application';
 import { AuthRepository } from '@/modules/auth/domain';
 import { InMemoryAuthRepository } from '@/modules/auth/infrastructure';
+import type { BudgetsRepository } from '@/modules/budgets/application/ports/BudgetsRepository';
+import { GetBudgetsUseCase } from '@/modules/budgets/application/use-cases/GetBudgetsUseCase';
+import { InMemoryBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/InMemoryBudgetsRepository';
 import type { ExpenseRepository } from '@/modules/expenses/application/ports/ExpenseRepository';
 import { CreateExpensesUseCase } from '@/modules/expenses/application/use-cases/CreateExpensesUseCase';
 import { InMemoryExpenseRepository } from '@/modules/expenses/infrastructure/repositories/InMemoryExpenseRepository';
@@ -19,12 +22,14 @@ const homeRepository: HomeRepository = new InMemoryHomeRepository();
 const profileRepository: ProfileRepository = new InMemoryProfileRepository();
 const expenseRepository: ExpenseRepository = new InMemoryExpenseRepository();
 const movementsRepository: MovementsRepository = new InMemoryMovementsRepository();
+const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);
 export const getProfileUseCase = new GetProfileUseCase(profileRepository);
 export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository);
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
+export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
 
 export const container = {
   authRepository,
@@ -32,9 +37,11 @@ export const container = {
   profileRepository,
   expenseRepository,
   movementsRepository,
+  budgetsRepository,
   loginUseCase,
   getHomeOverviewUseCase,
   getProfileUseCase,
   createExpensesUseCase,
   getMovementsUseCase,
+  getBudgetsUseCase,
 };

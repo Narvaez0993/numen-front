@@ -37,6 +37,37 @@
       "hint": "Try changing the filters or the search"
     }
   },
+  "budgets": {
+    "title": "Budgets",
+    "subtitle": "May · live tracking",
+    "month": {
+      "label": "May budget",
+      "daysLeft": "days left",
+      "daysLeftOne": "day left",
+      "of": "of",
+      "youCarry": "You're at",
+      "ofTheMonth": "of the month",
+      "available": "Available",
+      "dailySuggested": "Daily suggested"
+    },
+    "projection": {
+      "willEnd": "At this pace you'll end the month at",
+      "over": "above your target"
+    },
+    "byCategory": "By category",
+    "urgencyOrder": "ordered by urgency",
+    "used": "used",
+    "remaining": "{{amount}} left",
+    "over": "{{amount}} over",
+    "topMerchants": "Top merchants",
+    "viewAll": "View all",
+    "addCategory": "Add category",
+    "plusUpsell": {
+      "text": "Category-level budgets is a",
+      "label": "Plus",
+      "cta": "View plan"
+    }
+  },
   "tabs": {
     "home": "Home",
     "movements": "Movements",

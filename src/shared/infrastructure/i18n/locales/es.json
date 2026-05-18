@@ -37,6 +37,37 @@
       "hint": "Probá cambiar los filtros o la búsqueda"
     }
   },
+  "budgets": {
+    "title": "Presupuestos",
+    "subtitle": "Mayo · seguimiento en vivo",
+    "month": {
+      "label": "Presupuesto de mayo",
+      "daysLeft": "días restantes",
+      "daysLeftOne": "día restante",
+      "of": "de",
+      "youCarry": "Llevas",
+      "ofTheMonth": "del mes",
+      "available": "Disponible",
+      "dailySuggested": "Diario sugerido"
+    },
+    "projection": {
+      "willEnd": "A tu ritmo cerrarás el mes en",
+      "over": "por encima de tu meta"
+    },
+    "byCategory": "Por categoría",
+    "urgencyOrder": "orden por urgencia",
+    "used": "usado",
+    "remaining": "quedan {{amount}}",
+    "over": "{{amount}} sobre",
+    "topMerchants": "Merchants principales",
+    "viewAll": "Ver todos",
+    "addCategory": "Agregar categoría",
+    "plusUpsell": {
+      "text": "Presupuestos por categoría es una feature de",
+      "label": "Plus",
+      "cta": "Ver plan"
+    }
+  },
   "tabs": {
     "home": "Inicio",
     "movements": "Movimientos",
