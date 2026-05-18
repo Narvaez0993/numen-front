@@ -93,9 +93,9 @@
       }
     },
     "appearance": {
-      "dark": "Oscuro",
-      "light": "Claro",
-      "auto": "Automático"
+      "dark": "Dark",
+      "light": "Light",
+      "auto": "Auto"
     }
   },
   "notFound": {

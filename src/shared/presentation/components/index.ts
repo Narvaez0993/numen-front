@@ -13,3 +13,4 @@ export * from './FAB';
 export * from './SettingsGroup';
 export * from './SettingsRow';
 export * from './SubScreenHeader';
+export * from './ThemedStatusBar';

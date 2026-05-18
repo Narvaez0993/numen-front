@@ -67,7 +67,7 @@ const darkColors: ColorScheme = {
 };
 
 const lightColors: ColorScheme = {
-  bgBase: '#F7F8FB',
+  bgBase: '#FFFFFF',
   bgSurface: '#FFFFFF',
   bgFloat: '#F0F2F7',
   bgElevated: '#E8EBF2',
