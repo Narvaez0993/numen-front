@@ -39,7 +39,7 @@ export function HomeScreen() {
       <ScrollView
         contentContainerStyle={{
           paddingTop: 14,
-          paddingBottom: 130,
+          paddingBottom: 32,
           paddingHorizontal: 16,
         }}
         showsVerticalScrollIndicator={false}
