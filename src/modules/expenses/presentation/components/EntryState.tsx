@@ -5,7 +5,7 @@ import { Pressable, View } from 'react-native';
 import { Icon, IconName, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import { useExpenseSheetStore, type SheetFlow } from '../stores/useExpenseSheetStore';
+import { useExpenseSheetStore } from '../stores/useExpenseSheetStore';
 
 import { RecordingMic, WaveVisualizer } from './RecordingMic';
 
@@ -17,9 +17,19 @@ export function EntryState() {
   const { t } = useTranslation();
   const flow = useExpenseSheetStore((s) => s.flow);
   const setFlow = useExpenseSheetStore((s) => s.setFlow);
+  const setMethod = useExpenseSheetStore((s) => s.setMethod);
 
   const recording = flow === 'recording';
   const processing = flow === 'processing';
+
+  const goPhoto = () => {
+    setMethod('photo');
+    setFlow('photo');
+  };
+  const goWriting = () => {
+    setMethod('text');
+    setFlow('writing');
+  };
 
   useEffect(() => {
     if (recording) {
@@ -70,7 +80,7 @@ export function EntryState() {
 
       <View style={{ alignItems: 'center', paddingVertical: 22 }}>
         <RecordingMic
-          state={flow as Exclude<SheetFlow, 'confirm'>}
+          state={flow as 'entry' | 'recording' | 'processing'}
           onPress={handleMicPress}
         />
 
@@ -106,17 +116,34 @@ export function EntryState() {
         }}
         pointerEvents={flow === 'entry' ? 'auto' : 'none'}
       >
-        <SecondaryBtn icon="camera" label={t('expenses.sheet.photoReceipt')} />
-        <SecondaryBtn icon="pencil" label={t('expenses.sheet.write')} />
+        <SecondaryBtn
+          icon="camera"
+          label={t('expenses.sheet.photoReceipt')}
+          onPress={goPhoto}
+        />
+        <SecondaryBtn
+          icon="pencil"
+          label={t('expenses.sheet.write')}
+          onPress={goWriting}
+        />
       </View>
     </View>
   );
 }
 
-function SecondaryBtn({ icon, label }: { icon: IconName; label: string }) {
+function SecondaryBtn({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: IconName;
+  label: string;
+  onPress: () => void;
+}) {
   const { theme } = useTheme();
   return (
     <Pressable
+      onPress={onPress}
       style={({ pressed }) => ({
         flex: 1,
         flexDirection: 'row',

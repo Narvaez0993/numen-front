@@ -299,7 +299,41 @@
       "amount": "Amount",
       "addAnother": "Add another",
       "total": "Total",
-      "save": "Save expenses"
+      "save": "Save expenses",
+      "back": "Back",
+      "writing": {
+        "title": "Write expense",
+        "subtitle": "Type one or several, AI splits them",
+        "placeholder": "Describe your expenses. e.g. taxi to work nine thousand and lunch at juan valdez",
+        "iaHint": "Identifies amount, category and account automatically",
+        "examplesLabel": "Examples",
+        "examples": [
+          "Taxi to work, 9,000",
+          "Lunch at Crepes, 25,000",
+          "Carulla grocery 68,400",
+          "Coffee Juan Valdez 5,500"
+        ],
+        "cta": "Process with AI"
+      },
+      "photo": {
+        "title": "Receipt photo",
+        "subtitle": "AI extracts everything from the receipt",
+        "dropzoneTitle": "Take or upload a photo",
+        "dropzoneHint": "JPG, PNG · max 10 MB",
+        "iaHint": "We detect merchant, amount, date and category automatically.",
+        "take": "Take photo",
+        "gallery": "Choose from gallery",
+        "analyzing": "Analyzing receipt…",
+        "demoTranscript": "Carulla receipt · May 14, 2026"
+      },
+      "quote": {
+        "voice": "You said",
+        "text": "You wrote",
+        "photo": "Detected from receipt"
+      },
+      "transcript": {
+        "voice": "taxi to work, nine thousand and lunch at juan valdez eighteen thousand"
+      }
     },
     "toast": {
       "saved": "{{count}} expenses saved · {{total}}",

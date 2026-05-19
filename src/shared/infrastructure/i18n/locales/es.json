@@ -299,7 +299,41 @@
       "amount": "Monto",
       "addAnother": "Agregar otro",
       "total": "Total",
-      "save": "Guardar gastos"
+      "save": "Guardar gastos",
+      "back": "Volver",
+      "writing": {
+        "title": "Escribir gasto",
+        "subtitle": "Tipea uno o varios, la IA los separa",
+        "placeholder": "Describe tus gastos. ej: taxi al trabajo nueve mil y almuerzo en juan valdez",
+        "iaHint": "Identifica monto, categoría y cuenta automáticamente",
+        "examplesLabel": "Ejemplos",
+        "examples": [
+          "Taxi al trabajo, 9.000",
+          "Almuerzo en Crepes, 25.000",
+          "Mercado Carulla 68.400",
+          "Café Juan Valdez 5.500"
+        ],
+        "cta": "Procesar con IA"
+      },
+      "photo": {
+        "title": "Foto del recibo",
+        "subtitle": "La IA extrae todo del recibo",
+        "dropzoneTitle": "Toma o sube una foto",
+        "dropzoneHint": "JPG, PNG · máx 10 MB",
+        "iaHint": "Detectamos comercio, monto, fecha y categoría automáticamente.",
+        "take": "Tomar foto",
+        "gallery": "Elegir de galería",
+        "analyzing": "Analizando recibo…",
+        "demoTranscript": "Recibo de Carulla · 14 may 2026"
+      },
+      "quote": {
+        "voice": "Dijiste",
+        "text": "Escribiste",
+        "photo": "Detectado en el recibo"
+      },
+      "transcript": {
+        "voice": "taxi al trabajo, nueve mil y almuerzo en juan valdez dieciocho mil"
+      }
     },
     "toast": {
       "saved": "{{count}} gastos guardados · {{total}}",
