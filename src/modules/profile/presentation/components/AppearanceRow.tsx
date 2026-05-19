@@ -13,7 +13,7 @@ export function AppearanceRow({ last = false }: Props) {
   return (
     <SettingsRow
       icon="palette"
-      iconColor="neutral"
+      iconColor="pink"
       title={t('profile.rows.appearance.title')}
       value={t(`profile.appearance.${mode}`)}
       last={last}
