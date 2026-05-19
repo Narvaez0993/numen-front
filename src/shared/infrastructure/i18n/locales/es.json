@@ -68,6 +68,20 @@
       "cta": "Ver plan"
     }
   },
+  "subscriptions": {
+    "title": "Suscripciones",
+    "monthlyTotal": {
+      "label": "Total mensual",
+      "breakdown_one": "{{count}} activa · proyección anual {{yearly}}",
+      "breakdown_other": "{{count}} activas · proyección anual {{yearly}}"
+    },
+    "card": {
+      "cadence": "Cada {{days}} días · {{account}}",
+      "next_one": "En {{count}} día",
+      "next_other": "En {{count}} días"
+    },
+    "add": "Agregar suscripción"
+  },
   "accounts": {
     "title": "Fuentes y cuentas",
     "netBalance": {

@@ -65,6 +65,7 @@ export function ProfileScreen() {
             iconColor="amber"
             title={t('profile.rows.subs.title')}
             subtitle={t('profile.rows.subs.subtitle')}
+            onPress={() => router.push('/subscriptions')}
           />
           <SettingsRow
             icon="tag"

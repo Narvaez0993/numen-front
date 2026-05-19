@@ -25,6 +25,9 @@ import { InMemoryOnboardingRepository } from '@/modules/onboarding/infrastructur
 import type { ProfileRepository } from '@/modules/profile/application/ports/ProfileRepository';
 import { GetProfileUseCase } from '@/modules/profile/application/use-cases/GetProfileUseCase';
 import { InMemoryProfileRepository } from '@/modules/profile/infrastructure/repositories/InMemoryProfileRepository';
+import type { SubscriptionsRepository } from '@/modules/subscriptions/application/ports/SubscriptionsRepository';
+import { GetSubscriptionsUseCase } from '@/modules/subscriptions/application/use-cases/GetSubscriptionsUseCase';
+import { InMemorySubscriptionsRepository } from '@/modules/subscriptions/infrastructure/repositories/InMemorySubscriptionsRepository';
 
 const authRepository: AuthRepository = new InMemoryAuthRepository();
 const homeRepository: HomeRepository = new InMemoryHomeRepository();
@@ -34,6 +37,8 @@ const movementsRepository: MovementsRepository = new InMemoryMovementsRepository
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
 const accountsRepository: AccountsRepository = new InMemoryAccountsRepository();
+const subscriptionsRepository: SubscriptionsRepository =
+  new InMemorySubscriptionsRepository();
 const onboardingRepository: OnboardingRepository = new InMemoryOnboardingRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
@@ -45,6 +50,9 @@ export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
+);
+export const getSubscriptionsUseCase = new GetSubscriptionsUseCase(
+  subscriptionsRepository,
 );
 export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   onboardingRepository,
@@ -59,6 +67,7 @@ export const container = {
   budgetsRepository,
   assistantRepository,
   accountsRepository,
+  subscriptionsRepository,
   onboardingRepository,
   loginUseCase,
   getHomeOverviewUseCase,
@@ -68,5 +77,6 @@ export const container = {
   getBudgetsUseCase,
   getAssistantUseCase,
   getAccountsOverviewUseCase,
+  getSubscriptionsUseCase,
   completeOnboardingUseCase,
 };
