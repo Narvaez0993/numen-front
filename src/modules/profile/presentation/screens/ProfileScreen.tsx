@@ -73,6 +73,7 @@ export function ProfileScreen() {
             title={t('profile.rows.categories.title')}
             subtitle={t('profile.rows.categories.subtitle')}
             last
+            onPress={() => router.push('/categories')}
           />
         </SettingsGroup>
 

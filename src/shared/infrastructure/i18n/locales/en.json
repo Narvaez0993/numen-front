@@ -68,6 +68,38 @@
       "cta": "View plan"
     }
   },
+  "categories": {
+    "title": "Categories",
+    "thisMonth": {
+      "label": "This month",
+      "breakdown_one": "{{count}} category with activity · {{total}} standard available",
+      "breakdown_other": "{{count}} categories with activity · {{total}} standard available"
+    },
+    "searchPlaceholder": "Search category…",
+    "empty": "No results",
+    "groups": {
+      "standard": "Standard · {{count}}",
+      "custom": "Custom"
+    },
+    "row": {
+      "noMovements": "No movements this month",
+      "movements_one": "{{count}} expense · this month",
+      "movements_other": "{{count}} expenses · this month"
+    },
+    "upsell": {
+      "title": "Create your own categories",
+      "plus": "Plus",
+      "description": "Pick name, icon and color. Create individual budgets for each one.",
+      "preview": {
+        "mascotas": "Pets",
+        "gym": "Gym",
+        "cursos": "Courses",
+        "streaming": "Streaming"
+      },
+      "cta": "Learn about Plus"
+    },
+    "footer": "Tap any category to change its icon or color."
+  },
   "subscriptions": {
     "title": "Subscriptions",
     "monthlyTotal": {

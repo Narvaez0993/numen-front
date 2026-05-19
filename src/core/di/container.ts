@@ -4,6 +4,9 @@ import { InMemoryAccountsRepository } from '@/modules/accounts/infrastructure/re
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
 import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUseCase';
 import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
+import type { CategoriesRepository } from '@/modules/categories/application/ports/CategoriesRepository';
+import { GetCategoriesUseCase } from '@/modules/categories/application/use-cases/GetCategoriesUseCase';
+import { InMemoryCategoriesRepository } from '@/modules/categories/infrastructure/repositories/InMemoryCategoriesRepository';
 import { LoginUseCase } from '@/modules/auth/application';
 import { AuthRepository } from '@/modules/auth/domain';
 import { InMemoryAuthRepository } from '@/modules/auth/infrastructure';
@@ -39,6 +42,7 @@ const assistantRepository: AssistantRepository = new InMemoryAssistantRepository
 const accountsRepository: AccountsRepository = new InMemoryAccountsRepository();
 const subscriptionsRepository: SubscriptionsRepository =
   new InMemorySubscriptionsRepository();
+const categoriesRepository: CategoriesRepository = new InMemoryCategoriesRepository();
 const onboardingRepository: OnboardingRepository = new InMemoryOnboardingRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
@@ -54,6 +58,7 @@ export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
 export const getSubscriptionsUseCase = new GetSubscriptionsUseCase(
   subscriptionsRepository,
 );
+export const getCategoriesUseCase = new GetCategoriesUseCase(categoriesRepository);
 export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   onboardingRepository,
 );
@@ -68,6 +73,7 @@ export const container = {
   assistantRepository,
   accountsRepository,
   subscriptionsRepository,
+  categoriesRepository,
   onboardingRepository,
   loginUseCase,
   getHomeOverviewUseCase,
@@ -78,5 +84,6 @@ export const container = {
   getAssistantUseCase,
   getAccountsOverviewUseCase,
   getSubscriptionsUseCase,
+  getCategoriesUseCase,
   completeOnboardingUseCase,
 };
