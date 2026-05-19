@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
@@ -99,6 +100,7 @@ export function CustomCategoriesUpsell() {
 
       <Pressable
         accessibilityRole="button"
+        onPress={() => router.push('/plan')}
         style={({ pressed }) => ({
           flexDirection: 'row',
           alignItems: 'center',

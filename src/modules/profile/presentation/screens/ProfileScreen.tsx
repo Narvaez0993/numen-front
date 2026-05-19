@@ -95,6 +95,7 @@ export function ProfileScreen() {
             icon="star"
             title={t('profile.rows.plan.title')}
             value={t('profile.rows.plan.value')}
+            onPress={() => router.push('/plan')}
           />
           <SettingsRow icon="download" title={t('profile.rows.export.title')} last />
         </SettingsGroup>

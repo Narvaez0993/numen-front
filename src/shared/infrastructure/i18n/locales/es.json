@@ -68,6 +68,19 @@
       "cta": "Ver plan"
     }
   },
+  "plan": {
+    "title": "Tu plan",
+    "period": {
+      "mensual": "Mensual",
+      "anual": "Anual",
+      "savings": "-25%"
+    },
+    "status": {
+      "current": "Tu plan",
+      "recommended": "Recomendado"
+    },
+    "footer": "7 días gratis · cancela cuando quieras"
+  },
   "categories": {
     "title": "Categorías",
     "thisMonth": {

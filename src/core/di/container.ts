@@ -25,6 +25,9 @@ import { InMemoryMovementsRepository } from '@/modules/movements/infrastructure/
 import type { OnboardingRepository } from '@/modules/onboarding/application/ports/OnboardingRepository';
 import { CompleteOnboardingUseCase } from '@/modules/onboarding/application/use-cases/CompleteOnboardingUseCase';
 import { InMemoryOnboardingRepository } from '@/modules/onboarding/infrastructure/repositories/InMemoryOnboardingRepository';
+import type { PlanRepository } from '@/modules/plan/application/ports/PlanRepository';
+import { GetPlanComparisonUseCase } from '@/modules/plan/application/use-cases/GetPlanComparisonUseCase';
+import { InMemoryPlanRepository } from '@/modules/plan/infrastructure/repositories/InMemoryPlanRepository';
 import type { ProfileRepository } from '@/modules/profile/application/ports/ProfileRepository';
 import { GetProfileUseCase } from '@/modules/profile/application/use-cases/GetProfileUseCase';
 import { InMemoryProfileRepository } from '@/modules/profile/infrastructure/repositories/InMemoryProfileRepository';
@@ -43,6 +46,7 @@ const accountsRepository: AccountsRepository = new InMemoryAccountsRepository();
 const subscriptionsRepository: SubscriptionsRepository =
   new InMemorySubscriptionsRepository();
 const categoriesRepository: CategoriesRepository = new InMemoryCategoriesRepository();
+const planRepository: PlanRepository = new InMemoryPlanRepository();
 const onboardingRepository: OnboardingRepository = new InMemoryOnboardingRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
@@ -59,6 +63,7 @@ export const getSubscriptionsUseCase = new GetSubscriptionsUseCase(
   subscriptionsRepository,
 );
 export const getCategoriesUseCase = new GetCategoriesUseCase(categoriesRepository);
+export const getPlanComparisonUseCase = new GetPlanComparisonUseCase(planRepository);
 export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   onboardingRepository,
 );
@@ -74,6 +79,7 @@ export const container = {
   accountsRepository,
   subscriptionsRepository,
   categoriesRepository,
+  planRepository,
   onboardingRepository,
   loginUseCase,
   getHomeOverviewUseCase,
@@ -85,5 +91,6 @@ export const container = {
   getAccountsOverviewUseCase,
   getSubscriptionsUseCase,
   getCategoriesUseCase,
+  getPlanComparisonUseCase,
   completeOnboardingUseCase,
 };

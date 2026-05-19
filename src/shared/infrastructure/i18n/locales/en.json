@@ -68,6 +68,19 @@
       "cta": "View plan"
     }
   },
+  "plan": {
+    "title": "Your plan",
+    "period": {
+      "mensual": "Monthly",
+      "anual": "Yearly",
+      "savings": "-25%"
+    },
+    "status": {
+      "current": "Your plan",
+      "recommended": "Recommended"
+    },
+    "footer": "7-day free trial · cancel any time"
+  },
   "categories": {
     "title": "Categories",
     "thisMonth": {
