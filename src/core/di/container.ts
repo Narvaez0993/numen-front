@@ -1,3 +1,6 @@
+import type { AccountsRepository } from '@/modules/accounts/application/ports/AccountsRepository';
+import { GetAccountsOverviewUseCase } from '@/modules/accounts/application/use-cases/GetAccountsOverviewUseCase';
+import { InMemoryAccountsRepository } from '@/modules/accounts/infrastructure/repositories/InMemoryAccountsRepository';
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
 import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUseCase';
 import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
@@ -30,6 +33,7 @@ const expenseRepository: ExpenseRepository = new InMemoryExpenseRepository();
 const movementsRepository: MovementsRepository = new InMemoryMovementsRepository();
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
+const accountsRepository: AccountsRepository = new InMemoryAccountsRepository();
 const onboardingRepository: OnboardingRepository = new InMemoryOnboardingRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
@@ -39,6 +43,9 @@ export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
+export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
+  accountsRepository,
+);
 export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   onboardingRepository,
 );
@@ -51,6 +58,7 @@ export const container = {
   movementsRepository,
   budgetsRepository,
   assistantRepository,
+  accountsRepository,
   onboardingRepository,
   loginUseCase,
   getHomeOverviewUseCase,
@@ -59,5 +67,6 @@ export const container = {
   getMovementsUseCase,
   getBudgetsUseCase,
   getAssistantUseCase,
+  getAccountsOverviewUseCase,
   completeOnboardingUseCase,
 };

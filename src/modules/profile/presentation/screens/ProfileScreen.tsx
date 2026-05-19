@@ -58,6 +58,7 @@ export function ProfileScreen() {
             iconColor="mint"
             title={t('profile.rows.accounts.title')}
             subtitle={t('profile.rows.accounts.subtitle')}
+            onPress={() => router.push('/accounts')}
           />
           <SettingsRow
             icon="refresh"

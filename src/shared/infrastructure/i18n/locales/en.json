@@ -68,6 +68,29 @@
       "cta": "View plan"
     }
   },
+  "accounts": {
+    "title": "Sources and accounts",
+    "netBalance": {
+      "label": "Net balance",
+      "breakdown_one": "{{accounts}} account + cash − {{cards}} CC",
+      "breakdown_other": "{{accounts}} accounts + cash − {{cards}} CC"
+    },
+    "groups": {
+      "debit": "Debit and cash",
+      "credit": "Credit cards"
+    },
+    "tc": {
+      "debt": "Current debt",
+      "usage": "{{pct}}% of limit",
+      "limit": "{{amount}} limit",
+      "cutoff": "Cutoff {{day}}",
+      "due": "Next payment {{date}}"
+    },
+    "add": {
+      "account": "Add account",
+      "card": "Add card"
+    }
+  },
   "assistant": {
     "title": "Assistant",
     "greeting": "How can I help, Sebastián?",

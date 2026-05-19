@@ -68,6 +68,29 @@
       "cta": "Ver plan"
     }
   },
+  "accounts": {
+    "title": "Fuentes y cuentas",
+    "netBalance": {
+      "label": "Saldo neto",
+      "breakdown_one": "{{accounts}} cuenta + efectivo − {{cards}} TC",
+      "breakdown_other": "{{accounts}} cuentas + efectivo − {{cards}} TC"
+    },
+    "groups": {
+      "debit": "Débito y efectivo",
+      "credit": "Tarjetas de crédito"
+    },
+    "tc": {
+      "debt": "Deuda actual",
+      "usage": "{{pct}}% del cupo",
+      "limit": "{{amount}} de cupo",
+      "cutoff": "Corte {{day}}",
+      "due": "Pago próximo {{date}}"
+    },
+    "add": {
+      "account": "Agregar cuenta",
+      "card": "Agregar tarjeta"
+    }
+  },
   "assistant": {
     "title": "Asistente",
     "greeting": "¿En qué te ayudo, Sebastián?",
