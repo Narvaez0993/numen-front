@@ -1,5 +1,14 @@
-import { ReactNode } from 'react';
-import { type DimensionValue, Modal, Pressable, View, ViewStyle } from 'react-native';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  type DimensionValue,
+  Dimensions,
+  Easing,
+  Modal,
+  Pressable,
+  View,
+  type ViewStyle,
+} from 'react-native';
 
 import { useTheme } from '../theme';
 
@@ -17,6 +26,8 @@ type Props = {
   contentStyle?: ViewStyle;
 };
 
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
 export function BottomSheet({
   visible,
   onClose,
@@ -27,17 +38,61 @@ export function BottomSheet({
 }: Props) {
   const { theme, mode } = useTheme();
 
+  // Mount/unmount the Modal off the animation, so the closing animation can
+  // play before the Modal is removed.
+  const [mounted, setMounted] = useState(visible);
+  const scrimOpacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      Animated.parallel([
+        Animated.timing(scrimOpacity, {
+          toValue: 1,
+          duration: 220,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 320,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else if (mounted) {
+      Animated.parallel([
+        Animated.timing(scrimOpacity, {
+          toValue: 0,
+          duration: 180,
+          easing: Easing.in(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: SCREEN_HEIGHT,
+          duration: 240,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start(({ finished }) => {
+        if (finished) setMounted(false);
+      });
+    }
+  }, [visible, mounted, scrimOpacity, translateY]);
+
+  if (!mounted) return null;
+
   return (
     <Modal
-      visible={visible}
+      visible
       transparent
-      animationType="slide"
+      animationType="none"
       statusBarTranslucent
       onRequestClose={onClose}
     >
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-        <Pressable
-          onPress={onClose}
+        <Animated.View
           style={{
             position: 'absolute',
             top: 0,
@@ -45,9 +100,17 @@ export function BottomSheet({
             right: 0,
             bottom: 0,
             backgroundColor: theme.colors.scrim,
+            opacity: scrimOpacity,
           }}
-        />
-        <View
+        >
+          <Pressable
+            onPress={onClose}
+            style={{ flex: 1 }}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+          />
+        </Animated.View>
+        <Animated.View
           style={[
             {
               backgroundColor: theme.colors.bgSurface,
@@ -55,21 +118,16 @@ export function BottomSheet({
               borderTopRightRadius: 26,
               maxHeight,
               overflow: 'hidden',
+              transform: [{ translateY }],
               ...(mode === 'light'
                 ? {
                     shadowColor: '#000',
-                    shadowOpacity: 0.08,
-                    shadowOffset: { width: 0, height: -4 },
-                    shadowRadius: 24,
-                    elevation: 24,
+                    shadowOpacity: 0.06,
+                    shadowOffset: { width: 0, height: -2 },
+                    shadowRadius: 8,
+                    elevation: 4,
                   }
-                : {
-                    shadowColor: '#000',
-                    shadowOpacity: 0.3,
-                    shadowOffset: { width: 0, height: -4 },
-                    shadowRadius: 24,
-                    elevation: 24,
-                  }),
+                : {}),
             },
             contentStyle,
           ]}
@@ -110,7 +168,7 @@ export function BottomSheet({
           ) : null}
 
           {children}
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
