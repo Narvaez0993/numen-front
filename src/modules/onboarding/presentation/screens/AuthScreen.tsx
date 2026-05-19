@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -75,15 +75,17 @@ export function AuthScreen({ mode, onBack, onAuthSuccess, onModeChange }: Props)
       <View style={{ height: 36 }} />
 
       <View style={{ gap: 10 }}>
-        <AuthButton
-          icon="brand-apple"
-          iconFilled
-          label={t('onboarding.auth.apple')}
-          loading={loading === 'apple'}
-          disabled={loading !== null && loading !== 'apple'}
-          variant="apple"
-          onPress={() => void handleAuth('apple')}
-        />
+        {Platform.OS === 'ios' ? (
+          <AuthButton
+            icon="brand-apple"
+            iconFilled
+            label={t('onboarding.auth.apple')}
+            loading={loading === 'apple'}
+            disabled={loading !== null && loading !== 'apple'}
+            variant="apple"
+            onPress={() => void handleAuth('apple')}
+          />
+        ) : null}
         <AuthButton
           icon="brand-google"
           label={t('onboarding.auth.google')}
