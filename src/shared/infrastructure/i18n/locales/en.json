@@ -40,6 +40,7 @@
   "budgets": {
     "title": "Budgets",
     "subtitle": "May · live tracking",
+    "noActiveBudget": "No active budget",
     "month": {
       "label": "May budget",
       "daysLeft": "days left",
@@ -61,11 +62,95 @@
     "over": "{{amount}} over",
     "topMerchants": "Top merchants",
     "viewAll": "View all",
+    "editTope": "Edit cap",
     "addCategory": "Add category",
     "plusUpsell": {
-      "text": "Category-level budgets is a",
+      "text": "Create custom categories with",
       "label": "Plus",
       "cta": "View plan"
+    },
+    "emptyA": {
+      "title": "Set your budget",
+      "body": "Decide how much you don't want to spend this month. Numen helps you stay on track.",
+      "cta": "Create monthly budget"
+    },
+    "emptyB": {
+      "title": "Watch specific categories",
+      "body": "Get alerts when a category gets close to its cap.",
+      "cta": "Add a category to watch"
+    },
+    "editTecho": {
+      "title": "Your {{month}} cap",
+      "subtitle": "Edit the amount if you need to. Applies to this month only.",
+      "helper": "The change applies only to {{month}}. Future months keep the original value.",
+      "applyFuture": "Apply to future months too",
+      "applyFutureHint": "Updates the default value starting next month.",
+      "save": "Save",
+      "delete": "Delete budget"
+    },
+    "editTopeSheet": {
+      "title": "Cap for {{name}}",
+      "subtitle": "Numen will warn you when you're close to this amount.",
+      "carry": "You've spent {{amount}} this month",
+      "save": "Save cap",
+      "activate": "Activate cap",
+      "delete": "Delete cap"
+    },
+    "addVigilance": {
+      "title": "Watch a category",
+      "subtitle": "Pick a category and set its cap.",
+      "spent": "{{amount}} spent · no cap",
+      "add": "Add",
+      "allWatchedTitle": "You're already watching every category",
+      "allWatchedHint": "Tap them in the Budgets list to edit the caps."
+    },
+    "confirmSheet": {
+      "techoTitle": "Delete your {{month}} budget?",
+      "techoBody": "The per-category caps will also be removed. This action can't be undone.",
+      "techoCta": "Delete budget",
+      "topeTitle": "Delete the cap for {{name}}?",
+      "topeBody": "The category will keep showing under 'No cap' this month. You can turn it back on whenever you want.",
+      "topeCta": "Delete cap",
+      "cancel": "Cancel"
+    },
+    "create": {
+      "step": "Step {{current}} of {{total}}",
+      "skip": "Skip",
+      "next": "Continue",
+      "save": "Save budget",
+      "step1": {
+        "title": "Your {{month}} budget",
+        "subtitle": "How much don't you want to spend this month?",
+        "helper": "You can adjust it later if you need."
+      },
+      "step2": {
+        "title": "Want to watch any category?",
+        "subtitle": "Turn on caps for categories where you want extra self-control. It's optional.",
+        "infoPart1": "Caps ",
+        "infoBold": "aren't additional",
+        "infoPart2": " — every expense counts toward your cap of ",
+        "infoPart3": ". Caps just warn you when a specific category gets close to its limit.",
+        "categoriesLabel": "Categories",
+        "tope": "Cap {{amount}}",
+        "noTope": "No cap",
+        "createCategory": "Don't see one? Create category",
+        "exitTitle": "Leave without creating the budget?",
+        "exitBody": "You'll lose the changes you've made.",
+        "exitCta": "Leave"
+      }
+    },
+    "createCategory": {
+      "title": "New category",
+      "plus": "Plus",
+      "subtitle": "Name it however you want, pick an icon and color.",
+      "preview": "Preview",
+      "previewPlaceholder": "Your category",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Pets, Gym, Courses",
+      "iconLabel": "Icon",
+      "colorLabel": "Color",
+      "save": "Create category",
+      "footnote": "Custom categories are part of Plus."
     }
   },
   "plan": {

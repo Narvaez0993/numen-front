@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
-import { Icon, Text } from '@/shared/presentation/components';
+import { Text } from '@/shared/presentation/components';
 import { AccentColor, accentColorKey, useTheme } from '@/shared/presentation/theme';
 import { formatCOP } from '@/shared/presentation/utils/formatCOP';
 
@@ -18,13 +18,7 @@ export function MerchantList({ merchants, color }: Props) {
   const dotColor = theme.colors[accentColorKey(color, 'fg')];
 
   return (
-    <View
-      style={{
-        borderTopColor: theme.colors.borderSubtle,
-        borderTopWidth: 1,
-        paddingTop: 12,
-      }}
-    >
+    <View>
       <Text
         variant="micro"
         muted
@@ -73,32 +67,6 @@ export function MerchantList({ merchants, color }: Props) {
           </View>
         ))}
       </View>
-
-      <Pressable
-        style={({ pressed }) => ({
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 6,
-          alignSelf: 'flex-start',
-          marginTop: 10,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          borderRadius: 10,
-          backgroundColor: theme.colors.bgFloat,
-          borderColor: theme.colors.borderSubtle,
-          borderWidth: 1,
-          opacity: pressed ? 0.85 : 1,
-        })}
-      >
-        <Text
-          variant="label"
-          color={theme.colors.textSecondary}
-          style={{ fontSize: 11.5 }}
-        >
-          {t('budgets.viewAll')}
-        </Text>
-        <Icon name="chevron-right" size={11} color={theme.colors.textSecondary} />
-      </Pressable>
     </View>
   );
 }

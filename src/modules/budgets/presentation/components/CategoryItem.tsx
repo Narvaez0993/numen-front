@@ -11,16 +11,27 @@ import { MerchantList } from './MerchantList';
 
 type Props = {
   category: CategoryBudget;
+  tope: number;
   expanded: boolean;
   onToggle: () => void;
+  onEdit?: () => void;
+  onViewAll?: () => void;
 };
 
-export function CategoryItem({ category, expanded, onToggle }: Props) {
+export function CategoryItem({
+  category,
+  tope,
+  expanded,
+  onToggle,
+  onEdit,
+  onViewAll,
+}: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const pct = category.spent / category.target;
+  const safeTope = tope > 0 ? tope : category.target;
+  const pct = category.spent / safeTope;
   const pctLabel = Math.round(pct * 100);
-  const remaining = category.target - category.spent;
+  const remaining = safeTope - category.spent;
 
   return (
     <View
@@ -70,7 +81,7 @@ export function CategoryItem({ category, expanded, onToggle }: Props) {
               {formatCOP(category.spent)}
               <Text variant="body" muted style={{ fontSize: 12.5 }}>
                 {' '}
-                / {formatCOP(category.target)}
+                / {formatCOP(safeTope)}
               </Text>
             </Text>
           </View>
@@ -103,7 +114,78 @@ export function CategoryItem({ category, expanded, onToggle }: Props) {
 
       {expanded ? (
         <View style={{ paddingHorizontal: 14, paddingBottom: 14 }}>
-          <MerchantList merchants={category.topMerchants} color={category.color} />
+          <View
+            style={{
+              borderTopWidth: 1,
+              borderTopColor: theme.colors.borderSubtle,
+              paddingTop: 12,
+            }}
+          >
+            <MerchantList merchants={category.topMerchants} color={category.color} />
+            {(onEdit || onViewAll) && (
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                {onEdit && (
+                  <Pressable
+                    onPress={onEdit}
+                    style={({ pressed }) => ({
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      borderRadius: 10,
+                      backgroundColor: theme.colors.accentMintBg,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      opacity: pressed ? 0.85 : 1,
+                    })}
+                  >
+                    <Icon
+                      name="pencil"
+                      size={11}
+                      color={theme.colors.accentMint}
+                      stroke={2}
+                    />
+                    <Text
+                      variant="label"
+                      color={theme.colors.accentMint}
+                      style={{ fontSize: 11.5 }}
+                    >
+                      {t('budgets.editTope')}
+                    </Text>
+                  </Pressable>
+                )}
+                {onViewAll && (
+                  <Pressable
+                    onPress={onViewAll}
+                    style={({ pressed }) => ({
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      borderRadius: 10,
+                      backgroundColor: theme.colors.bgFloat,
+                      borderWidth: 1,
+                      borderColor: theme.colors.borderSubtle,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      opacity: pressed ? 0.85 : 1,
+                    })}
+                  >
+                    <Text
+                      variant="label"
+                      color={theme.colors.textSecondary}
+                      style={{ fontSize: 11.5 }}
+                    >
+                      {t('budgets.viewAll')}
+                    </Text>
+                    <Icon
+                      name="chevron-right"
+                      size={11}
+                      color={theme.colors.textSecondary}
+                    />
+                  </Pressable>
+                )}
+              </View>
+            )}
+          </View>
         </View>
       ) : null}
     </View>

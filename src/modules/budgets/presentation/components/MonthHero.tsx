@@ -9,16 +9,19 @@ import type { MonthBudget } from '../../domain/types/Budget';
 
 import { BudgetStat } from './BudgetStat';
 
-type Props = { month: MonthBudget };
+type Props = {
+  month: MonthBudget;
+  onPress?: () => void;
+};
 
-export function MonthHero({ month }: Props) {
+export function MonthHero({ month, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const pct = month.spent / month.target;
   const available = month.target - month.spent;
 
   return (
-    <Card padding={20} radius={22}>
+    <Card padding={20} radius={22} onPress={onPress}>
       <View
         style={{
           flexDirection: 'row',

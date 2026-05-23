@@ -40,6 +40,7 @@
   "budgets": {
     "title": "Presupuestos",
     "subtitle": "Mayo · seguimiento en vivo",
+    "noActiveBudget": "Sin presupuesto activo",
     "month": {
       "label": "Presupuesto de mayo",
       "daysLeft": "días restantes",
@@ -61,11 +62,95 @@
     "over": "{{amount}} sobre",
     "topMerchants": "Merchants principales",
     "viewAll": "Ver todos",
+    "editTope": "Editar tope",
     "addCategory": "Agregar categoría",
     "plusUpsell": {
-      "text": "Presupuestos por categoría es una feature de",
+      "text": "Crea categorías custom con",
       "label": "Plus",
       "cta": "Ver plan"
+    },
+    "emptyA": {
+      "title": "Define tu presupuesto",
+      "body": "Establece cuánto no quieres gastar este mes. Numen te ayuda a llegar.",
+      "cta": "Crear presupuesto mensual"
+    },
+    "emptyB": {
+      "title": "Vigila categorías específicas",
+      "body": "Recibe alertas cuando una categoría se acerque a su tope.",
+      "cta": "Agregar categoría a vigilar"
+    },
+    "editTecho": {
+      "title": "Tu techo de {{month}}",
+      "subtitle": "Edita el monto si necesitas. Aplica solo a este mes.",
+      "helper": "El cambio aplica solo a {{month}}. Los meses siguientes mantienen el valor original.",
+      "applyFuture": "Aplicar también a meses futuros",
+      "applyFutureHint": "Cambia el valor por defecto desde el próximo mes.",
+      "save": "Guardar",
+      "delete": "Eliminar presupuesto"
+    },
+    "editTopeSheet": {
+      "title": "Tope para {{name}}",
+      "subtitle": "Numen te avisará cuando te acerques a este monto.",
+      "carry": "Llevas {{amount}} este mes",
+      "save": "Guardar tope",
+      "activate": "Activar tope",
+      "delete": "Eliminar tope"
+    },
+    "addVigilance": {
+      "title": "Vigilar una categoría",
+      "subtitle": "Elige una categoría y define el tope.",
+      "spent": "{{amount}} gastado · sin tope",
+      "add": "Agregar",
+      "allWatchedTitle": "Ya estás vigilando todas las categorías",
+      "allWatchedHint": "Tócalas en la lista de Presupuestos para editar los topes."
+    },
+    "confirmSheet": {
+      "techoTitle": "¿Eliminar tu presupuesto de {{month}}?",
+      "techoBody": "Los topes por categoría también se eliminarán. Esta acción no se puede deshacer.",
+      "techoCta": "Eliminar presupuesto",
+      "topeTitle": "¿Eliminar el tope de {{name}}?",
+      "topeBody": "La categoría seguirá apareciendo en 'Sin tope' este mes. Puedes activarlo de nuevo cuando quieras.",
+      "topeCta": "Eliminar tope",
+      "cancel": "Cancelar"
+    },
+    "create": {
+      "step": "Paso {{current}} de {{total}}",
+      "skip": "Saltar",
+      "next": "Continuar",
+      "save": "Guardar presupuesto",
+      "step1": {
+        "title": "Tu presupuesto de {{month}}",
+        "subtitle": "¿Cuánto no quieres pasar este mes?",
+        "helper": "Puedes ajustarlo después si necesitas."
+      },
+      "step2": {
+        "title": "¿Quieres vigilar alguna categoría?",
+        "subtitle": "Activa topes en categorías donde quieras autocontrol específico. Es opcional.",
+        "infoPart1": "Los topes ",
+        "infoBold": "no son adicionales",
+        "infoPart2": " — todo gasto cuenta a tu techo de ",
+        "infoPart3": ". Los topes solo te avisan cuando una categoría específica se acerca a su límite.",
+        "categoriesLabel": "Categorías",
+        "tope": "Tope {{amount}}",
+        "noTope": "Sin tope",
+        "createCategory": "¿No ves la que buscas? Crear categoría",
+        "exitTitle": "¿Salir sin crear presupuesto?",
+        "exitBody": "Perderás los cambios que has hecho.",
+        "exitCta": "Salir"
+      }
+    },
+    "createCategory": {
+      "title": "Nueva categoría",
+      "plus": "Plus",
+      "subtitle": "Llámala como quieras, elige ícono y color.",
+      "preview": "Vista previa",
+      "previewPlaceholder": "Tu categoría",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej: Mascotas, Gym, Cursos",
+      "iconLabel": "Ícono",
+      "colorLabel": "Color",
+      "save": "Crear categoría",
+      "footnote": "Las categorías personalizadas son parte de Plus."
     }
   },
   "plan": {

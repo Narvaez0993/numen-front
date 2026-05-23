@@ -7,9 +7,10 @@ import { useTheme } from '@/shared/presentation/theme';
 type Props = {
   initials?: string;
   onAvatarPress?: () => void;
+  subtitle?: string;
 };
 
-export function BudgetsHeader({ initials = 'SM', onAvatarPress }: Props) {
+export function BudgetsHeader({ initials = 'SM', onAvatarPress, subtitle }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   return (
@@ -32,7 +33,7 @@ export function BudgetsHeader({ initials = 'SM', onAvatarPress }: Props) {
           {t('budgets.title')}
         </Text>
         <Text variant="caption" muted style={{ marginTop: 4 }} numberOfLines={1}>
-          {t('budgets.subtitle')}
+          {subtitle ?? t('budgets.subtitle')}
         </Text>
       </View>
       <Pressable
