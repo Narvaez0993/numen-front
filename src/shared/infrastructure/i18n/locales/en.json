@@ -368,7 +368,33 @@
     },
     "saldo": {
       "label": "Net balance",
-      "viewAccounts": "View accounts"
+      "viewAccounts": "View accounts",
+      "breakdown_one": "{{accounts}} account + cash − {{tc}} CC",
+      "breakdown_other": "{{accounts}} accounts + cash − {{tc}} CC",
+      "today": "For today",
+      "left": "left"
+    },
+    "month": {
+      "label": "{{month}} · {{daysLeft}} days",
+      "labelOne": "{{month}} · {{daysLeft}} day",
+      "dailySuggested": "Daily suggested"
+    },
+    "heroPicker": {
+      "title": "Home view",
+      "subtitle": "Pick what you want to see first when you open the app.",
+      "footnote": "You can change it from here anytime.",
+      "daily": {
+        "label": "Available today",
+        "sub": "Your daily allowance and what you've already spent"
+      },
+      "saldo": {
+        "label": "Net balance",
+        "sub": "How much you have in accounts, minus debts"
+      },
+      "mes": {
+        "label": "Monthly progress",
+        "sub": "Spent vs your monthly budget"
+      }
     },
     "categories": {
       "title": "Your categories",

@@ -1,20 +1,29 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/shared/presentation/theme';
 
 import { DailyHero } from '../components/DailyHero';
+import { HeroFrame } from '../components/HeroFrame';
+import { HeroVariantSheet } from '../components/HeroVariantSheet';
 import { HomeHeader } from '../components/HomeHeader';
+import { MesHero } from '../components/MesHero';
 import { RecentList } from '../components/RecentList';
 import { SaldoCompact } from '../components/SaldoCompact';
+import { SaldoHero } from '../components/SaldoHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
 import { UpcomingSubs } from '../components/UpcomingSubs';
 import { useHomeOverview } from '../hooks/useHomeOverview';
+import { useHeroVariantStore } from '../stores/useHeroVariantStore';
 
 export function HomeScreen() {
   const { theme } = useTheme();
   const { data, isLoading } = useHomeOverview();
+  const variant = useHeroVariantStore((s) => s.variant);
+  const setVariant = useHeroVariantStore((s) => s.setVariant);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   if (isLoading || !data) {
     return (
@@ -30,6 +39,15 @@ export function HomeScreen() {
       </SafeAreaView>
     );
   }
+
+  const hero =
+    variant === 'saldo' ? (
+      <SaldoHero saldo={data.saldo} daily={data.daily} />
+    ) : variant === 'mes' ? (
+      <MesHero month={data.month} daily={data.daily} />
+    ) : (
+      <DailyHero daily={data.daily} />
+    );
 
   return (
     <SafeAreaView
@@ -49,13 +67,20 @@ export function HomeScreen() {
             name={data.greeting}
             onAvatarPress={() => router.push('/profile')}
           />
-          <DailyHero daily={data.daily} />
-          <SaldoCompact saldo={data.saldo} />
+          <HeroFrame onPickerOpen={() => setPickerOpen(true)}>{hero}</HeroFrame>
+          {variant !== 'saldo' ? <SaldoCompact saldo={data.saldo} /> : null}
           <TopCategoriesCard categories={data.topCategories} />
           <UpcomingSubs items={data.upcoming} />
           <RecentList items={data.recent} />
         </View>
       </ScrollView>
+
+      <HeroVariantSheet
+        visible={pickerOpen}
+        variant={variant}
+        onChange={setVariant}
+        onClose={() => setPickerOpen(false)}
+      />
     </SafeAreaView>
   );
 }

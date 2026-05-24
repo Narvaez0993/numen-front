@@ -368,7 +368,33 @@
     },
     "saldo": {
       "label": "Saldo neto",
-      "viewAccounts": "Ver cuentas"
+      "viewAccounts": "Ver cuentas",
+      "breakdown_one": "{{accounts}} cuenta + efectivo − {{tc}} TC",
+      "breakdown_other": "{{accounts}} cuentas + efectivo − {{tc}} TC",
+      "today": "Para hoy",
+      "left": "quedan"
+    },
+    "month": {
+      "label": "{{month}} · {{daysLeft}} días",
+      "labelOne": "{{month}} · {{daysLeft}} día",
+      "dailySuggested": "Diario sugerido"
+    },
+    "heroPicker": {
+      "title": "Vista del Inicio",
+      "subtitle": "Elige qué información quieres ver primero al abrir la app.",
+      "footnote": "Puedes cambiarlo cuando quieras desde aquí.",
+      "daily": {
+        "label": "Disponible hoy",
+        "sub": "Tu allowance diario y lo que llevas gastado"
+      },
+      "saldo": {
+        "label": "Saldo neto",
+        "sub": "Cuánto tienes en cuentas, menos deudas"
+      },
+      "mes": {
+        "label": "Progreso del mes",
+        "sub": "Lo gastado vs tu presupuesto mensual"
+      }
     },
     "categories": {
       "title": "Tus categorías",
