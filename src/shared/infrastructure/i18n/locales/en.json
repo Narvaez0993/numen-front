@@ -396,6 +396,24 @@
         "sub": "Spent vs your monthly budget"
       }
     },
+    "gastado": {
+      "label": "Spent this month",
+      "short": "Spent · month",
+      "viewExpenses": "View expenses"
+    },
+    "layoutPicker": {
+      "title": "Home layout",
+      "subtitle": "Choose how your Home is organized.",
+      "footnote": "You can change it from here anytime.",
+      "actividad": {
+        "label": "Activity",
+        "sub": "Recent expenses first, summaries at the end"
+      },
+      "compacto": {
+        "label": "Compact",
+        "sub": "Balance and spent in a 2-up row, the rest below"
+      }
+    },
     "categories": {
       "title": "Your categories",
       "thisMonth": "this month"

@@ -396,6 +396,24 @@
         "sub": "Lo gastado vs tu presupuesto mensual"
       }
     },
+    "gastado": {
+      "label": "Gastado este mes",
+      "short": "Gastado · mes",
+      "viewExpenses": "Ver gastos"
+    },
+    "layoutPicker": {
+      "title": "Orden del Inicio",
+      "subtitle": "Elige cómo quieres ver la información del Home.",
+      "footnote": "Puedes cambiarlo cuando quieras desde aquí.",
+      "actividad": {
+        "label": "Actividad",
+        "sub": "Tus últimos gastos primero, los resúmenes al final"
+      },
+      "compacto": {
+        "label": "Compacto",
+        "sub": "Saldo y gastado en una fila 2-up arriba del resto"
+      }
+    },
     "categories": {
       "title": "Tus categorías",
       "thisMonth": "este mes"

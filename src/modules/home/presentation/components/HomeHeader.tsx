@@ -1,12 +1,13 @@
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Text } from '@/shared/presentation/components';
+import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 type Props = {
   name: string;
   onAvatarPress?: () => void;
+  onLayoutPress?: () => void;
   hour?: number;
 };
 
@@ -16,7 +17,7 @@ function greetingKey(hour: number): 'morning' | 'day' | 'night' {
   return 'night';
 }
 
-export function HomeHeader({ name, onAvatarPress, hour }: Props) {
+export function HomeHeader({ name, onAvatarPress, onLayoutPress, hour }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const h = hour ?? new Date().getHours();
@@ -45,24 +46,56 @@ export function HomeHeader({ name, onAvatarPress, hour }: Props) {
         </Text>
         <Text variant="h1">{name}</Text>
       </View>
-      <Pressable
-        onPress={onAvatarPress}
-        style={({ pressed }) => ({
-          width: 38,
-          height: 38,
-          borderRadius: 19,
-          backgroundColor: theme.colors.accentMintBg,
-          borderColor: theme.colors.borderSubtle,
-          borderWidth: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: pressed ? 0.85 : 1,
-        })}
-      >
-        <Text variant="label" color={theme.colors.accentMint} style={{ fontSize: 12.5 }}>
-          {initials}
-        </Text>
-      </Pressable>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        {onLayoutPress ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('home.layoutPicker.title')}
+            onPress={onLayoutPress}
+            hitSlop={6}
+            style={({ pressed }) => ({
+              width: 30,
+              height: 30,
+              borderRadius: 10,
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Icon
+              name="list-details"
+              size={14}
+              color={theme.colors.textTertiary}
+              stroke={1.8}
+            />
+          </Pressable>
+        ) : null}
+        <Pressable
+          onPress={onAvatarPress}
+          style={({ pressed }) => ({
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            backgroundColor: theme.colors.accentMintBg,
+            borderColor: theme.colors.borderSubtle,
+            borderWidth: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: pressed ? 0.85 : 1,
+          })}
+        >
+          <Text
+            variant="label"
+            color={theme.colors.accentMint}
+            style={{ fontSize: 12.5 }}
+          >
+            {initials}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }

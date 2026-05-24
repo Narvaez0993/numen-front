@@ -252,6 +252,15 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M12 21l0 2',
     'M21 12l2 0',
   ],
+
+  // Home layout picker / Gastado card
+  'arrow-up-right': ['M17 7l-10 10', 'M8 7h9v9'],
+  'layout-grid': [
+    'M4 4m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z',
+    'M14 4m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z',
+    'M4 14m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z',
+    'M14 14m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z',
+  ],
 };
 
 export type IconName = keyof typeof TABLER_PATHS | string;
