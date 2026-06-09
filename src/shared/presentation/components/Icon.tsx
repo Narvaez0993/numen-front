@@ -261,6 +261,44 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M4 14m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z',
     'M14 14m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z',
   ],
+
+  // Deudas feature
+  users: [
+    'M9 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0',
+    'M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2',
+    'M16 3.13a4 4 0 0 1 0 7.75',
+    'M21 21v-2a4 4 0 0 0 -3 -3.85',
+  ],
+  'info-circle': [
+    'M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0',
+    'M12 8h.01',
+    'M11 12h1v4h1',
+  ],
+  'alert-circle': ['M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0', 'M12 8v4', 'M12 16h.01'],
+  equal: ['M5 10h14', 'M5 14h14'],
+  'user-up': [
+    'M9 10a4 4 0 1 0 0 -8a4 4 0 0 0 0 8z',
+    'M3 22v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2',
+    'M19 16v-6',
+    'M16 13l3 -3l3 3',
+  ],
+  checks: ['M7 12l5 5l10 -10', 'M2 12l5 5m5 -5l5 -5'],
+  'arrow-down-left': ['M7 17l10 -10', 'M16 17h-9v-9'],
+  calendar: [
+    'M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z',
+    'M16 3v4',
+    'M8 3v4',
+    'M4 11h16',
+    'M11 15h1',
+    'M12 15v3',
+  ],
+  'calendar-event': [
+    'M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z',
+    'M16 3v4',
+    'M8 3v4',
+    'M4 11h16',
+    'M8 15h2v2h-2z',
+  ],
 };
 
 export type IconName = keyof typeof TABLER_PATHS | string;

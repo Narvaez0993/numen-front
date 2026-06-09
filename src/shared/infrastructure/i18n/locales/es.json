@@ -430,6 +430,143 @@
       "transferTag": "Transferencia · no es gasto"
     }
   },
+  "deudas": {
+    "title": "Deudas",
+    "summary": { "owedToMe": "me deben", "iOwe": "yo debo" },
+    "tabs": { "incoming": "Me deben", "outgoing": "Yo debo" },
+    "inicioCard": {
+      "title": "Deudas",
+      "owedToMe": "por cobrar",
+      "iOwe": "por pagar"
+    },
+    "status": {
+      "pending": "PENDIENTE",
+      "partial": "PARCIAL",
+      "paid": "PAGADO",
+      "overdue": "VENCIDA"
+    },
+    "pctPaid": "{{pct}}% pagado",
+    "due": {
+      "none": "sin vencimiento",
+      "todayLabel": "vence hoy",
+      "overdue_one": "venció hace {{count}} día",
+      "overdue_other": "venció hace {{count}} días",
+      "inDays_one": "vence en {{count}} día",
+      "inDays_other": "vence en {{count}} días",
+      "onDate": "vence {{date}}"
+    },
+    "card": {
+      "loanShort": "Préstamo",
+      "sharedWith_one": "Compartida con {{count}} persona",
+      "sharedWith_other": "Compartida con {{count}} personas",
+      "collected": "cobrado",
+      "owedPart": "pagado",
+      "pending_one": "{{count}} pendiente",
+      "pending_other": "{{count}} pendientes",
+      "remaining": "{{amount}} falta",
+      "bulkMarkPaid": "Marcar varios como pagados"
+    },
+    "empty": {
+      "incomingTitle": "No te deben nada",
+      "outgoingTitle": "No le debes a nadie",
+      "incomingBody": "Cuando prestes plata o pagues por otros, regístralo aquí para no olvidarte de cobrar.",
+      "outgoingBody": "Cuando alguien te preste plata o pague algo por ti, regístralo aquí.",
+      "cta": "Nueva deuda"
+    },
+    "history": {
+      "title": "Historial de abonos",
+      "empty": "Sin abonos registrados aún."
+    },
+    "detail": {
+      "balancePending": "Balance pendiente",
+      "ofOriginal": "de {{amount}} originales",
+      "overdueAlert": "Esta deuda venció el {{date}}. Considera contactar a {{name}}.",
+      "subTheyOweYou": "Te debe",
+      "subYouOweThem": "Le debes",
+      "partOf": "Parte de '{{event}}'",
+      "registerAbono": "Registrar abono"
+    },
+    "abono": {
+      "title": "Registrar abono",
+      "subIncoming": "{{name}} te abonó",
+      "subOutgoing": "Abono a {{name}}",
+      "balanceLabel": "Balance actual",
+      "accountIncoming": "Cuenta donde entró",
+      "accountOutgoing": "Cuenta de donde salió",
+      "save": "Guardar abono",
+      "toast": "Abono registrado · {{amount}}"
+    },
+    "create": {
+      "back": "Volver",
+      "step": "Paso {{current}} de {{total}}",
+      "next": "Continuar",
+      "saveIndividual": "Guardar deuda",
+      "saveShared": "Crear deuda compartida",
+      "step1": {
+        "title": "Nueva deuda",
+        "subtitle": "¿Quién está involucrado?",
+        "personsLabel_one": "Persona",
+        "personsLabel_other": "Personas ({{count}})",
+        "searchPlaceholder": "Buscar o agregar persona",
+        "addPersonPrefix": "Agregar",
+        "addPersonSuffix": "como nueva persona",
+        "sharedBanner": "Estás creando un gasto compartido. Habrá un paso adicional para dividir el monto."
+      },
+      "step2": {
+        "titleIndividual": "Detalles del préstamo",
+        "titleShared": "Detalles del gasto",
+        "subIndividual": "¿Cuánto y de dónde sale la plata?",
+        "subShared": "Monto total y categoría del gasto.",
+        "amountLabel": "Monto",
+        "amountSharedLabel": "Total del gasto",
+        "expenseToggleTitle": "Esto viene de un gasto que pagué",
+        "expenseToggleSub": "Cuenta a tu presupuesto solo por tu parte.",
+        "categoryLabel": "Categoría",
+        "categorySelected": "Seleccionada",
+        "categorySeeAll": "Buscar entre las 12 categorías",
+        "accountIncomingPaid": "Cuenta de donde salió",
+        "accountIncoming": "Cuenta donde entrará",
+        "accountOutgoing": "Cuenta donde entró",
+        "dateLabel": "Fecha",
+        "dateSheetTitle": "Fecha del préstamo",
+        "dateSheetSubtitle": "Cuándo ocurrió.",
+        "dueLabel": "Fecha límite",
+        "dueSheetTitle": "Fecha límite",
+        "dueSheetSubtitle": "Numen te avisará cuando se acerque.",
+        "dueNone": "Sin vencimiento",
+        "optional": "Opcional",
+        "noteLabel": "Nota (opcional)",
+        "notePlaceholder": "Ej. Comida del jueves, préstamo carro, etc.",
+        "accountSheetTitle": "Elegir cuenta",
+        "categorySheetTitle": "Elegir categoría",
+        "categorySheetSubtitle": "Busca o selecciona entre las 12 categorías estándar."
+      },
+      "step3": {
+        "title": "¿Cómo se divide?",
+        "subtitle": "Total {{amount}} · {{count}} personas",
+        "equalSplit": "Partes iguales · {{amount}} c/u",
+        "youPayMore": "Yo pongo más, los demás se reparten",
+        "personsLabel": "Personas",
+        "you": "Yo",
+        "yourPart": "Tu parte real",
+        "pctOfTotal": "{{pct}}% del total",
+        "sumLabel": "Suma de la división",
+        "remaining": "Faltan {{amount}}",
+        "overage": "Sobran {{amount}}"
+      },
+      "yoPongoMas": {
+        "title": "¿Cuánto pones tú?",
+        "subtitle_one": "El resto se queda con la otra persona.",
+        "subtitle_other": "El resto se divide entre las otras {{count}} personas.",
+        "perOther_one": "La otra persona pone {{amount}}",
+        "perOther_other": "Cada uno de los otros {{count}} pone {{amount}}",
+        "apply": "Aplicar"
+      },
+      "toastIndividual": "Deuda registrada · {{name}}",
+      "toastShared": "Deuda compartida creada · {{event}}"
+    },
+    "viewHistory": "Ver historial"
+  },
   "profile": {
     "title": "Perfil",
     "edit": "Editar",
@@ -452,6 +589,12 @@
       "categories": {
         "title": "Categorías",
         "subtitle": "12 estándar · 0 personalizadas"
+      },
+      "deudas": {
+        "title": "Deudas",
+        "subtitleEmpty": "Sin deudas activas",
+        "subtitle_one": "{{count}} deuda activa",
+        "subtitle_other": "{{count}} deudas activas"
       },
       "notifications": {
         "title": "Notificaciones"

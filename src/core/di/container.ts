@@ -13,6 +13,9 @@ import { InMemoryAuthRepository } from '@/modules/auth/infrastructure';
 import type { BudgetsRepository } from '@/modules/budgets/application/ports/BudgetsRepository';
 import { GetBudgetsUseCase } from '@/modules/budgets/application/use-cases/GetBudgetsUseCase';
 import { InMemoryBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/InMemoryBudgetsRepository';
+import type { DeudasRepository } from '@/modules/deudas/application/ports/DeudasRepository';
+import { GetDeudasUseCase } from '@/modules/deudas/application/use-cases/GetDeudasUseCase';
+import { InMemoryDeudasRepository } from '@/modules/deudas/infrastructure/repositories/InMemoryDeudasRepository';
 import type { ExpenseRepository } from '@/modules/expenses/application/ports/ExpenseRepository';
 import { CreateExpensesUseCase } from '@/modules/expenses/application/use-cases/CreateExpensesUseCase';
 import { InMemoryExpenseRepository } from '@/modules/expenses/infrastructure/repositories/InMemoryExpenseRepository';
@@ -41,6 +44,7 @@ const profileRepository: ProfileRepository = new InMemoryProfileRepository();
 const expenseRepository: ExpenseRepository = new InMemoryExpenseRepository();
 const movementsRepository: MovementsRepository = new InMemoryMovementsRepository();
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
+const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
 const accountsRepository: AccountsRepository = new InMemoryAccountsRepository();
 const subscriptionsRepository: SubscriptionsRepository =
@@ -55,6 +59,7 @@ export const getProfileUseCase = new GetProfileUseCase(profileRepository);
 export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository);
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
+export const getDeudasUseCase = new GetDeudasUseCase(deudasRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
@@ -75,6 +80,7 @@ export const container = {
   expenseRepository,
   movementsRepository,
   budgetsRepository,
+  deudasRepository,
   assistantRepository,
   accountsRepository,
   subscriptionsRepository,
@@ -87,6 +93,7 @@ export const container = {
   createExpensesUseCase,
   getMovementsUseCase,
   getBudgetsUseCase,
+  getDeudasUseCase,
   getAssistantUseCase,
   getAccountsOverviewUseCase,
   getSubscriptionsUseCase,

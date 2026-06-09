@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DeudasInicioCard } from '@/modules/deudas/presentation/components/DeudasInicioCard';
+import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { CompactStatsRow } from '../components/CompactStatsRow';
@@ -25,6 +27,7 @@ import { useHomeLayoutStore } from '../stores/useHomeLayoutStore';
 export function HomeScreen() {
   const { theme } = useTheme();
   const { data, isLoading } = useHomeOverview();
+  useDeudas();
   const variant = useHeroVariantStore((s) => s.variant);
   const setVariant = useHeroVariantStore((s) => s.setVariant);
   const layout = useHomeLayoutStore((s) => s.layout);
@@ -57,6 +60,7 @@ export function HomeScreen() {
     );
 
   const goMovements = () => router.push('/movements');
+  const goDeudas = () => router.push('/deudas');
 
   return (
     <SafeAreaView
@@ -87,6 +91,7 @@ export function HomeScreen() {
                 heroVariant={variant}
                 onOpenMovimientos={goMovements}
               />
+              <DeudasInicioCard onPress={goDeudas} />
               <TopCategoriesCard categories={data.topCategories} />
               <UpcomingSubs items={data.upcoming} />
               <RecentList items={data.recent} />
@@ -98,6 +103,7 @@ export function HomeScreen() {
               <TopCategoriesCard categories={data.topCategories} />
               {variant !== 'saldo' ? <SaldoCompact saldo={data.saldo} /> : null}
               <MesGastadoCompact month={data.month} onPress={goMovements} />
+              <DeudasInicioCard onPress={goDeudas} />
             </>
           )}
         </View>

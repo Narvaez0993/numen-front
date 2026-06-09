@@ -72,8 +72,15 @@ export function ProfileScreen() {
             iconColor="purple"
             title={t('profile.rows.categories.title')}
             subtitle={t('profile.rows.categories.subtitle')}
-            last
             onPress={() => router.push('/categories')}
+          />
+          <SettingsRow
+            icon="users"
+            iconColor="pink"
+            title={t('profile.rows.deudas.title')}
+            subtitle={t('profile.rows.deudas.subtitleEmpty')}
+            last
+            onPress={() => router.push('/deudas')}
           />
         </SettingsGroup>
 

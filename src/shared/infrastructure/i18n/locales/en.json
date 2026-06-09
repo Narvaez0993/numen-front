@@ -430,6 +430,143 @@
       "transferTag": "Transfer · not an expense"
     }
   },
+  "deudas": {
+    "title": "Debts",
+    "summary": { "owedToMe": "owe me", "iOwe": "I owe" },
+    "tabs": { "incoming": "Owed to me", "outgoing": "I owe" },
+    "inicioCard": {
+      "title": "Debts",
+      "owedToMe": "to collect",
+      "iOwe": "to pay"
+    },
+    "status": {
+      "pending": "PENDING",
+      "partial": "PARTIAL",
+      "paid": "PAID",
+      "overdue": "OVERDUE"
+    },
+    "pctPaid": "{{pct}}% paid",
+    "due": {
+      "none": "no due date",
+      "todayLabel": "due today",
+      "overdue_one": "overdue by {{count}} day",
+      "overdue_other": "overdue by {{count}} days",
+      "inDays_one": "due in {{count}} day",
+      "inDays_other": "due in {{count}} days",
+      "onDate": "due {{date}}"
+    },
+    "card": {
+      "loanShort": "Loan",
+      "sharedWith_one": "Shared with {{count}} person",
+      "sharedWith_other": "Shared with {{count}} people",
+      "collected": "collected",
+      "owedPart": "paid",
+      "pending_one": "{{count}} pending",
+      "pending_other": "{{count}} pending",
+      "remaining": "{{amount}} to go",
+      "bulkMarkPaid": "Mark several as paid"
+    },
+    "empty": {
+      "incomingTitle": "Nobody owes you",
+      "outgoingTitle": "You don't owe anyone",
+      "incomingBody": "When you lend money or pay for others, log it here so you don't forget to collect.",
+      "outgoingBody": "When someone lends you money or pays something for you, log it here.",
+      "cta": "New debt"
+    },
+    "history": {
+      "title": "Payment history",
+      "empty": "No payments yet."
+    },
+    "detail": {
+      "balancePending": "Pending balance",
+      "ofOriginal": "of {{amount}} original",
+      "overdueAlert": "This debt was due on {{date}}. Consider reaching out to {{name}}.",
+      "subTheyOweYou": "Owes you",
+      "subYouOweThem": "You owe",
+      "partOf": "Part of '{{event}}'",
+      "registerAbono": "Record payment"
+    },
+    "abono": {
+      "title": "Record payment",
+      "subIncoming": "{{name}} paid you",
+      "subOutgoing": "Payment to {{name}}",
+      "balanceLabel": "Current balance",
+      "accountIncoming": "Account it went into",
+      "accountOutgoing": "Account it came from",
+      "save": "Save payment",
+      "toast": "Payment recorded · {{amount}}"
+    },
+    "create": {
+      "back": "Back",
+      "step": "Step {{current}} of {{total}}",
+      "next": "Continue",
+      "saveIndividual": "Save debt",
+      "saveShared": "Create shared debt",
+      "step1": {
+        "title": "New debt",
+        "subtitle": "Who is involved?",
+        "personsLabel_one": "Person",
+        "personsLabel_other": "People ({{count}})",
+        "searchPlaceholder": "Search or add a person",
+        "addPersonPrefix": "Add",
+        "addPersonSuffix": "as a new person",
+        "sharedBanner": "You are creating a shared expense. There will be an extra step to split the total."
+      },
+      "step2": {
+        "titleIndividual": "Loan details",
+        "titleShared": "Expense details",
+        "subIndividual": "How much and where does the money come from?",
+        "subShared": "Total amount and category of the expense.",
+        "amountLabel": "Amount",
+        "amountSharedLabel": "Total amount",
+        "expenseToggleTitle": "This comes from an expense I paid",
+        "expenseToggleSub": "Counts toward your budget only for your share.",
+        "categoryLabel": "Category",
+        "categorySelected": "Selected",
+        "categorySeeAll": "Search among the 12 categories",
+        "accountIncomingPaid": "Account it came from",
+        "accountIncoming": "Account it will go into",
+        "accountOutgoing": "Account it went into",
+        "dateLabel": "Date",
+        "dateSheetTitle": "Date of the loan",
+        "dateSheetSubtitle": "When it happened.",
+        "dueLabel": "Due date",
+        "dueSheetTitle": "Due date",
+        "dueSheetSubtitle": "Numen will remind you when it's near.",
+        "dueNone": "No due date",
+        "optional": "Optional",
+        "noteLabel": "Note (optional)",
+        "notePlaceholder": "Ex. Thursday lunch, car loan, etc.",
+        "accountSheetTitle": "Pick an account",
+        "categorySheetTitle": "Pick a category",
+        "categorySheetSubtitle": "Search or pick from the 12 standard categories."
+      },
+      "step3": {
+        "title": "How is it split?",
+        "subtitle": "Total {{amount}} · {{count}} people",
+        "equalSplit": "Equal parts · {{amount}} each",
+        "youPayMore": "I pay more, the rest is split",
+        "personsLabel": "People",
+        "you": "Me",
+        "yourPart": "Your actual share",
+        "pctOfTotal": "{{pct}}% of total",
+        "sumLabel": "Total split",
+        "remaining": "{{amount}} short",
+        "overage": "{{amount}} over"
+      },
+      "yoPongoMas": {
+        "title": "How much are you paying?",
+        "subtitle_one": "The rest stays with the other person.",
+        "subtitle_other": "The rest is split among the other {{count}} people.",
+        "perOther_one": "The other person pays {{amount}}",
+        "perOther_other": "Each of the other {{count}} pays {{amount}}",
+        "apply": "Apply"
+      },
+      "toastIndividual": "Debt recorded · {{name}}",
+      "toastShared": "Shared debt created · {{event}}"
+    },
+    "viewHistory": "See history"
+  },
   "profile": {
     "title": "Profile",
     "edit": "Edit",
@@ -452,6 +589,12 @@
       "categories": {
         "title": "Categories",
         "subtitle": "12 standard · 0 custom"
+      },
+      "deudas": {
+        "title": "Debts",
+        "subtitleEmpty": "No active debts",
+        "subtitle_one": "{{count}} active debt",
+        "subtitle_other": "{{count}} active debts"
       },
       "notifications": {
         "title": "Notifications"
