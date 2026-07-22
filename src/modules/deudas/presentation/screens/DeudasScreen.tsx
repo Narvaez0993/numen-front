@@ -16,6 +16,7 @@ import { DeudasHeader } from '../components/DeudasHeader';
 import { DirectionTabs } from '../components/DirectionTabs';
 import { EmptyDeudasState } from '../components/EmptyDeudasState';
 import { NuevaDeudaFlow } from '../components/create-flow/NuevaDeudaFlow';
+import { HistorySheet } from '../components/sheets/HistorySheet';
 import { RegistrarAbonoSheet } from '../components/sheets/RegistrarAbonoSheet';
 import { useDeudas } from '../hooks/useDeudas';
 import { useDeudasStore } from '../stores/useDeudasStore';
@@ -44,6 +45,7 @@ export function DeudasScreen() {
 
   const [direction, setDirection] = useState<DebtDirection>('incoming');
   const [expandedEvent, setExpandedEvent] = useState<string | null>('ev-comida');
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [toast, setToast] = useState<{ visible: boolean; message: string }>({
     visible: false,
     message: '',
@@ -191,6 +193,7 @@ export function DeudasScreen() {
 
           {!isEmpty ? (
             <Pressable
+              onPress={() => setHistoryOpen(true)}
               style={({ pressed }) => ({
                 marginTop: 4,
                 alignSelf: 'center',
@@ -217,6 +220,7 @@ export function DeudasScreen() {
 
       <FAB variant="pink" onPress={() => openCreate(direction)} />
 
+      <HistorySheet visible={historyOpen} onClose={() => setHistoryOpen(false)} />
       <RegistrarAbonoSheet
         visible={!!abonoForId}
         debtId={abonoForId}

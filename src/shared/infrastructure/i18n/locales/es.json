@@ -537,8 +537,10 @@
       "cta": "Nueva deuda"
     },
     "history": {
-      "title": "Historial de abonos",
-      "empty": "Sin abonos registrados aún."
+      "title": "Historial de deudas",
+      "subtitle": "Las que ya quedaron en cero.",
+      "empty": "Aún no hay deudas pagadas.",
+      "noNote": "Sin nota"
     },
     "detail": {
       "balancePending": "Balance pendiente",
@@ -628,7 +630,12 @@
       "toastIndividual": "Deuda registrada · {{name}}",
       "toastShared": "Deuda compartida creada · {{event}}"
     },
-    "viewHistory": "Ver historial"
+    "viewHistory": "Ver historial",
+    "share": {
+      "button": "Compartir resumen",
+      "messageIncoming": "Hola {{name}}: te recuerdo que me debes {{balance}} (de {{total}}, vas {{pct}}% pagado). — enviado desde Numen",
+      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Numen"
+    }
   },
   "profile": {
     "title": "Perfil",

@@ -537,8 +537,10 @@
       "cta": "New debt"
     },
     "history": {
-      "title": "Payment history",
-      "empty": "No payments yet."
+      "title": "Debt history",
+      "subtitle": "The ones already settled.",
+      "empty": "No paid debts yet.",
+      "noNote": "No note"
     },
     "detail": {
       "balancePending": "Pending balance",
@@ -628,7 +630,12 @@
       "toastIndividual": "Debt recorded · {{name}}",
       "toastShared": "Shared debt created · {{event}}"
     },
-    "viewHistory": "See history"
+    "viewHistory": "See history",
+    "share": {
+      "button": "Share summary",
+      "messageIncoming": "Hi {{name}}: friendly reminder — you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Numen",
+      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Numen"
+    }
   },
   "profile": {
     "title": "Profile",

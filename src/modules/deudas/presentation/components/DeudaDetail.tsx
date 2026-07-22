@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, Share, View } from 'react-native';
 
 import { Button, Card, Icon, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
@@ -82,8 +82,23 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
             color={theme.colors.textSecondary}
           />
         </Pressable>
-        <View
-          style={{
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('deudas.share.button')}
+          onPress={() => {
+            const key = isIncoming
+              ? 'deudas.share.messageIncoming'
+              : 'deudas.share.messageOutgoing';
+            void Share.share({
+              message: t(key, {
+                name: person.name,
+                balance: formatCOP(deuda.balance),
+                total: formatCOP(deuda.amount),
+                pct: Math.round(debtProgress(deuda) * 100),
+              }),
+            }).catch(() => undefined);
+          }}
+          style={({ pressed }) => ({
             width: 38,
             height: 38,
             borderRadius: 12,
@@ -92,10 +107,11 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
             borderColor: theme.colors.borderSubtle,
             alignItems: 'center',
             justifyContent: 'center',
-          }}
+            opacity: pressed ? 0.85 : 1,
+          })}
         >
-          <Icon name="dots" size={17} color={theme.colors.textSecondary} />
-        </View>
+          <Icon name="arrow-up-right" size={17} color={theme.colors.textSecondary} />
+        </Pressable>
       </View>
 
       <ScrollView
