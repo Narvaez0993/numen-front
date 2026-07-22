@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Pressable, TextInput, View } from 'react-native';
 
-import { Button, Icon, Text } from '@/shared/presentation/components';
+import {
+  Button,
+  CategoryPickerInline,
+  OptionListInline,
+  SelectRow,
+  Text,
+} from '@/shared/presentation/components';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
@@ -13,8 +19,6 @@ import {
   INCOME_CATEGORIES,
   categoryColor,
 } from '../constants/manualOptions';
-
-import { CategoryPickerInline, OptionListInline } from './InlinePickers';
 
 export type ManualEntryType = 'expense' | 'income' | 'transfer';
 
@@ -296,65 +300,5 @@ export function ManualState({ onSave, saving = false }: Props) {
         onPress={handleSave}
       />
     </Animated.View>
-  );
-}
-
-function SelectRow({
-  label,
-  value,
-  valueColor,
-  expanded,
-  onToggle,
-  last = false,
-  children,
-}: {
-  label: string;
-  value: string;
-  valueColor?: string;
-  expanded: boolean;
-  onToggle: () => void;
-  last?: boolean;
-  children: React.ReactNode;
-}) {
-  const { theme } = useTheme();
-  return (
-    <View
-      style={{
-        borderBottomWidth: last && !expanded ? 0 : last ? 0 : 1,
-        borderBottomColor: theme.colors.borderSubtle,
-      }}
-    >
-      <Pressable
-        accessibilityRole="button"
-        onPress={onToggle}
-        style={({ pressed }) => ({
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 12,
-          paddingVertical: 13,
-          opacity: pressed ? 0.7 : 1,
-        })}
-      >
-        <Text variant="caption" muted>
-          {label}
-        </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text
-            variant="label"
-            color={valueColor ?? theme.colors.textPrimary}
-            style={{ fontSize: 12.5 }}
-          >
-            {value}
-          </Text>
-          <Icon
-            name={expanded ? 'chevron-down' : 'chevron-right'}
-            size={13}
-            color={theme.colors.textTertiary}
-          />
-        </View>
-      </Pressable>
-      {expanded ? children : null}
-    </View>
   );
 }

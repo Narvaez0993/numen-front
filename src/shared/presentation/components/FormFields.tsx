@@ -1,7 +1,10 @@
+import type { ReactNode } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
-import { Text } from '@/shared/presentation/components';
-import { useTheme } from '@/shared/presentation/theme';
+import { useTheme } from '../theme';
+
+import { Icon } from './Icon';
+import { Text } from './Text';
 
 export function formatDigits(digits: string): string {
   if (!digits) return '';
@@ -151,6 +154,66 @@ export function Segmented<T extends string>({
           </Pressable>
         );
       })}
+    </View>
+  );
+}
+
+export function SelectRow({
+  label,
+  value,
+  valueColor,
+  expanded,
+  onToggle,
+  last = false,
+  children,
+}: {
+  label: string;
+  value: string;
+  valueColor?: string;
+  expanded: boolean;
+  onToggle: () => void;
+  last?: boolean;
+  children: ReactNode;
+}) {
+  const { theme } = useTheme();
+  return (
+    <View
+      style={{
+        borderBottomWidth: last && !expanded ? 0 : last ? 0 : 1,
+        borderBottomColor: theme.colors.borderSubtle,
+      }}
+    >
+      <Pressable
+        accessibilityRole="button"
+        onPress={onToggle}
+        style={({ pressed }) => ({
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 12,
+          paddingVertical: 13,
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
+        <Text variant="caption" muted>
+          {label}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text
+            variant="label"
+            color={valueColor ?? theme.colors.textPrimary}
+            style={{ fontSize: 12.5 }}
+          >
+            {value}
+          </Text>
+          <Icon
+            name={expanded ? 'chevron-down' : 'chevron-right'}
+            size={13}
+            color={theme.colors.textTertiary}
+          />
+        </View>
+      </Pressable>
+      {expanded ? children : null}
     </View>
   );
 }

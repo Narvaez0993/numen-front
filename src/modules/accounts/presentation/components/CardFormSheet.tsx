@@ -2,12 +2,18 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TextInput, View } from 'react-native';
 
-import { BottomSheet, Button, Text } from '@/shared/presentation/components';
+import {
+  AmountField,
+  BottomSheet,
+  Button,
+  DeleteFlow,
+  FieldLabel,
+  Text,
+  TextField,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 import type { CreditCard } from '../../domain';
-
-import { AmountField, DeleteFlow, FieldLabel, TextField } from './FormFields';
 
 export type CardFormInput = {
   name: string;

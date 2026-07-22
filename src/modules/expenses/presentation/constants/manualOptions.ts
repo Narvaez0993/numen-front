@@ -1,9 +1,7 @@
 import type { AccentColor } from '@/shared/domain';
+import type { CategoryOption } from '@/shared/presentation/components';
 
-export type CategoryOption = {
-  name: string;
-  color: AccentColor;
-};
+export type { CategoryOption };
 
 /** Visual-prototype catalogs. Replaced by real repositories when wired. */
 export const EXPENSE_CATEGORIES: CategoryOption[] = [

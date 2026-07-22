@@ -2,14 +2,19 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 
-import { Icon, IconBox, Text } from '@/shared/presentation/components';
+import {
+  CategoryPickerInline,
+  Icon,
+  IconBox,
+  OptionListInline,
+  Text,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
 import { ACCOUNTS, EXPENSE_CATEGORIES } from '../constants/manualOptions';
 
 import { EditChip } from './EditChip';
-import { CategoryPickerInline, OptionListInline } from './InlinePickers';
 
 type Props = {
   item: DetectedExpense;

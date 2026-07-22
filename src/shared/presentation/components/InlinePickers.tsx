@@ -1,10 +1,16 @@
 import { Pressable, View } from 'react-native';
 
 import type { AccentColor } from '@/shared/domain';
-import { Icon, Text } from '@/shared/presentation/components';
-import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 
-import type { CategoryOption } from '../constants/manualOptions';
+import { accentColorKey, useTheme } from '../theme';
+
+import { Icon } from './Icon';
+import { Text } from './Text';
+
+export type CategoryOption = {
+  name: string;
+  color: AccentColor;
+};
 
 export function CategoryPickerInline({
   categories,

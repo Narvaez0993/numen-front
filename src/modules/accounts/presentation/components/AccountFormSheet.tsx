@@ -2,12 +2,19 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
-import { BottomSheet, Button, Text } from '@/shared/presentation/components';
+import {
+  AmountField,
+  BottomSheet,
+  Button,
+  DeleteFlow,
+  FieldLabel,
+  Segmented,
+  Text,
+  TextField,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 import type { Account } from '../../domain';
-
-import { AmountField, DeleteFlow, FieldLabel, Segmented, TextField } from './FormFields';
 
 export type AccountFormInput = {
   kind: 'debit' | 'cash';
