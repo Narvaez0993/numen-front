@@ -233,6 +233,33 @@
     "add": {
       "account": "Agregar cuenta",
       "card": "Agregar tarjeta"
+    },
+    "form": {
+      "newAccount": "Nueva cuenta",
+      "editAccount": "Editar cuenta",
+      "accountSubtitle": "Débito o efectivo, con el nombre que quieras.",
+      "newCard": "Nueva tarjeta",
+      "editCard": "Editar tarjeta",
+      "cardSubtitle": "Tu tarjeta de crédito: deuda, cupo y corte.",
+      "kind": {
+        "debit": "Débito",
+        "cash": "Efectivo"
+      },
+      "name": "Nombre",
+      "namePlaceholder": "Banco, billetera, bolsillo…",
+      "cardNamePlaceholder": "Visa, Master, la que uses…",
+      "sub": "Detalle (opcional)",
+      "subPlaceholder": "Cuenta de ahorros",
+      "balance": "Saldo actual",
+      "debt": "Deuda actual",
+      "limit": "Cupo",
+      "cutoffDay": "Día de corte",
+      "debtExceedsLimit": "La deuda no puede superar el cupo.",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "deleteConfirmTitle": "¿Eliminar {{name}}?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
     }
   },
   "assistant": {

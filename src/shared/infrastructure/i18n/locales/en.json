@@ -233,6 +233,33 @@
     "add": {
       "account": "Add account",
       "card": "Add card"
+    },
+    "form": {
+      "newAccount": "New account",
+      "editAccount": "Edit account",
+      "accountSubtitle": "Debit or cash, named however you like.",
+      "newCard": "New card",
+      "editCard": "Edit card",
+      "cardSubtitle": "Your credit card: debt, limit and cutoff.",
+      "kind": {
+        "debit": "Debit",
+        "cash": "Cash"
+      },
+      "name": "Name",
+      "namePlaceholder": "Bank, wallet, pocket…",
+      "cardNamePlaceholder": "Visa, Master, the one you use…",
+      "sub": "Detail (optional)",
+      "subPlaceholder": "Savings account",
+      "balance": "Current balance",
+      "debt": "Current debt",
+      "limit": "Credit limit",
+      "cutoffDay": "Cutoff day",
+      "debtExceedsLimit": "Debt can't exceed the limit.",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Delete {{name}}?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
     }
   },
   "assistant": {

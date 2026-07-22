@@ -9,9 +9,10 @@ import type { CreditCard } from '../../domain';
 
 type Props = {
   card: CreditCard;
+  onPress?: () => void;
 };
 
-export function CreditCardItem({ card }: Props) {
+export function CreditCardItem({ card, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const usage = card.limit > 0 ? card.debt / card.limit : 0;
@@ -20,6 +21,8 @@ export function CreditCardItem({ card }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
+      onPress={onPress}
+      disabled={!onPress}
       style={({ pressed }) => ({
         backgroundColor: theme.colors.bgSurface,
         borderColor: theme.colors.borderSubtle,
