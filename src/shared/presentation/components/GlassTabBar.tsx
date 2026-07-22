@@ -1,6 +1,7 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from 'expo-blur';
 import { LayoutAnimation, Platform, Pressable, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '../theme';
@@ -36,11 +37,24 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
   const insets = useSafeAreaInsets();
 
   const glassTint =
-    mode === 'dark' ? 'rgba(10, 14, 26, 0.52)' : 'rgba(255, 255, 255, 0.55)';
+    mode === 'dark' ? 'rgba(10, 14, 26, 0.30)' : 'rgba(255, 255, 255, 0.34)';
   const glassBorder =
-    mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(10, 14, 26, 0.10)';
+    mode === 'dark' ? 'rgba(255, 255, 255, 0.10)' : 'rgba(10, 14, 26, 0.10)';
   const activePillBg =
-    mode === 'dark' ? 'rgba(255, 255, 255, 0.09)' : 'rgba(10, 14, 26, 0.08)';
+    mode === 'dark' ? 'rgba(255, 255, 255, 0.10)' : 'rgba(10, 14, 26, 0.08)';
+  // iOS system materials carry real vibrancy (saturation bleed) — the core
+  // of the "liquid" look. Android falls back to plain dark/light blur.
+  const blurTint =
+    Platform.OS === 'ios'
+      ? mode === 'dark'
+        ? 'systemUltraThinMaterialDark'
+        : 'systemUltraThinMaterialLight'
+      : mode === 'dark'
+        ? 'dark'
+        : 'light';
+  const sheenOpacity = mode === 'dark' ? 0.09 : 0.5;
+  const rimColor =
+    mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.9)';
 
   return (
     <View
@@ -74,8 +88,8 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
         }}
       >
         <BlurView
-          intensity={55}
-          tint={mode === 'dark' ? 'dark' : 'light'}
+          intensity={80}
+          tint={blurTint}
           experimentalBlurMethod={
             Platform.OS === 'android' ? 'dimezisBlurView' : undefined
           }
@@ -89,6 +103,31 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
             right: 0,
             bottom: 0,
             backgroundColor: glassTint,
+          }}
+        />
+        {/* Specular sheen: light falling on the top half of the glass. */}
+        <Svg
+          pointerEvents="none"
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '58%' }}
+        >
+          <Defs>
+            <LinearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor="#FFFFFF" stopOpacity={sheenOpacity} />
+              <Stop offset="1" stopColor="#FFFFFF" stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#sheen)" />
+        </Svg>
+        {/* Rim light: the bright top edge that sells the material. */}
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 14,
+            right: 14,
+            height: 1,
+            backgroundColor: rimColor,
           }}
         />
 
@@ -114,7 +153,12 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
                 canPreventDefault: true,
               });
               if (!focused && !event.defaultPrevented) {
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                LayoutAnimation.configureNext({
+                  duration: 380,
+                  create: { type: 'easeInEaseOut', property: 'opacity' },
+                  update: { type: 'spring', springDamping: 0.72 },
+                  delete: { type: 'easeInEaseOut', property: 'opacity' },
+                });
                 navigation.navigate(route.name);
               }
             };
@@ -134,7 +178,8 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
                   paddingVertical: 11,
                   borderRadius: 22,
                   backgroundColor: focused ? activePillBg : 'transparent',
-                  opacity: pressed ? 0.8 : 1,
+                  opacity: pressed ? 0.9 : 1,
+                  transform: [{ scale: pressed ? 0.94 : 1 }],
                 })}
               >
                 {options?.tabBarIcon?.({ focused, color, size: 22 })}
