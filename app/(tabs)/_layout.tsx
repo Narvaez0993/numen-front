@@ -4,6 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { ExpenseSheet } from '@/modules/expenses/presentation/components/ExpenseSheet';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { Icon, FAB } from '@/shared/presentation/components';
+import {
+  GlassTabBar,
+  useFloatingTabBarClearance,
+} from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 
 export default function TabsLayout() {
@@ -11,6 +15,7 @@ export default function TabsLayout() {
   const { t } = useTranslation();
   const pathname = usePathname();
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
+  const clearance = useFloatingTabBarClearance();
 
   // Hide FAB on assistant per the brief
   const hideFab = pathname.endsWith('/assistant');
@@ -18,23 +23,12 @@ export default function TabsLayout() {
   return (
     <>
       <Tabs
+        tabBar={(props) => <GlassTabBar {...props} />}
         screenOptions={{
           headerShown: false,
+          sceneStyle: { backgroundColor: theme.colors.bgBase },
           tabBarActiveTintColor: theme.colors.accentMint,
           tabBarInactiveTintColor: theme.colors.textTertiary,
-          tabBarStyle: {
-            backgroundColor: theme.colors.bgBase,
-            borderTopColor: theme.colors.borderSubtle,
-            borderTopWidth: 1,
-            height: 80,
-            paddingTop: 8,
-            paddingBottom: 22,
-          },
-          tabBarLabelStyle: {
-            fontFamily: 'Geist_500Medium',
-            fontSize: 10,
-            marginTop: 2,
-          },
         }}
       >
         <Tabs.Screen
@@ -84,7 +78,7 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-      {!hideFab ? <FAB onPress={openSheet} /> : null}
+      {!hideFab ? <FAB onPress={openSheet} bottomOffset={clearance + 4} /> : null}
       <ExpenseSheet />
     </>
   );

@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FilterChip, Text } from '@/shared/presentation/components';
+import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 
 import {
@@ -30,6 +31,7 @@ export function MovementsScreen() {
   const { data } = useMovements();
   const [filters, setFilters] = useState<MovementsFilters>(emptyFilters);
   const [detailTx, setDetailTx] = useState<Transaction | null>(null);
+  const tabBarClearance = useFloatingTabBarClearance();
 
   const initialized = useMovementsStore((s) => s.initialized);
   const init = useMovementsStore((s) => s.init);
@@ -112,7 +114,7 @@ export function MovementsScreen() {
       <ScrollView
         contentContainerStyle={{
           paddingTop: 14,
-          paddingBottom: 32,
+          paddingBottom: tabBarClearance,
           paddingHorizontal: 16,
         }}
         showsVerticalScrollIndicator={false}

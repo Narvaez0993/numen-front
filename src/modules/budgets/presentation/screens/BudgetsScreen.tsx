@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon, SectionLabel, Text } from '@/shared/presentation/components';
+import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { BudgetsHeader } from '../components/BudgetsHeader';
@@ -34,6 +35,7 @@ type Confirm = { kind: 'techo' } | { kind: 'tope'; catId: string };
 const SHEET_CLOSE_MS = 280;
 
 export function BudgetsScreen() {
+  const tabBarClearance = useFloatingTabBarClearance();
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { data, isLoading } = useBudgets();
@@ -182,7 +184,7 @@ export function BudgetsScreen() {
       <ScrollView
         contentContainerStyle={{
           paddingTop: 14,
-          paddingBottom: 130,
+          paddingBottom: tabBarClearance + 40,
           paddingHorizontal: 16,
         }}
         showsVerticalScrollIndicator={false}

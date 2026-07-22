@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { limitsFor, usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { SectionLabel } from '@/shared/presentation/components';
+import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 
 import type {
@@ -57,6 +58,7 @@ export function AssistantScreen() {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [limitHit, setLimitHit] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const tabBarClearance = useFloatingTabBarClearance();
 
   const tier = usePlanStore((s) => s.tier);
   const used = usePlanStore((s) => s.used);
@@ -206,7 +208,7 @@ export function AssistantScreen() {
         <View
           style={{
             paddingTop: 8,
-            paddingBottom: 12,
+            paddingBottom: tabBarClearance,
             paddingHorizontal: 16,
             backgroundColor: theme.colors.bgBase,
             borderTopColor: theme.colors.borderSubtle,

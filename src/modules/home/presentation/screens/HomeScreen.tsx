@@ -6,6 +6,7 @@ import { DeudasInicioCard } from '@/modules/deudas/presentation/components/Deuda
 import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
 import { GoalsInicioCard } from '@/modules/goals/presentation/components/GoalsInicioCard';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { HomeHeader } from '../components/HomeHeader';
@@ -20,6 +21,7 @@ export function HomeScreen() {
   const { theme } = useTheme();
   const { data, isLoading } = useHomeOverview();
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
+  const tabBarClearance = useFloatingTabBarClearance();
   useDeudas();
 
   if (isLoading || !data) {
@@ -47,7 +49,7 @@ export function HomeScreen() {
       <ScrollView
         contentContainerStyle={{
           paddingTop: 14,
-          paddingBottom: 32,
+          paddingBottom: tabBarClearance,
           paddingHorizontal: 16,
         }}
         showsVerticalScrollIndicator={false}
