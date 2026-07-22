@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { Card, Text } from '@/shared/presentation/components';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   monthly: number;
@@ -26,12 +26,12 @@ export function MonthlyTotalCard({ monthly, yearly, count }: Props) {
         tabular
         style={{ fontSize: 28, lineHeight: 28, letterSpacing: -0.56 }}
       >
-        {formatCOP(monthly)}
+        {formatMoney(monthly)}
       </Text>
       <Text variant="caption" muted style={{ fontSize: 11.5, marginTop: 6 }}>
         {t('subscriptions.monthlyTotal.breakdown', {
           count,
-          yearly: formatCOP(yearly),
+          yearly: formatMoney(yearly),
         })}
       </Text>
     </Card>

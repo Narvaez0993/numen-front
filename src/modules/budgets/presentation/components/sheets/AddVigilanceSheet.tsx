@@ -3,7 +3,7 @@ import { Pressable, ScrollView, View } from 'react-native';
 
 import { BottomSheet, Icon, IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { SheetHeader } from './SheetHeader';
 
@@ -114,7 +114,7 @@ export function AddVigilanceSheet({
                     color={theme.colors.textTertiary}
                     style={{ fontSize: 11.5, marginTop: 2 }}
                   >
-                    {t('budgets.addVigilance.spent', { amount: formatCOP(c.spent) })}
+                    {t('budgets.addVigilance.spent', { amount: formatMoney(c.spent) })}
                   </Text>
                 </View>
                 <View

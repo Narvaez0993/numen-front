@@ -4,7 +4,7 @@ import { View } from 'react-native';
 
 import { Card, Icon, IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { totalsByDirection } from '../../domain/types/Deuda';
 import { useDeudasStore } from '../stores/useDeudasStore';
@@ -49,7 +49,7 @@ export function DeudasInicioCard({ onPress }: Props) {
                   tabular
                   style={{ fontSize: 11.5, fontFamily: 'Geist_500Medium' }}
                 >
-                  {formatCOP(totals.incoming)}
+                  {formatMoney(totals.incoming)}
                 </Text>
                 <Text
                   variant="caption"
@@ -78,7 +78,7 @@ export function DeudasInicioCard({ onPress }: Props) {
                   tabular
                   style={{ fontSize: 11.5, fontFamily: 'Geist_500Medium' }}
                 >
-                  {formatCOP(totals.outgoing)}
+                  {formatMoney(totals.outgoing)}
                 </Text>
                 <Text
                   variant="caption"

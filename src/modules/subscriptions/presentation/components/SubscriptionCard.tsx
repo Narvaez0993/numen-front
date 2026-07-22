@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Subscription } from '../../domain';
 
@@ -52,7 +52,7 @@ export function SubscriptionCard({ subscription, onPress }: Props) {
             {name}
           </Text>
           <Text variant="bodyLarge" tabular style={{ fontSize: 13.5 }}>
-            {formatCOP(amount)}
+            {formatMoney(amount)}
           </Text>
         </View>
         <View

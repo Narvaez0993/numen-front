@@ -4,7 +4,7 @@ import { Pressable, ScrollView, View } from 'react-native';
 
 import { BottomSheet, Button, IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import {
   CATEGORY_TOPE_PRESETS,
@@ -92,7 +92,7 @@ export function EditTopeSheet({
               color={theme.colors.textTertiary}
               style={{ fontSize: 11.5, marginTop: 2 }}
             >
-              {t('budgets.editTopeSheet.carry', { amount: formatCOP(category.spent) })}
+              {t('budgets.editTopeSheet.carry', { amount: formatMoney(category.spent) })}
             </Text>
           </View>
         </View>

@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { Card, Icon, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type {
   DailyAllowance,
@@ -54,7 +54,7 @@ export function TodayHero({ daily, saldo, month, onSaldoPress, onMonthPress }: P
         }}
       >
         <Text variant="display" tabular>
-          {formatCOP(remaining)}
+          {formatMoney(remaining)}
         </Text>
         <Text variant="caption" muted>
           {t('home.daily.availableToday')}
@@ -66,7 +66,7 @@ export function TodayHero({ daily, saldo, month, onSaldoPress, onMonthPress }: P
         style={{ marginBottom: 14 }}
       >
         <Text variant="caption" color={theme.colors.textSecondary} tabular>
-          {formatCOP(daily.spent)}
+          {formatMoney(daily.spent)}
         </Text>{' '}
         {t('home.daily.spent')}{' '}
         <Text variant="caption" muted>
@@ -74,7 +74,7 @@ export function TodayHero({ daily, saldo, month, onSaldoPress, onMonthPress }: P
         </Text>{' '}
         {t('home.daily.of')}{' '}
         <Text variant="caption" color={theme.colors.textSecondary} tabular>
-          {formatCOP(daily.suggested)}
+          {formatMoney(daily.suggested)}
         </Text>{' '}
         {t('home.daily.suggested')}
       </Text>
@@ -108,7 +108,7 @@ export function TodayHero({ daily, saldo, month, onSaldoPress, onMonthPress }: P
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <Text variant="bodyLarge" tabular>
-            {formatCOP(saldo.net)}
+            {formatMoney(saldo.net)}
           </Text>
           <Icon name="chevron-right" size={14} color={theme.colors.textTertiary} />
         </View>
@@ -137,7 +137,7 @@ export function TodayHero({ daily, saldo, month, onSaldoPress, onMonthPress }: P
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <Text variant="caption" color={theme.colors.textSecondary} tabular>
-              {formatCOP(month.spent)} {t('home.daily.of')} {formatCOP(month.target)}
+              {formatMoney(month.spent)} {t('home.daily.of')} {formatMoney(month.target)}
             </Text>
             <Icon name="chevron-right" size={14} color={theme.colors.textTertiary} />
           </View>

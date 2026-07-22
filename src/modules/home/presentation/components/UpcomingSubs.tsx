@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native';
 
 import { IconBox, SectionLabel, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { UpcomingSub } from '../../domain/types/HomeOverview';
 
@@ -69,7 +69,7 @@ export function UpcomingSubs({ items }: Props) {
                   tabular
                   style={{ marginTop: 2 }}
                 >
-                  {formatCOP(s.amount)}
+                  {formatMoney(s.amount)}
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>

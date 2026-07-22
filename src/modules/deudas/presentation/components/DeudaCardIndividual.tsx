@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { type Deuda, debtProgress, debtStatus } from '../../domain/types/Deuda';
 import { selectCounterparty, useDeudasStore } from '../stores/useDeudasStore';
@@ -67,7 +67,7 @@ export function DeudaCardIndividual({ deuda, onPress }: Props) {
           </Text>
         </View>
         <Text tabular style={{ fontSize: 15, fontWeight: '500', letterSpacing: -0.15 }}>
-          {formatCOP(deuda.balance)}
+          {formatMoney(deuda.balance)}
         </Text>
       </View>
 

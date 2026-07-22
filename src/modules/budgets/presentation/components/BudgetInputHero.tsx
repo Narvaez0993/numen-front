@@ -9,7 +9,7 @@ import {
 
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 function formatThousands(n: number): string {
   if (!n) return '';
@@ -128,7 +128,7 @@ export function BudgetInputHero({
                 tabular
                 style={{ fontSize: 12.5, fontWeight: '500' }}
               >
-                {formatCOP(p)}
+                {formatMoney(p)}
               </Text>
             </Pressable>
           );

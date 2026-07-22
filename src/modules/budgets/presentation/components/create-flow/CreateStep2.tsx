@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { Icon, IconBox, SectionLabel, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { DashedButton } from '../DashedButton';
 
@@ -83,7 +83,7 @@ export function CreateStep2({
             tabular
             style={{ fontSize: 11.5, fontWeight: '500', lineHeight: 16.7 }}
           >
-            {formatCOP(techo)}
+            {formatMoney(techo)}
           </Text>
           {t('budgets.create.step2.infoPart3')}
         </Text>
@@ -133,7 +133,7 @@ export function CreateStep2({
                     }}
                   >
                     {hasT
-                      ? t('budgets.create.step2.tope', { amount: formatCOP(tope) })
+                      ? t('budgets.create.step2.tope', { amount: formatMoney(tope) })
                       : t('budgets.create.step2.noTope')}
                   </Text>
                 </View>

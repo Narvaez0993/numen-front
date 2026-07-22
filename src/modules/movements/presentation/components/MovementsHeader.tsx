@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native';
 
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   monthLabel: string;
@@ -57,7 +57,7 @@ export function MovementsHeader({
             tabular
             style={{ fontWeight: '500' }}
           >
-            {formatCOP(monthTotal)}
+            {formatMoney(monthTotal)}
           </Text>
         </View>
       </View>

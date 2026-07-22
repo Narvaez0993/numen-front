@@ -4,7 +4,7 @@ import { Pressable, ScrollView, View, type DimensionValue } from 'react-native';
 
 import { BottomSheet, Icon, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
 import { useCreateExpenses } from '../hooks/useCreateExpenses';
@@ -59,7 +59,7 @@ export function ExpenseSheet() {
             (savedCount === 1 ? 'expenses.toast.savedOne' : 'expenses.toast.saved');
           setToast({
             visible: true,
-            message: t(key, { count: savedCount, total: formatCOP(totalAmount) }),
+            message: t(key, { count: savedCount, total: formatMoney(totalAmount) }),
           });
           closeSheet();
         },

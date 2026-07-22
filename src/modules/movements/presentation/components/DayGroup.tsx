@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 
 import { Card, Text } from '@/shared/presentation/components';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Account, Category } from '../../domain/types/MovementsCatalog';
 import type { DayGroup as DayGroupModel } from '../utils/groupByDay';
@@ -72,7 +72,7 @@ export function DayGroup({ group, categories, accounts, onItemPress }: Props) {
           tabular
           style={{ fontSize: 11.5, fontWeight: '500' }}
         >
-          {formatCOP(group.total)}
+          {formatMoney(group.total)}
         </Text>
       </View>
 

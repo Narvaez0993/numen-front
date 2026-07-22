@@ -15,7 +15,7 @@ import {
   Text,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { type Goal, goalPct } from '../../domain/types/Goal';
 import { ContributionSheet } from '../components/ContributionSheet';
@@ -155,10 +155,10 @@ export function GoalsScreen() {
                   }}
                 >
                   <Text variant="h2" tabular>
-                    {formatCOP(goal.saved)}
+                    {formatMoney(goal.saved)}
                   </Text>
                   <Text variant="caption" muted>
-                    {t('goals.of')} {formatCOP(goal.target)}
+                    {t('goals.of')} {formatMoney(goal.target)}
                   </Text>
                 </View>
                 <ProgressBar pct={pct} height={6} />

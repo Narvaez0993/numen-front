@@ -9,7 +9,7 @@ import {
   Text,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { RecentExpense } from '../../domain/types/HomeOverview';
 
@@ -124,7 +124,7 @@ export function RecentList({ items, onItemPress, onSeeAll }: Props) {
                 </Text>
               </View>
               <Text variant="bodyLarge" tabular color={amountColor}>
-                {isIncome ? `+${formatCOP(r.amount)}` : formatCOP(r.amount)}
+                {isIncome ? `+${formatMoney(r.amount)}` : formatMoney(r.amount)}
               </Text>
             </Pressable>
           );

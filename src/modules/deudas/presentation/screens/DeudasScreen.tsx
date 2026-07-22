@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FAB, Icon, Text, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { type DebtDirection, debtStatus } from '../../domain/types/Deuda';
 import { DeudaCardIndividual } from '../components/DeudaCardIndividual';
@@ -111,7 +111,7 @@ export function DeudasScreen() {
           onSaved={(amount) => {
             setToast({
               visible: true,
-              message: t('deudas.abono.toast', { amount: formatCOP(amount) }),
+              message: t('deudas.abono.toast', { amount: formatMoney(amount) }),
             });
           }}
         />
@@ -228,7 +228,7 @@ export function DeudasScreen() {
         onSaved={(amount) => {
           setToast({
             visible: true,
-            message: t('deudas.abono.toast', { amount: formatCOP(amount) }),
+            message: t('deudas.abono.toast', { amount: formatMoney(amount) }),
           });
         }}
       />

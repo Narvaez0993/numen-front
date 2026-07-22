@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { Card, Icon, IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { MonthIncome } from '../../domain/types/HomeOverview';
 
@@ -38,7 +38,7 @@ export function IncomeSummaryRow({ income, monthName, onPress }: Props) {
               tabular
               style={{ fontSize: 11.5, fontFamily: 'Geist_500Medium' }}
             >
-              {formatCOP(income.total)}
+              {formatMoney(income.total)}
             </Text>
             <Text
               variant="caption"

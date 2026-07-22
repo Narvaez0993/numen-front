@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { Icon, IconBox, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { type Deuda, debtStatus, type SharedEvent } from '../../domain/types/Deuda';
 import { useDeudasStore } from '../stores/useDeudasStore';
@@ -87,7 +87,7 @@ export function DeudaCardShared({
               tabular
               style={{ fontSize: 15, fontWeight: '500', letterSpacing: -0.15 }}
             >
-              {formatCOP(event.totalAmount)}
+              {formatMoney(event.totalAmount)}
             </Text>
             <View
               style={{
@@ -118,7 +118,7 @@ export function DeudaCardShared({
               color={theme.colors.accentMint}
               style={{ fontSize: 11, fontFamily: 'Geist_500Medium' }}
             >
-              {formatCOP(totalPaid)}
+              {formatMoney(totalPaid)}
             </Text>
             <Text color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
               {' '}
@@ -130,7 +130,7 @@ export function DeudaCardShared({
             </Text>
           </View>
           <Text tabular color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
-            {t('deudas.card.remaining', { amount: formatCOP(totalRem) })}
+            {t('deudas.card.remaining', { amount: formatMoney(totalRem) })}
           </Text>
         </View>
       </Pressable>
@@ -172,8 +172,8 @@ export function DeudaCardShared({
                     style={{ fontSize: 12 }}
                   >
                     {isPartial
-                      ? `${formatCOP(d.amount - d.balance)} / ${formatCOP(d.amount)}`
-                      : formatCOP(d.amount)}
+                      ? `${formatMoney(d.amount - d.balance)} / ${formatMoney(d.amount)}`
+                      : formatMoney(d.amount)}
                   </Text>
                   <DebtPill status={s} />
                 </Pressable>

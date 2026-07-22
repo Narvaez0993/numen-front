@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { BottomSheet, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { debtStatus } from '../../../domain/types/Deuda';
 import { useDeudasStore } from '../../stores/useDeudasStore';
@@ -85,7 +85,7 @@ export function HistorySheet({ visible, onClose }: Props) {
                   </View>
                   <View style={{ alignItems: 'flex-end', gap: 4 }}>
                     <Text variant="bodyLarge" tabular style={{ fontSize: 13.5 }}>
-                      {formatCOP(debt.amount)}
+                      {formatMoney(debt.amount)}
                     </Text>
                     <DebtPill status="paid" />
                   </View>

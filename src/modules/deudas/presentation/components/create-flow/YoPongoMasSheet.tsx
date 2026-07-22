@@ -4,7 +4,7 @@ import { TextInput, View } from 'react-native';
 
 import { BottomSheet, Button, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   visible: boolean;
@@ -113,7 +113,7 @@ export function YoPongoMasSheet({
             >
               {t('deudas.create.yoPongoMas.perOther', {
                 count: others,
-                amount: formatCOP(perOther),
+                amount: formatMoney(perOther),
               })}
             </Text>
           </View>

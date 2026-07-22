@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { IconBox, Pill, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Account, Category } from '../../domain/types/MovementsCatalog';
 import type { Transaction } from '../../domain/types/Transaction';
@@ -95,7 +95,7 @@ export function TxRow({ tx, category, account, last, onPress }: Props) {
         </Text>
       </View>
       <Text variant="bodyLarge" tabular color={amountColor}>
-        {isIncome ? `+${formatCOP(tx.amount)}` : formatCOP(tx.amount)}
+        {isIncome ? `+${formatMoney(tx.amount)}` : formatMoney(tx.amount)}
       </Text>
     </Pressable>
   );

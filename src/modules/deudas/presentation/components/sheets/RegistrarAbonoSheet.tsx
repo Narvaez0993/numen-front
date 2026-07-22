@@ -4,7 +4,7 @@ import { Pressable, ScrollView, TextInput, View } from 'react-native';
 
 import { BottomSheet, Button, Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { ACCOUNT_OPTIONS, type SelectOption } from '../../constants/options';
 import {
@@ -125,7 +125,7 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
             {t('deudas.abono.balanceLabel')}
           </Text>
           <Text tabular style={{ fontSize: 18, fontWeight: '500' }}>
-            {formatCOP(balance)}
+            {formatMoney(balance)}
           </Text>
         </View>
 
@@ -202,7 +202,7 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
                     color={active ? theme.colors.accentMint : theme.colors.textSecondary}
                     style={{ fontSize: 12, fontFamily: 'Geist_500Medium' }}
                   >
-                    {formatCOP(val)}
+                    {formatMoney(val)}
                   </Text>
                   {` (${Math.round(pct * 100)}%)`}
                 </Text>

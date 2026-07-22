@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { Button, Icon, type IconName, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
 import { useExpenseSheetStore, type SheetMethod } from '../stores/useExpenseSheetStore';
@@ -206,7 +206,7 @@ export function ConfirmState({ onSave, saving = false }: Props) {
           {t('expenses.sheet.total')}
         </Text>
         <Text variant="display" tabular style={{ fontSize: 22 }}>
-          {formatCOP(total)}
+          {formatMoney(total)}
         </Text>
       </View>
 

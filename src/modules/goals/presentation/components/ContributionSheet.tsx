@@ -10,7 +10,7 @@ import {
   Text,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Goal } from '../../domain/types/Goal';
 
@@ -50,7 +50,7 @@ export function ContributionSheet({ visible, goal, onClose, onSave }: Props) {
             color={theme.colors.textSecondary}
             style={{ marginTop: 4 }}
           >
-            {t('goals.contribution.remaining', { amount: formatCOP(remaining) })}
+            {t('goals.contribution.remaining', { amount: formatMoney(remaining) })}
           </Text>
         </View>
 

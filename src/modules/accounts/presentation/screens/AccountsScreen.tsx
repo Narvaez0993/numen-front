@@ -12,7 +12,7 @@ import {
 } from '@/shared/presentation/components';
 import type { AccentColor } from '@/shared/domain';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
@@ -168,7 +168,7 @@ export function AccountsScreen() {
               iconColor={account.color}
               title={account.name}
               subtitle={account.sub}
-              value={formatCOP(account.balance)}
+              value={formatMoney(account.balance)}
               last={i === accounts.length - 1}
               onPress={() => setAccountSheet({ open: true, account })}
             />

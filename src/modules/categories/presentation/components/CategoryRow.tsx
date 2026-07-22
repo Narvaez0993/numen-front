@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { Icon, Text } from '@/shared/presentation/components';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Category } from '../../domain';
 
@@ -70,7 +70,7 @@ export function CategoryRow({ category, last = false }: Props) {
       </View>
       {category.spent > 0 ? (
         <Text variant="label" tabular style={{ fontSize: 13 }}>
-          {formatCOP(category.spent)}
+          {formatMoney(category.spent)}
         </Text>
       ) : (
         <Text variant="caption" muted style={{ fontSize: 11 }}>
