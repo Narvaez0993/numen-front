@@ -9,6 +9,7 @@ type State = {
   hydrated: boolean;
   profile: OnboardingProfileDTO | null;
   markCompleted: (profile: OnboardingProfileDTO) => void;
+  updateName: (name: string) => void;
   reset: () => void;
 };
 
@@ -19,6 +20,8 @@ export const useOnboardingStore = create<State>()(
       hydrated: false,
       profile: null,
       markCompleted: (profile) => set({ completed: true, profile }),
+      updateName: (name) =>
+        set((s) => (s.profile ? { profile: { ...s.profile, name } } : s)),
       reset: () => set({ completed: false, profile: null }),
     }),
     {

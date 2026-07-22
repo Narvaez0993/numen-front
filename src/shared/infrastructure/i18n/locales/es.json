@@ -311,7 +311,7 @@
   },
   "assistant": {
     "title": "Asistente",
-    "greeting": "¿En qué te ayudo, Sebastián?",
+    "greeting": "¿En qué te ayudo, {{name}}?",
     "thisWeek": "Esta semana",
     "suggestions": "Sugerencias",
     "conversation": "Conversación",
@@ -400,21 +400,18 @@
       "title": "Tu cuenta principal",
       "subtitle": "Para empezar a llevar el saldo. Puedes agregar más después.",
       "banks": {
-        "bbva": "BBVA",
-        "bancolombia": "Bancolombia",
-        "davivienda": "Davivienda",
-        "nu": "Nu",
-        "daviplata": "Daviplata",
-        "nequi": "Nequi",
+        "banco": "Banco",
+        "billetera": "Billetera",
         "efectivo": "Efectivo",
         "otro": "Otro"
       },
       "sheet": {
-        "title": "Saldo aproximado en {{bank}}",
+        "title": "Saldo aproximado · {{bank}}",
         "hint": "Estimado está bien. Lo puedes ajustar después.",
         "save": "Guardar y continuar",
         "skip": "No sé, saltar"
-      }
+      },
+      "currency": "Tu moneda"
     },
     "magic": {
       "step": "Paso 5 de 5",
@@ -424,7 +421,7 @@
       "processing": "Procesando…",
       "exampleLabel": "Ejemplo",
       "example": "Café tres mil quinientos",
-      "preferText": "Prefiero escribirlo"
+      "preferText": "Saltar demo"
     },
     "confirm": {
       "pill": "Registrado",
@@ -727,12 +724,26 @@
       "resetOnboarding": {
         "title": "Resetear onboarding",
         "subtitle": "Solo en desarrollo"
+      },
+      "language": {
+        "title": "Idioma"
+      },
+      "currency": {
+        "title": "Moneda"
       }
     },
     "appearance": {
       "dark": "Dark",
       "light": "Light",
       "auto": "Auto"
+    },
+    "soon": "Próximamente",
+    "editName": {
+      "title": "Tu nombre",
+      "subtitle": "Así te saluda Numen.",
+      "label": "Nombre",
+      "placeholder": "Tu nombre",
+      "save": "Guardar"
     }
   },
   "expenses": {

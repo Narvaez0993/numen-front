@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { Text } from '@/shared/presentation/components';
+import { Icon, Text } from '@/shared/presentation/components';
+import {
+  SUPPORTED_CURRENCIES,
+  useCurrencyStore,
+} from '@/shared/presentation/currency/useCurrencyStore';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { BANKS, type BankId } from '../../domain';
@@ -33,6 +37,14 @@ export function SetupScreen({
   const [selected, setSelected] = useState<BankId | null>(initialBankId);
   const [showSheet, setShowSheet] = useState(false);
   const [balance, setBalance] = useState(initialBalance ? initialBalance.toString() : '');
+  const currency = useCurrencyStore((s) => s.currency);
+  const setCurrency = useCurrencyStore((s) => s.setCurrency);
+
+  const cycleCurrency = () => {
+    const idx = SUPPORTED_CURRENCIES.indexOf(currency);
+    const next = SUPPORTED_CURRENCIES[(idx + 1) % SUPPORTED_CURRENCIES.length];
+    if (next) setCurrency(next);
+  };
 
   const onTileClick = (id: BankId) => {
     setSelected(id);
@@ -88,6 +100,34 @@ export function SetupScreen({
           </View>
         ))}
       </View>
+
+      <Pressable
+        accessibilityRole="button"
+        onPress={cycleCurrency}
+        style={({ pressed }) => ({
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginTop: 16,
+          paddingHorizontal: 14,
+          paddingVertical: 13,
+          backgroundColor: theme.colors.bgFloat,
+          borderColor: theme.colors.borderSubtle,
+          borderWidth: 1,
+          borderRadius: 12,
+          opacity: pressed ? 0.8 : 1,
+        })}
+      >
+        <Text variant="caption" muted>
+          {t('onboarding.setup.currency')}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text variant="label" style={{ fontSize: 12.5 }}>
+            {currency}
+          </Text>
+          <Icon name="chevron-right" size={13} color={theme.colors.textTertiary} />
+        </View>
+      </Pressable>
 
       <View style={{ flex: 1 }} />
 

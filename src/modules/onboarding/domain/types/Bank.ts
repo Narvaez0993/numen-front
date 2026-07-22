@@ -1,14 +1,6 @@
 import type { AccentColor } from '@/shared/domain';
 
-export type BankId =
-  | 'bbva'
-  | 'bancolombia'
-  | 'davivienda'
-  | 'nu'
-  | 'daviplata'
-  | 'nequi'
-  | 'efectivo'
-  | 'otro';
+export type BankId = 'banco' | 'billetera' | 'efectivo' | 'otro';
 
 export type BrandBank = {
   id: BankId;

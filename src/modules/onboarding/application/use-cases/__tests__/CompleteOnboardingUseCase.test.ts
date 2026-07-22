@@ -22,7 +22,7 @@ describe('CompleteOnboardingUseCase', () => {
     const result = await useCase.execute({
       name: '  Sebastián  ',
       goal: 'ahorrar',
-      bankId: 'bbva',
+      bankId: 'banco',
       balance: 5245000,
     });
 
@@ -55,7 +55,7 @@ describe('CompleteOnboardingUseCase', () => {
     const result = await useCase.execute({
       name: 'Sebastián',
       goal: null,
-      bankId: 'bbva',
+      bankId: 'banco',
       balance: -100,
     });
 

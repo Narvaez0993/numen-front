@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DeudasInicioCard } from '@/modules/deudas/presentation/components/DeudasInicioCard';
 import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
 import { GoalsInicioCard } from '@/modules/goals/presentation/components/GoalsInicioCard';
+import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { HomeHeader } from '../components/HomeHeader';
@@ -18,6 +19,7 @@ import { useHomeOverview } from '../hooks/useHomeOverview';
 export function HomeScreen() {
   const { theme } = useTheme();
   const { data, isLoading } = useHomeOverview();
+  const onboardingName = useOnboardingStore((s) => s.profile?.name);
   useDeudas();
 
   if (isLoading || !data) {
@@ -52,7 +54,7 @@ export function HomeScreen() {
       >
         <View style={{ gap: 18 }}>
           <HomeHeader
-            name={data.greeting}
+            name={onboardingName?.trim() || data.greeting}
             onAvatarPress={() => router.push('/profile')}
           />
           <TodayHero

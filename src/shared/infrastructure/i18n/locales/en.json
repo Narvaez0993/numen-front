@@ -311,7 +311,7 @@
   },
   "assistant": {
     "title": "Assistant",
-    "greeting": "How can I help, Sebastián?",
+    "greeting": "How can I help, {{name}}?",
     "thisWeek": "This week",
     "suggestions": "Suggestions",
     "conversation": "Conversation",
@@ -400,21 +400,18 @@
       "title": "Your main account",
       "subtitle": "To start tracking the balance. You can add more later.",
       "banks": {
-        "bbva": "BBVA",
-        "bancolombia": "Bancolombia",
-        "davivienda": "Davivienda",
-        "nu": "Nu",
-        "daviplata": "Daviplata",
-        "nequi": "Nequi",
+        "banco": "Bank",
+        "billetera": "Wallet",
         "efectivo": "Cash",
         "otro": "Other"
       },
       "sheet": {
-        "title": "Approximate balance in {{bank}}",
+        "title": "Approximate balance · {{bank}}",
         "hint": "An estimate is fine. You can adjust later.",
         "save": "Save and continue",
         "skip": "Not sure, skip"
-      }
+      },
+      "currency": "Your currency"
     },
     "magic": {
       "step": "Step 5 of 5",
@@ -424,7 +421,7 @@
       "processing": "Processing…",
       "exampleLabel": "Example",
       "example": "Coffee three thousand five hundred",
-      "preferText": "I'd rather type it"
+      "preferText": "Skip demo"
     },
     "confirm": {
       "pill": "Logged",
@@ -727,12 +724,26 @@
       "resetOnboarding": {
         "title": "Reset onboarding",
         "subtitle": "Development only"
+      },
+      "language": {
+        "title": "Language"
+      },
+      "currency": {
+        "title": "Currency"
       }
     },
     "appearance": {
       "dark": "Dark",
       "light": "Light",
       "auto": "Auto"
+    },
+    "soon": "Coming soon",
+    "editName": {
+      "title": "Your name",
+      "subtitle": "How Numen greets you.",
+      "label": "Name",
+      "placeholder": "Your name",
+      "save": "Save"
     }
   },
   "expenses": {

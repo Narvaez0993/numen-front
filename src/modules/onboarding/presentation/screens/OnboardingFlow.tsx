@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { completeOnboardingUseCase } from '@/core/di/container';
+import { useGoalsStore } from '@/modules/goals/presentation/stores/useGoalsStore';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { useOnboardingFlow } from '../hooks/useOnboardingFlow';
@@ -19,6 +21,7 @@ import { WelcomeScreen } from './WelcomeScreen';
 
 export function OnboardingFlow() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const flow = useOnboardingFlow();
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
   const finishingRef = useRef(false);
@@ -35,6 +38,20 @@ export function OnboardingFlow() {
     const result = await completeOnboardingUseCase.execute(profile);
     const persisted = result.ok ? result.value : profile;
     markCompleted(persisted);
+    if (persisted.goal === 'ahorrar') {
+      const goalsStore = useGoalsStore.getState();
+      if (!goalsStore.goals.some((g) => g.id === 'goal-onboarding')) {
+        goalsStore.addGoal({
+          id: 'goal-onboarding',
+          name: 'Mi primera meta',
+          iconName: 'target',
+          color: 'mint',
+          target: 1_000_000,
+          saved: 0,
+          projectionMonth: '',
+        });
+      }
+    }
     // Navigate explicitly to the tabs group. Expo Router v4 cross-group
     // imperative navigation works best with an explicit group path.
     router.replace('/(tabs)');
@@ -130,7 +147,9 @@ export function OnboardingFlow() {
           <ConfirmScreen
             expense={expense}
             transcript={flow.ctx.transcript ?? ''}
-            accountValue={flow.ctx.bankId ? flow.ctx.bankId : null}
+            accountValue={
+              flow.ctx.bankId ? t(`onboarding.setup.banks.${flow.ctx.bankId}`) : null
+            }
             onContinue={() => {
               void finish();
             }}
