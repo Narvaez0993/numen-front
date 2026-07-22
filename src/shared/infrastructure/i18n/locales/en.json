@@ -224,7 +224,27 @@
       "next_one": "In {{count}} day",
       "next_other": "In {{count}} days"
     },
-    "add": "Add subscription"
+    "add": "Add subscription",
+    "form": {
+      "newTitle": "New subscription",
+      "editTitle": "Edit subscription",
+      "subtitle": "The recurring charge and where it comes from.",
+      "name": "Name",
+      "namePlaceholder": "Netflix, gym, iCloud…",
+      "amount": "Amount",
+      "cadence": "Frequency",
+      "cadences": {
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "account": "Account",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Delete {{name}}?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
+    }
   },
   "accounts": {
     "title": "Sources and accounts",

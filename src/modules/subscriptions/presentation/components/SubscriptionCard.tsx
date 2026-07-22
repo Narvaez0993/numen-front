@@ -9,9 +9,10 @@ import type { Subscription } from '../../domain';
 
 type Props = {
   subscription: Subscription;
+  onPress?: () => void;
 };
 
-export function SubscriptionCard({ subscription }: Props) {
+export function SubscriptionCard({ subscription, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { name, icon, color, amount, every, account, nextInDays, urgent } = subscription;
@@ -22,6 +23,8 @@ export function SubscriptionCard({ subscription }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
+      onPress={onPress}
+      disabled={!onPress}
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',

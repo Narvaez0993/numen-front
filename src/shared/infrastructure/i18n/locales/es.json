@@ -224,7 +224,27 @@
       "next_one": "En {{count}} día",
       "next_other": "En {{count}} días"
     },
-    "add": "Agregar suscripción"
+    "add": "Agregar suscripción",
+    "form": {
+      "newTitle": "Nueva suscripción",
+      "editTitle": "Editar suscripción",
+      "subtitle": "El cobro recurrente y de dónde sale.",
+      "name": "Nombre",
+      "namePlaceholder": "Netflix, gimnasio, iCloud…",
+      "amount": "Monto",
+      "cadence": "Frecuencia",
+      "cadences": {
+        "weekly": "Semanal",
+        "monthly": "Mensual",
+        "yearly": "Anual"
+      },
+      "account": "Cuenta",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "deleteConfirmTitle": "¿Eliminar {{name}}?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
+    }
   },
   "accounts": {
     "title": "Fuentes y cuentas",
