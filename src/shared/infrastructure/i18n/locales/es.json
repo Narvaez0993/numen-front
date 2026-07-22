@@ -437,7 +437,35 @@
   "goals": {
     "title": "Metas",
     "of": "de",
-    "projection": "A este ritmo llegas en {{month}}"
+    "projection": "A este ritmo llegas en {{month}}",
+    "projectionEmpty": "Registra tu primer aporte para empezar",
+    "projectionSoon": "El agente proyectará tu fecha con más aportes",
+    "add": "Nueva meta",
+    "contribute": "Registrar aporte",
+    "edit": "Editar",
+    "empty": {
+      "title": "Aún no tienes metas",
+      "body": "Crea una meta de ahorro y el agente te ayudará a llegar."
+    },
+    "form": {
+      "newGoal": "Nueva meta",
+      "editGoal": "Editar meta",
+      "subtitle": "Un objetivo claro y el monto para lograrlo.",
+      "name": "Nombre",
+      "namePlaceholder": "Viaje, fondo de emergencia…",
+      "target": "Monto objetivo",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
+    },
+    "contribution": {
+      "title": "Aporte a {{name}}",
+      "remaining": "Te faltan {{amount}} para llegar",
+      "amount": "Monto del aporte",
+      "save": "Guardar aporte"
+    }
   },
   "deudas": {
     "title": "Deudas",

@@ -5,14 +5,15 @@ import { Card, Icon, IconBox, ProgressBar, Text } from '@/shared/presentation/co
 import { useTheme } from '@/shared/presentation/theme';
 
 import { goalPct } from '../../domain/types/Goal';
-import { MOCK_GOALS } from '../constants/mockGoals';
+import { useGoalsStore } from '../stores/useGoalsStore';
 
 type Props = { onPress: () => void };
 
 export function GoalsInicioCard({ onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const goal = MOCK_GOALS[0];
+  const goals = useGoalsStore((s) => s.goals);
+  const goal = goals[0];
   if (!goal) return null;
 
   const pct = goalPct(goal);

@@ -437,7 +437,35 @@
   "goals": {
     "title": "Goals",
     "of": "of",
-    "projection": "At this pace you'll get there in {{month}}"
+    "projection": "At this pace you'll get there in {{month}}",
+    "projectionEmpty": "Log your first contribution to get started",
+    "projectionSoon": "The agent will project your date with more contributions",
+    "add": "New goal",
+    "contribute": "Add contribution",
+    "edit": "Edit",
+    "empty": {
+      "title": "No goals yet",
+      "body": "Create a savings goal and the agent will help you get there."
+    },
+    "form": {
+      "newGoal": "New goal",
+      "editGoal": "Edit goal",
+      "subtitle": "A clear objective and the amount to reach it.",
+      "name": "Name",
+      "namePlaceholder": "Trip, emergency fund…",
+      "target": "Target amount",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Delete \"{{name}}\"?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
+    },
+    "contribution": {
+      "title": "Contribution to {{name}}",
+      "remaining": "{{amount}} to go",
+      "amount": "Contribution amount",
+      "save": "Save contribution"
+    }
   },
   "deudas": {
     "title": "Debts",
