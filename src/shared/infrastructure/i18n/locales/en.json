@@ -367,52 +367,11 @@
       "suggested": "suggested"
     },
     "saldo": {
-      "label": "Net balance",
-      "viewAccounts": "View accounts",
-      "breakdown_one": "{{accounts}} account + cash − {{tc}} CC",
-      "breakdown_other": "{{accounts}} accounts + cash − {{tc}} CC",
-      "today": "For today",
-      "left": "left"
+      "label": "Net balance"
     },
     "month": {
       "label": "{{month}} · {{daysLeft}} days",
-      "labelOne": "{{month}} · {{daysLeft}} day",
-      "dailySuggested": "Daily suggested"
-    },
-    "heroPicker": {
-      "title": "Home view",
-      "subtitle": "Pick what you want to see first when you open the app.",
-      "footnote": "You can change it from here anytime.",
-      "daily": {
-        "label": "Available today",
-        "sub": "Your daily allowance and what you've already spent"
-      },
-      "saldo": {
-        "label": "Net balance",
-        "sub": "How much you have in accounts, minus debts"
-      },
-      "mes": {
-        "label": "Monthly progress",
-        "sub": "Spent vs your monthly budget"
-      }
-    },
-    "gastado": {
-      "label": "Spent this month",
-      "short": "Spent · month",
-      "viewExpenses": "View expenses"
-    },
-    "layoutPicker": {
-      "title": "Home layout",
-      "subtitle": "Choose how your Home is organized.",
-      "footnote": "You can change it from here anytime.",
-      "actividad": {
-        "label": "Activity",
-        "sub": "Recent expenses first, summaries at the end"
-      },
-      "compacto": {
-        "label": "Compact",
-        "sub": "Balance and spent in a 2-up row, the rest below"
-      }
+      "labelOne": "{{month}} · {{daysLeft}} day"
     },
     "categories": {
       "title": "Your categories",
@@ -425,15 +384,30 @@
       "inDays_other": "in {{count}} days"
     },
     "recent": {
-      "title": "Recent expenses",
+      "title": "Recent activity",
       "seeAll": "See all",
       "transferTag": "Transfer · not an expense"
+    },
+    "income": {
+      "title": "{{month}} income",
+      "savings": "{{pct}}% saved"
     }
+  },
+  "goals": {
+    "title": "Goals",
+    "of": "of",
+    "projection": "At this pace you'll get there in {{month}}"
   },
   "deudas": {
     "title": "Debts",
-    "summary": { "owedToMe": "owe me", "iOwe": "I owe" },
-    "tabs": { "incoming": "Owed to me", "outgoing": "I owe" },
+    "summary": {
+      "owedToMe": "owe me",
+      "iOwe": "I owe"
+    },
+    "tabs": {
+      "incoming": "Owed to me",
+      "outgoing": "I owe"
+    },
     "inicioCard": {
       "title": "Debts",
       "owedToMe": "to collect",
@@ -648,7 +622,11 @@
       "hint": "e.g. \"taxi to work, nine thousand\"",
       "photoReceipt": "Photo receipt",
       "write": "Write",
-      "quote": "\"taxi to work, nine thousand and lunch at juan valdez eighteen thousand\"",
+      "quote": {
+        "voice": "You said",
+        "text": "You wrote",
+        "photo": "Detected from receipt"
+      },
       "detectedAuto": "Auto-detected",
       "amount": "Amount",
       "addAnother": "Add another",
@@ -679,11 +657,6 @@
         "gallery": "Choose from gallery",
         "analyzing": "Analyzing receipt…",
         "demoTranscript": "Carulla receipt · May 14, 2026"
-      },
-      "quote": {
-        "voice": "You said",
-        "text": "You wrote",
-        "photo": "Detected from receipt"
       },
       "transcript": {
         "voice": "taxi to work, nine thousand and lunch at juan valdez eighteen thousand"

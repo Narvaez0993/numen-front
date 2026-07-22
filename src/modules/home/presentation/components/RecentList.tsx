@@ -13,9 +13,13 @@ import { formatCOP } from '@/shared/presentation/utils/formatCOP';
 
 import type { RecentExpense } from '../../domain/types/HomeOverview';
 
-type Props = { items: RecentExpense[]; onItemPress?: () => void };
+type Props = {
+  items: RecentExpense[];
+  onItemPress?: () => void;
+  onSeeAll?: () => void;
+};
 
-export function RecentList({ items, onItemPress }: Props) {
+export function RecentList({ items, onItemPress, onSeeAll }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -31,7 +35,7 @@ export function RecentList({ items, onItemPress }: Props) {
         }}
       >
         <SectionLabel>{t('home.recent.title')}</SectionLabel>
-        <Pressable hitSlop={6}>
+        <Pressable hitSlop={6} onPress={onSeeAll} disabled={!onSeeAll}>
           <Text
             variant="label"
             color={theme.colors.accentMint}
@@ -44,9 +48,15 @@ export function RecentList({ items, onItemPress }: Props) {
       <Card padding={4}>
         {items.map((r, i) => {
           const isTransfer = r.tag === 'transfer';
+          const isIncome = !isTransfer && r.amount > 0;
           const lineColor = isTransfer
             ? theme.colors.textTertiary
             : theme.colors.textPrimary;
+          const amountColor = isTransfer
+            ? theme.colors.textTertiary
+            : isIncome
+              ? theme.colors.accentMint
+              : theme.colors.textPrimary;
           const subtitle = isTransfer
             ? t('home.recent.transferTag')
             : `${r.category} · ${r.time}`;
@@ -54,6 +64,7 @@ export function RecentList({ items, onItemPress }: Props) {
             <Pressable
               key={r.id}
               onPress={onItemPress}
+              disabled={!onItemPress}
               style={({ pressed }) => ({
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -112,8 +123,8 @@ export function RecentList({ items, onItemPress }: Props) {
                   {subtitle}
                 </Text>
               </View>
-              <Text variant="bodyLarge" tabular color={lineColor}>
-                {formatCOP(r.amount)}
+              <Text variant="bodyLarge" tabular color={amountColor}>
+                {isIncome ? `+${formatCOP(r.amount)}` : formatCOP(r.amount)}
               </Text>
             </Pressable>
           );

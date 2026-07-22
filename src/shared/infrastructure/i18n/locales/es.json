@@ -367,52 +367,11 @@
       "suggested": "sugeridos"
     },
     "saldo": {
-      "label": "Saldo neto",
-      "viewAccounts": "Ver cuentas",
-      "breakdown_one": "{{accounts}} cuenta + efectivo − {{tc}} TC",
-      "breakdown_other": "{{accounts}} cuentas + efectivo − {{tc}} TC",
-      "today": "Para hoy",
-      "left": "quedan"
+      "label": "Saldo neto"
     },
     "month": {
       "label": "{{month}} · {{daysLeft}} días",
-      "labelOne": "{{month}} · {{daysLeft}} día",
-      "dailySuggested": "Diario sugerido"
-    },
-    "heroPicker": {
-      "title": "Vista del Inicio",
-      "subtitle": "Elige qué información quieres ver primero al abrir la app.",
-      "footnote": "Puedes cambiarlo cuando quieras desde aquí.",
-      "daily": {
-        "label": "Disponible hoy",
-        "sub": "Tu allowance diario y lo que llevas gastado"
-      },
-      "saldo": {
-        "label": "Saldo neto",
-        "sub": "Cuánto tienes en cuentas, menos deudas"
-      },
-      "mes": {
-        "label": "Progreso del mes",
-        "sub": "Lo gastado vs tu presupuesto mensual"
-      }
-    },
-    "gastado": {
-      "label": "Gastado este mes",
-      "short": "Gastado · mes",
-      "viewExpenses": "Ver gastos"
-    },
-    "layoutPicker": {
-      "title": "Orden del Inicio",
-      "subtitle": "Elige cómo quieres ver la información del Home.",
-      "footnote": "Puedes cambiarlo cuando quieras desde aquí.",
-      "actividad": {
-        "label": "Actividad",
-        "sub": "Tus últimos gastos primero, los resúmenes al final"
-      },
-      "compacto": {
-        "label": "Compacto",
-        "sub": "Saldo y gastado en una fila 2-up arriba del resto"
-      }
+      "labelOne": "{{month}} · {{daysLeft}} día"
     },
     "categories": {
       "title": "Tus categorías",
@@ -425,15 +384,30 @@
       "inDays_other": "en {{count}} días"
     },
     "recent": {
-      "title": "Últimos gastos",
+      "title": "Últimos movimientos",
       "seeAll": "Ver todos",
       "transferTag": "Transferencia · no es gasto"
+    },
+    "income": {
+      "title": "Ingresos de {{month}}",
+      "savings": "ahorro {{pct}}%"
     }
+  },
+  "goals": {
+    "title": "Metas",
+    "of": "de",
+    "projection": "A este ritmo llegas en {{month}}"
   },
   "deudas": {
     "title": "Deudas",
-    "summary": { "owedToMe": "me deben", "iOwe": "yo debo" },
-    "tabs": { "incoming": "Me deben", "outgoing": "Yo debo" },
+    "summary": {
+      "owedToMe": "me deben",
+      "iOwe": "yo debo"
+    },
+    "tabs": {
+      "incoming": "Me deben",
+      "outgoing": "Yo debo"
+    },
     "inicioCard": {
       "title": "Deudas",
       "owedToMe": "por cobrar",
@@ -648,7 +622,11 @@
       "hint": "ej: \"taxi al trabajo, nueve mil\"",
       "photoReceipt": "Foto recibo",
       "write": "Escribir",
-      "quote": "\"taxi al trabajo, nueve mil y almuerzo en juan valdez dieciocho mil\"",
+      "quote": {
+        "voice": "Dijiste",
+        "text": "Escribiste",
+        "photo": "Detectado en el recibo"
+      },
       "detectedAuto": "Detectado automáticamente",
       "amount": "Monto",
       "addAnother": "Agregar otro",
@@ -679,11 +657,6 @@
         "gallery": "Elegir de galería",
         "analyzing": "Analizando recibo…",
         "demoTranscript": "Recibo de Carulla · 14 may 2026"
-      },
-      "quote": {
-        "voice": "Dijiste",
-        "text": "Escribiste",
-        "photo": "Detectado en el recibo"
       },
       "transcript": {
         "voice": "taxi al trabajo, nueve mil y almuerzo en juan valdez dieciocho mil"
