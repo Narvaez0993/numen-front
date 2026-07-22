@@ -1,14 +1,27 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from 'expo-blur';
-import { LayoutAnimation, Platform, Pressable, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { useEffect, useState } from 'react';
+import { Platform, Pressable, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { useTheme } from '../theme';
 
 import { Text } from './Text';
 
 const BAR_HEIGHT = 62;
+const ROW_PADDING = 10;
+const ICON_SIZE = 22;
+const LABEL_GAP = 7;
+const PILL_PAD = 15;
+
+const SWIM_SPRING = { damping: 17, stiffness: 190, mass: 0.7 };
 
 /**
  * Bottom offset for the floating pill. Devices with a home indicator already
@@ -31,6 +44,8 @@ export function useFloatingTabBarClearance(): number {
 /**
  * Floating "liquid glass" pill tab bar. The only place blur is allowed:
  * floating navigation surfaces, never content (design rule amended jul 2026).
+ * One single highlight pill swims between fixed tab cells (spring), and the
+ * active label fades in inside it.
  */
 export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { theme, mode } = useTheme();
@@ -56,6 +71,43 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
   const rimColor =
     mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.9)';
 
+  const labels = state.routes.map(
+    (route) => descriptors[route.key]?.options.title ?? route.name,
+  );
+
+  const [rowWidth, setRowWidth] = useState(0);
+  const [labelWidths, setLabelWidths] = useState<Record<number, number>>({});
+
+  const pillX = useSharedValue(0);
+  const pillW = useSharedValue(0);
+  const pillOpacity = useSharedValue(0);
+
+  const cellWidth = rowWidth > 0 ? (rowWidth - ROW_PADDING * 2) / state.routes.length : 0;
+  const activeLabelW = labelWidths[state.index] ?? 0;
+  const ready = rowWidth > 0 && activeLabelW > 0;
+
+  useEffect(() => {
+    if (!ready) return;
+    const targetW = PILL_PAD * 2 + ICON_SIZE + LABEL_GAP + activeLabelW;
+    const cellCenter = ROW_PADDING + cellWidth * state.index + cellWidth / 2;
+    const targetX = cellCenter - targetW / 2;
+    if (pillOpacity.value === 0) {
+      // First layout: place the pill without a cross-screen swim.
+      pillX.value = targetX;
+      pillW.value = targetW;
+      pillOpacity.value = withTiming(1, { duration: 180 });
+      return;
+    }
+    pillX.value = withSpring(targetX, SWIM_SPRING);
+    pillW.value = withSpring(targetW, SWIM_SPRING);
+  }, [ready, state.index, cellWidth, activeLabelW, pillX, pillW, pillOpacity]);
+
+  const pillStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: pillX.value }],
+    width: pillW.value,
+    opacity: pillOpacity.value,
+  }));
+
   return (
     <View
       pointerEvents="box-none"
@@ -78,6 +130,29 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
           : {}),
       }}
     >
+      {/* Hidden measurers: natural width of every label (re-measure per language). */}
+      <View
+        pointerEvents="none"
+        style={{ position: 'absolute', opacity: 0, flexDirection: 'row' }}
+      >
+        {labels.map((label, i) => (
+          <Text
+            key={`${i}-${label}`}
+            variant="label"
+            numberOfLines={1}
+            style={{ fontSize: 12.5 }}
+            onLayout={(e) => {
+              const width = Math.ceil(e.nativeEvent.layout.width);
+              setLabelWidths((prev) =>
+                prev[i] === width ? prev : { ...prev, [i]: width },
+              );
+            }}
+          >
+            {label}
+          </Text>
+        ))}
+      </View>
+
       <View
         style={{
           flex: 1,
@@ -131,20 +206,35 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
           }}
         />
 
+        {/* The swimming highlight pill (behind the tab cells). */}
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              top: 9,
+              bottom: 9,
+              left: 0,
+              borderRadius: (BAR_HEIGHT - 18) / 2,
+              backgroundColor: activePillBg,
+            },
+            pillStyle,
+          ]}
+        />
+
         <View
+          onLayout={(e) => setRowWidth(e.nativeEvent.layout.width)}
           style={{
             flex: 1,
             flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 10,
+            alignItems: 'stretch',
+            paddingHorizontal: ROW_PADDING,
           }}
         >
           {state.routes.map((route, index) => {
             const { options } = descriptors[route.key] ?? {};
             const focused = state.index === index;
-            const label = options?.title ?? route.name;
-            const color = focused ? theme.colors.accentMint : theme.colors.textTertiary;
+            const label = labels[index] ?? route.name;
 
             const onPress = () => {
               const event = navigation.emit({
@@ -153,46 +243,87 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
                 canPreventDefault: true,
               });
               if (!focused && !event.defaultPrevented) {
-                LayoutAnimation.configureNext({
-                  duration: 380,
-                  create: { type: 'easeInEaseOut', property: 'opacity' },
-                  update: { type: 'spring', springDamping: 0.72 },
-                  delete: { type: 'easeInEaseOut', property: 'opacity' },
-                });
                 navigation.navigate(route.name);
               }
             };
 
             return (
-              <Pressable
+              <GlassTab
                 key={route.key}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: focused }}
-                accessibilityLabel={label}
+                focused={focused}
+                label={label}
+                labelWidth={labelWidths[index] ?? 0}
+                color={focused ? theme.colors.accentMint : theme.colors.textTertiary}
                 onPress={onPress}
-                style={({ pressed }) => ({
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 7,
-                  paddingHorizontal: focused ? 16 : 13,
-                  paddingVertical: 11,
-                  borderRadius: 22,
-                  backgroundColor: focused ? activePillBg : 'transparent',
-                  opacity: pressed ? 0.9 : 1,
-                  transform: [{ scale: pressed ? 0.94 : 1 }],
+                icon={options?.tabBarIcon?.({
+                  focused,
+                  color: focused ? theme.colors.accentMint : theme.colors.textTertiary,
+                  size: ICON_SIZE,
                 })}
-              >
-                {options?.tabBarIcon?.({ focused, color, size: 22 })}
-                {focused ? (
-                  <Text variant="label" color={color} style={{ fontSize: 12.5 }}>
-                    {label}
-                  </Text>
-                ) : null}
-              </Pressable>
+              />
             );
           })}
         </View>
       </View>
     </View>
+  );
+}
+
+function GlassTab({
+  focused,
+  label,
+  labelWidth,
+  color,
+  icon,
+  onPress,
+}: {
+  focused: boolean;
+  label: string;
+  labelWidth: number;
+  color: string;
+  icon: React.ReactNode;
+  onPress: () => void;
+}) {
+  const labelStyle = useAnimatedStyle(() => {
+    const open = focused && labelWidth > 0;
+    return {
+      width: withSpring(open ? labelWidth + LABEL_GAP : 0, SWIM_SPRING),
+      opacity: open ? withTiming(1, { duration: 260 }) : withTiming(0, { duration: 90 }),
+    };
+  }, [focused, labelWidth]);
+
+  const pressScale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressScale.value }],
+  }));
+
+  return (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityState={{ selected: focused }}
+      accessibilityLabel={label}
+      onPress={onPress}
+      onPressIn={() => {
+        pressScale.value = withTiming(0.92, { duration: 90 });
+      }}
+      onPressOut={() => {
+        pressScale.value = withSpring(1, SWIM_SPRING);
+      }}
+      style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+    >
+      <Animated.View style={[{ flexDirection: 'row', alignItems: 'center' }, pressStyle]}>
+        {icon}
+        <Animated.View style={[{ overflow: 'hidden' }, labelStyle]}>
+          <Text
+            variant="label"
+            color={color}
+            numberOfLines={1}
+            style={{ fontSize: 12.5, paddingLeft: LABEL_GAP }}
+          >
+            {label}
+          </Text>
+        </Animated.View>
+      </Animated.View>
+    </Pressable>
   );
 }
