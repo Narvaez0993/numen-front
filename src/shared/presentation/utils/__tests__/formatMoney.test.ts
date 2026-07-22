@@ -1,9 +1,13 @@
 import { i18n } from '@/shared/infrastructure/i18n';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 
 import { formatMoney } from '../formatMoney';
 
-// Default store currency is COP; language is pinned per block for determinism.
+// Currency and language are pinned per block for determinism.
 describe('formatMoney', () => {
+  beforeAll(() => {
+    useCurrencyStore.setState({ currency: 'COP' });
+  });
   describe('COP + es', () => {
     beforeAll(async () => {
       await i18n.changeLanguage('es');
@@ -34,6 +38,22 @@ describe('formatMoney', () => {
 
     it('uses comma grouping in English', () => {
       expect(formatMoney(1234567)).toBe('$1,234,567');
+    });
+  });
+
+  describe('USD + en', () => {
+    beforeAll(async () => {
+      useCurrencyStore.setState({ currency: 'USD' });
+      await i18n.changeLanguage('en');
+    });
+
+    afterAll(async () => {
+      useCurrencyStore.setState({ currency: 'COP' });
+      await i18n.changeLanguage('es');
+    });
+
+    it('shows two decimals', () => {
+      expect(formatMoney(1234.5)).toBe('$1,234.50');
     });
   });
 });

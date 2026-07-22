@@ -6,11 +6,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import {
-  SUPPORTED_CURRENCIES,
-  useCurrencyStore,
-} from '@/shared/presentation/currency/useCurrencyStore';
-import {
+  CurrencyPickerSheet,
   SettingsGroup,
   SettingsRow,
   SubScreenHeader,
@@ -40,17 +38,11 @@ export function ProfileScreen() {
   const tier = usePlanStore((s) => s.tier);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const currency = useCurrencyStore((s) => s.currency);
-  const setCurrency = useCurrencyStore((s) => s.setCurrency);
   const [editOpen, setEditOpen] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
 
   const cycleLanguage = () => {
     void i18n.changeLanguage(i18n.language.startsWith('en') ? 'es' : 'en');
-  };
-
-  const cycleCurrency = () => {
-    const idx = SUPPORTED_CURRENCIES.indexOf(currency);
-    const next = SUPPORTED_CURRENCIES[(idx + 1) % SUPPORTED_CURRENCIES.length];
-    if (next) setCurrency(next);
   };
 
   if (isLoading || !data) {
@@ -147,7 +139,7 @@ export function ProfileScreen() {
             iconColor="amber"
             title={t('profile.rows.currency.title')}
             value={currency}
-            onPress={cycleCurrency}
+            onPress={() => setCurrencyOpen(true)}
           />
           <SettingsRow
             icon="sparkles"
@@ -223,6 +215,10 @@ export function ProfileScreen() {
         </View>
       </ScrollView>
 
+      <CurrencyPickerSheet
+        visible={currencyOpen}
+        onClose={() => setCurrencyOpen(false)}
+      />
       <EditNameSheet
         visible={editOpen}
         initialName={onboardingName ?? data.displayName}

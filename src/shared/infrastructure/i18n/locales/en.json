@@ -867,5 +867,15 @@
         "invalidCredentials": "Invalid email or password"
       }
     }
+  },
+  "currency": {
+    "title": "Your currency",
+    "subtitle": "All your amounts are shown in this currency.",
+    "names": {
+      "COP": "Colombian peso",
+      "USD": "US dollar",
+      "EUR": "Euro",
+      "MXN": "Mexican peso"
+    }
   }
 }

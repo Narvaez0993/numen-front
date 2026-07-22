@@ -2,11 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
-import { Icon, Text } from '@/shared/presentation/components';
-import {
-  SUPPORTED_CURRENCIES,
-  useCurrencyStore,
-} from '@/shared/presentation/currency/useCurrencyStore';
+import { CurrencyPickerSheet, Icon, Text } from '@/shared/presentation/components';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { BANKS, type BankId } from '../../domain';
@@ -45,13 +42,7 @@ export function SetupScreen({
   const [showSheet, setShowSheet] = useState(false);
   const [balance, setBalance] = useState(initialBalance ? initialBalance.toString() : '');
   const currency = useCurrencyStore((s) => s.currency);
-  const setCurrency = useCurrencyStore((s) => s.setCurrency);
-
-  const cycleCurrency = () => {
-    const idx = SUPPORTED_CURRENCIES.indexOf(currency);
-    const next = SUPPORTED_CURRENCIES[(idx + 1) % SUPPORTED_CURRENCIES.length];
-    if (next) setCurrency(next);
-  };
+  const [currencyOpen, setCurrencyOpen] = useState(false);
 
   const onTileClick = (id: BankId) => {
     if (id !== selected) {
@@ -119,7 +110,7 @@ export function SetupScreen({
 
       <Pressable
         accessibilityRole="button"
-        onPress={cycleCurrency}
+        onPress={() => setCurrencyOpen(true)}
         style={({ pressed }) => ({
           flexDirection: 'row',
           alignItems: 'center',
@@ -139,7 +130,7 @@ export function SetupScreen({
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <Text variant="label" style={{ fontSize: 12.5 }}>
-            {currency}
+            {currency} · {t(`currency.names.${currency}`)}
           </Text>
           <Icon name="chevron-right" size={13} color={theme.colors.textTertiary} />
         </View>
@@ -165,6 +156,11 @@ export function SetupScreen({
       >
         {t('onboarding.perso.skip')}
       </OnbTextLink>
+
+      <CurrencyPickerSheet
+        visible={currencyOpen}
+        onClose={() => setCurrencyOpen(false)}
+      />
 
       {selectedBank && (
         <SetupBalanceSheet

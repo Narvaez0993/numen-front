@@ -867,5 +867,15 @@
         "invalidCredentials": "Correo o contraseña incorrectos"
       }
     }
+  },
+  "currency": {
+    "title": "Tu moneda",
+    "subtitle": "Todos tus montos se muestran en esta moneda.",
+    "names": {
+      "COP": "Peso colombiano",
+      "USD": "Dólar estadounidense",
+      "EUR": "Euro",
+      "MXN": "Peso mexicano"
+    }
   }
 }
