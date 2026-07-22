@@ -23,6 +23,7 @@ describe('CompleteOnboardingUseCase', () => {
       name: '  Sebastián  ',
       goal: 'ahorrar',
       bankId: 'banco',
+      sourceName: 'Bancolombia',
       balance: 5245000,
     });
 
@@ -41,6 +42,7 @@ describe('CompleteOnboardingUseCase', () => {
       name: 'S',
       goal: null,
       bankId: null,
+      sourceName: null,
       balance: 0,
     });
 
@@ -56,6 +58,7 @@ describe('CompleteOnboardingUseCase', () => {
       name: 'Sebastián',
       goal: null,
       bankId: 'banco',
+      sourceName: 'Bancolombia',
       balance: -100,
     });
 
@@ -72,6 +75,7 @@ describe('CompleteOnboardingUseCase', () => {
       name: 'Sebastián',
       goal: 'gastos',
       bankId: null,
+      sourceName: null,
       balance: 0,
     });
 

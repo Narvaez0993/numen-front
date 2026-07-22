@@ -408,12 +408,20 @@
         "otro": "Otro"
       },
       "sheet": {
-        "title": "Saldo aproximado · {{bank}}",
-        "hint": "Estimado está bien. Lo puedes ajustar después.",
+        "hint": "Ponle el nombre que usas tú. El saldo estimado está bien.",
         "save": "Guardar y continuar",
-        "skip": "No sé, saltar"
+        "skip": "No sé, saltar",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Bancolombia, Nequi, bolsillo…",
+        "balanceLabel": "Saldo aproximado"
       },
-      "currency": "Tu moneda"
+      "currency": "Tu moneda",
+      "sheetTitles": {
+        "banco": "Tu banco",
+        "billetera": "Tu billetera",
+        "efectivo": "Tu efectivo",
+        "otro": "Tu cuenta"
+      }
     },
     "magic": {
       "step": "Paso 5 de 5",

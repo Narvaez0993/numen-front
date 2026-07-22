@@ -21,13 +21,19 @@ import { parseBalanceDigits } from '../utils/formatBalanceInput';
 
 type Props = {
   initialBankId: BankId | null;
+  initialSourceName: string | null;
   initialBalance: number;
   onBack: () => void;
-  onContinue: (params: { bankId: BankId | null; balance: number }) => void;
+  onContinue: (params: {
+    bankId: BankId | null;
+    sourceName: string | null;
+    balance: number;
+  }) => void;
 };
 
 export function SetupScreen({
   initialBankId,
+  initialSourceName,
   initialBalance,
   onBack,
   onContinue,
@@ -35,6 +41,7 @@ export function SetupScreen({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [selected, setSelected] = useState<BankId | null>(initialBankId);
+  const [sourceName, setSourceName] = useState(initialSourceName ?? '');
   const [showSheet, setShowSheet] = useState(false);
   const [balance, setBalance] = useState(initialBalance ? initialBalance.toString() : '');
   const currency = useCurrencyStore((s) => s.currency);
@@ -47,14 +54,23 @@ export function SetupScreen({
   };
 
   const onTileClick = (id: BankId) => {
+    if (id !== selected) {
+      setSourceName(t(`onboarding.setup.banks.${id}`));
+    }
     setSelected(id);
     setShowSheet(true);
+  };
+
+  const resolvedName = (id: BankId | null) => {
+    const trimmed = sourceName.trim();
+    if (trimmed) return trimmed;
+    return id ? t(`onboarding.setup.banks.${id}`) : null;
   };
 
   const saveBalance = () => {
     const num = parseBalanceDigits(balance);
     setShowSheet(false);
-    onContinue({ bankId: selected, balance: num });
+    onContinue({ bankId: selected, sourceName: resolvedName(selected), balance: num });
   };
 
   const selectedBank = BANKS.find((b) => b.id === selected) ?? null;
@@ -136,6 +152,7 @@ export function SetupScreen({
         onPress={() =>
           onContinue({
             bankId: selected,
+            sourceName: resolvedName(selected),
             balance: parseBalanceDigits(balance),
           })
         }
@@ -143,7 +160,7 @@ export function SetupScreen({
         {t('onboarding.perso.continue')}
       </OnbCTA>
       <OnbTextLink
-        onPress={() => onContinue({ bankId: null, balance: 0 })}
+        onPress={() => onContinue({ bankId: null, sourceName: null, balance: 0 })}
         style={{ marginTop: 4 }}
       >
         {t('onboarding.perso.skip')}
@@ -152,17 +169,25 @@ export function SetupScreen({
       {selectedBank && (
         <SetupBalanceSheet
           visible={showSheet}
-          bankName={t(`onboarding.setup.banks.${selectedBank.id}`)}
+          name={sourceName}
+          onNameChange={setSourceName}
           value={balance}
           onChange={setBalance}
           onSave={saveBalance}
           onSkip={() => {
             setShowSheet(false);
-            onContinue({ bankId: selected, balance: 0 });
+            onContinue({
+              bankId: selected,
+              sourceName: resolvedName(selected),
+              balance: 0,
+            });
           }}
           onClose={() => setShowSheet(false)}
-          title={t('onboarding.setup.sheet.title')}
+          title={t(`onboarding.setup.sheetTitles.${selectedBank.id}`)}
           hint={t('onboarding.setup.sheet.hint')}
+          nameLabel={t('onboarding.setup.sheet.nameLabel')}
+          namePlaceholder={t('onboarding.setup.sheet.namePlaceholder')}
+          balanceLabel={t('onboarding.setup.sheet.balanceLabel')}
           saveLabel={t('onboarding.setup.sheet.save')}
           skipLabel={t('onboarding.setup.sheet.skip')}
         />

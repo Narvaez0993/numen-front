@@ -33,6 +33,7 @@ export function OnboardingFlow() {
       name: flow.ctx.name,
       goal: flow.ctx.goal,
       bankId: flow.ctx.bankId,
+      sourceName: flow.ctx.sourceName,
       balance: flow.ctx.balance,
     };
     const result = await completeOnboardingUseCase.execute(profile);
@@ -117,10 +118,11 @@ export function OnboardingFlow() {
         return (
           <SetupScreen
             initialBankId={flow.ctx.bankId}
+            initialSourceName={flow.ctx.sourceName}
             initialBalance={flow.ctx.balance}
             onBack={flow.goBack}
-            onContinue={({ bankId, balance }) => {
-              flow.setCtx({ bankId, balance });
+            onContinue={({ bankId, sourceName, balance }) => {
+              flow.setCtx({ bankId, sourceName, balance });
               flow.go('magic');
             }}
           />
@@ -148,7 +150,8 @@ export function OnboardingFlow() {
             expense={expense}
             transcript={flow.ctx.transcript ?? ''}
             accountValue={
-              flow.ctx.bankId ? t(`onboarding.setup.banks.${flow.ctx.bankId}`) : null
+              flow.ctx.sourceName ??
+              (flow.ctx.bankId ? t(`onboarding.setup.banks.${flow.ctx.bankId}`) : null)
             }
             onContinue={() => {
               void finish();

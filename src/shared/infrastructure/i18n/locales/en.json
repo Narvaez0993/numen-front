@@ -408,12 +408,20 @@
         "otro": "Other"
       },
       "sheet": {
-        "title": "Approximate balance · {{bank}}",
-        "hint": "An estimate is fine. You can adjust later.",
+        "hint": "Name it the way you call it. An estimated balance is fine.",
         "save": "Save and continue",
-        "skip": "Not sure, skip"
+        "skip": "Not sure, skip",
+        "nameLabel": "Name",
+        "namePlaceholder": "Chase, PayPal, pocket…",
+        "balanceLabel": "Approximate balance"
       },
-      "currency": "Your currency"
+      "currency": "Your currency",
+      "sheetTitles": {
+        "banco": "Your bank",
+        "billetera": "Your wallet",
+        "efectivo": "Your cash",
+        "otro": "Your account"
+      }
     },
     "magic": {
       "step": "Step 5 of 5",

@@ -18,7 +18,8 @@ import { OnbTextLink } from './OnbTextLink';
 
 type Props = {
   visible: boolean;
-  bankName: string;
+  name: string;
+  onNameChange: (name: string) => void;
   value: string;
   onChange: (value: string) => void;
   onSave: () => void;
@@ -26,13 +27,17 @@ type Props = {
   onClose: () => void;
   title: string;
   hint: string;
+  nameLabel: string;
+  namePlaceholder: string;
+  balanceLabel: string;
   saveLabel: string;
   skipLabel: string;
 };
 
 export function SetupBalanceSheet({
   visible,
-  bankName,
+  name,
+  onNameChange,
   value,
   onChange,
   onSave,
@@ -40,6 +45,9 @@ export function SetupBalanceSheet({
   onClose,
   title,
   hint,
+  nameLabel,
+  namePlaceholder,
+  balanceLabel,
   saveLabel,
   skipLabel,
 }: Props) {
@@ -114,7 +122,7 @@ export function SetupBalanceSheet({
 
           <View style={{ height: 18 }} />
           <Text variant="h1" style={{ fontSize: 18 }}>
-            {title.replace('{{bank}}', bankName)}
+            {title}
           </Text>
           <Text
             variant="caption"
@@ -126,6 +134,42 @@ export function SetupBalanceSheet({
 
           <View style={{ height: 18 }} />
 
+          <Text
+            variant="micro"
+            muted
+            uppercase
+            style={{ fontSize: 10.5, letterSpacing: 1.05, marginBottom: 8 }}
+          >
+            {nameLabel}
+          </Text>
+          <TextInput
+            value={name}
+            onChangeText={onNameChange}
+            placeholder={namePlaceholder}
+            placeholderTextColor={theme.colors.textTertiary}
+            style={{
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              borderRadius: 14,
+              paddingHorizontal: 16,
+              paddingVertical: 13,
+              fontSize: 15,
+              color: theme.colors.textPrimary,
+              fontFamily: 'Geist_500Medium',
+            }}
+          />
+
+          <View style={{ height: 14 }} />
+
+          <Text
+            variant="micro"
+            muted
+            uppercase
+            style={{ fontSize: 10.5, letterSpacing: 1.05, marginBottom: 8 }}
+          >
+            {balanceLabel}
+          </Text>
           <View
             style={{
               flexDirection: 'row',

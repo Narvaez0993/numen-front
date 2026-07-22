@@ -232,7 +232,13 @@ export function ProfileScreen() {
           if (store.profile) {
             store.updateName(name);
           } else {
-            store.markCompleted({ name, goal: null, bankId: null, balance: 0 });
+            store.markCompleted({
+              name,
+              goal: null,
+              bankId: null,
+              sourceName: null,
+              balance: 0,
+            });
           }
           setEditOpen(false);
         }}
