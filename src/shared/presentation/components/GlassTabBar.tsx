@@ -8,7 +8,15 @@ import { useTheme } from '../theme';
 import { Text } from './Text';
 
 const BAR_HEIGHT = 62;
-const BAR_BOTTOM_MARGIN = 12;
+
+/**
+ * Bottom offset for the floating pill. Devices with a home indicator already
+ * provide ~34px of safe area, so the pill hugs it; inset-less devices get a
+ * small margin of their own.
+ */
+function barBottom(insetBottom: number): number {
+  return insetBottom > 0 ? insetBottom - 6 : 10;
+}
 
 /**
  * Vertical room tab screens must reserve so content scrolls clear of the
@@ -16,7 +24,7 @@ const BAR_BOTTOM_MARGIN = 12;
  */
 export function useFloatingTabBarClearance(): number {
   const insets = useSafeAreaInsets();
-  return insets.bottom + BAR_BOTTOM_MARGIN + BAR_HEIGHT + 18;
+  return barBottom(insets.bottom) + BAR_HEIGHT + 18;
 }
 
 /**
@@ -41,7 +49,7 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
         position: 'absolute',
         left: 20,
         right: 20,
-        bottom: insets.bottom + BAR_BOTTOM_MARGIN,
+        bottom: barBottom(insets.bottom),
         height: BAR_HEIGHT,
         borderRadius: BAR_HEIGHT / 2,
         borderWidth: 1,
