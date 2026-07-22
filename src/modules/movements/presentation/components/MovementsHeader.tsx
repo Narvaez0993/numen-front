@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 import { Text } from '@/shared/presentation/components';
@@ -18,6 +19,7 @@ export function MovementsHeader({
   onAvatarPress,
 }: Props) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   return (
     <View
       style={{
@@ -35,7 +37,7 @@ export function MovementsHeader({
           style={{ fontSize: 22, letterSpacing: -0.44 }}
           numberOfLines={1}
         >
-          Movimientos
+          {t('movements.title')}
         </Text>
         <View
           style={{

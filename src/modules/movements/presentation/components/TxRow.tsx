@@ -84,7 +84,7 @@ export function TxRow({ tx, category, account, last, onPress }: Props) {
           </Text>
           {tx.tag === 'recurrente' ? (
             <Pill variant="amber" style={{ paddingHorizontal: 6, paddingVertical: 2 }}>
-              recurrente
+              {t('common.recurring')}
             </Pill>
           ) : null}
         </View>

@@ -6,9 +6,11 @@
     "confirm": "Confirmar",
     "save": "Guardar",
     "continue": "Continuar",
-    "all": "Todas"
+    "all": "Todas",
+    "recurring": "recurrente"
   },
   "movements": {
+    "title": "Movimientos",
     "currentMonth": "Mayo",
     "searchPlaceholder": "Buscar gasto, merchant, monto…",
     "results": "{{count}} resultados",

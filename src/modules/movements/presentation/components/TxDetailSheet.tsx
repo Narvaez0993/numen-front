@@ -93,7 +93,9 @@ export function TxDetailSheet({
             <Text variant="h1" style={{ fontSize: 16 }}>
               {t('movements.detail.title')}
             </Text>
-            {tx.tag === 'recurrente' ? <Pill variant="amber">recurrente</Pill> : null}
+            {tx.tag === 'recurrente' ? (
+              <Pill variant="amber">{t('common.recurring')}</Pill>
+            ) : null}
           </View>
           <Text
             variant="caption"

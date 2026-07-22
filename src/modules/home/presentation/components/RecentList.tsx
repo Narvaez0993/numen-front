@@ -116,7 +116,7 @@ export function RecentList({ items, onItemPress, onSeeAll }: Props) {
                     {r.description}
                   </Text>
                   {r.tag === 'recurrente' ? (
-                    <Pill variant="amber">recurrente</Pill>
+                    <Pill variant="amber">{t('common.recurring')}</Pill>
                   ) : null}
                 </View>
                 <Text variant="caption" muted style={{ marginTop: 2 }}>

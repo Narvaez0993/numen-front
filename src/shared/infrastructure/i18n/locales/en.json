@@ -6,9 +6,11 @@
     "confirm": "Confirm",
     "save": "Save",
     "continue": "Continue",
-    "all": "All"
+    "all": "All",
+    "recurring": "recurring"
   },
   "movements": {
+    "title": "Movements",
     "currentMonth": "May",
     "searchPlaceholder": "Search expense, merchant, amount…",
     "results": "{{count}} results",
