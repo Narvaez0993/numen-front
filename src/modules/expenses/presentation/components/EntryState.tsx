@@ -30,6 +30,7 @@ export function EntryState() {
     setMethod('text');
     setFlow('writing');
   };
+  const goManual = () => setFlow('manual');
 
   useEffect(() => {
     if (recording) {
@@ -125,6 +126,11 @@ export function EntryState() {
           icon="pencil"
           label={t('expenses.sheet.write')}
           onPress={goWriting}
+        />
+        <SecondaryBtn
+          icon="list-details"
+          label={t('expenses.sheet.manual')}
+          onPress={goManual}
         />
       </View>
     </View>

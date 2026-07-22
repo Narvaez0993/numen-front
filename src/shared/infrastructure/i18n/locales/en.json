@@ -620,7 +620,7 @@
       "talking": "Speaking…",
       "wait": "One moment",
       "hint": "e.g. \"taxi to work, nine thousand\"",
-      "photoReceipt": "Photo receipt",
+      "photoReceipt": "Photo",
       "write": "Write",
       "quote": {
         "voice": "You said",
@@ -660,12 +660,36 @@
       },
       "transcript": {
         "voice": "taxi to work, nine thousand and lunch at juan valdez eighteen thousand"
+      },
+      "manual": "Manual",
+      "addedManually": "Added by you",
+      "manualEntry": {
+        "title": "Manual entry",
+        "subtitle": "Full control, no AI",
+        "type": {
+          "expense": "Expense",
+          "income": "Income",
+          "transfer": "Transfer"
+        },
+        "descriptionPlaceholder": "Description",
+        "category": "Category",
+        "account": "Account",
+        "from": "From",
+        "to": "To",
+        "date": "Date",
+        "save": {
+          "expense": "Save expense",
+          "income": "Save income",
+          "transfer": "Save transfer"
+        }
       }
     },
     "toast": {
       "saved": "{{count}} expenses saved · {{total}}",
       "savedOne": "{{count}} expense saved · {{total}}",
-      "undo": "Undo"
+      "undo": "Undo",
+      "savedIncome": "Income saved · {{total}}",
+      "savedTransfer": "Transfer recorded · {{total}}"
     }
   },
   "notFound": {
