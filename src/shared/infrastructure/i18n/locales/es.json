@@ -172,13 +172,21 @@
     "period": {
       "mensual": "Mensual",
       "anual": "Anual",
-      "savings": "-25%"
+      "savings": "-48%"
     },
     "status": {
       "current": "Tu plan",
       "recommended": "Recomendado"
     },
-    "footer": "7 días gratis · cancela cuando quieras"
+    "footer": "7 días gratis · cancela cuando quieras",
+    "gate": {
+      "cta": "Ver Plus",
+      "notNow": "Ahora no"
+    },
+    "toast": {
+      "activated": "Plus activo · 7 días de prueba"
+    },
+    "backToFree": "Volver a Free (demo)"
   },
   "categories": {
     "title": "Categorías",
@@ -294,6 +302,11 @@
       "deleteConfirmTitle": "¿Eliminar {{name}}?",
       "deleteConfirm": "Sí, eliminar",
       "cancel": "Cancelar"
+    },
+    "gate": {
+      "accountTitle": "Tu plan Free llega hasta 2 cuentas",
+      "cardTitle": "Tu plan Free incluye 1 tarjeta",
+      "body": "Con Plus tienes cuentas y tarjetas ilimitadas, y tu agente revisándolo todo cada semana."
     }
   },
   "assistant": {
@@ -506,6 +519,10 @@
       "remaining": "Te faltan {{amount}} para llegar",
       "amount": "Monto del aporte",
       "save": "Guardar aporte"
+    },
+    "gate": {
+      "title": "Tu plan Free incluye 1 meta activa",
+      "body": "Con Plus creas todas las metas que quieras y el agente les hace seguimiento."
     }
   },
   "deudas": {

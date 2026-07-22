@@ -14,6 +14,9 @@ import type { AccentColor } from '@/shared/domain';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatCOP } from '@/shared/presentation/utils/formatCOP';
 
+import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
+import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
+
 import type { Account, CreditCard } from '../../domain';
 import { AccountFormSheet, type AccountFormInput } from '../components/AccountFormSheet';
 import { AddDashedButton } from '../components/AddDashedButton';
@@ -55,6 +58,8 @@ export function AccountsScreen() {
     open: boolean;
     card: CreditCard | null;
   }>({ open: false, card: null });
+  const [gate, setGate] = useState<'account' | 'card' | null>(null);
+  const tier = usePlanStore((s) => s.tier);
 
   useEffect(() => {
     if (data && !initialized) init(data);
@@ -187,12 +192,20 @@ export function AccountsScreen() {
           <AddDashedButton
             icon="plus"
             label={t('accounts.add.account')}
-            onPress={() => setAccountSheet({ open: true, account: null })}
+            onPress={() =>
+              tier === 'free' && accounts.length >= 2
+                ? setGate('account')
+                : setAccountSheet({ open: true, account: null })
+            }
           />
           <AddDashedButton
             icon="plus"
             label={t('accounts.add.card')}
-            onPress={() => setCardSheet({ open: true, card: null })}
+            onPress={() =>
+              tier === 'free' && creditCards.length >= 1
+                ? setGate('card')
+                : setCardSheet({ open: true, card: null })
+            }
           />
         </View>
       </ScrollView>
@@ -210,6 +223,14 @@ export function AccountsScreen() {
         onClose={closeCardSheet}
         onSave={handleSaveCard}
         onDelete={handleDeleteCard}
+      />
+      <GateSheet
+        visible={gate !== null}
+        title={t(
+          gate === 'card' ? 'accounts.gate.cardTitle' : 'accounts.gate.accountTitle',
+        )}
+        body={t('accounts.gate.body')}
+        onClose={() => setGate(null)}
       />
     </SafeAreaView>
   );

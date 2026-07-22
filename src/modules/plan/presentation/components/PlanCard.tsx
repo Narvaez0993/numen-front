@@ -11,9 +11,11 @@ import { PlanFeatureRow } from './PlanFeatureRow';
 type Props = {
   plan: Plan;
   period: BillingPeriod;
+  onCta?: () => void;
+  ctaLoading?: boolean;
 };
 
-export function PlanCard({ plan, period }: Props) {
+export function PlanCard({ plan, period, onCta, ctaLoading = false }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -108,7 +110,9 @@ export function PlanCard({ plan, period }: Props) {
         ))}
       </View>
 
-      {plan.ctaLabel ? <Button label={plan.ctaLabel} full /> : null}
+      {plan.ctaLabel ? (
+        <Button label={plan.ctaLabel} full onPress={onCta} loading={ctaLoading} />
+      ) : null}
     </View>
   );
 }

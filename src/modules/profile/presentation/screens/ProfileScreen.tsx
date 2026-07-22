@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import {
   SettingsGroup,
   SettingsRow,
@@ -20,6 +21,7 @@ export function ProfileScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { data, isLoading } = useProfile();
+  const tier = usePlanStore((s) => s.tier);
 
   if (isLoading || !data) {
     return (
@@ -101,7 +103,7 @@ export function ProfileScreen() {
             icon="star"
             iconColor="amber"
             title={t('profile.rows.plan.title')}
-            value={t('profile.rows.plan.value')}
+            value={tier === 'plus' ? 'Plus' : 'Free'}
             onPress={() => router.push('/plan')}
           />
           <SettingsRow

@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
+import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import {
   Card,
   Icon,
@@ -44,8 +46,18 @@ export function GoalsScreen() {
     goal: null,
   });
   const [contributionGoal, setContributionGoal] = useState<Goal | null>(null);
+  const [gateOpen, setGateOpen] = useState(false);
+  const tier = usePlanStore((s) => s.tier);
 
   const closeForm = () => setFormSheet({ open: false, goal: null });
+
+  const handleAddPress = () => {
+    if (tier === 'free' && goals.length >= 1) {
+      setGateOpen(true);
+      return;
+    }
+    setFormSheet({ open: true, goal: null });
+  };
 
   const handleSave = (input: GoalFormInput) => {
     if (formSheet.goal) {
@@ -175,7 +187,7 @@ export function GoalsScreen() {
 
         <Pressable
           accessibilityRole="button"
-          onPress={() => setFormSheet({ open: true, goal: null })}
+          onPress={handleAddPress}
           style={({ pressed }) => ({
             flexDirection: 'row',
             alignItems: 'center',
@@ -212,6 +224,12 @@ export function GoalsScreen() {
         goal={contributionGoal}
         onClose={() => setContributionGoal(null)}
         onSave={handleContribute}
+      />
+      <GateSheet
+        visible={gateOpen}
+        title={t('goals.gate.title')}
+        body={t('goals.gate.body')}
+        onClose={() => setGateOpen(false)}
       />
     </SafeAreaView>
   );

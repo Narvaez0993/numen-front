@@ -172,13 +172,21 @@
     "period": {
       "mensual": "Monthly",
       "anual": "Yearly",
-      "savings": "-25%"
+      "savings": "-48%"
     },
     "status": {
       "current": "Your plan",
       "recommended": "Recommended"
     },
-    "footer": "7-day free trial · cancel any time"
+    "footer": "7-day free trial · cancel any time",
+    "gate": {
+      "cta": "See Plus",
+      "notNow": "Not now"
+    },
+    "toast": {
+      "activated": "Plus active · 7-day trial"
+    },
+    "backToFree": "Back to Free (demo)"
   },
   "categories": {
     "title": "Categories",
@@ -294,6 +302,11 @@
       "deleteConfirmTitle": "Delete {{name}}?",
       "deleteConfirm": "Yes, delete",
       "cancel": "Cancel"
+    },
+    "gate": {
+      "accountTitle": "Free includes up to 2 accounts",
+      "cardTitle": "Free includes 1 card",
+      "body": "Plus gives you unlimited accounts and cards, with your agent reviewing everything weekly."
     }
   },
   "assistant": {
@@ -506,6 +519,10 @@
       "remaining": "{{amount}} to go",
       "amount": "Contribution amount",
       "save": "Save contribution"
+    },
+    "gate": {
+      "title": "Free includes 1 active goal",
+      "body": "Plus lets you create unlimited goals, with the agent tracking each one."
     }
   },
   "deudas": {
