@@ -67,7 +67,8 @@ const darkColors: ColorScheme = {
 };
 
 const lightColors: ColorScheme = {
-  bgBase: '#FFFFFF',
+  // Soft gray page so white cards read as a layer (mirrors dark's depth).
+  bgBase: '#F4F5F9',
   bgSurface: '#FFFFFF',
   bgFloat: '#F0F2F7',
   bgElevated: '#E8EBF2',
