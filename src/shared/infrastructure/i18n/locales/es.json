@@ -30,11 +30,25 @@
     "types": {
       "expenses": "Solo gastos",
       "recurring": "Recurrentes",
-      "transfers": "Transferencias"
+      "transfers": "Transferencias",
+      "income": "Ingresos"
     },
     "empty": {
       "title": "Sin resultados",
       "hint": "Probá cambiar los filtros o la búsqueda"
+    },
+    "transferTag": "Transferencia · no es gasto",
+    "detail": {
+      "title": "Detalle del movimiento",
+      "description": "Descripción",
+      "amount": "Monto",
+      "category": "Categoría",
+      "account": "Cuenta",
+      "save": "Guardar cambios",
+      "delete": "Eliminar movimiento",
+      "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
     }
   },
   "budgets": {

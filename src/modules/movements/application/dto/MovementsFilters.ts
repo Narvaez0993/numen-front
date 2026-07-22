@@ -1,4 +1,4 @@
-export type MovementsTypeFilter = 'gasto' | 'recurrente' | 'transfer';
+export type MovementsTypeFilter = 'gasto' | 'ingreso' | 'recurrente' | 'transfer';
 
 export type MovementsFilters = {
   query: string;

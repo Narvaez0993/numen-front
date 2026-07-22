@@ -30,11 +30,25 @@
     "types": {
       "expenses": "Expenses only",
       "recurring": "Recurring",
-      "transfers": "Transfers"
+      "transfers": "Transfers",
+      "income": "Income"
     },
     "empty": {
       "title": "No results",
       "hint": "Try changing the filters or the search"
+    },
+    "transferTag": "Transfer · not an expense",
+    "detail": {
+      "title": "Movement detail",
+      "description": "Description",
+      "amount": "Amount",
+      "category": "Category",
+      "account": "Account",
+      "save": "Save changes",
+      "delete": "Delete movement",
+      "deleteConfirmTitle": "Delete \"{{name}}\"?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
     }
   },
   "budgets": {

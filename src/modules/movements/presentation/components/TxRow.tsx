@@ -1,4 +1,5 @@
-import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Pressable, View } from 'react-native';
 
 import { IconBox, Pill, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
@@ -12,16 +13,26 @@ type Props = {
   category: Category;
   account: Account;
   last: boolean;
+  onPress?: () => void;
 };
 
-export function TxRow({ tx, category, account, last }: Props) {
+export function TxRow({ tx, category, account, last, onPress }: Props) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const isTransfer = tx.tag === 'transfer';
+  const isIncome = !isTransfer && tx.amount > 0;
   const lineColor = isTransfer ? theme.colors.textTertiary : theme.colors.textPrimary;
+  const amountColor = isTransfer
+    ? theme.colors.textTertiary
+    : isIncome
+      ? theme.colors.accentMint
+      : theme.colors.textPrimary;
 
   return (
-    <View
-      style={{
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
@@ -29,8 +40,8 @@ export function TxRow({ tx, category, account, last }: Props) {
         paddingVertical: 12,
         borderBottomWidth: last ? 0 : 1,
         borderBottomColor: theme.colors.borderSubtle,
-        opacity: isTransfer ? 0.65 : 1,
-      }}
+        opacity: isTransfer ? 0.65 : pressed ? 0.85 : 1,
+      })}
     >
       {isTransfer ? (
         <View
@@ -79,13 +90,13 @@ export function TxRow({ tx, category, account, last }: Props) {
         </View>
         <Text variant="caption" muted numberOfLines={1} style={{ marginTop: 2 }}>
           {isTransfer
-            ? 'Transferencia · no es gasto'
+            ? t('movements.transferTag')
             : `${category.name} · ${account.short} · ${tx.time}`}
         </Text>
       </View>
-      <Text variant="bodyLarge" tabular color={lineColor}>
-        {formatCOP(tx.amount)}
+      <Text variant="bodyLarge" tabular color={amountColor}>
+        {isIncome ? `+${formatCOP(tx.amount)}` : formatCOP(tx.amount)}
       </Text>
-    </View>
+    </Pressable>
   );
 }

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,37 +13,51 @@ import {
   type MovementsFilters,
   type MovementsTypeFilter,
 } from '../../application/dto/MovementsFilters';
+import type { Transaction } from '../../domain/types/Transaction';
 import { DayGroup } from '../components/DayGroup';
 import { EmptyState } from '../components/EmptyState';
 import { MovementsHeader } from '../components/MovementsHeader';
 import { SearchBar } from '../components/SearchBar';
+import { TxDetailSheet } from '../components/TxDetailSheet';
 import { useMovements } from '../hooks/useMovements';
+import { useMovementsStore } from '../stores/useMovementsStore';
 import { filterTransactions } from '../utils/filterTransactions';
 import { groupByDay } from '../utils/groupByDay';
 
 export function MovementsScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const { data, isLoading } = useMovements();
+  const { data } = useMovements();
   const [filters, setFilters] = useState<MovementsFilters>(emptyFilters);
+  const [detailTx, setDetailTx] = useState<Transaction | null>(null);
+
+  const initialized = useMovementsStore((s) => s.initialized);
+  const init = useMovementsStore((s) => s.init);
+  const transactions = useMovementsStore((s) => s.transactions);
+  const updateTransaction = useMovementsStore((s) => s.updateTransaction);
+  const removeTransaction = useMovementsStore((s) => s.removeTransaction);
+
+  useEffect(() => {
+    if (data && !initialized) init(data.transactions);
+  }, [data, initialized, init]);
 
   const { groups, count, monthTotal } = useMemo(() => {
-    if (!data) return { groups: [], count: 0, monthTotal: 0 };
-    const filtered = filterTransactions(data.transactions, filters, {
+    if (!data || !initialized) return { groups: [], count: 0, monthTotal: 0 };
+    const filtered = filterTransactions(transactions, filters, {
       categories: data.categories,
       accounts: data.accounts,
     });
     const total = filtered
-      .filter((t) => t.tag !== 'transfer')
-      .reduce((sum, t) => sum + t.amount, 0);
+      .filter((tx) => tx.tag !== 'transfer' && tx.amount < 0)
+      .reduce((sum, tx) => sum + tx.amount, 0);
     return {
       groups: groupByDay(filtered),
       count: filtered.length,
       monthTotal: total,
     };
-  }, [data, filters]);
+  }, [data, initialized, transactions, filters]);
 
-  if (isLoading || !data) {
+  if (!data || !initialized) {
     return (
       <SafeAreaView
         style={{
@@ -67,6 +81,7 @@ export function MovementsScreen() {
     .map((c) => ({ value: c.id, label: c.name }));
   const typeOptions: { value: MovementsTypeFilter; label: string }[] = [
     { value: 'gasto', label: t('movements.types.expenses') },
+    { value: 'ingreso', label: t('movements.types.income') },
     { value: 'recurrente', label: t('movements.types.recurring') },
     { value: 'transfer', label: t('movements.types.transfers') },
   ];
@@ -78,6 +93,16 @@ export function MovementsScreen() {
   ];
 
   const active = hasActiveFilters(filters);
+
+  const handleSaveDetail = (patch: Parameters<typeof updateTransaction>[1]) => {
+    if (detailTx) updateTransaction(detailTx.id, patch);
+    setDetailTx(null);
+  };
+
+  const handleDeleteDetail = () => {
+    if (detailTx) removeTransaction(detailTx.id);
+    setDetailTx(null);
+  };
 
   return (
     <SafeAreaView
@@ -170,12 +195,23 @@ export function MovementsScreen() {
                   group={g}
                   categories={data.categories}
                   accounts={data.accounts}
+                  onItemPress={setDetailTx}
                 />
               ))}
             </View>
           )}
         </View>
       </ScrollView>
+
+      <TxDetailSheet
+        visible={detailTx !== null}
+        tx={detailTx}
+        categories={data.categories}
+        accounts={data.accounts}
+        onClose={() => setDetailTx(null)}
+        onSave={handleSaveDetail}
+        onDelete={handleDeleteDetail}
+      />
     </SafeAreaView>
   );
 }

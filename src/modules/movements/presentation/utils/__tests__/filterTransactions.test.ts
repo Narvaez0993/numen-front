@@ -6,11 +6,32 @@ import { filterTransactions } from '../filterTransactions';
 
 const catalogs = { categories: CATEGORIES, accounts: ACCOUNTS };
 
+const MAY = TRANSACTIONS.filter((t) => t.date.startsWith('2026-05'));
+
 describe('filterTransactions', () => {
-  it('returns all when filters are empty', () => {
-    expect(filterTransactions(TRANSACTIONS, emptyFilters, catalogs)).toHaveLength(
-      TRANSACTIONS.length,
+  it('defaults to the current month (mayo) when filters are empty', () => {
+    const r = filterTransactions(TRANSACTIONS, emptyFilters, catalogs);
+    expect(r).toHaveLength(MAY.length);
+    expect(r.every((t) => t.date.startsWith('2026-05'))).toBe(true);
+  });
+
+  it('month=abril returns only April transactions', () => {
+    const r = filterTransactions(
+      TRANSACTIONS,
+      { ...emptyFilters, month: 'abril' },
+      catalogs,
     );
+    expect(r.length).toBeGreaterThan(0);
+    expect(r.every((t) => t.date.startsWith('2026-04'))).toBe(true);
+  });
+
+  it('month=year returns everything in 2026', () => {
+    const r = filterTransactions(
+      TRANSACTIONS,
+      { ...emptyFilters, month: 'year' },
+      catalogs,
+    );
+    expect(r).toHaveLength(TRANSACTIONS.length);
   });
 
   it('filters by description query (case insensitive)', () => {
@@ -41,13 +62,23 @@ describe('filterTransactions', () => {
     expect(r).toHaveLength(2);
   });
 
-  it('type=gasto excludes transfers', () => {
+  it('type=gasto excludes transfers and income', () => {
     const r = filterTransactions(
       TRANSACTIONS,
       { ...emptyFilters, type: 'gasto' },
       catalogs,
     );
-    expect(r.every((t) => t.tag !== 'transfer')).toBe(true);
+    expect(r.every((t) => t.tag !== 'transfer' && t.amount < 0)).toBe(true);
+  });
+
+  it('type=ingreso keeps only positive non-transfer movements', () => {
+    const r = filterTransactions(
+      TRANSACTIONS,
+      { ...emptyFilters, type: 'ingreso' },
+      catalogs,
+    );
+    expect(r.map((t) => t.id)).toEqual(['t18']);
+    expect(r.every((t) => t.amount > 0)).toBe(true);
   });
 
   it('type=recurrente keeps only recurrente-tagged', () => {

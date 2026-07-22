@@ -8,10 +8,13 @@ import type { DayGroup as DayGroupModel } from '../utils/groupByDay';
 
 import { TxRow } from './TxRow';
 
+import type { Transaction } from '../../domain/types/Transaction';
+
 type Props = {
   group: DayGroupModel;
   categories: Record<string, Category>;
   accounts: Record<string, Account>;
+  onItemPress?: (tx: Transaction) => void;
 };
 
 const HEADER_LABELS: Record<string, [string, string]> = {
@@ -25,7 +28,7 @@ function formatHeader(group: DayGroupModel): [string, string] {
   return [group.dayBucket.toUpperCase(), ''];
 }
 
-export function DayGroup({ group, categories, accounts }: Props) {
+export function DayGroup({ group, categories, accounts, onItemPress }: Props) {
   const [label, sub] = formatHeader(group);
 
   return (
@@ -85,6 +88,7 @@ export function DayGroup({ group, categories, accounts }: Props) {
               category={category}
               account={account}
               last={i === group.items.length - 1}
+              onPress={onItemPress ? () => onItemPress(tx) : undefined}
             />
           );
         })}
