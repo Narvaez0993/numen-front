@@ -302,7 +302,28 @@
     "thisWeek": "This week",
     "suggestions": "Suggestions",
     "conversation": "Conversation",
-    "inputPlaceholder": "Ask me anything…"
+    "inputPlaceholder": "Ask me anything…",
+    "summary": {
+      "pill": "Summary · May",
+      "title": "How May is going",
+      "body": "You've spent $1.919.500, a similar pace to April. Your top category is Groceries, and with this month's salary your savings rate is 54%. Watch Coffee: it's at 96% of its cap.",
+      "spent": "Spent",
+      "savings": "Savings",
+      "projection": "Proj. close",
+      "plusTeaser": "With Plus, your agent reviews your week.",
+      "seePlus": "See Plus"
+    },
+    "usage": {
+      "registrations": "AI entries",
+      "messages": "Messages",
+      "planFree": "Your monthly quota on Free · renews on the 1st",
+      "planPlus": "Your monthly quota on Plus · renews on the 1st"
+    },
+    "limit": {
+      "title": "You're out of messages this month",
+      "body": "Free includes 10 agent messages per month. Plus gives you 300, plus the weekly review.",
+      "cta": "See Plus"
+    }
   },
   "onboarding": {
     "skip": "Skip",

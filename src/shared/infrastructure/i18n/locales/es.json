@@ -302,7 +302,28 @@
     "thisWeek": "Esta semana",
     "suggestions": "Sugerencias",
     "conversation": "Conversación",
-    "inputPlaceholder": "Pregúntame lo que sea…"
+    "inputPlaceholder": "Pregúntame lo que sea…",
+    "summary": {
+      "pill": "Resumen · Mayo",
+      "title": "Así vas en mayo",
+      "body": "Llevas $1.919.500 gastados, un ritmo parecido al de abril. Tu mayor categoría es Mercado, y con el sueldo de este mes tu ahorro va en 54%. Ojo con Café: está al 96% de su tope.",
+      "spent": "Gastado",
+      "savings": "Ahorro",
+      "projection": "Cierre proy.",
+      "plusTeaser": "Con Plus, tu agente te revisa cada semana.",
+      "seePlus": "Ver Plus"
+    },
+    "usage": {
+      "registrations": "Registros IA",
+      "messages": "Mensajes",
+      "planFree": "Tu cuota del mes en el plan Free · se renueva el 1º",
+      "planPlus": "Tu cuota del mes en Plus · se renueva el 1º"
+    },
+    "limit": {
+      "title": "Te quedaste sin mensajes este mes",
+      "body": "Tu plan Free incluye 10 mensajes con el agente al mes. Con Plus tienes 300, más la revisión semanal.",
+      "cta": "Ver Plus"
+    }
   },
   "onboarding": {
     "skip": "Saltar",
