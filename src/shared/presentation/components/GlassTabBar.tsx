@@ -47,12 +47,15 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
   const { theme, mode } = useTheme();
   const insets = useSafeAreaInsets();
 
+  // Dark: tint the glass with the app's own navy so at rest it belongs to
+  // the palette (the blur only reveals itself as content scrolls under).
+  // Light: near-white with a hint of the page gray for cohesion.
   const glassTint =
-    mode === 'dark' ? 'rgba(10, 14, 26, 0.30)' : 'rgba(255, 255, 255, 0.34)';
+    mode === 'dark' ? 'rgba(13, 18, 31, 0.52)' : 'rgba(250, 250, 253, 0.40)';
   const glassBorder =
-    mode === 'dark' ? 'rgba(255, 255, 255, 0.10)' : 'rgba(10, 14, 26, 0.10)';
+    mode === 'dark' ? 'rgba(198, 210, 240, 0.07)' : 'rgba(10, 14, 26, 0.10)';
   const activePillBg =
-    mode === 'dark' ? 'rgba(255, 255, 255, 0.10)' : 'rgba(10, 14, 26, 0.08)';
+    mode === 'dark' ? 'rgba(198, 210, 240, 0.09)' : 'rgba(10, 14, 26, 0.08)';
   // iOS system materials carry real vibrancy (saturation bleed) — the core
   // of the "liquid" look. Android falls back to plain dark/light blur.
   const blurTint =
@@ -63,9 +66,9 @@ export function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProp
       : mode === 'dark'
         ? 'dark'
         : 'light';
-  const sheenOpacity = mode === 'dark' ? 0.09 : 0.5;
+  const sheenOpacity = mode === 'dark' ? 0.05 : 0.5;
   const rimColor =
-    mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.9)';
+    mode === 'dark' ? 'rgba(198, 210, 240, 0.10)' : 'rgba(255, 255, 255, 0.9)';
 
   const [rowWidth, setRowWidth] = useState(0);
 
