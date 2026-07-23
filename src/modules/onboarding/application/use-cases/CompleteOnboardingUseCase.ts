@@ -20,6 +20,7 @@ export class CompleteOnboardingUseCase {
       name: trimmedName,
       goal: profile.goal,
       bankId: profile.bankId,
+      sourceName: profile.sourceName,
       balance: profile.balance,
     };
     try {

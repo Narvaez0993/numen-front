@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { Text } from '@/shared/presentation/components';
 import { AccentColor, accentColorKey, useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { MerchantStat } from '../../domain/types/Budget';
 
@@ -62,7 +62,7 @@ export function MerchantList({ merchants, color }: Props) {
               tabular
               style={{ fontSize: 12.5, minWidth: 70, textAlign: 'right' }}
             >
-              {formatCOP(m.amount)}
+              {formatMoney(m.amount)}
             </Text>
           </View>
         ))}

@@ -13,6 +13,7 @@ export type CategoryId =
   | 'educacion'
   | 'hogar'
   | 'otros'
+  | 'ingreso'
   | 'transfer';
 
 export type Category = {

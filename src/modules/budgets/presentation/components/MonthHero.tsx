@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { Card, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { MonthBudget } from '../../domain/types/Budget';
 
@@ -54,10 +54,10 @@ export function MonthHero({ month, onPress }: Props) {
         }}
       >
         <Text variant="display" tabular>
-          {formatCOP(month.spent)}
+          {formatMoney(month.spent)}
         </Text>
         <Text variant="caption" muted tabular style={{ fontSize: 14 }}>
-          {t('budgets.month.of')} {formatCOP(month.target)}
+          {t('budgets.month.of')} {formatMoney(month.target)}
         </Text>
       </View>
       <Text
@@ -75,10 +75,10 @@ export function MonthHero({ month, onPress }: Props) {
       <ProgressBar pct={pct} height={9} />
 
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
-        <BudgetStat label={t('budgets.month.available')} value={formatCOP(available)} />
+        <BudgetStat label={t('budgets.month.available')} value={formatMoney(available)} />
         <BudgetStat
           label={t('budgets.month.dailySuggested')}
-          value={formatCOP(month.dailySuggested)}
+          value={formatMoney(month.dailySuggested)}
           variant="mint"
         />
       </View>

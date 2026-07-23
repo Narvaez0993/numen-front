@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 import { Button, Icon, type IconName, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
 import { useExpenseSheetStore, type SheetMethod } from '../stores/useExpenseSheetStore';
@@ -60,10 +60,33 @@ export function ConfirmState({ onSave, saving = false }: Props) {
 
   const initial = method === 'photo' ? DETECTED_PHOTO : DETECTED_VOICE;
   const [items, setItems] = useState<DetectedExpense[]>(initial);
+  const manualIds = useRef<Set<string>>(new Set());
+  const nextId = useRef(0);
 
   useEffect(() => {
     setItems(method === 'photo' ? DETECTED_PHOTO : DETECTED_VOICE);
+    manualIds.current.clear();
   }, [method]);
+
+  const updateItem = (id: string, patch: Partial<DetectedExpense>) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+  };
+
+  const addItem = () => {
+    const id = `manual-${nextId.current++}`;
+    manualIds.current.add(id);
+    setItems((prev) => [
+      ...prev,
+      {
+        id,
+        description: '',
+        categoryName: 'Otros',
+        categoryColor: 'pink',
+        amount: 0,
+        sourceName: 'Efectivo',
+      },
+    ]);
+  };
 
   const total = items.reduce((sum, i) => sum + i.amount, 0);
   const titleKey =
@@ -139,12 +162,15 @@ export function ConfirmState({ onSave, saving = false }: Props) {
           <DetectedCard
             key={item.id}
             item={item}
+            manual={manualIds.current.has(item.id)}
+            onChange={(patch) => updateItem(item.id, patch)}
             onRemove={() => setItems((prev) => prev.filter((i) => i.id !== item.id))}
           />
         ))}
       </View>
 
       <Pressable
+        onPress={addItem}
         style={({ pressed }) => ({
           flexDirection: 'row',
           alignItems: 'center',
@@ -180,7 +206,7 @@ export function ConfirmState({ onSave, saving = false }: Props) {
           {t('expenses.sheet.total')}
         </Text>
         <Text variant="display" tabular style={{ fontSize: 22 }}>
-          {formatCOP(total)}
+          {formatMoney(total)}
         </Text>
       </View>
 
@@ -188,6 +214,7 @@ export function ConfirmState({ onSave, saving = false }: Props) {
         label={t('expenses.sheet.save')}
         loading={saving}
         full
+        disabled={items.length === 0}
         onPress={() => onSave(items)}
       />
     </View>

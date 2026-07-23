@@ -6,6 +6,7 @@ export type SheetFlow =
   | 'processing'
   | 'writing'
   | 'photo'
+  | 'manual'
   | 'confirm';
 
 export type SheetMethod = 'voice' | 'text' | 'photo';

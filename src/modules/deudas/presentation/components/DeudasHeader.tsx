@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { totalsByDirection } from '../../domain/types/Deuda';
 import { useDeudasStore } from '../stores/useDeudasStore';
@@ -79,7 +79,7 @@ export function DeudasHeader({ onBack, onProfile, initials = 'SM' }: Props) {
               color={theme.colors.accentMint}
               style={{ fontSize: 12.5, fontFamily: 'Geist_500Medium' }}
             >
-              {formatCOP(totals.incoming)}
+              {formatMoney(totals.incoming)}
             </Text>
             <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
               {' '}
@@ -95,7 +95,7 @@ export function DeudasHeader({ onBack, onProfile, initials = 'SM' }: Props) {
               color={theme.colors.accentAmber}
               style={{ fontSize: 12.5, fontFamily: 'Geist_500Medium' }}
             >
-              {formatCOP(totals.outgoing)}
+              {formatMoney(totals.outgoing)}
             </Text>
             <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
               {' '}

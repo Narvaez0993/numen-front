@@ -1,3 +1,8 @@
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -42,13 +47,45 @@ function OnboardingGate() {
   );
 }
 
+/**
+ * Feeds the app theme into React Navigation so freshly-mounted screens and
+ * stack cards paint with the app background instead of the default white
+ * (kills the first-visit white flash between views).
+ */
+function RootNavigator() {
+  const { theme, mode } = useTheme();
+  const base = mode === 'dark' ? DarkTheme : DefaultTheme;
+  const navigationTheme = {
+    ...base,
+    colors: {
+      ...base.colors,
+      background: theme.colors.bgBase,
+      card: theme.colors.bgBase,
+      border: theme.colors.borderSubtle,
+      primary: theme.colors.accentMint,
+      text: theme.colors.textPrimary,
+    },
+  };
+
+  return (
+    <NavigationThemeProvider value={navigationTheme}>
+      <ThemedStatusBar />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: theme.colors.bgBase },
+        }}
+      />
+      <OnboardingGate />
+    </NavigationThemeProvider>
+  );
+}
+
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AppProviders>
-        <ThemedStatusBar />
-        <Stack screenOptions={{ headerShown: false }} />
-        <OnboardingGate />
+        <RootNavigator />
       </AppProviders>
     </SafeAreaProvider>
   );

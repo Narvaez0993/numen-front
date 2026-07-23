@@ -2,7 +2,7 @@ import { View } from 'react-native';
 
 import { IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { AccentColor } from '@/shared/domain';
 
@@ -109,7 +109,7 @@ function SubsResponse() {
               tabular
               style={{ fontSize: 12.5, minWidth: 60, textAlign: 'right' }}
             >
-              {formatCOP(s.amount)}
+              {formatMoney(s.amount)}
             </Text>
           </View>
         ))}

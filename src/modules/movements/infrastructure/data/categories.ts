@@ -18,6 +18,12 @@ export const CATEGORIES: Record<CategoryId, Category> = {
   educacion: { id: 'educacion', name: 'Educación', iconName: 'school', color: 'purple' },
   hogar: { id: 'hogar', name: 'Hogar', iconName: 'home-2', color: 'mint' },
   otros: { id: 'otros', name: 'Otros', iconName: 'dots', color: 'neutral' },
+  ingreso: {
+    id: 'ingreso',
+    name: 'Ingreso',
+    iconName: 'arrow-down-left',
+    color: 'mint',
+  },
   transfer: {
     id: 'transfer',
     name: 'Transferencia',

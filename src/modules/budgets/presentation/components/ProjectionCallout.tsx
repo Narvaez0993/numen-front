@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { BudgetProjection } from '../../domain/types/Budget';
 
@@ -46,7 +46,7 @@ export function ProjectionCallout({ projection }: Props) {
             tabular
             style={{ fontSize: 12.5 }}
           >
-            {formatCOP(projection.willEnd)}
+            {formatMoney(projection.willEnd)}
           </Text>
         </Text>
         <Text
@@ -55,7 +55,7 @@ export function ProjectionCallout({ projection }: Props) {
           style={{ fontSize: 11.5 }}
         >
           <Text variant="caption" tabular style={{ fontWeight: '500', fontSize: 11.5 }}>
-            {formatCOP(projection.over)}
+            {formatMoney(projection.over)}
           </Text>{' '}
           {t('budgets.projection.over')}
         </Text>

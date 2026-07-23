@@ -11,7 +11,8 @@ export class InMemoryHomeRepository implements HomeRepository {
       greeting: 'Sebastián',
       daily: { suggested: 67000, spent: 45000 },
       saldo: { net: 5245000, accounts: 3, hasCash: true, hasTC: 1 },
-      month: { spent: 1919500, target: 3000000, daysLeft: 17 },
+      month: { name: 'Mayo', spent: 1919500, target: 3000000, daysLeft: 17 },
+      income: { total: 4200000, savingsRate: 0.54 },
       topCategories: [
         {
           id: 'mercado',
@@ -91,6 +92,16 @@ export class InMemoryHomeRepository implements HomeRepository {
           color: 'purple',
           amount: -9000,
           time: '08:15',
+          tag: null,
+        },
+        {
+          id: 'r6',
+          description: 'Sueldo mayo',
+          category: 'Salario',
+          iconName: 'arrow-down-left',
+          color: 'mint',
+          amount: 4200000,
+          time: 'ayer',
           tag: null,
         },
         {

@@ -6,9 +6,11 @@
     "confirm": "Confirm",
     "save": "Save",
     "continue": "Continue",
-    "all": "All"
+    "all": "All",
+    "recurring": "recurring"
   },
   "movements": {
+    "title": "Movements",
     "currentMonth": "May",
     "searchPlaceholder": "Search expense, merchant, amount…",
     "results": "{{count}} results",
@@ -30,11 +32,25 @@
     "types": {
       "expenses": "Expenses only",
       "recurring": "Recurring",
-      "transfers": "Transfers"
+      "transfers": "Transfers",
+      "income": "Income"
     },
     "empty": {
       "title": "No results",
       "hint": "Try changing the filters or the search"
+    },
+    "transferTag": "Transfer · not an expense",
+    "detail": {
+      "title": "Movement detail",
+      "description": "Description",
+      "amount": "Amount",
+      "category": "Category",
+      "account": "Account",
+      "save": "Save changes",
+      "delete": "Delete movement",
+      "deleteConfirmTitle": "Delete \"{{name}}\"?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
     }
   },
   "budgets": {
@@ -158,13 +174,21 @@
     "period": {
       "mensual": "Monthly",
       "anual": "Yearly",
-      "savings": "-25%"
+      "savings": "-48%"
     },
     "status": {
       "current": "Your plan",
       "recommended": "Recommended"
     },
-    "footer": "7-day free trial · cancel any time"
+    "footer": "7-day free trial · cancel any time",
+    "gate": {
+      "cta": "See Plus",
+      "notNow": "Not now"
+    },
+    "toast": {
+      "activated": "Plus active · 7-day trial"
+    },
+    "backToFree": "Back to Free (demo)"
   },
   "categories": {
     "title": "Categories",
@@ -210,7 +234,27 @@
       "next_one": "In {{count}} day",
       "next_other": "In {{count}} days"
     },
-    "add": "Add subscription"
+    "add": "Add subscription",
+    "form": {
+      "newTitle": "New subscription",
+      "editTitle": "Edit subscription",
+      "subtitle": "The recurring charge and where it comes from.",
+      "name": "Name",
+      "namePlaceholder": "Netflix, gym, iCloud…",
+      "amount": "Amount",
+      "cadence": "Frequency",
+      "cadences": {
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "account": "Account",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Delete {{name}}?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
+    }
   },
   "accounts": {
     "title": "Sources and accounts",
@@ -233,15 +277,68 @@
     "add": {
       "account": "Add account",
       "card": "Add card"
+    },
+    "form": {
+      "newAccount": "New account",
+      "editAccount": "Edit account",
+      "accountSubtitle": "Debit or cash, named however you like.",
+      "newCard": "New card",
+      "editCard": "Edit card",
+      "cardSubtitle": "Your credit card: debt, limit and cutoff.",
+      "kind": {
+        "debit": "Debit",
+        "cash": "Cash"
+      },
+      "name": "Name",
+      "namePlaceholder": "Bank, wallet, pocket…",
+      "cardNamePlaceholder": "Visa, Master, the one you use…",
+      "sub": "Detail (optional)",
+      "subPlaceholder": "Savings account",
+      "balance": "Current balance",
+      "debt": "Current debt",
+      "limit": "Credit limit",
+      "cutoffDay": "Cutoff day",
+      "debtExceedsLimit": "Debt can't exceed the limit.",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Delete {{name}}?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
+    },
+    "gate": {
+      "accountTitle": "Free includes up to 2 accounts",
+      "cardTitle": "Free includes 1 card",
+      "body": "Plus gives you unlimited accounts and cards, with your agent reviewing everything weekly."
     }
   },
   "assistant": {
     "title": "Assistant",
-    "greeting": "How can I help, Sebastián?",
+    "greeting": "How can I help, {{name}}?",
     "thisWeek": "This week",
     "suggestions": "Suggestions",
     "conversation": "Conversation",
-    "inputPlaceholder": "Ask me anything…"
+    "inputPlaceholder": "Ask me anything…",
+    "summary": {
+      "pill": "Summary · May",
+      "title": "How May is going",
+      "body": "You've spent $1.919.500, a similar pace to April. Your top category is Groceries, and with this month's salary your savings rate is 54%. Watch Coffee: it's at 96% of its cap.",
+      "spent": "Spent",
+      "savings": "Savings",
+      "projection": "Proj. close",
+      "plusTeaser": "With Plus, your agent reviews your week.",
+      "seePlus": "See Plus"
+    },
+    "usage": {
+      "registrations": "AI entries",
+      "messages": "Messages",
+      "planFree": "Your monthly quota on Free · renews on the 1st",
+      "planPlus": "Your monthly quota on Plus · renews on the 1st"
+    },
+    "limit": {
+      "title": "You're out of messages this month",
+      "body": "Free includes 10 agent messages per month. Plus gives you 300, plus the weekly review.",
+      "cta": "See Plus"
+    }
   },
   "onboarding": {
     "skip": "Skip",
@@ -305,20 +402,25 @@
       "title": "Your main account",
       "subtitle": "To start tracking the balance. You can add more later.",
       "banks": {
-        "bbva": "BBVA",
-        "bancolombia": "Bancolombia",
-        "davivienda": "Davivienda",
-        "nu": "Nu",
-        "daviplata": "Daviplata",
-        "nequi": "Nequi",
+        "banco": "Bank",
+        "billetera": "Wallet",
         "efectivo": "Cash",
         "otro": "Other"
       },
       "sheet": {
-        "title": "Approximate balance in {{bank}}",
-        "hint": "An estimate is fine. You can adjust later.",
+        "hint": "Name it the way you call it. An estimated balance is fine.",
         "save": "Save and continue",
-        "skip": "Not sure, skip"
+        "skip": "Not sure, skip",
+        "nameLabel": "Name",
+        "namePlaceholder": "Chase, PayPal, pocket…",
+        "balanceLabel": "Approximate balance"
+      },
+      "currency": "Your currency",
+      "sheetTitles": {
+        "banco": "Your bank",
+        "billetera": "Your wallet",
+        "efectivo": "Your cash",
+        "otro": "Your account"
       }
     },
     "magic": {
@@ -329,7 +431,7 @@
       "processing": "Processing…",
       "exampleLabel": "Example",
       "example": "Coffee three thousand five hundred",
-      "preferText": "I'd rather type it"
+      "preferText": "Skip demo"
     },
     "confirm": {
       "pill": "Logged",
@@ -367,52 +469,11 @@
       "suggested": "suggested"
     },
     "saldo": {
-      "label": "Net balance",
-      "viewAccounts": "View accounts",
-      "breakdown_one": "{{accounts}} account + cash − {{tc}} CC",
-      "breakdown_other": "{{accounts}} accounts + cash − {{tc}} CC",
-      "today": "For today",
-      "left": "left"
+      "label": "Net balance"
     },
     "month": {
       "label": "{{month}} · {{daysLeft}} days",
-      "labelOne": "{{month}} · {{daysLeft}} day",
-      "dailySuggested": "Daily suggested"
-    },
-    "heroPicker": {
-      "title": "Home view",
-      "subtitle": "Pick what you want to see first when you open the app.",
-      "footnote": "You can change it from here anytime.",
-      "daily": {
-        "label": "Available today",
-        "sub": "Your daily allowance and what you've already spent"
-      },
-      "saldo": {
-        "label": "Net balance",
-        "sub": "How much you have in accounts, minus debts"
-      },
-      "mes": {
-        "label": "Monthly progress",
-        "sub": "Spent vs your monthly budget"
-      }
-    },
-    "gastado": {
-      "label": "Spent this month",
-      "short": "Spent · month",
-      "viewExpenses": "View expenses"
-    },
-    "layoutPicker": {
-      "title": "Home layout",
-      "subtitle": "Choose how your Home is organized.",
-      "footnote": "You can change it from here anytime.",
-      "actividad": {
-        "label": "Activity",
-        "sub": "Recent expenses first, summaries at the end"
-      },
-      "compacto": {
-        "label": "Compact",
-        "sub": "Balance and spent in a 2-up row, the rest below"
-      }
+      "labelOne": "{{month}} · {{daysLeft}} day"
     },
     "categories": {
       "title": "Your categories",
@@ -425,15 +486,62 @@
       "inDays_other": "in {{count}} days"
     },
     "recent": {
-      "title": "Recent expenses",
+      "title": "Recent activity",
       "seeAll": "See all",
       "transferTag": "Transfer · not an expense"
+    },
+    "income": {
+      "title": "{{month}} income",
+      "savings": "{{pct}}% saved"
+    }
+  },
+  "goals": {
+    "title": "Goals",
+    "of": "of",
+    "projection": "At this pace you'll get there in {{month}}",
+    "projectionEmpty": "Log your first contribution to get started",
+    "projectionSoon": "The agent will project your date with more contributions",
+    "add": "New goal",
+    "contribute": "Add contribution",
+    "edit": "Edit",
+    "empty": {
+      "title": "No goals yet",
+      "body": "Create a savings goal and the agent will help you get there."
+    },
+    "form": {
+      "newGoal": "New goal",
+      "editGoal": "Edit goal",
+      "subtitle": "A clear objective and the amount to reach it.",
+      "name": "Name",
+      "namePlaceholder": "Trip, emergency fund…",
+      "target": "Target amount",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Delete \"{{name}}\"?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
+    },
+    "contribution": {
+      "title": "Contribution to {{name}}",
+      "remaining": "{{amount}} to go",
+      "amount": "Contribution amount",
+      "save": "Save contribution"
+    },
+    "gate": {
+      "title": "Free includes 1 active goal",
+      "body": "Plus lets you create unlimited goals, with the agent tracking each one."
     }
   },
   "deudas": {
     "title": "Debts",
-    "summary": { "owedToMe": "owe me", "iOwe": "I owe" },
-    "tabs": { "incoming": "Owed to me", "outgoing": "I owe" },
+    "summary": {
+      "owedToMe": "owe me",
+      "iOwe": "I owe"
+    },
+    "tabs": {
+      "incoming": "Owed to me",
+      "outgoing": "I owe"
+    },
     "inicioCard": {
       "title": "Debts",
       "owedToMe": "to collect",
@@ -474,8 +582,10 @@
       "cta": "New debt"
     },
     "history": {
-      "title": "Payment history",
-      "empty": "No payments yet."
+      "title": "Debt history",
+      "subtitle": "The ones already settled.",
+      "empty": "No paid debts yet.",
+      "noNote": "No note"
     },
     "detail": {
       "balancePending": "Pending balance",
@@ -565,7 +675,12 @@
       "toastIndividual": "Debt recorded · {{name}}",
       "toastShared": "Shared debt created · {{event}}"
     },
-    "viewHistory": "See history"
+    "viewHistory": "See history",
+    "share": {
+      "button": "Share summary",
+      "messageIncoming": "Hi {{name}}: friendly reminder — you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Numen",
+      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Numen"
+    }
   },
   "profile": {
     "title": "Profile",
@@ -619,12 +734,26 @@
       "resetOnboarding": {
         "title": "Reset onboarding",
         "subtitle": "Development only"
+      },
+      "language": {
+        "title": "Language"
+      },
+      "currency": {
+        "title": "Currency"
       }
     },
     "appearance": {
       "dark": "Dark",
       "light": "Light",
       "auto": "Auto"
+    },
+    "soon": "Coming soon",
+    "editName": {
+      "title": "Your name",
+      "subtitle": "How Numen greets you.",
+      "label": "Name",
+      "placeholder": "Your name",
+      "save": "Save"
     }
   },
   "expenses": {
@@ -646,9 +775,13 @@
       "talking": "Speaking…",
       "wait": "One moment",
       "hint": "e.g. \"taxi to work, nine thousand\"",
-      "photoReceipt": "Photo receipt",
+      "photoReceipt": "Photo",
       "write": "Write",
-      "quote": "\"taxi to work, nine thousand and lunch at juan valdez eighteen thousand\"",
+      "quote": {
+        "voice": "You said",
+        "text": "You wrote",
+        "photo": "Detected from receipt"
+      },
       "detectedAuto": "Auto-detected",
       "amount": "Amount",
       "addAnother": "Add another",
@@ -680,19 +813,38 @@
         "analyzing": "Analyzing receipt…",
         "demoTranscript": "Carulla receipt · May 14, 2026"
       },
-      "quote": {
-        "voice": "You said",
-        "text": "You wrote",
-        "photo": "Detected from receipt"
-      },
       "transcript": {
         "voice": "taxi to work, nine thousand and lunch at juan valdez eighteen thousand"
+      },
+      "manual": "Manual",
+      "addedManually": "Added by you",
+      "manualEntry": {
+        "title": "Manual entry",
+        "subtitle": "Full control, no AI",
+        "type": {
+          "expense": "Expense",
+          "income": "Income",
+          "transfer": "Transfer"
+        },
+        "descriptionPlaceholder": "Description",
+        "category": "Category",
+        "account": "Account",
+        "from": "From",
+        "to": "To",
+        "date": "Date",
+        "save": {
+          "expense": "Save expense",
+          "income": "Save income",
+          "transfer": "Save transfer"
+        }
       }
     },
     "toast": {
       "saved": "{{count}} expenses saved · {{total}}",
       "savedOne": "{{count}} expense saved · {{total}}",
-      "undo": "Undo"
+      "undo": "Undo",
+      "savedIncome": "Income saved · {{total}}",
+      "savedTransfer": "Transfer recorded · {{total}}"
     }
   },
   "notFound": {
@@ -714,6 +866,16 @@
         "passwordTooShort": "Password must be at least 8 characters",
         "invalidCredentials": "Invalid email or password"
       }
+    }
+  },
+  "currency": {
+    "title": "Your currency",
+    "subtitle": "All your amounts are shown in this currency.",
+    "names": {
+      "COP": "Colombian peso",
+      "USD": "US dollar",
+      "EUR": "Euro",
+      "MXN": "Mexican peso"
     }
   }
 }

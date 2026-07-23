@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, Share, View } from 'react-native';
 
 import { Button, Card, Icon, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { debtProgress, debtStatus } from '../../domain/types/Deuda';
 import {
@@ -82,8 +82,23 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
             color={theme.colors.textSecondary}
           />
         </Pressable>
-        <View
-          style={{
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('deudas.share.button')}
+          onPress={() => {
+            const key = isIncoming
+              ? 'deudas.share.messageIncoming'
+              : 'deudas.share.messageOutgoing';
+            void Share.share({
+              message: t(key, {
+                name: person.name,
+                balance: formatMoney(deuda.balance),
+                total: formatMoney(deuda.amount),
+                pct: Math.round(debtProgress(deuda) * 100),
+              }),
+            }).catch(() => undefined);
+          }}
+          style={({ pressed }) => ({
             width: 38,
             height: 38,
             borderRadius: 12,
@@ -92,10 +107,11 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
             borderColor: theme.colors.borderSubtle,
             alignItems: 'center',
             justifyContent: 'center',
-          }}
+            opacity: pressed ? 0.85 : 1,
+          })}
         >
-          <Icon name="dots" size={17} color={theme.colors.textSecondary} />
-        </View>
+          <Icon name="arrow-up-right" size={17} color={theme.colors.textSecondary} />
+        </Pressable>
       </View>
 
       <ScrollView
@@ -191,10 +207,10 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
               lineHeight: 32,
             }}
           >
-            {formatCOP(deuda.balance)}
+            {formatMoney(deuda.balance)}
           </Text>
           <Text color={theme.colors.textSecondary} style={{ fontSize: 12, marginTop: 6 }}>
-            {t('deudas.detail.ofOriginal', { amount: formatCOP(deuda.amount) })}
+            {t('deudas.detail.ofOriginal', { amount: formatMoney(deuda.amount) })}
           </Text>
           <View style={{ marginTop: 14 }}>
             <ProgressBar pct={pct} height={6} />
@@ -289,7 +305,7 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text tabular style={{ fontSize: 14.5, fontWeight: '500' }}>
-                      {formatCOP(p.amount)}
+                      {formatMoney(p.amount)}
                     </Text>
                     <Text
                       color={theme.colors.textTertiary}

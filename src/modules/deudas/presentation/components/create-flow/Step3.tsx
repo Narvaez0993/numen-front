@@ -3,7 +3,7 @@ import { Pressable, TextInput, View } from 'react-native';
 
 import { Icon, SectionLabel, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Counterparty } from '../../../domain/types/Deuda';
 
@@ -68,7 +68,7 @@ export function Step3({
           style={{ fontSize: 13, lineHeight: 18.85 }}
         >
           {t('deudas.create.step3.subtitle', {
-            amount: formatCOP(amount),
+            amount: formatMoney(amount),
             count: n,
           })}
         </Text>
@@ -101,7 +101,7 @@ export function Step3({
             color={isEqual ? theme.colors.accentMint : theme.colors.textSecondary}
             style={{ fontSize: 12.5 }}
           >
-            {t('deudas.create.step3.equalSplit', { amount: formatCOP(eachEqual) })}
+            {t('deudas.create.step3.equalSplit', { amount: formatMoney(eachEqual) })}
           </Text>
         </Pressable>
         <Pressable
@@ -310,7 +310,7 @@ export function Step3({
                 style={{ fontSize: 14, fontFamily: 'Geist_500Medium' }}
               >
                 {t('deudas.create.step3.overage', {
-                  amount: formatCOP(splitsSum + yoShare - amount),
+                  amount: formatMoney(splitsSum + yoShare - amount),
                 })}
               </Text>
             </>
@@ -322,7 +322,7 @@ export function Step3({
                 color={theme.colors.accentMint}
                 style={{ fontSize: 14, fontFamily: 'Geist_500Medium' }}
               >
-                {formatCOP(amount)}
+                {formatMoney(amount)}
               </Text>
             </>
           ) : (
@@ -332,7 +332,7 @@ export function Step3({
               style={{ fontSize: 14, fontFamily: 'Geist_500Medium' }}
             >
               {t('deudas.create.step3.remaining', {
-                amount: formatCOP(amount - splitsSum - yoShare),
+                amount: formatMoney(amount - splitsSum - yoShare),
               })}
             </Text>
           )}

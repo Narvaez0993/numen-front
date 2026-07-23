@@ -3,15 +3,16 @@ import { Pressable, View } from 'react-native';
 
 import { Icon, IconBox, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { CreditCard } from '../../domain';
 
 type Props = {
   card: CreditCard;
+  onPress?: () => void;
 };
 
-export function CreditCardItem({ card }: Props) {
+export function CreditCardItem({ card, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const usage = card.limit > 0 ? card.debt / card.limit : 0;
@@ -20,6 +21,8 @@ export function CreditCardItem({ card }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
+      onPress={onPress}
+      disabled={!onPress}
       style={({ pressed }) => ({
         backgroundColor: theme.colors.bgSurface,
         borderColor: theme.colors.borderSubtle,
@@ -69,7 +72,7 @@ export function CreditCardItem({ card }: Props) {
             {t('accounts.tc.debt')}
           </Text>
           <Text variant="bodyLarge" tabular style={{ fontSize: 16 }}>
-            {formatCOP(card.debt)}
+            {formatMoney(card.debt)}
           </Text>
         </View>
         <ProgressBar pct={usage} height={5} />
@@ -95,7 +98,7 @@ export function CreditCardItem({ card }: Props) {
             tabular
             style={{ fontSize: 10.5, letterSpacing: 0 }}
           >
-            {t('accounts.tc.limit', { amount: formatCOP(card.limit) })}
+            {t('accounts.tc.limit', { amount: formatMoney(card.limit) })}
           </Text>
         </View>
       </View>

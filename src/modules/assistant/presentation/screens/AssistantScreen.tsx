@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { limitsFor, usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { SectionLabel } from '@/shared/presentation/components';
+import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 
 import type {
@@ -25,17 +27,25 @@ import { CannedResponse } from '../components/CannedResponse';
 import { ChatInput } from '../components/ChatInput';
 import { FormattedText } from '../components/FormattedText';
 import { InsightCard } from '../components/InsightCard';
+import { LimitGateCard } from '../components/LimitGateCard';
+import { MonthlySummaryCard } from '../components/MonthlySummaryCard';
 import { SuggestedChips } from '../components/SuggestedChips';
 import { TypingIndicator } from '../components/TypingIndicator';
+import { UsageMeter } from '../components/UsageMeter';
 import { UserBubble } from '../components/UserBubble';
 import { useAssistant } from '../hooks/useAssistant';
 import { matchCanned } from '../utils/matchCanned';
 
+/** Insights whose CTA takes you to the place where you can act. */
+const INSIGHT_ROUTES: Record<string, string> = {
+  'alerta-cafe': '/budgets',
+  'subs-total': '/subscriptions',
+  'accion-clasificar': '/movements',
+};
+
+/** Insights whose CTA starts a conversation instead. */
 const INSIGHT_TO_QUERY: Record<string, string> = {
-  'alerta-cafe': '¿Cómo voy en café?',
   'patron-viernes': 'Gastos del fin de semana',
-  'subs-total': 'Mis suscripciones',
-  'accion-clasificar': 'Revisemos los gastos sin clasificar',
 };
 
 export function AssistantScreen() {
@@ -46,18 +56,35 @@ export function AssistantScreen() {
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  const [limitHit, setLimitHit] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const tabBarClearance = useFloatingTabBarClearance();
+
+  const tier = usePlanStore((s) => s.tier);
+  const used = usePlanStore((s) => s.used);
+  const consumeMessage = usePlanStore((s) => s.consumeMessage);
+  const limits = limitsFor(tier);
+  const canSend = used.messages < limits.messages;
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollToEnd({ animated: true });
     }
-  }, [messages, typing]);
+  }, [messages, typing, limitHit]);
+
+  useEffect(() => {
+    if (canSend) setLimitHit(false);
+  }, [canSend]);
 
   const sendMessage = useCallback(
     async (text: string) => {
       if (!text.trim() || typing) return;
+      if (!canSend) {
+        setLimitHit(true);
+        return;
+      }
       setInput('');
+      consumeMessage();
       const userMsg: ChatMessage = {
         id: Date.now(),
         role: 'user',
@@ -77,11 +104,16 @@ export function AssistantScreen() {
       setTyping(false);
       setMessages((m) => [...m, response]);
     },
-    [typing],
+    [typing, canSend, consumeMessage],
   );
 
   const onInsightCta = useCallback(
     (insight: Insight) => {
+      const route = INSIGHT_ROUTES[insight.id];
+      if (route) {
+        router.push(route as never);
+        return;
+      }
       const q = INSIGHT_TO_QUERY[insight.id] ?? insight.cta;
       setDismissed((d) => new Set([...d, insight.id]));
       void sendMessage(q);
@@ -112,7 +144,6 @@ export function AssistantScreen() {
   }
 
   const visibleInsights = data.insights.filter((i) => !dismissed.has(i.id));
-  const showInsights = visibleInsights.length > 0 && messages.length < 2;
 
   return (
     <SafeAreaView
@@ -138,13 +169,13 @@ export function AssistantScreen() {
         >
           <AssistantHeader onAvatarPress={() => router.push('/profile')} />
 
-          {showInsights ? (
+          <UsageMeter />
+
+          <MonthlySummaryCard onSeePlus={() => router.push('/plan')} />
+
+          {visibleInsights.length > 0 ? (
             <View style={{ gap: 10 }}>
-              <SectionLabel>
-                {messages.length === 0
-                  ? t('assistant.thisWeek')
-                  : t('assistant.suggestions')}
-              </SectionLabel>
+              <SectionLabel>{t('assistant.thisWeek')}</SectionLabel>
               {visibleInsights.map((ins) => (
                 <InsightCard key={ins.id} insight={ins} onCtaPress={onInsightCta} />
               ))}
@@ -170,12 +201,14 @@ export function AssistantScreen() {
               {typing ? <TypingIndicator /> : null}
             </View>
           ) : null}
+
+          {limitHit ? <LimitGateCard onSeePlus={() => router.push('/plan')} /> : null}
         </ScrollView>
 
         <View
           style={{
             paddingTop: 8,
-            paddingBottom: 12,
+            paddingBottom: tabBarClearance,
             paddingHorizontal: 16,
             backgroundColor: theme.colors.bgBase,
             borderTopColor: theme.colors.borderSubtle,

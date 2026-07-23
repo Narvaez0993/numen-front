@@ -22,7 +22,8 @@ describe('CompleteOnboardingUseCase', () => {
     const result = await useCase.execute({
       name: '  Sebastián  ',
       goal: 'ahorrar',
-      bankId: 'bbva',
+      bankId: 'banco',
+      sourceName: 'Bancolombia',
       balance: 5245000,
     });
 
@@ -41,6 +42,7 @@ describe('CompleteOnboardingUseCase', () => {
       name: 'S',
       goal: null,
       bankId: null,
+      sourceName: null,
       balance: 0,
     });
 
@@ -55,7 +57,8 @@ describe('CompleteOnboardingUseCase', () => {
     const result = await useCase.execute({
       name: 'Sebastián',
       goal: null,
-      bankId: 'bbva',
+      bankId: 'banco',
+      sourceName: 'Bancolombia',
       balance: -100,
     });
 
@@ -72,6 +75,7 @@ describe('CompleteOnboardingUseCase', () => {
       name: 'Sebastián',
       goal: 'gastos',
       bankId: null,
+      sourceName: null,
       balance: 0,
     });
 

@@ -4,7 +4,7 @@ import { Pressable, ScrollView, View, type DimensionValue } from 'react-native';
 
 import { BottomSheet, Icon, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
 import { useCreateExpenses } from '../hooks/useCreateExpenses';
@@ -12,6 +12,7 @@ import { useExpenseSheetStore, type SheetFlow } from '../stores/useExpenseSheetS
 
 import { ConfirmState } from './ConfirmState';
 import { EntryState } from './EntryState';
+import { ManualState } from './ManualState';
 import { PhotoState } from './PhotoState';
 import { WritingState } from './WritingState';
 
@@ -21,6 +22,7 @@ const MAX_HEIGHT: Record<SheetFlow, DimensionValue> = {
   processing: '62%',
   writing: '78%',
   photo: '80%',
+  manual: '88%',
   confirm: '88%',
 };
 
@@ -38,9 +40,9 @@ export function ExpenseSheet() {
     message: '',
   });
 
-  const isSubScreen = flow === 'writing' || flow === 'photo';
+  const isSubScreen = flow === 'writing' || flow === 'photo' || flow === 'manual';
 
-  const handleSave = (items: DetectedExpense[]) => {
+  const handleSave = (items: DetectedExpense[], messageKey?: string) => {
     createExpenses.mutate(
       {
         expenses: items.map((it) => ({
@@ -52,11 +54,12 @@ export function ExpenseSheet() {
       },
       {
         onSuccess: ({ savedCount, totalAmount }) => {
-          const messageKey =
-            savedCount === 1 ? 'expenses.toast.savedOne' : 'expenses.toast.saved';
+          const key =
+            messageKey ??
+            (savedCount === 1 ? 'expenses.toast.savedOne' : 'expenses.toast.saved');
           setToast({
             visible: true,
-            message: t(messageKey, { count: savedCount, total: formatCOP(totalAmount) }),
+            message: t(key, { count: savedCount, total: formatMoney(totalAmount) }),
           });
           closeSheet();
         },
@@ -104,6 +107,20 @@ export function ExpenseSheet() {
             <WritingState />
           ) : flow === 'photo' ? (
             <PhotoState />
+          ) : flow === 'manual' ? (
+            <ManualState
+              onSave={(item, type) =>
+                handleSave(
+                  [item],
+                  type === 'income'
+                    ? 'expenses.toast.savedIncome'
+                    : type === 'transfer'
+                      ? 'expenses.toast.savedTransfer'
+                      : undefined,
+                )
+              }
+              saving={createExpenses.isPending}
+            />
           ) : (
             <EntryState />
           )}

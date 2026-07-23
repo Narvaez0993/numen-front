@@ -13,9 +13,16 @@ export type Saldo = {
 };
 
 export type MonthProgress = {
+  name: string;
   spent: number;
   target: number;
   daysLeft: number;
+};
+
+export type MonthIncome = {
+  total: number;
+  /** 0..1 — share of income not yet spent this month. */
+  savingsRate: number;
 };
 
 export type CategoryProgress = {
@@ -54,6 +61,7 @@ export type HomeOverview = {
   daily: DailyAllowance;
   saldo: Saldo;
   month: MonthProgress;
+  income: MonthIncome;
   topCategories: CategoryProgress[];
   upcoming: UpcomingSub[];
   recent: RecentExpense[];

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
+import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -9,9 +10,20 @@ type Props = {
   onAvatarPress?: () => void;
 };
 
-export function AssistantHeader({ initials = 'SM', onAvatarPress }: Props) {
+export function AssistantHeader({ initials, onAvatarPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const profileName = useOnboardingStore((s) => s.profile?.name);
+  const name = profileName?.trim() || 'Sebastián';
+  const avatarInitials =
+    initials ??
+    name
+      .split(' ')
+      .map((p) => p[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
   return (
     <View
       style={{
@@ -32,7 +44,7 @@ export function AssistantHeader({ initials = 'SM', onAvatarPress }: Props) {
           {t('assistant.title')}
         </Text>
         <Text variant="caption" muted style={{ marginTop: 4 }} numberOfLines={1}>
-          {t('assistant.greeting')}
+          {t('assistant.greeting', { name })}
         </Text>
       </View>
       <Pressable
@@ -50,7 +62,7 @@ export function AssistantHeader({ initials = 'SM', onAvatarPress }: Props) {
         })}
       >
         <Text variant="label" color={theme.colors.accentMint} style={{ fontSize: 12.5 }}>
-          {initials}
+          {avatarInitials}
         </Text>
       </Pressable>
     </View>

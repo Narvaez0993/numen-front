@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { Icon, IconBox, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { CategoryBudget } from '../../domain/types/Budget';
 
@@ -78,10 +78,10 @@ export function CategoryItem({
               tabular
               style={{ fontWeight: '500', fontSize: 12.5 }}
             >
-              {formatCOP(category.spent)}
+              {formatMoney(category.spent)}
               <Text variant="body" muted style={{ fontSize: 12.5 }}>
                 {' '}
-                / {formatCOP(safeTope)}
+                / {formatMoney(safeTope)}
               </Text>
             </Text>
           </View>
@@ -98,8 +98,8 @@ export function CategoryItem({
             </Text>
             <Text variant="caption" muted tabular style={{ fontSize: 11 }}>
               {remaining >= 0
-                ? t('budgets.remaining', { amount: formatCOP(remaining) })
-                : t('budgets.over', { amount: formatCOP(Math.abs(remaining)) })}
+                ? t('budgets.remaining', { amount: formatMoney(remaining) })
+                : t('budgets.over', { amount: formatMoney(Math.abs(remaining)) })}
             </Text>
           </View>
         </View>

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { Card, Text } from '@/shared/presentation/components';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   netBalance: number;
@@ -27,7 +27,7 @@ export function NetBalanceCard({ netBalance, accountsCount, creditCardsCount }: 
         tabular
         style={{ fontSize: 28, lineHeight: 28, letterSpacing: -0.56 }}
       >
-        {formatCOP(netBalance)}
+        {formatMoney(netBalance)}
       </Text>
       <Text variant="caption" muted style={{ fontSize: 11.5, marginTop: 6 }}>
         {t('accounts.netBalance.breakdown', {

@@ -3,15 +3,16 @@ import { Pressable, View } from 'react-native';
 
 import { IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Subscription } from '../../domain';
 
 type Props = {
   subscription: Subscription;
+  onPress?: () => void;
 };
 
-export function SubscriptionCard({ subscription }: Props) {
+export function SubscriptionCard({ subscription, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { name, icon, color, amount, every, account, nextInDays, urgent } = subscription;
@@ -22,6 +23,8 @@ export function SubscriptionCard({ subscription }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
+      onPress={onPress}
+      disabled={!onPress}
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
@@ -49,7 +52,7 @@ export function SubscriptionCard({ subscription }: Props) {
             {name}
           </Text>
           <Text variant="bodyLarge" tabular style={{ fontSize: 13.5 }}>
-            {formatCOP(amount)}
+            {formatMoney(amount)}
           </Text>
         </View>
         <View

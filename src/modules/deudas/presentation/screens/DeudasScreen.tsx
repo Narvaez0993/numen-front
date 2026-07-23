@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FAB, Icon, Text, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { type DebtDirection, debtStatus } from '../../domain/types/Deuda';
 import { DeudaCardIndividual } from '../components/DeudaCardIndividual';
@@ -16,6 +16,7 @@ import { DeudasHeader } from '../components/DeudasHeader';
 import { DirectionTabs } from '../components/DirectionTabs';
 import { EmptyDeudasState } from '../components/EmptyDeudasState';
 import { NuevaDeudaFlow } from '../components/create-flow/NuevaDeudaFlow';
+import { HistorySheet } from '../components/sheets/HistorySheet';
 import { RegistrarAbonoSheet } from '../components/sheets/RegistrarAbonoSheet';
 import { useDeudas } from '../hooks/useDeudas';
 import { useDeudasStore } from '../stores/useDeudasStore';
@@ -44,6 +45,7 @@ export function DeudasScreen() {
 
   const [direction, setDirection] = useState<DebtDirection>('incoming');
   const [expandedEvent, setExpandedEvent] = useState<string | null>('ev-comida');
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [toast, setToast] = useState<{ visible: boolean; message: string }>({
     visible: false,
     message: '',
@@ -109,7 +111,7 @@ export function DeudasScreen() {
           onSaved={(amount) => {
             setToast({
               visible: true,
-              message: t('deudas.abono.toast', { amount: formatCOP(amount) }),
+              message: t('deudas.abono.toast', { amount: formatMoney(amount) }),
             });
           }}
         />
@@ -191,6 +193,7 @@ export function DeudasScreen() {
 
           {!isEmpty ? (
             <Pressable
+              onPress={() => setHistoryOpen(true)}
               style={({ pressed }) => ({
                 marginTop: 4,
                 alignSelf: 'center',
@@ -217,6 +220,7 @@ export function DeudasScreen() {
 
       <FAB variant="pink" onPress={() => openCreate(direction)} />
 
+      <HistorySheet visible={historyOpen} onClose={() => setHistoryOpen(false)} />
       <RegistrarAbonoSheet
         visible={!!abonoForId}
         debtId={abonoForId}
@@ -224,7 +228,7 @@ export function DeudasScreen() {
         onSaved={(amount) => {
           setToast({
             visible: true,
-            message: t('deudas.abono.toast', { amount: formatCOP(amount) }),
+            message: t('deudas.abono.toast', { amount: formatMoney(amount) }),
           });
         }}
       />

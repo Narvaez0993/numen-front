@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { Card, IconBox, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatCOP } from '@/shared/presentation/utils/formatCOP';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { CategoryProgress } from '../../domain/types/HomeOverview';
 
@@ -60,7 +60,7 @@ export function TopCategoriesCard({ categories }: Props) {
                     color={theme.colors.textSecondary}
                     style={{ fontWeight: '500', fontSize: 12.5 }}
                   >
-                    {formatCOP(c.spent)}
+                    {formatMoney(c.spent)}
                     <Text variant="caption" muted>
                       {' '}
                       · {Math.round(pct * 100)}%
