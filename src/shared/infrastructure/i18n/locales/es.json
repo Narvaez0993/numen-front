@@ -1,0 +1,881 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "continue": "Continuar",
+    "all": "Todas",
+    "recurring": "recurrente"
+  },
+  "movements": {
+    "title": "Movimientos",
+    "currentMonth": "Mayo",
+    "searchPlaceholder": "Buscar gasto, merchant, monto…",
+    "results": "{{count}} resultados",
+    "resultsOne": "{{count}} resultado",
+    "clear": "Limpiar",
+    "filters": {
+      "month": "Mes",
+      "monthAll": "Este mes (mayo)",
+      "account": "Cuenta",
+      "category": "Categoría",
+      "type": "Tipo"
+    },
+    "months": {
+      "april": "Abril",
+      "march": "Marzo",
+      "last90": "Últimos 90 días",
+      "thisYear": "Este año"
+    },
+    "types": {
+      "expenses": "Solo gastos",
+      "recurring": "Recurrentes",
+      "transfers": "Transferencias",
+      "income": "Ingresos"
+    },
+    "empty": {
+      "title": "Sin resultados",
+      "hint": "Probá cambiar los filtros o la búsqueda"
+    },
+    "transferTag": "Transferencia · no es gasto",
+    "detail": {
+      "title": "Detalle del movimiento",
+      "description": "Descripción",
+      "amount": "Monto",
+      "category": "Categoría",
+      "account": "Cuenta",
+      "save": "Guardar cambios",
+      "delete": "Eliminar movimiento",
+      "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
+    }
+  },
+  "budgets": {
+    "title": "Presupuestos",
+    "subtitle": "Mayo · seguimiento en vivo",
+    "noActiveBudget": "Sin presupuesto activo",
+    "month": {
+      "label": "Presupuesto de mayo",
+      "daysLeft": "días restantes",
+      "daysLeftOne": "día restante",
+      "of": "de",
+      "youCarry": "Llevas",
+      "ofTheMonth": "del mes",
+      "available": "Disponible",
+      "dailySuggested": "Diario sugerido"
+    },
+    "projection": {
+      "willEnd": "A tu ritmo cerrarás el mes en",
+      "over": "por encima de tu meta"
+    },
+    "byCategory": "Por categoría",
+    "urgencyOrder": "orden por urgencia",
+    "used": "usado",
+    "remaining": "quedan {{amount}}",
+    "over": "{{amount}} sobre",
+    "topMerchants": "Merchants principales",
+    "viewAll": "Ver todos",
+    "editTope": "Editar tope",
+    "addCategory": "Agregar categoría",
+    "plusUpsell": {
+      "text": "Crea categorías custom con",
+      "label": "Plus",
+      "cta": "Ver plan"
+    },
+    "emptyA": {
+      "title": "Define tu presupuesto",
+      "body": "Establece cuánto no quieres gastar este mes. Numen te ayuda a llegar.",
+      "cta": "Crear presupuesto mensual"
+    },
+    "emptyB": {
+      "title": "Vigila categorías específicas",
+      "body": "Recibe alertas cuando una categoría se acerque a su tope.",
+      "cta": "Agregar categoría a vigilar"
+    },
+    "editTecho": {
+      "title": "Tu techo de {{month}}",
+      "subtitle": "Edita el monto si necesitas. Aplica solo a este mes.",
+      "helper": "El cambio aplica solo a {{month}}. Los meses siguientes mantienen el valor original.",
+      "applyFuture": "Aplicar también a meses futuros",
+      "applyFutureHint": "Cambia el valor por defecto desde el próximo mes.",
+      "save": "Guardar",
+      "delete": "Eliminar presupuesto"
+    },
+    "editTopeSheet": {
+      "title": "Tope para {{name}}",
+      "subtitle": "Numen te avisará cuando te acerques a este monto.",
+      "carry": "Llevas {{amount}} este mes",
+      "save": "Guardar tope",
+      "activate": "Activar tope",
+      "delete": "Eliminar tope"
+    },
+    "addVigilance": {
+      "title": "Vigilar una categoría",
+      "subtitle": "Elige una categoría y define el tope.",
+      "spent": "{{amount}} gastado · sin tope",
+      "add": "Agregar",
+      "allWatchedTitle": "Ya estás vigilando todas las categorías",
+      "allWatchedHint": "Tócalas en la lista de Presupuestos para editar los topes."
+    },
+    "confirmSheet": {
+      "techoTitle": "¿Eliminar tu presupuesto de {{month}}?",
+      "techoBody": "Los topes por categoría también se eliminarán. Esta acción no se puede deshacer.",
+      "techoCta": "Eliminar presupuesto",
+      "topeTitle": "¿Eliminar el tope de {{name}}?",
+      "topeBody": "La categoría seguirá apareciendo en 'Sin tope' este mes. Puedes activarlo de nuevo cuando quieras.",
+      "topeCta": "Eliminar tope",
+      "cancel": "Cancelar"
+    },
+    "create": {
+      "step": "Paso {{current}} de {{total}}",
+      "skip": "Saltar",
+      "next": "Continuar",
+      "save": "Guardar presupuesto",
+      "step1": {
+        "title": "Tu presupuesto de {{month}}",
+        "subtitle": "¿Cuánto no quieres pasar este mes?",
+        "helper": "Puedes ajustarlo después si necesitas."
+      },
+      "step2": {
+        "title": "¿Quieres vigilar alguna categoría?",
+        "subtitle": "Activa topes en categorías donde quieras autocontrol específico. Es opcional.",
+        "infoPart1": "Los topes ",
+        "infoBold": "no son adicionales",
+        "infoPart2": " — todo gasto cuenta a tu techo de ",
+        "infoPart3": ". Los topes solo te avisan cuando una categoría específica se acerca a su límite.",
+        "categoriesLabel": "Categorías",
+        "tope": "Tope {{amount}}",
+        "noTope": "Sin tope",
+        "createCategory": "¿No ves la que buscas? Crear categoría",
+        "exitTitle": "¿Salir sin crear presupuesto?",
+        "exitBody": "Perderás los cambios que has hecho.",
+        "exitCta": "Salir"
+      }
+    },
+    "createCategory": {
+      "title": "Nueva categoría",
+      "plus": "Plus",
+      "subtitle": "Llámala como quieras, elige ícono y color.",
+      "preview": "Vista previa",
+      "previewPlaceholder": "Tu categoría",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej: Mascotas, Gym, Cursos",
+      "iconLabel": "Ícono",
+      "colorLabel": "Color",
+      "save": "Crear categoría",
+      "footnote": "Las categorías personalizadas son parte de Plus."
+    }
+  },
+  "plan": {
+    "title": "Tu plan",
+    "period": {
+      "mensual": "Mensual",
+      "anual": "Anual",
+      "savings": "-48%"
+    },
+    "status": {
+      "current": "Tu plan",
+      "recommended": "Recomendado"
+    },
+    "footer": "7 días gratis · cancela cuando quieras",
+    "gate": {
+      "cta": "Ver Plus",
+      "notNow": "Ahora no"
+    },
+    "toast": {
+      "activated": "Plus activo · 7 días de prueba"
+    },
+    "backToFree": "Volver a Free (demo)"
+  },
+  "categories": {
+    "title": "Categorías",
+    "thisMonth": {
+      "label": "Este mes",
+      "breakdown_one": "{{count}} categoría con movimiento · {{total}} estándar disponibles",
+      "breakdown_other": "{{count}} categorías con movimiento · {{total}} estándar disponibles"
+    },
+    "searchPlaceholder": "Buscar categoría…",
+    "empty": "Sin resultados",
+    "groups": {
+      "standard": "Estándar · {{count}}",
+      "custom": "Personalizadas"
+    },
+    "row": {
+      "noMovements": "Sin movimientos este mes",
+      "movements_one": "{{count}} gasto · este mes",
+      "movements_other": "{{count}} gastos · este mes"
+    },
+    "upsell": {
+      "title": "Crea tus propias categorías",
+      "plus": "Plus",
+      "description": "Elige nombre, ícono y color. Crea presupuestos individuales por cada una.",
+      "preview": {
+        "mascotas": "Mascotas",
+        "gym": "Gym",
+        "cursos": "Cursos",
+        "streaming": "Streaming"
+      },
+      "cta": "Conoce Plus"
+    },
+    "footer": "Cambia el ícono o el color de cualquier categoría tocándola."
+  },
+  "subscriptions": {
+    "title": "Suscripciones",
+    "monthlyTotal": {
+      "label": "Total mensual",
+      "breakdown_one": "{{count}} activa · proyección anual {{yearly}}",
+      "breakdown_other": "{{count}} activas · proyección anual {{yearly}}"
+    },
+    "card": {
+      "cadence": "Cada {{days}} días · {{account}}",
+      "next_one": "En {{count}} día",
+      "next_other": "En {{count}} días"
+    },
+    "add": "Agregar suscripción",
+    "form": {
+      "newTitle": "Nueva suscripción",
+      "editTitle": "Editar suscripción",
+      "subtitle": "El cobro recurrente y de dónde sale.",
+      "name": "Nombre",
+      "namePlaceholder": "Netflix, gimnasio, iCloud…",
+      "amount": "Monto",
+      "cadence": "Frecuencia",
+      "cadences": {
+        "weekly": "Semanal",
+        "monthly": "Mensual",
+        "yearly": "Anual"
+      },
+      "account": "Cuenta",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "deleteConfirmTitle": "¿Eliminar {{name}}?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
+    }
+  },
+  "accounts": {
+    "title": "Fuentes y cuentas",
+    "netBalance": {
+      "label": "Saldo neto",
+      "breakdown_one": "{{accounts}} cuenta + efectivo − {{cards}} TC",
+      "breakdown_other": "{{accounts}} cuentas + efectivo − {{cards}} TC"
+    },
+    "groups": {
+      "debit": "Débito y efectivo",
+      "credit": "Tarjetas de crédito"
+    },
+    "tc": {
+      "debt": "Deuda actual",
+      "usage": "{{pct}}% del cupo",
+      "limit": "{{amount}} de cupo",
+      "cutoff": "Corte {{day}}",
+      "due": "Pago próximo {{date}}"
+    },
+    "add": {
+      "account": "Agregar cuenta",
+      "card": "Agregar tarjeta"
+    },
+    "form": {
+      "newAccount": "Nueva cuenta",
+      "editAccount": "Editar cuenta",
+      "accountSubtitle": "Débito o efectivo, con el nombre que quieras.",
+      "newCard": "Nueva tarjeta",
+      "editCard": "Editar tarjeta",
+      "cardSubtitle": "Tu tarjeta de crédito: deuda, cupo y corte.",
+      "kind": {
+        "debit": "Débito",
+        "cash": "Efectivo"
+      },
+      "name": "Nombre",
+      "namePlaceholder": "Banco, billetera, bolsillo…",
+      "cardNamePlaceholder": "Visa, Master, la que uses…",
+      "sub": "Detalle (opcional)",
+      "subPlaceholder": "Cuenta de ahorros",
+      "balance": "Saldo actual",
+      "debt": "Deuda actual",
+      "limit": "Cupo",
+      "cutoffDay": "Día de corte",
+      "debtExceedsLimit": "La deuda no puede superar el cupo.",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "deleteConfirmTitle": "¿Eliminar {{name}}?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
+    },
+    "gate": {
+      "accountTitle": "Tu plan Free llega hasta 2 cuentas",
+      "cardTitle": "Tu plan Free incluye 1 tarjeta",
+      "body": "Con Plus tienes cuentas y tarjetas ilimitadas, y tu agente revisándolo todo cada semana."
+    }
+  },
+  "assistant": {
+    "title": "Asistente",
+    "greeting": "¿En qué te ayudo, {{name}}?",
+    "thisWeek": "Esta semana",
+    "suggestions": "Sugerencias",
+    "conversation": "Conversación",
+    "inputPlaceholder": "Pregúntame lo que sea…",
+    "summary": {
+      "pill": "Resumen · Mayo",
+      "title": "Así vas en mayo",
+      "body": "Llevas $1.919.500 gastados, un ritmo parecido al de abril. Tu mayor categoría es Mercado, y con el sueldo de este mes tu ahorro va en 54%. Ojo con Café: está al 96% de su tope.",
+      "spent": "Gastado",
+      "savings": "Ahorro",
+      "projection": "Cierre proy.",
+      "plusTeaser": "Con Plus, tu agente te revisa cada semana.",
+      "seePlus": "Ver Plus"
+    },
+    "usage": {
+      "registrations": "Registros IA",
+      "messages": "Mensajes",
+      "planFree": "Tu cuota del mes en el plan Free · se renueva el 1º",
+      "planPlus": "Tu cuota del mes en Plus · se renueva el 1º"
+    },
+    "limit": {
+      "title": "Te quedaste sin mensajes este mes",
+      "body": "Tu plan Free incluye 10 mensajes con el agente al mes. Con Plus tienes 300, más la revisión semanal.",
+      "cta": "Ver Plus"
+    }
+  },
+  "onboarding": {
+    "skip": "Saltar",
+    "welcome": {
+      "title1": "Olvídate de Excel.",
+      "subtitle1": "Lleva tus gastos diciéndolos en voz alta. La IA hace el resto.",
+      "title2": "Habla. No escribas.",
+      "subtitle2": "Dile a Numen \"café tres mil quinientos\" y queda registrado al instante. Sin formularios.",
+      "title3": "Tu plata, en tiempo real.",
+      "subtitle3": "Saldos, presupuestos y deudas en una sola pantalla. Sin Excel, sin fórmulas.",
+      "start": "Empezar",
+      "haveAccount": "Ya tengo cuenta"
+    },
+    "auth": {
+      "signup": {
+        "title": "Crea tu cuenta",
+        "subtitle": "En menos de un minuto y sin contraseñas."
+      },
+      "login": {
+        "title": "Bienvenido de vuelta",
+        "subtitle": "Continuemos donde lo dejaste."
+      },
+      "apple": "Continuar con Apple",
+      "google": "Continuar con Google",
+      "email": "Continuar con email",
+      "signupHint": "¿Ya tienes cuenta?",
+      "loginHint": "¿No tienes cuenta?",
+      "signupLink": "Iniciar sesión",
+      "loginLink": "Crear una",
+      "terms": "Al continuar aceptas los Términos y la Política de privacidad de Numen."
+    },
+    "perso": {
+      "step1": "Paso 1 de 2",
+      "step2": "Paso 2 de 2",
+      "continue": "Continuar",
+      "skip": "Saltar este paso",
+      "name": {
+        "title": "¿Cómo te llamas?",
+        "subtitle": "Numen te llamará así.",
+        "placeholder": "Tu nombre"
+      },
+      "goal": {
+        "title": "Hola, {{name}}. ¿Qué quieres lograr con Numen?",
+        "subtitle": "Esto nos ayuda a darte sugerencias relevantes.",
+        "friend": "amigo",
+        "gastos": {
+          "title": "Saber dónde se va mi plata",
+          "sub": "Tengo ingresos OK pero no sé en qué gasto."
+        },
+        "ahorrar": {
+          "title": "Ahorrar para algo específico",
+          "sub": "Tengo una meta y quiero llegar a ella."
+        },
+        "deudas": {
+          "title": "Salir de deudas",
+          "sub": "Quiero pagar tarjetas y dejar de deber."
+        }
+      }
+    },
+    "setup": {
+      "title": "Tu cuenta principal",
+      "subtitle": "Para empezar a llevar el saldo. Puedes agregar más después.",
+      "banks": {
+        "banco": "Banco",
+        "billetera": "Billetera",
+        "efectivo": "Efectivo",
+        "otro": "Otro"
+      },
+      "sheet": {
+        "hint": "Ponle el nombre que usas tú. El saldo estimado está bien.",
+        "save": "Guardar y continuar",
+        "skip": "No sé, saltar",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Bancolombia, Nequi, bolsillo…",
+        "balanceLabel": "Saldo aproximado"
+      },
+      "currency": "Tu moneda",
+      "sheetTitles": {
+        "banco": "Tu banco",
+        "billetera": "Tu billetera",
+        "efectivo": "Tu efectivo",
+        "otro": "Tu cuenta"
+      }
+    },
+    "magic": {
+      "step": "Paso 5 de 5",
+      "title": "Probemos la magia.",
+      "subtitle": "Toca el mic y dime un gasto que hiciste hoy.",
+      "recording": "Te escucho…",
+      "processing": "Procesando…",
+      "exampleLabel": "Ejemplo",
+      "example": "Café tres mil quinientos",
+      "preferText": "Saltar demo"
+    },
+    "confirm": {
+      "pill": "Registrado",
+      "title": "Así de fácil.",
+      "subtitle": "Numen entendió lo que dijiste. Edita si algo está mal.",
+      "dijiste": "Dijiste",
+      "when": "Hoy · 9:41 a.m.",
+      "category": "Categoría",
+      "account": "Cuenta",
+      "defaultAccount": "Cuenta principal",
+      "continue": "Sigamos a Inicio",
+      "edit": "Editar este gasto"
+    }
+  },
+  "tabs": {
+    "home": "Inicio",
+    "movements": "Movimientos",
+    "budgets": "Presupuestos",
+    "assistant": "Asistente"
+  },
+  "placeholder": {
+    "hint": "Esta pantalla llega en una próxima iteración"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Buenos días",
+      "day": "Hola",
+      "night": "Buenas noches"
+    },
+    "daily": {
+      "label": "Para hoy",
+      "availableToday": "disponibles hoy",
+      "spent": "gastado",
+      "of": "de",
+      "suggested": "sugeridos"
+    },
+    "saldo": {
+      "label": "Saldo neto"
+    },
+    "month": {
+      "label": "{{month}} · {{daysLeft}} días",
+      "labelOne": "{{month}} · {{daysLeft}} día"
+    },
+    "categories": {
+      "title": "Tus categorías",
+      "thisMonth": "este mes"
+    },
+    "upcoming": {
+      "title": "Próximos cobros",
+      "window": "7 días",
+      "inDays_one": "en {{count}} día",
+      "inDays_other": "en {{count}} días"
+    },
+    "recent": {
+      "title": "Últimos movimientos",
+      "seeAll": "Ver todos",
+      "transferTag": "Transferencia · no es gasto"
+    },
+    "income": {
+      "title": "Ingresos de {{month}}",
+      "savings": "ahorro {{pct}}%"
+    }
+  },
+  "goals": {
+    "title": "Metas",
+    "of": "de",
+    "projection": "A este ritmo llegas en {{month}}",
+    "projectionEmpty": "Registra tu primer aporte para empezar",
+    "projectionSoon": "El agente proyectará tu fecha con más aportes",
+    "add": "Nueva meta",
+    "contribute": "Registrar aporte",
+    "edit": "Editar",
+    "empty": {
+      "title": "Aún no tienes metas",
+      "body": "Crea una meta de ahorro y el agente te ayudará a llegar."
+    },
+    "form": {
+      "newGoal": "Nueva meta",
+      "editGoal": "Editar meta",
+      "subtitle": "Un objetivo claro y el monto para lograrlo.",
+      "name": "Nombre",
+      "namePlaceholder": "Viaje, fondo de emergencia…",
+      "target": "Monto objetivo",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
+    },
+    "contribution": {
+      "title": "Aporte a {{name}}",
+      "remaining": "Te faltan {{amount}} para llegar",
+      "amount": "Monto del aporte",
+      "save": "Guardar aporte"
+    },
+    "gate": {
+      "title": "Tu plan Free incluye 1 meta activa",
+      "body": "Con Plus creas todas las metas que quieras y el agente les hace seguimiento."
+    }
+  },
+  "deudas": {
+    "title": "Deudas",
+    "summary": {
+      "owedToMe": "me deben",
+      "iOwe": "yo debo"
+    },
+    "tabs": {
+      "incoming": "Me deben",
+      "outgoing": "Yo debo"
+    },
+    "inicioCard": {
+      "title": "Deudas",
+      "owedToMe": "por cobrar",
+      "iOwe": "por pagar"
+    },
+    "status": {
+      "pending": "PENDIENTE",
+      "partial": "PARCIAL",
+      "paid": "PAGADO",
+      "overdue": "VENCIDA"
+    },
+    "pctPaid": "{{pct}}% pagado",
+    "due": {
+      "none": "sin vencimiento",
+      "todayLabel": "vence hoy",
+      "overdue_one": "venció hace {{count}} día",
+      "overdue_other": "venció hace {{count}} días",
+      "inDays_one": "vence en {{count}} día",
+      "inDays_other": "vence en {{count}} días",
+      "onDate": "vence {{date}}"
+    },
+    "card": {
+      "loanShort": "Préstamo",
+      "sharedWith_one": "Compartida con {{count}} persona",
+      "sharedWith_other": "Compartida con {{count}} personas",
+      "collected": "cobrado",
+      "owedPart": "pagado",
+      "pending_one": "{{count}} pendiente",
+      "pending_other": "{{count}} pendientes",
+      "remaining": "{{amount}} falta",
+      "bulkMarkPaid": "Marcar varios como pagados"
+    },
+    "empty": {
+      "incomingTitle": "No te deben nada",
+      "outgoingTitle": "No le debes a nadie",
+      "incomingBody": "Cuando prestes plata o pagues por otros, regístralo aquí para no olvidarte de cobrar.",
+      "outgoingBody": "Cuando alguien te preste plata o pague algo por ti, regístralo aquí.",
+      "cta": "Nueva deuda"
+    },
+    "history": {
+      "title": "Historial de deudas",
+      "subtitle": "Las que ya quedaron en cero.",
+      "empty": "Aún no hay deudas pagadas.",
+      "noNote": "Sin nota"
+    },
+    "detail": {
+      "balancePending": "Balance pendiente",
+      "ofOriginal": "de {{amount}} originales",
+      "overdueAlert": "Esta deuda venció el {{date}}. Considera contactar a {{name}}.",
+      "subTheyOweYou": "Te debe",
+      "subYouOweThem": "Le debes",
+      "partOf": "Parte de '{{event}}'",
+      "registerAbono": "Registrar abono"
+    },
+    "abono": {
+      "title": "Registrar abono",
+      "subIncoming": "{{name}} te abonó",
+      "subOutgoing": "Abono a {{name}}",
+      "balanceLabel": "Balance actual",
+      "accountIncoming": "Cuenta donde entró",
+      "accountOutgoing": "Cuenta de donde salió",
+      "save": "Guardar abono",
+      "toast": "Abono registrado · {{amount}}"
+    },
+    "create": {
+      "back": "Volver",
+      "step": "Paso {{current}} de {{total}}",
+      "next": "Continuar",
+      "saveIndividual": "Guardar deuda",
+      "saveShared": "Crear deuda compartida",
+      "step1": {
+        "title": "Nueva deuda",
+        "subtitle": "¿Quién está involucrado?",
+        "personsLabel_one": "Persona",
+        "personsLabel_other": "Personas ({{count}})",
+        "searchPlaceholder": "Buscar o agregar persona",
+        "addPersonPrefix": "Agregar",
+        "addPersonSuffix": "como nueva persona",
+        "sharedBanner": "Estás creando un gasto compartido. Habrá un paso adicional para dividir el monto."
+      },
+      "step2": {
+        "titleIndividual": "Detalles del préstamo",
+        "titleShared": "Detalles del gasto",
+        "subIndividual": "¿Cuánto y de dónde sale la plata?",
+        "subShared": "Monto total y categoría del gasto.",
+        "amountLabel": "Monto",
+        "amountSharedLabel": "Total del gasto",
+        "expenseToggleTitle": "Esto viene de un gasto que pagué",
+        "expenseToggleSub": "Cuenta a tu presupuesto solo por tu parte.",
+        "categoryLabel": "Categoría",
+        "categorySelected": "Seleccionada",
+        "categorySeeAll": "Buscar entre las 12 categorías",
+        "accountIncomingPaid": "Cuenta de donde salió",
+        "accountIncoming": "Cuenta donde entrará",
+        "accountOutgoing": "Cuenta donde entró",
+        "dateLabel": "Fecha",
+        "dateSheetTitle": "Fecha del préstamo",
+        "dateSheetSubtitle": "Cuándo ocurrió.",
+        "dueLabel": "Fecha límite",
+        "dueSheetTitle": "Fecha límite",
+        "dueSheetSubtitle": "Numen te avisará cuando se acerque.",
+        "dueNone": "Sin vencimiento",
+        "optional": "Opcional",
+        "noteLabel": "Nota (opcional)",
+        "notePlaceholder": "Ej. Comida del jueves, préstamo carro, etc.",
+        "accountSheetTitle": "Elegir cuenta",
+        "categorySheetTitle": "Elegir categoría",
+        "categorySheetSubtitle": "Busca o selecciona entre las 12 categorías estándar."
+      },
+      "step3": {
+        "title": "¿Cómo se divide?",
+        "subtitle": "Total {{amount}} · {{count}} personas",
+        "equalSplit": "Partes iguales · {{amount}} c/u",
+        "youPayMore": "Yo pongo más, los demás se reparten",
+        "personsLabel": "Personas",
+        "you": "Yo",
+        "yourPart": "Tu parte real",
+        "pctOfTotal": "{{pct}}% del total",
+        "sumLabel": "Suma de la división",
+        "remaining": "Faltan {{amount}}",
+        "overage": "Sobran {{amount}}"
+      },
+      "yoPongoMas": {
+        "title": "¿Cuánto pones tú?",
+        "subtitle_one": "El resto se queda con la otra persona.",
+        "subtitle_other": "El resto se divide entre las otras {{count}} personas.",
+        "perOther_one": "La otra persona pone {{amount}}",
+        "perOther_other": "Cada uno de los otros {{count}} pone {{amount}}",
+        "apply": "Aplicar"
+      },
+      "toastIndividual": "Deuda registrada · {{name}}",
+      "toastShared": "Deuda compartida creada · {{event}}"
+    },
+    "viewHistory": "Ver historial",
+    "share": {
+      "button": "Compartir resumen",
+      "messageIncoming": "Hola {{name}}: te recuerdo que me debes {{balance}} (de {{total}}, vas {{pct}}% pagado). — enviado desde Numen",
+      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Numen"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "edit": "Editar",
+    "signOut": "Cerrar sesión",
+    "groups": {
+      "myData": "Mis datos",
+      "app": "App",
+      "account": "Cuenta",
+      "developer": "Developer"
+    },
+    "rows": {
+      "accounts": {
+        "title": "Fuentes y cuentas",
+        "subtitle": "4 activas · saldo neto $5.245.000"
+      },
+      "subs": {
+        "title": "Suscripciones",
+        "subtitle": "3 activas · $92.800/mes"
+      },
+      "categories": {
+        "title": "Categorías",
+        "subtitle": "12 estándar · 0 personalizadas"
+      },
+      "deudas": {
+        "title": "Deudas",
+        "subtitleEmpty": "Sin deudas activas",
+        "subtitle_one": "{{count}} deuda activa",
+        "subtitle_other": "{{count}} deudas activas"
+      },
+      "notifications": {
+        "title": "Notificaciones"
+      },
+      "appearance": {
+        "title": "Apariencia"
+      },
+      "assistant": {
+        "title": "Asistente",
+        "value": "Proactivo"
+      },
+      "security": {
+        "title": "Seguridad y PIN"
+      },
+      "plan": {
+        "title": "Plan",
+        "value": "Free"
+      },
+      "export": {
+        "title": "Exportar datos"
+      },
+      "resetOnboarding": {
+        "title": "Resetear onboarding",
+        "subtitle": "Solo en desarrollo"
+      },
+      "language": {
+        "title": "Idioma"
+      },
+      "currency": {
+        "title": "Moneda"
+      }
+    },
+    "appearance": {
+      "dark": "Dark",
+      "light": "Light",
+      "auto": "Auto"
+    },
+    "soon": "Próximamente",
+    "editName": {
+      "title": "Tu nombre",
+      "subtitle": "Así te saluda Numen.",
+      "label": "Nombre",
+      "placeholder": "Tu nombre",
+      "save": "Guardar"
+    }
+  },
+  "expenses": {
+    "sheet": {
+      "title": {
+        "entry": "Nuevo gasto",
+        "recording": "Escuchando…",
+        "processing": "Procesando…",
+        "confirm": "{{count}} gastos detectados",
+        "confirmOne": "{{count}} gasto detectado"
+      },
+      "sub": {
+        "entry": "La forma más rápida",
+        "recording": "Toca de nuevo cuando termines",
+        "processing": "Identificando los gastos",
+        "confirm": "Revisa y edita antes de guardar"
+      },
+      "tapAndSpeak": "Toca y habla",
+      "talking": "Hablando…",
+      "wait": "Un momento",
+      "hint": "ej: \"taxi al trabajo, nueve mil\"",
+      "photoReceipt": "Foto",
+      "write": "Escribir",
+      "quote": {
+        "voice": "Dijiste",
+        "text": "Escribiste",
+        "photo": "Detectado en el recibo"
+      },
+      "detectedAuto": "Detectado automáticamente",
+      "amount": "Monto",
+      "addAnother": "Agregar otro",
+      "total": "Total",
+      "save": "Guardar gastos",
+      "back": "Volver",
+      "writing": {
+        "title": "Escribir gasto",
+        "subtitle": "Tipea uno o varios, la IA los separa",
+        "placeholder": "Describe tus gastos. ej: taxi al trabajo nueve mil y almuerzo en juan valdez",
+        "iaHint": "Identifica monto, categoría y cuenta automáticamente",
+        "examplesLabel": "Ejemplos",
+        "examples": [
+          "Taxi al trabajo, 9.000",
+          "Almuerzo en Crepes, 25.000",
+          "Mercado Carulla 68.400",
+          "Café Juan Valdez 5.500"
+        ],
+        "cta": "Procesar con IA"
+      },
+      "photo": {
+        "title": "Foto del recibo",
+        "subtitle": "La IA extrae todo del recibo",
+        "dropzoneTitle": "Toma o sube una foto",
+        "dropzoneHint": "JPG, PNG · máx 10 MB",
+        "iaHint": "Detectamos comercio, monto, fecha y categoría automáticamente.",
+        "take": "Tomar foto",
+        "gallery": "Elegir de galería",
+        "analyzing": "Analizando recibo…",
+        "demoTranscript": "Recibo de Carulla · 14 may 2026"
+      },
+      "transcript": {
+        "voice": "taxi al trabajo, nueve mil y almuerzo en juan valdez dieciocho mil"
+      },
+      "manual": "Manual",
+      "addedManually": "Agregado por ti",
+      "manualEntry": {
+        "title": "Registro manual",
+        "subtitle": "Control total, sin IA",
+        "type": {
+          "expense": "Gasto",
+          "income": "Ingreso",
+          "transfer": "Transferencia"
+        },
+        "descriptionPlaceholder": "Descripción",
+        "category": "Categoría",
+        "account": "Cuenta",
+        "from": "Desde",
+        "to": "Hacia",
+        "date": "Fecha",
+        "save": {
+          "expense": "Guardar gasto",
+          "income": "Guardar ingreso",
+          "transfer": "Guardar transferencia"
+        }
+      }
+    },
+    "toast": {
+      "saved": "{{count}} gastos guardados · {{total}}",
+      "savedOne": "{{count}} gasto guardado · {{total}}",
+      "undo": "Deshacer",
+      "savedIncome": "Ingreso guardado · {{total}}",
+      "savedTransfer": "Transferencia registrada · {{total}}"
+    }
+  },
+  "notFound": {
+    "title": "Pantalla no encontrada",
+    "backHome": "Volver al inicio"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Ingresa con tu cuenta",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@correo.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Tu contraseña",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "errors": {
+        "invalidEmail": "Correo no válido",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+        "invalidCredentials": "Correo o contraseña incorrectos"
+      }
+    }
+  },
+  "currency": {
+    "title": "Tu moneda",
+    "subtitle": "Todos tus montos se muestran en esta moneda.",
+    "names": {
+      "COP": "Peso colombiano",
+      "USD": "Dólar estadounidense",
+      "EUR": "Euro",
+      "MXN": "Peso mexicano"
+    }
+  }
+}
