@@ -12,6 +12,7 @@ import {
   LogoutUseCase,
   RegisterUseCase,
   ResendCodeUseCase,
+  UpdateDisplayNameUseCase,
   VerifyEmailUseCase,
 } from '@/modules/auth/application';
 import { AuthRepository } from '@/modules/auth/domain';
@@ -69,6 +70,7 @@ export const registerUseCase = new RegisterUseCase(authRepository);
 export const verifyEmailUseCase = new VerifyEmailUseCase(authRepository);
 export const resendCodeUseCase = new ResendCodeUseCase(authRepository);
 export const logoutUseCase = new LogoutUseCase(authRepository);
+export const updateDisplayNameUseCase = new UpdateDisplayNameUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);
 export const getProfileUseCase = new GetProfileUseCase(profileRepository);
 export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository);
@@ -107,6 +109,7 @@ export const container = {
   verifyEmailUseCase,
   resendCodeUseCase,
   logoutUseCase,
+  updateDisplayNameUseCase,
   getHomeOverviewUseCase,
   getProfileUseCase,
   createExpensesUseCase,

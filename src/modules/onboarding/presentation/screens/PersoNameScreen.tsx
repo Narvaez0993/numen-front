@@ -13,7 +13,7 @@ import { StepIndicator } from '../components/StepIndicator';
 
 type Props = {
   initialValue: string;
-  onBack: () => void;
+  onBack?: () => void;
   onContinue: (name: string) => void;
 };
 

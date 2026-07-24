@@ -10,11 +10,7 @@ export class RegisterUseCase {
     try {
       const email = Email.create(input.email);
       const password = Password.create(input.password);
-      await this.authRepository.register({
-        email,
-        password,
-        displayName: input.name.trim(),
-      });
+      await this.authRepository.register({ email, password });
       return ok({ email: email.value });
     } catch (error) {
       return err(error instanceof Error ? error : new Error('Unknown register error'));

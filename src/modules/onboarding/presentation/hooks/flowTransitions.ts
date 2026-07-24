@@ -2,10 +2,10 @@ export type OnboardingScreen =
   | 'welcome1'
   | 'welcome2'
   | 'welcome3'
-  | 'name'
   | 'account'
   | 'emailSignup'
   | 'verify'
+  | 'name'
   | 'goal'
   | 'setup'
   | 'magic'
@@ -15,10 +15,10 @@ export const SCREEN_FLOW: readonly OnboardingScreen[] = [
   'welcome1',
   'welcome2',
   'welcome3',
-  'name',
   'account',
   'emailSignup',
   'verify',
+  'name',
   'goal',
   'setup',
   'magic',
@@ -29,12 +29,13 @@ export const BACK_MAP: Readonly<Record<OnboardingScreen, OnboardingScreen | null
   welcome1: null,
   welcome2: 'welcome1',
   welcome3: 'welcome2',
-  name: 'welcome3',
-  account: 'name',
+  account: 'welcome3',
   emailSignup: 'account',
   verify: 'emailSignup',
-  // Once the session is issued at `verify`, the auth steps are behind us.
-  goal: null,
+  // The session is issued at `verify`; the name is the first personalization
+  // step and the resume entry point, so it has no back.
+  name: null,
+  goal: 'name',
   setup: 'goal',
   magic: null,
   confirm: null,
@@ -43,7 +44,7 @@ export const BACK_MAP: Readonly<Record<OnboardingScreen, OnboardingScreen | null
 export function nextWelcome(idx: 0 | 1 | 2): OnboardingScreen {
   if (idx === 0) return 'welcome2';
   if (idx === 1) return 'welcome3';
-  return 'name';
+  return 'account';
 }
 
 export function prevWelcome(idx: 0 | 1 | 2): OnboardingScreen | null {

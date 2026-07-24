@@ -32,11 +32,10 @@ const seedUsers: SeedUser[] = [
 
 export class InMemoryAuthRepository implements AuthRepository {
   private session: AuthSession | null = null;
-  private pending = new Map<string, { displayName: string; password: string }>();
+  private pending = new Map<string, { password: string }>();
 
   async register(credentials: RegisterCredentials): Promise<void> {
     this.pending.set(credentials.email.value, {
-      displayName: credentials.displayName,
       password: credentials.password.value,
     });
   }
@@ -46,11 +45,12 @@ export class InMemoryAuthRepository implements AuthRepository {
     if (!registered || code !== DEV_CODE) {
       throw new InvalidCodeError();
     }
+    // The name is set later via `updateDisplayName`, after verification.
     this.session = this.issue(
       new User({
         id: `usr-${this.pending.size + 1}`,
         email,
-        displayName: registered.displayName,
+        displayName: '',
         tier: 'free',
         emailVerified: true,
       }),
@@ -85,6 +85,22 @@ export class InMemoryAuthRepository implements AuthRepository {
 
   async logout(): Promise<void> {
     this.session = null;
+  }
+
+  async updateDisplayName(displayName: string): Promise<User> {
+    if (!this.session) {
+      throw new SessionExpiredError();
+    }
+    const current = this.session.user;
+    const updated = new User({
+      id: current.id,
+      email: current.email,
+      displayName,
+      tier: current.tier,
+      emailVerified: current.emailVerified,
+    });
+    this.session = { ...this.session, user: updated };
+    return updated;
   }
 
   async currentSession(): Promise<AuthSession | null> {

@@ -39,7 +39,6 @@ export class HttpAuthRepository implements AuthRepository {
       await this.http.post('/auth/register', {
         email: credentials.email.value,
         password: credentials.password.value,
-        display_name: credentials.displayName,
       });
     } catch (error) {
       throw mapApiError(error);
@@ -104,6 +103,23 @@ export class HttpAuthRepository implements AuthRepository {
       }
     }
     await this.clearTokens();
+  }
+
+  async updateDisplayName(displayName: string): Promise<User> {
+    try {
+      const { data } = await this.http.patch<CurrentUserResponse>('/auth/me', {
+        display_name: displayName,
+      });
+      return new User({
+        id: data.user_id,
+        email: Email.create(data.email),
+        displayName: data.display_name,
+        tier: data.tier as Tier,
+        emailVerified: data.email_verified,
+      });
+    } catch (error) {
+      throw mapApiError(error);
+    }
   }
 
   async currentSession(): Promise<AuthSession | null> {

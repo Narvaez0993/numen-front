@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAuthStore } from '@/modules/auth/presentation';
+import { useAuthStore, useUpdateName } from '@/modules/auth/presentation';
 import { completeOnboardingUseCase } from '@/core/di/container';
 import { useGoalsStore } from '@/modules/goals/presentation/stores/useGoalsStore';
 import { useTheme } from '@/shared/presentation/theme';
@@ -28,8 +28,9 @@ export function OnboardingFlow() {
   // Returning from a partial signup (verified, session issued) resumes at the
   // personalization steps instead of restarting the welcome sequence.
   const hasSession = useAuthStore((s) => s.session !== null);
-  const flow = useOnboardingFlow(hasSession ? 'goal' : 'welcome1');
+  const flow = useOnboardingFlow(hasSession ? 'name' : 'welcome1');
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
+  const updateName = useUpdateName();
   const finishingRef = useRef(false);
 
   const finish = useCallback(async () => {
@@ -82,17 +83,6 @@ export function OnboardingFlow() {
         ) as 0 | 1 | 2;
         return <WelcomeScreen idx={idx} onAdvance={flow.go} />;
       }
-      case 'name':
-        return (
-          <PersoNameScreen
-            initialValue={flow.ctx.name}
-            onBack={flow.goBack}
-            onContinue={(name) => {
-              flow.setCtx({ name });
-              flow.go('account');
-            }}
-          />
-        );
       case 'account':
         return (
           <AccountScreen
@@ -103,7 +93,6 @@ export function OnboardingFlow() {
       case 'emailSignup':
         return (
           <EmailSignupScreen
-            name={flow.ctx.name}
             onBack={flow.goBack}
             onRegistered={(email) => {
               flow.setCtx({ email });
@@ -116,7 +105,19 @@ export function OnboardingFlow() {
           <AccountVerifyScreen
             email={flow.ctx.email}
             onBack={flow.goBack}
-            onVerified={() => flow.go('goal')}
+            onVerified={() => flow.go('name')}
+          />
+        );
+      case 'name':
+        return (
+          <PersoNameScreen
+            initialValue={flow.ctx.name}
+            onContinue={(name) => {
+              flow.setCtx({ name });
+              // Persist the name to the backend (best-effort) and continue.
+              updateName.mutate(name);
+              flow.go('goal');
+            }}
           />
         );
       case 'goal':

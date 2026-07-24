@@ -11,12 +11,11 @@ import { OnbPage } from '../components/OnbPage';
 import { Wordmark } from '../components/Wordmark';
 
 type Props = {
-  name: string;
   onBack: () => void;
   onRegistered: (email: string) => void;
 };
 
-export function EmailSignupScreen({ name, onBack, onRegistered }: Props) {
+export function EmailSignupScreen({ onBack, onRegistered }: Props) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -32,7 +31,7 @@ export function EmailSignupScreen({ name, onBack, onRegistered }: Props) {
 
   const submit = ({ email, password }: { email: string; password: string }) => {
     if (register.isError) register.reset();
-    register.mutate({ name, email: email.trim(), password });
+    register.mutate({ email: email.trim(), password });
   };
 
   return (

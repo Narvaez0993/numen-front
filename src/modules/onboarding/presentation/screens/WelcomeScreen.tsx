@@ -29,7 +29,7 @@ export function WelcomeScreen({ idx, onAdvance }: Props) {
   const next = (): OnboardingScreen => {
     if (idx === 0) return 'welcome2';
     if (idx === 1) return 'welcome3';
-    return 'name';
+    return 'account';
   };
   const prev = (): OnboardingScreen | null => {
     if (idx === 0) return null;
@@ -66,7 +66,7 @@ export function WelcomeScreen({ idx, onAdvance }: Props) {
         }}
       >
         <Wordmark size={17} />
-        <SkipLink onPress={() => onAdvance('name')} label={t('onboarding.skip')} />
+        <SkipLink onPress={() => onAdvance('account')} label={t('onboarding.skip')} />
       </View>
 
       <View

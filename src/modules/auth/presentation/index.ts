@@ -4,6 +4,7 @@ export * from './hooks/useRegister';
 export * from './hooks/useVerifyEmail';
 export * from './hooks/useResendCode';
 export * from './hooks/useLogout';
+export * from './hooks/useUpdateName';
 export * from './components/CredentialsForm';
 export * from './components/OtpInput';
 export * from './components/VerifyCodeForm';
