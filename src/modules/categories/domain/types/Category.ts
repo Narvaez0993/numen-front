@@ -14,3 +14,16 @@ export type Category = {
   spent: number;
   count: number;
 };
+
+export type NewCategory = {
+  name: string;
+  icon: string;
+  color: CategoryColor;
+  flow: CategoryFlow;
+};
+
+export type CategoryPatch = {
+  name?: string;
+  icon?: string;
+  color?: CategoryColor;
+};

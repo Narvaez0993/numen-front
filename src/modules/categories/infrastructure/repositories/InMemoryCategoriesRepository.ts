@@ -1,5 +1,10 @@
-import type { CategoriesOverview, Category } from '../../domain';
 import type { CategoriesRepository } from '../../application';
+import type {
+  CategoriesOverview,
+  Category,
+  CategoryPatch,
+  NewCategory,
+} from '../../domain';
 
 const STANDARD_CATEGORIES: readonly Category[] = [
   {
@@ -125,14 +130,45 @@ const STANDARD_CATEGORIES: readonly Category[] = [
 ];
 
 export class InMemoryCategoriesRepository implements CategoriesRepository {
+  private custom: Category[] = [];
+  private seq = 0;
+
   async getOverview(): Promise<CategoriesOverview> {
-    const totalSpent = STANDARD_CATEGORIES.reduce((sum, c) => sum + c.spent, 0);
-    const activeCount = STANDARD_CATEGORIES.filter((c) => c.count > 0).length;
+    const categories = [...STANDARD_CATEGORIES, ...this.custom];
+    const totalSpent = categories.reduce((sum, c) => sum + c.spent, 0);
+    const activeCount = categories.filter((c) => c.count > 0).length;
     return {
-      categories: STANDARD_CATEGORIES,
+      categories,
       totalSpent,
       activeCount,
-      totalCount: STANDARD_CATEGORIES.length,
+      totalCount: categories.length,
     };
+  }
+
+  async create(input: NewCategory): Promise<Category> {
+    this.seq += 1;
+    const category: Category = {
+      id: `custom-${this.seq}`,
+      ...input,
+      isStandard: false,
+      spent: 0,
+      count: 0,
+    };
+    this.custom.push(category);
+    return category;
+  }
+
+  async update(id: string, patch: CategoryPatch): Promise<Category> {
+    const existing = this.custom.find((c) => c.id === id);
+    if (!existing) {
+      throw new Error('Category not found');
+    }
+    const updated: Category = { ...existing, ...patch };
+    this.custom = this.custom.map((c) => (c.id === id ? updated : c));
+    return updated;
+  }
+
+  async remove(id: string): Promise<void> {
+    this.custom = this.custom.filter((c) => c.id !== id);
   }
 }

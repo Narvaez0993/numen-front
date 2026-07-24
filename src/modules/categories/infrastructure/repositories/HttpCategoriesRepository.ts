@@ -6,6 +6,8 @@ import type {
   Category,
   CategoryColor,
   CategoryFlow,
+  CategoryPatch,
+  NewCategory,
 } from '../../domain';
 import { mapApiError } from '../mappers/mapApiError';
 
@@ -36,6 +38,41 @@ export class HttpCategoriesRepository implements CategoriesRepository {
         activeCount: 0,
         totalCount: categories.length,
       };
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async create(input: NewCategory): Promise<Category> {
+    try {
+      const { data } = await this.http.post<CategoryResponse>('/categories', {
+        name: input.name,
+        icon: input.icon,
+        color: input.color,
+        flow: input.flow,
+      });
+      return toCategory(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async update(id: string, patch: CategoryPatch): Promise<Category> {
+    try {
+      const { data } = await this.http.patch<CategoryResponse>(`/categories/${id}`, {
+        name: patch.name,
+        icon: patch.icon,
+        color: patch.color,
+      });
+      return toCategory(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async remove(id: string): Promise<void> {
+    try {
+      await this.http.delete(`/categories/${id}`);
     } catch (error) {
       throw mapApiError(error);
     }

@@ -5,7 +5,10 @@ import type { AssistantRepository } from '@/modules/assistant/application/ports/
 import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUseCase';
 import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
 import type { CategoriesRepository } from '@/modules/categories/application/ports/CategoriesRepository';
+import { CreateCategoryUseCase } from '@/modules/categories/application/use-cases/CreateCategoryUseCase';
+import { DeleteCategoryUseCase } from '@/modules/categories/application/use-cases/DeleteCategoryUseCase';
 import { GetCategoriesUseCase } from '@/modules/categories/application/use-cases/GetCategoriesUseCase';
+import { UpdateCategoryUseCase } from '@/modules/categories/application/use-cases/UpdateCategoryUseCase';
 import { HttpCategoriesRepository } from '@/modules/categories/infrastructure';
 import {
   LoginUseCase,
@@ -87,6 +90,9 @@ export const getSubscriptionsUseCase = new GetSubscriptionsUseCase(
   subscriptionsRepository,
 );
 export const getCategoriesUseCase = new GetCategoriesUseCase(categoriesRepository);
+export const createCategoryUseCase = new CreateCategoryUseCase(categoriesRepository);
+export const updateCategoryUseCase = new UpdateCategoryUseCase(categoriesRepository);
+export const deleteCategoryUseCase = new DeleteCategoryUseCase(categoriesRepository);
 export const getPlanComparisonUseCase = new GetPlanComparisonUseCase(planRepository);
 export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   onboardingRepository,
@@ -122,6 +128,9 @@ export const container = {
   getAccountsOverviewUseCase,
   getSubscriptionsUseCase,
   getCategoriesUseCase,
+  createCategoryUseCase,
+  updateCategoryUseCase,
+  deleteCategoryUseCase,
   getPlanComparisonUseCase,
   completeOnboardingUseCase,
 };
