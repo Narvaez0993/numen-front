@@ -35,7 +35,7 @@ export function PersoGoalScreen({ name, initialGoal, onBack, onContinue }: Props
         center={<StepIndicator>{t('onboarding.perso.step2')}</StepIndicator>}
       />
       <View style={{ marginTop: 14 }}>
-        <SegmentProgress total={2} current={selected ? 1 : 0} />
+        <SegmentProgress total={2} current={1} />
       </View>
 
       <View style={{ height: 28 }} />
