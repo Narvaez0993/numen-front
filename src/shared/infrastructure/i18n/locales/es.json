@@ -212,19 +212,45 @@
       "movements_one": "{{count}} gasto · este mes",
       "movements_other": "{{count}} gastos · este mes"
     },
-    "upsell": {
-      "title": "Crea tus propias categorías",
+    "limitReached": {
+      "title": "Llegaste al límite de personalizadas",
       "plus": "Plus",
-      "description": "Elige nombre, ícono y color. Crea presupuestos individuales por cada una.",
-      "preview": {
-        "mascotas": "Mascotas",
-        "gym": "Gym",
-        "cursos": "Cursos",
-        "streaming": "Streaming"
-      },
+      "description": "El plan gratis incluye 2 categorías personalizadas. Con Plus son ilimitadas.",
       "cta": "Conoce Plus"
     },
-    "footer": "Cambia el ícono o el color de cualquier categoría tocándola."
+    "custom": {
+      "createButton": "Crear categoría"
+    },
+    "form": {
+      "createTitle": "Nueva categoría",
+      "editTitle": "Editar categoría",
+      "subtitle": "Ponle nombre, ícono y color. La usarás al registrar tus movimientos.",
+      "previewPlaceholder": "Nombre de la categoría",
+      "flowLabel": "Tipo",
+      "flow": {
+        "expense": "Gasto",
+        "income": "Ingreso"
+      },
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Ej. Mascotas",
+      "iconLabel": "Ícono",
+      "colorLabel": "Color",
+      "saveCreate": "Crear categoría",
+      "saveEdit": "Guardar cambios",
+      "delete": "Borrar categoría",
+      "deleteConfirm": {
+        "title": "¿Borrar categoría?",
+        "body": "Esta acción no se puede deshacer.",
+        "cancel": "Cancelar",
+        "confirm": "Borrar"
+      },
+      "errors": {
+        "nameTaken": "Ya existe una categoría con ese nombre.",
+        "generic": "No se pudo guardar. Intenta de nuevo.",
+        "deleteFailed": "No se pudo borrar. Intenta de nuevo."
+      }
+    },
+    "footer": "Toca una categoría personalizada para editarla."
   },
   "subscriptions": {
     "title": "Suscripciones",

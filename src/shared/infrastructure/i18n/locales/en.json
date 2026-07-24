@@ -212,19 +212,45 @@
       "movements_one": "{{count}} expense · this month",
       "movements_other": "{{count}} expenses · this month"
     },
-    "upsell": {
-      "title": "Create your own categories",
+    "limitReached": {
+      "title": "You've reached the custom limit",
       "plus": "Plus",
-      "description": "Pick name, icon and color. Create individual budgets for each one.",
-      "preview": {
-        "mascotas": "Pets",
-        "gym": "Gym",
-        "cursos": "Courses",
-        "streaming": "Streaming"
-      },
+      "description": "The free plan includes 2 custom categories. Plus makes them unlimited.",
       "cta": "Learn about Plus"
     },
-    "footer": "Tap any category to change its icon or color."
+    "custom": {
+      "createButton": "Create category"
+    },
+    "form": {
+      "createTitle": "New category",
+      "editTitle": "Edit category",
+      "subtitle": "Give it a name, icon and color. You'll use it when logging movements.",
+      "previewPlaceholder": "Category name",
+      "flowLabel": "Type",
+      "flow": {
+        "expense": "Expense",
+        "income": "Income"
+      },
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Pets",
+      "iconLabel": "Icon",
+      "colorLabel": "Color",
+      "saveCreate": "Create category",
+      "saveEdit": "Save changes",
+      "delete": "Delete category",
+      "deleteConfirm": {
+        "title": "Delete category?",
+        "body": "This action can't be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "errors": {
+        "nameTaken": "A category with that name already exists.",
+        "generic": "Couldn't save. Try again.",
+        "deleteFailed": "Couldn't delete. Try again."
+      }
+    },
+    "footer": "Tap a custom category to edit it."
   },
   "subscriptions": {
     "title": "Subscriptions",
