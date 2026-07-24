@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useLogout } from '@/modules/auth/presentation';
+import { useAuthStore, useLogout } from '@/modules/auth/presentation';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
@@ -181,8 +181,11 @@ export function ProfileScreen() {
               chevron={false}
               last
               onPress={() => {
-                useOnboardingStore.getState().reset();
-                router.replace('/(onboarding)');
+                // Full replay: clear both flags and the session so the gate
+                // sends us back to the welcome hook.
+                useOnboardingStore.getState().hardReset();
+                useAuthStore.getState().clear();
+                router.replace('/(auth)/signup');
               }}
             />
           </SettingsGroup>

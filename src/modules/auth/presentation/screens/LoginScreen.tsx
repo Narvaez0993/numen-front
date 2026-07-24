@@ -50,13 +50,15 @@ export function LoginScreen() {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/(onboarding)');
+      router.replace('/(auth)/signup');
     }
   };
 
   const createAccount = () => {
+    // Clear any prior setup so the new registration replays it (keeps
+    // `introSeen`, so this lands on the register step, not the welcome hook).
     useOnboardingStore.getState().reset();
-    router.replace('/(onboarding)');
+    router.replace('/(auth)/signup');
   };
 
   return (
