@@ -5,9 +5,9 @@ const environment =
   (process.env.ENVIRONMENT as 'development' | 'staging' | 'production') ?? 'development';
 
 const config: ExpoConfig = {
-  name: 'numen',
-  slug: 'front-numen',
-  scheme: 'numen',
+  name: 'Deshka',
+  slug: 'deshka',
+  scheme: 'deshka',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',

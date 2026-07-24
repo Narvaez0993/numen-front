@@ -17,7 +17,7 @@ export function Wordmark({ size = 17 }: Props) {
         letterSpacing: -size * 0.02,
       }}
     >
-      Numen<Text style={{ color: theme.colors.accentMint }}>.</Text>
+      Deshka<Text style={{ color: theme.colors.accentMint }}>.</Text>
     </Text>
   );
 }

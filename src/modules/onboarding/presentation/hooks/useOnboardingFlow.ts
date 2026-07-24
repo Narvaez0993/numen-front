@@ -5,50 +5,41 @@ import {
   type OnboardingContext,
 } from '../../domain/types/OnboardingContext';
 
-import { type AuthMode, BACK_MAP, type OnboardingScreen } from './flowTransitions';
-
-export type FlowTarget = OnboardingScreen | 'login';
-
-type FlowState = {
-  screen: OnboardingScreen;
-  mode: AuthMode;
+type FlowState<S extends string> = {
+  screen: S;
   ctx: OnboardingContext;
-  go: (target: FlowTarget) => void;
+  go: (target: S) => void;
   goBack: () => void;
   setCtx: (partial: Partial<OnboardingContext>) => void;
   reset: () => void;
 };
 
-export function useOnboardingFlow(): FlowState {
-  const [screen, setScreen] = useState<OnboardingScreen>('welcome1');
-  const [mode, setMode] = useState<AuthMode>('signup');
+/**
+ * Generic single-screen state machine shared by the auth and setup flows. The
+ * caller supplies the entry screen and a back-edge map (stable module constants
+ * like `AUTH_BACK_MAP` / `SETUP_BACK_MAP`).
+ */
+export function useOnboardingFlow<S extends string>(
+  initialScreen: S,
+  backMap: Readonly<Record<S, S | null>>,
+): FlowState<S> {
+  const [screen, setScreen] = useState<S>(initialScreen);
   const [ctx, setCtx] = useState<OnboardingContext>(EMPTY_ONBOARDING_CONTEXT);
 
-  const go = useCallback((target: FlowTarget) => {
-    if (target === 'login') {
-      setMode('login');
-      setScreen('auth');
-      return;
-    }
-    if (target === 'auth') {
-      setMode('signup');
-    }
-    setScreen(target);
-  }, []);
+  const go = useCallback((target: S) => setScreen(target), []);
 
   const goBack = useCallback(() => {
-    setScreen((current) => BACK_MAP[current] ?? current);
-  }, []);
+    setScreen((current) => backMap[current] ?? current);
+  }, [backMap]);
 
   const updateCtx = useCallback((partial: Partial<OnboardingContext>) => {
     setCtx((prev) => ({ ...prev, ...partial }));
   }, []);
 
   const reset = useCallback(() => {
-    setScreen('welcome1');
-    setMode('signup');
+    setScreen(initialScreen);
     setCtx(EMPTY_ONBOARDING_CONTEXT);
-  }, []);
+  }, [initialScreen]);
 
-  return { screen, mode, ctx, go, goBack, setCtx: updateCtx, reset };
+  return { screen, ctx, go, goBack, setCtx: updateCtx, reset };
 }

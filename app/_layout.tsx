@@ -8,34 +8,63 @@ import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { setOnSessionExpired } from '@/core/di/container';
+import { useAuthStore } from '@/modules/auth/presentation';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { ThemedStatusBar } from '@/shared/presentation/components';
 import { AppProviders } from '@/shared/presentation/providers';
 import { useTheme } from '@/shared/presentation/theme';
 
-function OnboardingGate() {
+/**
+ * Single gate for both session and onboarding state. Waits for both stores to
+ * rehydrate, then routes to the right group. A failed token refresh clears the
+ * session (via the registered handler) and this gate sends the user to login.
+ */
+function RootGate() {
   const segments = useSegments();
   const router = useRouter();
-  const hydrated = useOnboardingStore((s) => s.hydrated);
-  const completed = useOnboardingStore((s) => s.completed);
   const { theme } = useTheme();
 
+  const authHydrated = useAuthStore((s) => s.hydrated);
+  const session = useAuthStore((s) => s.session);
+  const clearSession = useAuthStore((s) => s.clear);
+  const onbHydrated = useOnboardingStore((s) => s.hydrated);
+  const introSeen = useOnboardingStore((s) => s.introSeen);
+  const profileDone = useOnboardingStore((s) => s.profileDone);
+
+  const ready = authHydrated && onbHydrated;
+
   useEffect(() => {
-    if (!hydrated) return;
-    const inOnboarding = segments[0] === '(onboarding)';
-    if (!completed && !inOnboarding) {
-      router.replace('/(onboarding)');
-    } else if (completed && inOnboarding) {
+    setOnSessionExpired(() => clearSession());
+    return () => setOnSessionExpired(() => {});
+  }, [clearSession]);
+
+  useEffect(() => {
+    if (!ready) return;
+    const group = segments[0];
+    const inAuth = group === '(auth)';
+    const inSetup = group === '(onboarding)'; // post-session setup #2
+
+    if (!session) {
+      // No session → only the auth group is valid. First-time users see the
+      // welcome hook; anyone who has been past it lands on login.
+      if (!inAuth) {
+        router.replace(introSeen ? '/(auth)/login' : '/(auth)/signup');
+      }
+    } else if (!profileDone) {
+      // Session issued but setup not finished (fresh registration) → setup flow.
+      if (!inSetup) router.replace('/(onboarding)');
+    } else if (inAuth || inSetup) {
+      // Session + setup done → the app.
       router.replace('/(tabs)');
     }
-  }, [hydrated, completed, segments, router]);
+  }, [ready, session, introSeen, profileDone, segments, router]);
 
-  if (hydrated) return null;
+  if (ready) return null;
 
   // Solid cover during the AsyncStorage rehydration window. Prevents the
-  // default /(tabs) route from flashing under returning users (when the
-  // gate is about to send them to home) or under new users (when the gate
-  // is about to send them to /(onboarding)).
+  // default /(tabs) route from flashing before the gate decides where to send
+  // the user.
   return (
     <View
       pointerEvents="auto"
@@ -76,7 +105,7 @@ function RootNavigator() {
           contentStyle: { backgroundColor: theme.colors.bgBase },
         }}
       />
-      <OnboardingGate />
+      <RootGate />
     </NavigationThemeProvider>
   );
 }

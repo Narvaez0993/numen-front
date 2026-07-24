@@ -1,37 +1,25 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 
+import { Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import { AuthButton, type AuthButtonVariant } from '../components/AuthButton';
+import { AuthButton } from '../components/AuthButton';
 import { OnbHeader } from '../components/OnbHeader';
 import { OnbPage } from '../components/OnbPage';
 import { Wordmark } from '../components/Wordmark';
-import type { AuthMode } from '../hooks/flowTransitions';
-
-type Method = 'apple' | 'google' | 'email';
 
 type Props = {
-  mode: AuthMode;
   onBack: () => void;
-  onAuthSuccess: () => void;
-  onModeChange: (mode: AuthMode) => void;
+  onEmailSignup: () => void;
 };
 
-export function AuthScreen({ mode, onBack, onAuthSuccess, onModeChange }: Props) {
+export function AccountScreen({ onBack, onEmailSignup }: Props) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [loading, setLoading] = useState<Method | null>(null);
-
-  const handleAuth = async (method: Method) => {
-    setLoading(method);
-    await new Promise((r) => setTimeout(r, 900));
-    setLoading(null);
-    onAuthSuccess();
-  };
-
-  const isSignup = mode === 'signup';
+  const [comingSoon, setComingSoon] = useState(false);
 
   return (
     <OnbPage paddingTop={14} paddingHorizontal={22} paddingBottom={24}>
@@ -53,7 +41,7 @@ export function AuthScreen({ mode, onBack, onAuthSuccess, onModeChange }: Props)
             textAlign: 'center',
           }}
         >
-          {t(isSignup ? 'onboarding.auth.signup.title' : 'onboarding.auth.login.title')}
+          {t('auth.register.title')}
         </Text>
         <Text
           style={{
@@ -64,11 +52,7 @@ export function AuthScreen({ mode, onBack, onAuthSuccess, onModeChange }: Props)
             fontFamily: 'Geist_400Regular',
           }}
         >
-          {t(
-            isSignup
-              ? 'onboarding.auth.signup.subtitle'
-              : 'onboarding.auth.login.subtitle',
-          )}
+          {t('auth.register.subtitle')}
         </Text>
       </View>
 
@@ -80,33 +64,42 @@ export function AuthScreen({ mode, onBack, onAuthSuccess, onModeChange }: Props)
             icon="brand-apple"
             iconFilled
             label={t('onboarding.auth.apple')}
-            loading={loading === 'apple'}
-            disabled={loading !== null && loading !== 'apple'}
             variant="apple"
-            onPress={() => void handleAuth('apple')}
+            onPress={() => setComingSoon(true)}
           />
         ) : null}
         <AuthButton
           icon="brand-google"
           label={t('onboarding.auth.google')}
-          loading={loading === 'google'}
-          disabled={loading !== null && loading !== 'google'}
           variant="surface"
-          onPress={() => void handleAuth('google')}
-        />
-        <AuthButton
-          icon="mail"
-          label={t('onboarding.auth.email')}
-          loading={loading === 'email'}
-          disabled={loading !== null && loading !== 'email'}
-          variant={'ghost' satisfies AuthButtonVariant}
-          onPress={() => void handleAuth('email')}
+          onPress={() => setComingSoon(true)}
         />
       </View>
 
+      <View style={styles.divider}>
+        <View style={[styles.line, { backgroundColor: theme.colors.borderSubtle }]} />
+        <Text
+          style={{
+            fontSize: 12,
+            color: theme.colors.textTertiary,
+            fontFamily: 'Geist_400Regular',
+          }}
+        >
+          {t('auth.register.or')}
+        </Text>
+        <View style={[styles.line, { backgroundColor: theme.colors.borderSubtle }]} />
+      </View>
+
+      <AuthButton
+        icon="mail"
+        label={t('onboarding.auth.emailSignup')}
+        variant="surface"
+        onPress={onEmailSignup}
+      />
+
       <View style={{ flex: 1 }} />
 
-      <View style={{ alignItems: 'center', marginTop: 16, marginBottom: 12 }}>
+      <View style={styles.footer}>
         <Text
           style={{
             fontSize: 12.5,
@@ -114,18 +107,17 @@ export function AuthScreen({ mode, onBack, onAuthSuccess, onModeChange }: Props)
             fontFamily: 'Geist_400Regular',
           }}
         >
-          {t(isSignup ? 'onboarding.auth.signupHint' : 'onboarding.auth.loginHint')}{' '}
-          <Pressable onPress={() => onModeChange(isSignup ? 'login' : 'signup')}>
-            <Text
-              style={{
-                fontSize: 12.5,
-                color: theme.colors.accentMint,
-                fontFamily: 'Geist_500Medium',
-              }}
-            >
-              {t(isSignup ? 'onboarding.auth.signupLink' : 'onboarding.auth.loginLink')}
-            </Text>
-          </Pressable>
+          {t('onboarding.auth.signupHint')}
+        </Text>
+        <Text
+          onPress={() => router.push('/(auth)/login')}
+          style={{
+            fontSize: 12.5,
+            color: theme.colors.accentMint,
+            fontFamily: 'Geist_500Medium',
+          }}
+        >
+          {t('onboarding.auth.signupLink')}
         </Text>
       </View>
 
@@ -141,6 +133,34 @@ export function AuthScreen({ mode, onBack, onAuthSuccess, onModeChange }: Props)
       >
         {t('onboarding.auth.terms')}
       </Text>
+
+      <Toast
+        visible={comingSoon}
+        message={t('auth.social.comingSoon')}
+        onDismiss={() => setComingSoon(false)}
+        durationMs={2500}
+      />
     </OnbPage>
   );
 }
+
+const styles = StyleSheet.create({
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginVertical: 18,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 16,
+    marginBottom: 12,
+  },
+});

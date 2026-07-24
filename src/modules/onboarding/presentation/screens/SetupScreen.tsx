@@ -13,7 +13,9 @@ import { OnbCTA } from '../components/OnbCTA';
 import { OnbHeader } from '../components/OnbHeader';
 import { OnbPage } from '../components/OnbPage';
 import { OnbTextLink } from '../components/OnbTextLink';
+import { SegmentProgress } from '../components/SegmentProgress';
 import { SetupBalanceSheet } from '../components/SetupBalanceSheet';
+import { StepIndicator } from '../components/StepIndicator';
 import { parseBalanceDigits } from '../utils/formatBalanceInput';
 
 type Props = {
@@ -68,9 +70,15 @@ export function SetupScreen({
 
   return (
     <OnbPage paddingTop={14} paddingHorizontal={20} paddingBottom={24}>
-      <OnbHeader onBack={onBack} />
+      <OnbHeader
+        onBack={onBack}
+        center={<StepIndicator>{t('onboarding.perso.step3')}</StepIndicator>}
+      />
+      <View style={{ marginTop: 14 }}>
+        <SegmentProgress total={3} current={2} />
+      </View>
 
-      <View style={{ height: 14 }} />
+      <View style={{ height: 28 }} />
 
       <Text
         style={{
