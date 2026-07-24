@@ -8,6 +8,7 @@ describe('SCREEN_FLOW', () => {
       'welcome3',
       'name',
       'account',
+      'emailSignup',
       'verify',
       'goal',
       'setup',
@@ -30,7 +31,8 @@ describe('BACK_MAP', () => {
     expect(BACK_MAP.welcome3).toBe('welcome2');
     expect(BACK_MAP.name).toBe('welcome3');
     expect(BACK_MAP.account).toBe('name');
-    expect(BACK_MAP.verify).toBe('account');
+    expect(BACK_MAP.emailSignup).toBe('account');
+    expect(BACK_MAP.verify).toBe('emailSignup');
     expect(BACK_MAP.setup).toBe('goal');
   });
 });

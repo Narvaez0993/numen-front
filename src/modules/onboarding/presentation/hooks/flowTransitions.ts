@@ -4,6 +4,7 @@ export type OnboardingScreen =
   | 'welcome3'
   | 'name'
   | 'account'
+  | 'emailSignup'
   | 'verify'
   | 'goal'
   | 'setup'
@@ -16,6 +17,7 @@ export const SCREEN_FLOW: readonly OnboardingScreen[] = [
   'welcome3',
   'name',
   'account',
+  'emailSignup',
   'verify',
   'goal',
   'setup',
@@ -29,7 +31,8 @@ export const BACK_MAP: Readonly<Record<OnboardingScreen, OnboardingScreen | null
   welcome3: 'welcome2',
   name: 'welcome3',
   account: 'name',
-  verify: 'account',
+  emailSignup: 'account',
+  verify: 'emailSignup',
   // Once the session is issued at `verify`, the auth steps are behind us.
   goal: null,
   setup: 'goal',

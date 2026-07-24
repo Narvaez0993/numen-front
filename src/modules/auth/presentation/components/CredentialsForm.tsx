@@ -43,63 +43,67 @@ export function CredentialsForm({
   });
 
   return (
-    <View style={[styles.container, { gap: theme.spacing.md }]}>
-      <Controller
-        control={control}
-        name="email"
-        render={({ field }) => (
-          <Input
-            label={t('auth.login.emailLabel')}
-            placeholder={t('auth.login.emailPlaceholder')}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            value={field.value}
-            onChangeText={field.onChange}
-            error={
-              formState.errors.email ? t('auth.login.errors.invalidEmail') : serverError
-            }
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="password"
-        render={({ field }) => (
-          <View>
+    <View style={styles.container}>
+      <View style={{ gap: theme.spacing.md }}>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field }) => (
             <Input
-              label={t('auth.login.passwordLabel')}
-              placeholder={t('auth.register.passwordPlaceholder')}
-              secureTextEntry={!visible}
+              label={t('auth.login.emailLabel')}
+              placeholder={t('auth.login.emailPlaceholder')}
+              keyboardType="email-address"
               autoCapitalize="none"
-              autoComplete="new-password"
+              autoComplete="email"
               value={field.value}
               onChangeText={field.onChange}
-              style={{ paddingRight: 74 }}
               error={
-                formState.errors.password
-                  ? t('auth.login.errors.passwordTooShort')
-                  : undefined
+                formState.errors.email ? t('auth.login.errors.invalidEmail') : serverError
               }
             />
-            <Pressable
-              onPress={() => setVisible((v) => !v)}
-              hitSlop={8}
-              style={styles.toggle}
-            >
-              <Text variant="caption" style={{ color: theme.colors.accentMint }}>
-                {t(visible ? 'auth.register.hide' : 'auth.register.show')}
-              </Text>
-            </Pressable>
-          </View>
-        )}
-      />
-      <Button
-        label={loading ? submittingLabel : submitLabel}
-        loading={loading}
-        full
-        onPress={handleSubmit(onSubmit)}
-      />
+          )}
+        />
+        <Controller
+          control={control}
+          name="password"
+          render={({ field }) => (
+            <View>
+              <Input
+                label={t('auth.login.passwordLabel')}
+                placeholder={t('auth.register.passwordPlaceholder')}
+                secureTextEntry={!visible}
+                autoCapitalize="none"
+                autoComplete="new-password"
+                value={field.value}
+                onChangeText={field.onChange}
+                style={{ paddingRight: 74 }}
+                error={
+                  formState.errors.password
+                    ? t('auth.login.errors.passwordTooShort')
+                    : undefined
+                }
+              />
+              <Pressable
+                onPress={() => setVisible((v) => !v)}
+                hitSlop={8}
+                style={styles.toggle}
+              >
+                <Text variant="caption" style={{ color: theme.colors.accentMint }}>
+                  {t(visible ? 'auth.register.hide' : 'auth.register.show')}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        />
+      </View>
+      <View style={{ marginTop: theme.spacing.xl }}>
+        <Button
+          label={loading ? submittingLabel : submitLabel}
+          loading={loading}
+          full
+          onPress={handleSubmit(onSubmit)}
+        />
+      </View>
     </View>
   );
 }

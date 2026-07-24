@@ -368,7 +368,8 @@
       "loginHint": "¿No tienes cuenta?",
       "signupLink": "Iniciar sesión",
       "loginLink": "Crear una",
-      "terms": "Al continuar aceptas los Términos y la Política de privacidad de Numen."
+      "terms": "Al continuar aceptas los Términos y la Política de privacidad de Numen.",
+      "emailSignup": "Crear cuenta con correo"
     },
     "perso": {
       "step1": "Paso 1 de 2",
@@ -882,7 +883,8 @@
       "errors": {
         "emailExists": "Este correo ya está registrado",
         "generic": "No pudimos crear tu cuenta. Intenta de nuevo."
-      }
+      },
+      "emailSubtitle": "Ingresa tu correo y una contraseña."
     },
     "verify": {
       "title": "Verifica tu correo",

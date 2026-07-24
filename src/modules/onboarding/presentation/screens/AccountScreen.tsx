@@ -1,10 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 
-import { CredentialsForm, useRegister } from '@/modules/auth/presentation';
-import type { DomainError } from '@/shared/domain';
 import { Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -14,37 +12,21 @@ import { OnbPage } from '../components/OnbPage';
 import { Wordmark } from '../components/Wordmark';
 
 type Props = {
-  name: string;
   onBack: () => void;
-  onRegistered: (email: string) => void;
+  onEmailSignup: () => void;
 };
 
-export function AccountScreen({ name, onBack, onRegistered }: Props) {
+export function AccountScreen({ onBack, onEmailSignup }: Props) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [comingSoon, setComingSoon] = useState(false);
-
-  const register = useRegister({ onSuccess: ({ email }) => onRegistered(email) });
-
-  const errorCode = (register.error as DomainError | null)?.code;
-  const emailError =
-    errorCode === 'auth.user_already_exists'
-      ? t('auth.register.errors.emailExists')
-      : undefined;
-  const genericError =
-    register.isError && !emailError ? t('auth.register.errors.generic') : undefined;
-
-  const submit = ({ email, password }: { email: string; password: string }) => {
-    if (register.isError) register.reset();
-    register.mutate({ name, email: email.trim(), password });
-  };
 
   return (
     <OnbPage paddingTop={14} paddingHorizontal={22} paddingBottom={24}>
       <OnbHeader onBack={onBack} />
 
-      <View style={{ height: 18 }} />
-      <View style={{ alignItems: 'center', marginBottom: 22 }}>
+      <View style={{ height: 22 }} />
+      <View style={{ alignItems: 'center', marginBottom: 28 }}>
         <Wordmark size={22} />
       </View>
 
@@ -74,7 +56,7 @@ export function AccountScreen({ name, onBack, onRegistered }: Props) {
         </Text>
       </View>
 
-      <View style={{ height: 24 }} />
+      <View style={{ height: 36 }} />
 
       <View style={{ gap: 10 }}>
         {Platform.OS === 'ios' ? (
@@ -108,31 +90,16 @@ export function AccountScreen({ name, onBack, onRegistered }: Props) {
         <View style={[styles.line, { backgroundColor: theme.colors.borderSubtle }]} />
       </View>
 
-      <CredentialsForm
-        onSubmit={submit}
-        submitLabel={t('auth.register.submit')}
-        submittingLabel={t('auth.register.submitting')}
-        loading={register.isPending}
-        serverError={emailError}
+      <AuthButton
+        icon="mail"
+        label={t('onboarding.auth.emailSignup')}
+        variant="surface"
+        onPress={onEmailSignup}
       />
 
-      {genericError ? (
-        <Text
-          style={{
-            fontSize: 12.5,
-            color: theme.colors.accentCoral,
-            fontFamily: 'Geist_400Regular',
-            textAlign: 'center',
-            marginTop: 10,
-          }}
-        >
-          {genericError}
-        </Text>
-      ) : null}
+      <View style={{ flex: 1 }} />
 
-      <View style={{ flex: 1, minHeight: 16 }} />
-
-      <View style={{ alignItems: 'center', marginTop: 12, marginBottom: 10 }}>
+      <View style={styles.footer}>
         <Text
           style={{
             fontSize: 12.5,
@@ -140,18 +107,17 @@ export function AccountScreen({ name, onBack, onRegistered }: Props) {
             fontFamily: 'Geist_400Regular',
           }}
         >
-          {t('onboarding.auth.signupHint')}{' '}
-          <Pressable onPress={() => router.push('/(auth)/login')}>
-            <Text
-              style={{
-                fontSize: 12.5,
-                color: theme.colors.accentMint,
-                fontFamily: 'Geist_500Medium',
-              }}
-            >
-              {t('onboarding.auth.signupLink')}
-            </Text>
-          </Pressable>
+          {t('onboarding.auth.signupHint')}
+        </Text>
+        <Text
+          onPress={() => router.push('/(auth)/login')}
+          style={{
+            fontSize: 12.5,
+            color: theme.colors.accentMint,
+            fontFamily: 'Geist_500Medium',
+          }}
+        >
+          {t('onboarding.auth.signupLink')}
         </Text>
       </View>
 
@@ -178,10 +144,10 @@ export function AccountScreen({ name, onBack, onRegistered }: Props) {
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   divider: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
     marginVertical: 18,
   },
@@ -189,4 +155,12 @@ const styles = {
     flex: 1,
     height: 1,
   },
-};
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 16,
+    marginBottom: 12,
+  },
+});

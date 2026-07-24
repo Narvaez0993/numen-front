@@ -14,6 +14,7 @@ import { useOnboardingStore } from '../stores/useOnboardingStore';
 
 import { AccountScreen } from './AccountScreen';
 import { AccountVerifyScreen } from './AccountVerifyScreen';
+import { EmailSignupScreen } from './EmailSignupScreen';
 import { ConfirmScreen } from './ConfirmScreen';
 import { MagicMomentScreen } from './MagicMomentScreen';
 import { PersoGoalScreen } from './PersoGoalScreen';
@@ -95,6 +96,13 @@ export function OnboardingFlow() {
       case 'account':
         return (
           <AccountScreen
+            onBack={flow.goBack}
+            onEmailSignup={() => flow.go('emailSignup')}
+          />
+        );
+      case 'emailSignup':
+        return (
+          <EmailSignupScreen
             name={flow.ctx.name}
             onBack={flow.goBack}
             onRegistered={(email) => {
