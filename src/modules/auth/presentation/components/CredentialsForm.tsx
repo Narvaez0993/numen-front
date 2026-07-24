@@ -21,11 +21,13 @@ type Props = {
   submittingLabel: string;
   loading?: boolean;
   serverError?: string;
+  passwordPlaceholder?: string;
+  passwordAutoComplete?: 'new-password' | 'current-password';
 };
 
 /**
- * Email + password form used for account creation. Mirrors `LoginForm` but
- * adds a show/hide password toggle and a slot for a server-side error.
+ * Email + password form used for account creation and login. Includes a
+ * show/hide password toggle and a slot for a server-side error.
  */
 export function CredentialsForm({
   onSubmit,
@@ -33,6 +35,8 @@ export function CredentialsForm({
   submittingLabel,
   loading,
   serverError,
+  passwordPlaceholder,
+  passwordAutoComplete = 'new-password',
 }: Props) {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -70,10 +74,12 @@ export function CredentialsForm({
             <View>
               <Input
                 label={t('auth.login.passwordLabel')}
-                placeholder={t('auth.register.passwordPlaceholder')}
+                placeholder={
+                  passwordPlaceholder ?? t('auth.register.passwordPlaceholder')
+                }
                 secureTextEntry={!visible}
                 autoCapitalize="none"
-                autoComplete="new-password"
+                autoComplete={passwordAutoComplete}
                 value={field.value}
                 onChangeText={field.onChange}
                 style={{ paddingRight: 74 }}
