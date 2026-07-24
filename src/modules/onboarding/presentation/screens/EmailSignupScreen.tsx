@@ -1,5 +1,6 @@
+import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { CredentialsForm, useRegister } from '@/modules/auth/presentation';
 import type { DomainError } from '@/shared/domain';
@@ -94,6 +95,52 @@ export function EmailSignupScreen({ name, onBack, onRegistered }: Props) {
       ) : null}
 
       <View style={{ flex: 1 }} />
+
+      <View style={styles.footer}>
+        <Text
+          style={{
+            fontSize: 12.5,
+            color: theme.colors.textSecondary,
+            fontFamily: 'Geist_400Regular',
+          }}
+        >
+          {t('onboarding.auth.signupHint')}
+        </Text>
+        <Text
+          onPress={() => router.push('/(auth)/login')}
+          style={{
+            fontSize: 12.5,
+            color: theme.colors.accentMint,
+            fontFamily: 'Geist_500Medium',
+          }}
+        >
+          {t('onboarding.auth.signupLink')}
+        </Text>
+      </View>
+
+      <Text
+        style={{
+          fontSize: 11,
+          color: theme.colors.textTertiary,
+          lineHeight: 16,
+          textAlign: 'center',
+          paddingHorizontal: 12,
+          fontFamily: 'Geist_400Regular',
+        }}
+      >
+        {t('onboarding.auth.terms')}
+      </Text>
     </OnbPage>
   );
 }
+
+const styles = StyleSheet.create({
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 16,
+    marginBottom: 12,
+  },
+});
