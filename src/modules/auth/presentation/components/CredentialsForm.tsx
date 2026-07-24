@@ -44,7 +44,7 @@ export function CredentialsForm({
 
   return (
     <View style={styles.container}>
-      <View style={{ gap: theme.spacing.md }}>
+      <View style={{ gap: 18 }}>
         <Controller
           control={control}
           name="email"
@@ -96,7 +96,7 @@ export function CredentialsForm({
           )}
         />
       </View>
-      <View style={{ marginTop: theme.spacing.xl }}>
+      <View style={{ marginTop: 34 }}>
         <Button
           label={loading ? submittingLabel : submitLabel}
           loading={loading}
