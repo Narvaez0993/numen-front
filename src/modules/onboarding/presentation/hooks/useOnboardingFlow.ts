@@ -5,37 +5,41 @@ import {
   type OnboardingContext,
 } from '../../domain/types/OnboardingContext';
 
-import { BACK_MAP, type OnboardingScreen } from './flowTransitions';
-
-type FlowState = {
-  screen: OnboardingScreen;
+type FlowState<S extends string> = {
+  screen: S;
   ctx: OnboardingContext;
-  go: (target: OnboardingScreen) => void;
+  go: (target: S) => void;
   goBack: () => void;
   setCtx: (partial: Partial<OnboardingContext>) => void;
   reset: () => void;
 };
 
-export function useOnboardingFlow(
-  initialScreen: OnboardingScreen = 'welcome1',
-): FlowState {
-  const [screen, setScreen] = useState<OnboardingScreen>(initialScreen);
+/**
+ * Generic single-screen state machine shared by the auth and setup flows. The
+ * caller supplies the entry screen and a back-edge map (stable module constants
+ * like `AUTH_BACK_MAP` / `SETUP_BACK_MAP`).
+ */
+export function useOnboardingFlow<S extends string>(
+  initialScreen: S,
+  backMap: Readonly<Record<S, S | null>>,
+): FlowState<S> {
+  const [screen, setScreen] = useState<S>(initialScreen);
   const [ctx, setCtx] = useState<OnboardingContext>(EMPTY_ONBOARDING_CONTEXT);
 
-  const go = useCallback((target: OnboardingScreen) => setScreen(target), []);
+  const go = useCallback((target: S) => setScreen(target), []);
 
   const goBack = useCallback(() => {
-    setScreen((current) => BACK_MAP[current] ?? current);
-  }, []);
+    setScreen((current) => backMap[current] ?? current);
+  }, [backMap]);
 
   const updateCtx = useCallback((partial: Partial<OnboardingContext>) => {
     setCtx((prev) => ({ ...prev, ...partial }));
   }, []);
 
   const reset = useCallback(() => {
-    setScreen('welcome1');
+    setScreen(initialScreen);
     setCtx(EMPTY_ONBOARDING_CONTEXT);
-  }, []);
+  }, [initialScreen]);
 
   return { screen, ctx, go, goBack, setCtx: updateCtx, reset };
 }

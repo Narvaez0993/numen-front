@@ -13,11 +13,11 @@ import { OnbTextLink } from '../components/OnbTextLink';
 import { OrbitalHero } from '../components/OrbitalHero';
 import { SkipLink } from '../components/SkipLink';
 import { Wordmark } from '../components/Wordmark';
-import type { OnboardingScreen } from '../hooks/flowTransitions';
+import type { AuthStep } from '../hooks/flowTransitions';
 
 type Props = {
   idx: 0 | 1 | 2;
-  onAdvance: (next: OnboardingScreen) => void;
+  onAdvance: (next: AuthStep) => void;
 };
 
 export function WelcomeScreen({ idx, onAdvance }: Props) {
@@ -26,12 +26,12 @@ export function WelcomeScreen({ idx, onAdvance }: Props) {
   const titleKey = `onboarding.welcome.title${idx + 1}` as const;
   const subtitleKey = `onboarding.welcome.subtitle${idx + 1}` as const;
 
-  const next = (): OnboardingScreen => {
+  const next = (): AuthStep => {
     if (idx === 0) return 'welcome2';
     if (idx === 1) return 'welcome3';
     return 'account';
   };
-  const prev = (): OnboardingScreen | null => {
+  const prev = (): AuthStep | null => {
     if (idx === 0) return null;
     if (idx === 1) return 'welcome1';
     return 'welcome2';
