@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AsyncStorageKeys = {
-  locale: 'numen.locale',
-  themeMode: 'numen.themeMode',
+  locale: 'deshka.locale',
+  themeMode: 'deshka.themeMode',
 } as const;
 
 export type AsyncStorageKey = (typeof AsyncStorageKeys)[keyof typeof AsyncStorageKeys];

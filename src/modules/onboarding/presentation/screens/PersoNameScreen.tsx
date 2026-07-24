@@ -13,7 +13,7 @@ import { StepIndicator } from '../components/StepIndicator';
 
 type Props = {
   initialValue: string;
-  onBack: () => void;
+  onBack?: () => void;
   onContinue: (name: string) => void;
 };
 
@@ -42,7 +42,7 @@ export function PersoNameScreen({ initialValue, onBack, onContinue }: Props) {
         center={<StepIndicator>{t('onboarding.perso.step1')}</StepIndicator>}
       />
       <View style={{ marginTop: 14 }}>
-        <SegmentProgress total={2} current={0} />
+        <SegmentProgress total={3} current={0} />
       </View>
 
       <View style={{ height: 36 }} />

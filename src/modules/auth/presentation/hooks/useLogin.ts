@@ -1,15 +1,23 @@
 import { useMutation } from '@tanstack/react-query';
-import { router } from 'expo-router';
 
 import { loginUseCase } from '@/core/di/container';
 
-import type { LoginInputDTO, LoginOutputDTO } from '../../application';
+import type { AuthSessionDTO, LoginInputDTO } from '../../application';
 import { useAuthStore } from '../stores/useAuthStore';
 
-export function useLogin() {
+type Options = {
+  onSuccess?: (session: AuthSessionDTO) => void;
+};
+
+/**
+ * Persists the session metadata on success and defers navigation to the root
+ * gate, which reacts to the store. `onSuccess` lets the caller add flow-level
+ * behavior (e.g. marking onboarding complete for a returning user).
+ */
+export function useLogin(options?: Options) {
   const setSession = useAuthStore((state) => state.setSession);
 
-  return useMutation<LoginOutputDTO, Error, LoginInputDTO>({
+  return useMutation<AuthSessionDTO, Error, LoginInputDTO>({
     mutationFn: async (input) => {
       const result = await loginUseCase.execute(input);
       if (!result.ok) {
@@ -17,14 +25,15 @@ export function useLogin() {
       }
       return result.value;
     },
-    onSuccess: (data) => {
+    onSuccess: (session) => {
       setSession({
-        userId: data.userId,
-        email: data.email,
-        displayName: data.displayName,
-        accessToken: data.accessToken,
+        userId: session.userId,
+        email: session.email,
+        displayName: session.displayName,
+        tier: session.tier,
+        emailVerified: session.emailVerified,
       });
-      router.replace('/');
+      options?.onSuccess?.(session);
     },
   });
 }

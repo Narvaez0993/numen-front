@@ -1,8 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 
 export const SecureStorageKeys = {
-  accessToken: 'numen.accessToken',
-  refreshToken: 'numen.refreshToken',
+  accessToken: 'deshka.accessToken',
+  refreshToken: 'deshka.refreshToken',
 } as const;
 
 export type SecureStorageKey = (typeof SecureStorageKeys)[keyof typeof SecureStorageKeys];

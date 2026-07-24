@@ -14,8 +14,6 @@ import { OnbHeader } from '../components/OnbHeader';
 import { OnbPage } from '../components/OnbPage';
 import { OnbTextLink } from '../components/OnbTextLink';
 import { RegisteredPill } from '../components/RegisteredPill';
-import { SegmentProgress } from '../components/SegmentProgress';
-import { StepIndicator } from '../components/StepIndicator';
 
 type Props = {
   expense: OnboardingExpense;
@@ -52,10 +50,7 @@ export function ConfirmScreen({ expense, transcript, accountValue, onContinue }:
 
   return (
     <OnbPage paddingTop={14} paddingHorizontal={20} paddingBottom={24}>
-      <OnbHeader center={<StepIndicator>{t('onboarding.magic.step')}</StepIndicator>} />
-      <View style={{ marginTop: 14 }}>
-        <SegmentProgress total={5} current={4} />
-      </View>
+      <OnbHeader />
 
       <View style={{ height: 22 }} />
 

@@ -24,7 +24,7 @@ export const useThemePreference = create<State>()(
       cycle: () => set({ mode: NEXT[get().mode] }),
     }),
     {
-      name: 'numen.theme-preference',
+      name: 'deshka.theme-preference',
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),

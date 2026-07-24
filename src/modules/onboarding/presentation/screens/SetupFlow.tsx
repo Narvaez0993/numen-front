@@ -4,26 +4,33 @@ import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAuthStore, useUpdateName } from '@/modules/auth/presentation';
 import { completeOnboardingUseCase } from '@/core/di/container';
 import { useGoalsStore } from '@/modules/goals/presentation/stores/useGoalsStore';
 import { useTheme } from '@/shared/presentation/theme';
 
+import { SETUP_BACK_MAP, type SetupStep } from '../hooks/flowTransitions';
 import { useOnboardingFlow } from '../hooks/useOnboardingFlow';
 import { useOnboardingStore } from '../stores/useOnboardingStore';
 
-import { AuthScreen } from './AuthScreen';
 import { ConfirmScreen } from './ConfirmScreen';
 import { MagicMomentScreen } from './MagicMomentScreen';
 import { PersoGoalScreen } from './PersoGoalScreen';
 import { PersoNameScreen } from './PersoNameScreen';
 import { SetupScreen } from './SetupScreen';
-import { WelcomeScreen } from './WelcomeScreen';
 
-export function OnboardingFlow() {
+/**
+ * Post-session setup #2: name → goal → account setup → magic moment → confirm.
+ * Lives in the `(onboarding)` group and is only reachable with a session (the
+ * gate guarantees it). Shown once, right after registration — never on login.
+ */
+export function SetupFlow() {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const flow = useOnboardingFlow();
+  const hasSession = useAuthStore((s) => s.session !== null);
+  const flow = useOnboardingFlow<SetupStep>('name', SETUP_BACK_MAP);
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
+  const updateName = useUpdateName();
   const finishingRef = useRef(false);
 
   const finish = useCallback(async () => {
@@ -66,43 +73,25 @@ export function OnboardingFlow() {
     }
   }, [flow.screen, flow.ctx.expense, finish]);
 
+  // Impossible via the gate, but if the session is lost mid-setup render
+  // nothing and let the gate route away instead of firing authed calls.
+  if (!hasSession) return null;
+
   const renderScreen = () => {
     switch (flow.screen) {
-      case 'welcome1':
-      case 'welcome2':
-      case 'welcome3': {
-        const idx = (
-          flow.screen === 'welcome1' ? 0 : flow.screen === 'welcome2' ? 1 : 2
-        ) as 0 | 1 | 2;
-        return <WelcomeScreen idx={idx} onAdvance={flow.go} />;
-      }
-      case 'auth':
-        return (
-          <AuthScreen
-            mode={flow.mode}
-            onBack={flow.goBack}
-            onModeChange={(mode) => flow.go(mode === 'login' ? 'login' : 'auth')}
-            onAuthSuccess={() => {
-              if (flow.mode === 'login') {
-                void finish();
-              } else {
-                flow.go('perso1');
-              }
-            }}
-          />
-        );
-      case 'perso1':
+      case 'name':
         return (
           <PersoNameScreen
             initialValue={flow.ctx.name}
-            onBack={flow.goBack}
             onContinue={(name) => {
               flow.setCtx({ name });
-              flow.go('perso2');
+              // Persist the name to the backend (best-effort) and continue.
+              updateName.mutate(name);
+              flow.go('goal');
             }}
           />
         );
-      case 'perso2':
+      case 'goal':
         return (
           <PersoGoalScreen
             name={flow.ctx.name}

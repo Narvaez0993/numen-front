@@ -87,7 +87,7 @@
     },
     "emptyA": {
       "title": "Define tu presupuesto",
-      "body": "Establece cuánto no quieres gastar este mes. Numen te ayuda a llegar.",
+      "body": "Establece cuánto no quieres gastar este mes. Deshka te ayuda a llegar.",
       "cta": "Crear presupuesto mensual"
     },
     "emptyB": {
@@ -106,7 +106,7 @@
     },
     "editTopeSheet": {
       "title": "Tope para {{name}}",
-      "subtitle": "Numen te avisará cuando te acerques a este monto.",
+      "subtitle": "Deshka te avisará cuando te acerques a este monto.",
       "carry": "Llevas {{amount}} este mes",
       "save": "Guardar tope",
       "activate": "Activar tope",
@@ -346,7 +346,7 @@
       "title1": "Olvídate de Excel.",
       "subtitle1": "Lleva tus gastos diciéndolos en voz alta. La IA hace el resto.",
       "title2": "Habla. No escribas.",
-      "subtitle2": "Dile a Numen \"café tres mil quinientos\" y queda registrado al instante. Sin formularios.",
+      "subtitle2": "Dile a Deshka \"café tres mil quinientos\" y queda registrado al instante. Sin formularios.",
       "title3": "Tu plata, en tiempo real.",
       "subtitle3": "Saldos, presupuestos y deudas en una sola pantalla. Sin Excel, sin fórmulas.",
       "start": "Empezar",
@@ -368,20 +368,22 @@
       "loginHint": "¿No tienes cuenta?",
       "signupLink": "Iniciar sesión",
       "loginLink": "Crear una",
-      "terms": "Al continuar aceptas los Términos y la Política de privacidad de Numen."
+      "terms": "Al continuar aceptas los Términos y la Política de privacidad de Deshka.",
+      "emailSignup": "Crear cuenta con correo"
     },
     "perso": {
-      "step1": "Paso 1 de 2",
-      "step2": "Paso 2 de 2",
+      "step1": "Paso 1 de 3",
+      "step2": "Paso 2 de 3",
+      "step3": "Paso 3 de 3",
       "continue": "Continuar",
       "skip": "Saltar este paso",
       "name": {
         "title": "¿Cómo te llamas?",
-        "subtitle": "Numen te llamará así.",
+        "subtitle": "Deshka te llamará así.",
         "placeholder": "Tu nombre"
       },
       "goal": {
-        "title": "Hola, {{name}}. ¿Qué quieres lograr con Numen?",
+        "title": "Hola, {{name}}. ¿Qué quieres lograr con Deshka?",
         "subtitle": "Esto nos ayuda a darte sugerencias relevantes.",
         "friend": "amigo",
         "gastos": {
@@ -424,7 +426,6 @@
       }
     },
     "magic": {
-      "step": "Paso 5 de 5",
       "title": "Probemos la magia.",
       "subtitle": "Toca el mic y dime un gasto que hiciste hoy.",
       "recording": "Te escucho…",
@@ -436,7 +437,7 @@
     "confirm": {
       "pill": "Registrado",
       "title": "Así de fácil.",
-      "subtitle": "Numen entendió lo que dijiste. Edita si algo está mal.",
+      "subtitle": "Deshka entendió lo que dijiste. Edita si algo está mal.",
       "dijiste": "Dijiste",
       "when": "Hoy · 9:41 a.m.",
       "category": "Categoría",
@@ -642,7 +643,7 @@
         "dateSheetSubtitle": "Cuándo ocurrió.",
         "dueLabel": "Fecha límite",
         "dueSheetTitle": "Fecha límite",
-        "dueSheetSubtitle": "Numen te avisará cuando se acerque.",
+        "dueSheetSubtitle": "Deshka te avisará cuando se acerque.",
         "dueNone": "Sin vencimiento",
         "optional": "Opcional",
         "noteLabel": "Nota (opcional)",
@@ -678,8 +679,8 @@
     "viewHistory": "Ver historial",
     "share": {
       "button": "Compartir resumen",
-      "messageIncoming": "Hola {{name}}: te recuerdo que me debes {{balance}} (de {{total}}, vas {{pct}}% pagado). — enviado desde Numen",
-      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Numen"
+      "messageIncoming": "Hola {{name}}: te recuerdo que me debes {{balance}} (de {{total}}, vas {{pct}}% pagado). — enviado desde Deshka",
+      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Deshka"
     }
   },
   "profile": {
@@ -750,7 +751,7 @@
     "soon": "Próximamente",
     "editName": {
       "title": "Tu nombre",
-      "subtitle": "Así te saluda Numen.",
+      "subtitle": "Así te saluda Deshka.",
       "label": "Nombre",
       "placeholder": "Tu nombre",
       "save": "Guardar"
@@ -864,8 +865,44 @@
       "errors": {
         "invalidEmail": "Correo no válido",
         "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
-        "invalidCredentials": "Correo o contraseña incorrectos"
+        "invalidCredentials": "Correo o contraseña incorrectos",
+        "generic": "Algo salió mal. Intenta de nuevo."
+      },
+      "noAccount": "¿No tienes cuenta?",
+      "createAccount": "Crear una"
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Empieza en menos de un minuto.",
+      "or": "o",
+      "submit": "Crear cuenta",
+      "submitting": "Creando...",
+      "passwordPlaceholder": "Mínimo 8 caracteres",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "errors": {
+        "emailExists": "Este correo ya está registrado",
+        "generic": "No pudimos crear tu cuenta. Intenta de nuevo."
+      },
+      "emailSubtitle": "Ingresa tu correo y una contraseña."
+    },
+    "verify": {
+      "title": "Verifica tu correo",
+      "subtitle": "Ingresa el código de 6 dígitos que enviamos a <b>{{email}}</b>.",
+      "verifying": "Verificando...",
+      "resend": "Reenviar código",
+      "resending": "Reenviando...",
+      "resendIn": "Reenviar en {{seconds}}s",
+      "errors": {
+        "invalid": "Código incorrecto",
+        "expired": "El código expiró. Solicita uno nuevo.",
+        "tooManyAttempts": "Demasiados intentos. Solicita un código nuevo.",
+        "cooldown": "Espera un momento antes de reenviar.",
+        "generic": "Algo salió mal. Intenta de nuevo."
       }
+    },
+    "social": {
+      "comingSoon": "Disponible muy pronto"
     }
   },
   "currency": {
