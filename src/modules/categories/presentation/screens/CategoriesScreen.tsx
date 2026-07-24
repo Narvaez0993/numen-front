@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SectionLabel, SubScreenHeader, Text } from '@/shared/presentation/components';
@@ -17,7 +17,7 @@ import { filterCategories } from '../utils/filterCategories';
 export function CategoriesScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const { data, isLoading } = useCategories();
+  const { data, isLoading, isError, refetch } = useCategories();
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -25,6 +25,50 @@ export function CategoriesScreen() {
     const matched = filterCategories(query, data.categories);
     return [...matched].sort((a, b) => b.spent - a.spent);
   }, [query, data]);
+
+  if (isError) {
+    return (
+      <SafeAreaView
+        edges={['top']}
+        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
+      >
+        <SubScreenHeader title={t('categories.title')} onBack={() => router.back()} />
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 32,
+            gap: 16,
+          }}
+        >
+          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
+            {t('categories.error.title')}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void refetch()}
+            style={({ pressed }) => ({
+              paddingHorizontal: 20,
+              paddingVertical: 11,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Text
+              variant="label"
+              color={theme.colors.accentMint}
+              style={{ fontSize: 13 }}
+            >
+              {t('categories.error.retry')}
+            </Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (isLoading || !data) {
     return (

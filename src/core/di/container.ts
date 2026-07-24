@@ -6,7 +6,7 @@ import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/G
 import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
 import type { CategoriesRepository } from '@/modules/categories/application/ports/CategoriesRepository';
 import { GetCategoriesUseCase } from '@/modules/categories/application/use-cases/GetCategoriesUseCase';
-import { InMemoryCategoriesRepository } from '@/modules/categories/infrastructure/repositories/InMemoryCategoriesRepository';
+import { HttpCategoriesRepository } from '@/modules/categories/infrastructure';
 import {
   LoginUseCase,
   LogoutUseCase,
@@ -61,7 +61,9 @@ const assistantRepository: AssistantRepository = new InMemoryAssistantRepository
 const accountsRepository: AccountsRepository = new InMemoryAccountsRepository();
 const subscriptionsRepository: SubscriptionsRepository =
   new InMemorySubscriptionsRepository();
-const categoriesRepository: CategoriesRepository = new InMemoryCategoriesRepository();
+const categoriesRepository: CategoriesRepository = new HttpCategoriesRepository(
+  httpClient,
+);
 const planRepository: PlanRepository = new InMemoryPlanRepository();
 const onboardingRepository: OnboardingRepository = new InMemoryOnboardingRepository();
 

@@ -192,6 +192,10 @@
   },
   "categories": {
     "title": "Categorías",
+    "error": {
+      "title": "No pudimos cargar tus categorías.",
+      "retry": "Reintentar"
+    },
     "thisMonth": {
       "label": "Este mes",
       "breakdown_one": "{{count}} categoría con movimiento · {{total}} estándar disponibles",
