@@ -29,7 +29,8 @@ function RootGate() {
   const session = useAuthStore((s) => s.session);
   const clearSession = useAuthStore((s) => s.clear);
   const onbHydrated = useOnboardingStore((s) => s.hydrated);
-  const completed = useOnboardingStore((s) => s.completed);
+  const introSeen = useOnboardingStore((s) => s.introSeen);
+  const profileDone = useOnboardingStore((s) => s.profileDone);
 
   const ready = authHydrated && onbHydrated;
 
@@ -42,21 +43,22 @@ function RootGate() {
     if (!ready) return;
     const group = segments[0];
     const inAuth = group === '(auth)';
-    const inOnboarding = group === '(onboarding)';
+    const inSetup = group === '(onboarding)'; // post-session setup #2
 
     if (!session) {
-      // Both (onboarding) and (auth) are valid without a session — the latter
-      // is reachable mid-onboarding via "I already have an account". Only
-      // redirect when the user landed somewhere else (e.g. a stale tabs URL).
-      if (!inOnboarding && !inAuth) {
-        router.replace(completed ? '/(auth)/login' : '/(onboarding)');
+      // No session → only the auth group is valid. First-time users see the
+      // welcome hook; anyone who has been past it lands on login.
+      if (!inAuth) {
+        router.replace(introSeen ? '/(auth)/login' : '/(auth)/signup');
       }
-    } else if (!completed && !inOnboarding) {
-      router.replace('/(onboarding)');
-    } else if (completed && (inAuth || inOnboarding)) {
+    } else if (!profileDone) {
+      // Session issued but setup not finished (fresh registration) → setup flow.
+      if (!inSetup) router.replace('/(onboarding)');
+    } else if (inAuth || inSetup) {
+      // Session + setup done → the app.
       router.replace('/(tabs)');
     }
-  }, [ready, session, completed, segments, router]);
+  }, [ready, session, introSeen, profileDone, segments, router]);
 
   if (ready) return null;
 
