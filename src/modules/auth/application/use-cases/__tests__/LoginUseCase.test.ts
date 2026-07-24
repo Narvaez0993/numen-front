@@ -8,13 +8,13 @@ describe('LoginUseCase', () => {
     const useCase = new LoginUseCase(repo);
 
     const result = await useCase.execute({
-      email: 'demo@numen.app',
+      email: 'demo@deshka.app',
       password: 'demo1234',
     });
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.email).toBe('demo@numen.app');
+      expect(result.value.email).toBe('demo@deshka.app');
       expect(result.value.accessToken).toMatch(/^dev-access-/);
     }
   });
@@ -24,7 +24,7 @@ describe('LoginUseCase', () => {
     const useCase = new LoginUseCase(repo);
 
     const result = await useCase.execute({
-      email: 'demo@numen.app',
+      email: 'demo@deshka.app',
       password: 'wrong-password',
     });
 

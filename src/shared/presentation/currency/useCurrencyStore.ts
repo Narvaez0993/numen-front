@@ -31,7 +31,7 @@ export const useCurrencyStore = create<State & Actions>()(
       setCurrency: (currency) => set({ currency }),
     }),
     {
-      name: 'numen.currency',
+      name: 'deshka.currency',
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),

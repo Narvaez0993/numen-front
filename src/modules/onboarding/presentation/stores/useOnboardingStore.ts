@@ -25,7 +25,7 @@ export const useOnboardingStore = create<State>()(
       reset: () => set({ completed: false, profile: null }),
     }),
     {
-      name: 'numen.onboarding',
+      name: 'deshka.onboarding',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ completed: state.completed, profile: state.profile }),
       onRehydrateStorage: () => () => {

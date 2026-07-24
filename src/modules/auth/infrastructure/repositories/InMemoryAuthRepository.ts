@@ -21,7 +21,7 @@ const seedUsers: SeedUser[] = [
   {
     user: new User({
       id: 'usr-1',
-      email: Email.create('demo@numen.app'),
+      email: Email.create('demo@deshka.app'),
       displayName: 'Demo',
       tier: 'free',
       emailVerified: true,

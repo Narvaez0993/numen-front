@@ -1,5 +1,5 @@
 /**
- * Design tokens — Gastos by IM (numen).
+ * Design tokens — Deshka.
  *
  * Values come from the official design bundle `tokens.css`. Do NOT diverge
  * without updating the bundle first.

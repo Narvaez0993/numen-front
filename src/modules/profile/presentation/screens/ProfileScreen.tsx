@@ -218,7 +218,7 @@ export function ProfileScreen() {
 
         <View style={{ alignItems: 'center', marginTop: 18 }}>
           <Text variant="micro" muted style={{ fontSize: 10.5, letterSpacing: 0.42 }}>
-            {data.version} · Gastos by IM
+            {data.version} · Deshka
           </Text>
         </View>
       </ScrollView>

@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthStoreState>()(
       clear: () => set({ session: null }),
     }),
     {
-      name: 'numen.auth',
+      name: 'deshka.auth',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ session: state.session }),
       onRehydrateStorage: () => () => {

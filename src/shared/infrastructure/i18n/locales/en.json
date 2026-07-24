@@ -87,7 +87,7 @@
     },
     "emptyA": {
       "title": "Set your budget",
-      "body": "Decide how much you don't want to spend this month. Numen helps you stay on track.",
+      "body": "Decide how much you don't want to spend this month. Deshka helps you stay on track.",
       "cta": "Create monthly budget"
     },
     "emptyB": {
@@ -106,7 +106,7 @@
     },
     "editTopeSheet": {
       "title": "Cap for {{name}}",
-      "subtitle": "Numen will warn you when you're close to this amount.",
+      "subtitle": "Deshka will warn you when you're close to this amount.",
       "carry": "You've spent {{amount}} this month",
       "save": "Save cap",
       "activate": "Activate cap",
@@ -346,7 +346,7 @@
       "title1": "Forget Excel.",
       "subtitle1": "Track expenses by saying them out loud. AI does the rest.",
       "title2": "Speak. Don't type.",
-      "subtitle2": "Tell Numen \"coffee three thousand five hundred\" and it lands instantly. No forms.",
+      "subtitle2": "Tell Deshka \"coffee three thousand five hundred\" and it lands instantly. No forms.",
       "title3": "Your money, in real time.",
       "subtitle3": "Balances, budgets and debts on a single screen. No Excel, no formulas.",
       "start": "Get started",
@@ -368,7 +368,7 @@
       "loginHint": "Don't have an account?",
       "signupLink": "Sign in",
       "loginLink": "Create one",
-      "terms": "By continuing you accept Numen's Terms and Privacy policy.",
+      "terms": "By continuing you accept Deshka's Terms and Privacy policy.",
       "emailSignup": "Sign up with email"
     },
     "perso": {
@@ -378,11 +378,11 @@
       "skip": "Skip this step",
       "name": {
         "title": "What's your name?",
-        "subtitle": "Numen will call you this.",
+        "subtitle": "Deshka will call you this.",
         "placeholder": "Your name"
       },
       "goal": {
-        "title": "Hi, {{name}}. What do you want to achieve with Numen?",
+        "title": "Hi, {{name}}. What do you want to achieve with Deshka?",
         "subtitle": "This helps us give you relevant suggestions.",
         "friend": "friend",
         "gastos": {
@@ -437,7 +437,7 @@
     "confirm": {
       "pill": "Logged",
       "title": "Just like that.",
-      "subtitle": "Numen understood what you said. Edit if something is off.",
+      "subtitle": "Deshka understood what you said. Edit if something is off.",
       "dijiste": "You said",
       "when": "Today · 9:41 a.m.",
       "category": "Category",
@@ -643,7 +643,7 @@
         "dateSheetSubtitle": "When it happened.",
         "dueLabel": "Due date",
         "dueSheetTitle": "Due date",
-        "dueSheetSubtitle": "Numen will remind you when it's near.",
+        "dueSheetSubtitle": "Deshka will remind you when it's near.",
         "dueNone": "No due date",
         "optional": "Optional",
         "noteLabel": "Note (optional)",
@@ -679,8 +679,8 @@
     "viewHistory": "See history",
     "share": {
       "button": "Share summary",
-      "messageIncoming": "Hi {{name}}: friendly reminder — you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Numen",
-      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Numen"
+      "messageIncoming": "Hi {{name}}: friendly reminder — you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
+      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka"
     }
   },
   "profile": {
@@ -751,7 +751,7 @@
     "soon": "Coming soon",
     "editName": {
       "title": "Your name",
-      "subtitle": "How Numen greets you.",
+      "subtitle": "How Deshka greets you.",
       "label": "Name",
       "placeholder": "Your name",
       "save": "Save"
