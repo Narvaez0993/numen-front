@@ -372,8 +372,9 @@
       "emailSignup": "Crear cuenta con correo"
     },
     "perso": {
-      "step1": "Paso 1 de 2",
-      "step2": "Paso 2 de 2",
+      "step1": "Paso 1 de 3",
+      "step2": "Paso 2 de 3",
+      "step3": "Paso 3 de 3",
       "continue": "Continuar",
       "skip": "Saltar este paso",
       "name": {
@@ -425,7 +426,6 @@
       }
     },
     "magic": {
-      "step": "Paso 5 de 5",
       "title": "Probemos la magia.",
       "subtitle": "Toca el mic y dime un gasto que hiciste hoy.",
       "recording": "Te escucho…",

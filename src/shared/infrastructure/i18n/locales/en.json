@@ -372,8 +372,9 @@
       "emailSignup": "Sign up with email"
     },
     "perso": {
-      "step1": "Step 1 of 2",
-      "step2": "Step 2 of 2",
+      "step1": "Step 1 of 3",
+      "step2": "Step 2 of 3",
+      "step3": "Step 3 of 3",
       "continue": "Continue",
       "skip": "Skip this step",
       "name": {
@@ -425,7 +426,6 @@
       }
     },
     "magic": {
-      "step": "Step 5 of 5",
       "title": "Let's try the magic.",
       "subtitle": "Tap the mic and tell me an expense you made today.",
       "recording": "Listening…",

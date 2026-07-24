@@ -12,9 +12,7 @@ import { MicHero, type MicState } from '../components/MicHero';
 import { OnbHeader } from '../components/OnbHeader';
 import { OnbPage } from '../components/OnbPage';
 import { OnbTextLink } from '../components/OnbTextLink';
-import { SegmentProgress } from '../components/SegmentProgress';
 import { SkipLink } from '../components/SkipLink';
-import { StepIndicator } from '../components/StepIndicator';
 
 type Props = {
   onDetected: (params: { transcript: string; expense: OnboardingExpense }) => void;
@@ -62,14 +60,10 @@ export function MagicMomentScreen({ onDetected, onSkip }: Props) {
   return (
     <OnbPage paddingTop={14} paddingHorizontal={20} paddingBottom={20}>
       <OnbHeader
-        center={<StepIndicator>{t('onboarding.magic.step')}</StepIndicator>}
         trailing={
           !interacting && <SkipLink onPress={onSkip} label={t('onboarding.skip')} />
         }
       />
-      <View style={{ marginTop: 14 }}>
-        <SegmentProgress total={5} current={4} />
-      </View>
 
       <View style={{ height: 22 }} />
 
