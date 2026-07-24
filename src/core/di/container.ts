@@ -7,9 +7,16 @@ import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/
 import type { CategoriesRepository } from '@/modules/categories/application/ports/CategoriesRepository';
 import { GetCategoriesUseCase } from '@/modules/categories/application/use-cases/GetCategoriesUseCase';
 import { InMemoryCategoriesRepository } from '@/modules/categories/infrastructure/repositories/InMemoryCategoriesRepository';
-import { LoginUseCase } from '@/modules/auth/application';
+import {
+  LoginUseCase,
+  LogoutUseCase,
+  RegisterUseCase,
+  ResendCodeUseCase,
+  VerifyEmailUseCase,
+} from '@/modules/auth/application';
 import { AuthRepository } from '@/modules/auth/domain';
-import { InMemoryAuthRepository } from '@/modules/auth/infrastructure';
+import { HttpAuthRepository } from '@/modules/auth/infrastructure';
+import { httpClient } from '@/shared/infrastructure/http/client';
 import type { BudgetsRepository } from '@/modules/budgets/application/ports/BudgetsRepository';
 import { GetBudgetsUseCase } from '@/modules/budgets/application/use-cases/GetBudgetsUseCase';
 import { InMemoryBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/InMemoryBudgetsRepository';
@@ -38,7 +45,11 @@ import type { SubscriptionsRepository } from '@/modules/subscriptions/applicatio
 import { GetSubscriptionsUseCase } from '@/modules/subscriptions/application/use-cases/GetSubscriptionsUseCase';
 import { InMemorySubscriptionsRepository } from '@/modules/subscriptions/infrastructure/repositories/InMemorySubscriptionsRepository';
 
-const authRepository: AuthRepository = new InMemoryAuthRepository();
+// Re-exported so the app layer can register a session-expiry handler without
+// importing shared-infrastructure directly (boundaries: app → core is allowed).
+export { setOnSessionExpired } from '@/shared/infrastructure/http/client';
+
+const authRepository: AuthRepository = new HttpAuthRepository(httpClient);
 const homeRepository: HomeRepository = new InMemoryHomeRepository();
 const profileRepository: ProfileRepository = new InMemoryProfileRepository();
 const expenseRepository: ExpenseRepository = new InMemoryExpenseRepository();
@@ -54,6 +65,10 @@ const planRepository: PlanRepository = new InMemoryPlanRepository();
 const onboardingRepository: OnboardingRepository = new InMemoryOnboardingRepository();
 
 export const loginUseCase = new LoginUseCase(authRepository);
+export const registerUseCase = new RegisterUseCase(authRepository);
+export const verifyEmailUseCase = new VerifyEmailUseCase(authRepository);
+export const resendCodeUseCase = new ResendCodeUseCase(authRepository);
+export const logoutUseCase = new LogoutUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);
 export const getProfileUseCase = new GetProfileUseCase(profileRepository);
 export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository);
@@ -88,6 +103,10 @@ export const container = {
   planRepository,
   onboardingRepository,
   loginUseCase,
+  registerUseCase,
+  verifyEmailUseCase,
+  resendCodeUseCase,
+  logoutUseCase,
   getHomeOverviewUseCase,
   getProfileUseCase,
   createExpensesUseCase,

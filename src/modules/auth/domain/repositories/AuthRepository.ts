@@ -7,6 +7,12 @@ export type AuthCredentials = {
   password: Password;
 };
 
+export type RegisterCredentials = {
+  email: Email;
+  password: Password;
+  displayName: string;
+};
+
 export type AuthSession = {
   user: User;
   accessToken: string;
@@ -14,7 +20,11 @@ export type AuthSession = {
 };
 
 export interface AuthRepository {
+  register(credentials: RegisterCredentials): Promise<void>;
+  verifyEmail(email: Email, code: string): Promise<AuthSession>;
+  resendCode(email: Email): Promise<void>;
   login(credentials: AuthCredentials): Promise<AuthSession>;
+  refresh(): Promise<AuthSession>;
   logout(): Promise<void>;
   currentSession(): Promise<AuthSession | null>;
 }

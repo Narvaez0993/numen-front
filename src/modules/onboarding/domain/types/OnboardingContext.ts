@@ -11,6 +11,7 @@ export type OnboardingExpense = {
 
 export type OnboardingContext = {
   name: string;
+  email: string;
   goal: GoalId | null;
   bankId: BankId | null;
   sourceName: string | null;
@@ -21,6 +22,7 @@ export type OnboardingContext = {
 
 export const EMPTY_ONBOARDING_CONTEXT: OnboardingContext = {
   name: '',
+  email: '',
   goal: null,
   bankId: null,
   sourceName: null,

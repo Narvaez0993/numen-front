@@ -1,0 +1,116 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { z } from 'zod';
+
+import { Button, Input, Text } from '@/shared/presentation/components';
+import { useTheme } from '@/shared/presentation/theme';
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+export type CredentialsValues = z.infer<typeof schema>;
+
+type Props = {
+  onSubmit: (values: CredentialsValues) => void;
+  submitLabel: string;
+  submittingLabel: string;
+  loading?: boolean;
+  serverError?: string;
+};
+
+/**
+ * Email + password form used for account creation. Mirrors `LoginForm` but
+ * adds a show/hide password toggle and a slot for a server-side error.
+ */
+export function CredentialsForm({
+  onSubmit,
+  submitLabel,
+  submittingLabel,
+  loading,
+  serverError,
+}: Props) {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const [visible, setVisible] = useState(false);
+  const { control, handleSubmit, formState } = useForm<CredentialsValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  return (
+    <View style={[styles.container, { gap: theme.spacing.md }]}>
+      <Controller
+        control={control}
+        name="email"
+        render={({ field }) => (
+          <Input
+            label={t('auth.login.emailLabel')}
+            placeholder={t('auth.login.emailPlaceholder')}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoComplete="email"
+            value={field.value}
+            onChangeText={field.onChange}
+            error={
+              formState.errors.email ? t('auth.login.errors.invalidEmail') : serverError
+            }
+          />
+        )}
+      />
+      <Controller
+        control={control}
+        name="password"
+        render={({ field }) => (
+          <View>
+            <Input
+              label={t('auth.login.passwordLabel')}
+              placeholder={t('auth.register.passwordPlaceholder')}
+              secureTextEntry={!visible}
+              autoCapitalize="none"
+              autoComplete="new-password"
+              value={field.value}
+              onChangeText={field.onChange}
+              style={{ paddingRight: 74 }}
+              error={
+                formState.errors.password
+                  ? t('auth.login.errors.passwordTooShort')
+                  : undefined
+              }
+            />
+            <Pressable
+              onPress={() => setVisible((v) => !v)}
+              hitSlop={8}
+              style={styles.toggle}
+            >
+              <Text variant="caption" style={{ color: theme.colors.accentMint }}>
+                {t(visible ? 'auth.register.hide' : 'auth.register.show')}
+              </Text>
+            </Pressable>
+          </View>
+        )}
+      />
+      <Button
+        label={loading ? submittingLabel : submitLabel}
+        loading={loading}
+        full
+        onPress={handleSubmit(onSubmit)}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  toggle: {
+    position: 'absolute',
+    right: 14,
+    top: 38,
+  },
+});

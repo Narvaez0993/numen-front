@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAuthStore } from '@/modules/auth/presentation';
 import { completeOnboardingUseCase } from '@/core/di/container';
 import { useGoalsStore } from '@/modules/goals/presentation/stores/useGoalsStore';
 import { useTheme } from '@/shared/presentation/theme';
@@ -11,7 +12,8 @@ import { useTheme } from '@/shared/presentation/theme';
 import { useOnboardingFlow } from '../hooks/useOnboardingFlow';
 import { useOnboardingStore } from '../stores/useOnboardingStore';
 
-import { AuthScreen } from './AuthScreen';
+import { AccountScreen } from './AccountScreen';
+import { AccountVerifyScreen } from './AccountVerifyScreen';
 import { ConfirmScreen } from './ConfirmScreen';
 import { MagicMomentScreen } from './MagicMomentScreen';
 import { PersoGoalScreen } from './PersoGoalScreen';
@@ -22,7 +24,10 @@ import { WelcomeScreen } from './WelcomeScreen';
 export function OnboardingFlow() {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const flow = useOnboardingFlow();
+  // Returning from a partial signup (verified, session issued) resumes at the
+  // personalization steps instead of restarting the welcome sequence.
+  const hasSession = useAuthStore((s) => s.session !== null);
+  const flow = useOnboardingFlow(hasSession ? 'goal' : 'welcome1');
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
   const finishingRef = useRef(false);
 
@@ -76,33 +81,37 @@ export function OnboardingFlow() {
         ) as 0 | 1 | 2;
         return <WelcomeScreen idx={idx} onAdvance={flow.go} />;
       }
-      case 'auth':
-        return (
-          <AuthScreen
-            mode={flow.mode}
-            onBack={flow.goBack}
-            onModeChange={(mode) => flow.go(mode === 'login' ? 'login' : 'auth')}
-            onAuthSuccess={() => {
-              if (flow.mode === 'login') {
-                void finish();
-              } else {
-                flow.go('perso1');
-              }
-            }}
-          />
-        );
-      case 'perso1':
+      case 'name':
         return (
           <PersoNameScreen
             initialValue={flow.ctx.name}
             onBack={flow.goBack}
             onContinue={(name) => {
               flow.setCtx({ name });
-              flow.go('perso2');
+              flow.go('account');
             }}
           />
         );
-      case 'perso2':
+      case 'account':
+        return (
+          <AccountScreen
+            name={flow.ctx.name}
+            onBack={flow.goBack}
+            onRegistered={(email) => {
+              flow.setCtx({ email });
+              flow.go('verify');
+            }}
+          />
+        );
+      case 'verify':
+        return (
+          <AccountVerifyScreen
+            email={flow.ctx.email}
+            onBack={flow.goBack}
+            onVerified={() => flow.go('goal')}
+          />
+        );
+      case 'goal':
         return (
           <PersoGoalScreen
             name={flow.ctx.name}

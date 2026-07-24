@@ -864,8 +864,43 @@
       "errors": {
         "invalidEmail": "Correo no válido",
         "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
-        "invalidCredentials": "Correo o contraseña incorrectos"
+        "invalidCredentials": "Correo o contraseña incorrectos",
+        "generic": "Algo salió mal. Intenta de nuevo."
+      },
+      "noAccount": "¿No tienes cuenta?",
+      "createAccount": "Crear una"
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Empieza en menos de un minuto.",
+      "or": "o",
+      "submit": "Crear cuenta",
+      "submitting": "Creando...",
+      "passwordPlaceholder": "Mínimo 8 caracteres",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "errors": {
+        "emailExists": "Este correo ya está registrado",
+        "generic": "No pudimos crear tu cuenta. Intenta de nuevo."
       }
+    },
+    "verify": {
+      "title": "Verifica tu correo",
+      "subtitle": "Ingresa el código de 6 dígitos que enviamos a <b>{{email}}</b>.",
+      "verifying": "Verificando...",
+      "resend": "Reenviar código",
+      "resending": "Reenviando...",
+      "resendIn": "Reenviar en {{seconds}}s",
+      "errors": {
+        "invalid": "Código incorrecto",
+        "expired": "El código expiró. Solicita uno nuevo.",
+        "tooManyAttempts": "Demasiados intentos. Solicita un código nuevo.",
+        "cooldown": "Espera un momento antes de reenviar.",
+        "generic": "Algo salió mal. Intenta de nuevo."
+      }
+    },
+    "social": {
+      "comingSoon": "Disponible muy pronto"
     }
   },
   "currency": {

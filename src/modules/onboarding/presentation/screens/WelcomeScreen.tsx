@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PanResponder, View } from 'react-native';
@@ -12,11 +13,11 @@ import { OnbTextLink } from '../components/OnbTextLink';
 import { OrbitalHero } from '../components/OrbitalHero';
 import { SkipLink } from '../components/SkipLink';
 import { Wordmark } from '../components/Wordmark';
-import type { FlowTarget } from '../hooks/useOnboardingFlow';
+import type { OnboardingScreen } from '../hooks/flowTransitions';
 
 type Props = {
   idx: 0 | 1 | 2;
-  onAdvance: (next: FlowTarget) => void;
+  onAdvance: (next: OnboardingScreen) => void;
 };
 
 export function WelcomeScreen({ idx, onAdvance }: Props) {
@@ -25,12 +26,12 @@ export function WelcomeScreen({ idx, onAdvance }: Props) {
   const titleKey = `onboarding.welcome.title${idx + 1}` as const;
   const subtitleKey = `onboarding.welcome.subtitle${idx + 1}` as const;
 
-  const next = (): FlowTarget => {
+  const next = (): OnboardingScreen => {
     if (idx === 0) return 'welcome2';
     if (idx === 1) return 'welcome3';
-    return 'auth';
+    return 'name';
   };
-  const prev = (): FlowTarget | null => {
+  const prev = (): OnboardingScreen | null => {
     if (idx === 0) return null;
     if (idx === 1) return 'welcome1';
     return 'welcome2';
@@ -65,7 +66,7 @@ export function WelcomeScreen({ idx, onAdvance }: Props) {
         }}
       >
         <Wordmark size={17} />
-        <SkipLink onPress={() => onAdvance('auth')} label={t('onboarding.skip')} />
+        <SkipLink onPress={() => onAdvance('name')} label={t('onboarding.skip')} />
       </View>
 
       <View
@@ -118,7 +119,10 @@ export function WelcomeScreen({ idx, onAdvance }: Props) {
 
       <View>
         <OnbCTA onPress={() => onAdvance(next())}>{t('onboarding.welcome.start')}</OnbCTA>
-        <OnbTextLink onPress={() => onAdvance('login')} style={{ marginTop: 6 }}>
+        <OnbTextLink
+          onPress={() => router.push('/(auth)/login')}
+          style={{ marginTop: 6 }}
+        >
           {t('onboarding.welcome.haveAccount')}
         </OnbTextLink>
       </View>

@@ -1,6 +1,10 @@
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
+import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import type { DomainError } from '@/shared/domain';
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -10,7 +14,35 @@ import { useLogin } from '../hooks/useLogin';
 export function LoginScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const login = useLogin();
+  const [pendingEmail, setPendingEmail] = useState('');
+
+  const login = useLogin({
+    onSuccess: (session) => {
+      // Returning user: mark onboarding complete so the gate routes to tabs.
+      useOnboardingStore.getState().markCompleted({
+        name: session.displayName,
+        goal: null,
+        bankId: null,
+        sourceName: null,
+        balance: 0,
+      });
+    },
+  });
+
+  const error = login.error as DomainError | null;
+
+  useEffect(() => {
+    if (login.isError && error?.code === 'auth.email_not_verified' && pendingEmail) {
+      router.push({ pathname: '/(auth)/verify', params: { email: pendingEmail } });
+    }
+  }, [login.isError, error, pendingEmail]);
+
+  const errorMessage =
+    login.isError && error?.code !== 'auth.email_not_verified'
+      ? error?.code === 'auth.invalid_credentials'
+        ? t('auth.login.errors.invalidCredentials')
+        : t('auth.login.errors.generic')
+      : null;
 
   return (
     <View
@@ -29,12 +61,38 @@ export function LoginScreen() {
           {t('auth.login.subtitle')}
         </Text>
       </View>
-      <LoginForm onSubmit={(values) => login.mutate(values)} loading={login.isPending} />
-      {login.isError ? (
+
+      <LoginForm
+        onSubmit={(values) => {
+          if (login.isError) login.reset();
+          setPendingEmail(values.email.trim());
+          login.mutate({ email: values.email.trim(), password: values.password });
+        }}
+        loading={login.isPending}
+      />
+
+      {errorMessage ? (
         <Text variant="caption" style={{ color: theme.colors.accentCoral }}>
-          {t('auth.login.errors.invalidCredentials')}
+          {errorMessage}
         </Text>
       ) : null}
+
+      <View style={{ alignItems: 'center' }}>
+        <Pressable
+          onPress={() => {
+            useOnboardingStore.getState().reset();
+            router.replace('/(onboarding)');
+          }}
+          hitSlop={8}
+        >
+          <Text variant="caption" muted>
+            {t('auth.login.noAccount')}{' '}
+            <Text variant="caption" style={{ color: theme.colors.accentMint }}>
+              {t('auth.login.createAccount')}
+            </Text>
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }

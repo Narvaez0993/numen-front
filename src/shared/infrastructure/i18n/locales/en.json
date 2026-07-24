@@ -864,8 +864,43 @@
       "errors": {
         "invalidEmail": "Invalid email",
         "passwordTooShort": "Password must be at least 8 characters",
-        "invalidCredentials": "Invalid email or password"
+        "invalidCredentials": "Invalid email or password",
+        "generic": "Something went wrong. Try again."
+      },
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create one"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Get started in under a minute.",
+      "or": "or",
+      "submit": "Create account",
+      "submitting": "Creating...",
+      "passwordPlaceholder": "At least 8 characters",
+      "show": "Show",
+      "hide": "Hide",
+      "errors": {
+        "emailExists": "This email is already registered",
+        "generic": "We couldn't create your account. Try again."
       }
+    },
+    "verify": {
+      "title": "Verify your email",
+      "subtitle": "Enter the 6-digit code we sent to <b>{{email}}</b>.",
+      "verifying": "Verifying...",
+      "resend": "Resend code",
+      "resending": "Resending...",
+      "resendIn": "Resend in {{seconds}}s",
+      "errors": {
+        "invalid": "Incorrect code",
+        "expired": "The code expired. Request a new one.",
+        "tooManyAttempts": "Too many attempts. Request a new code.",
+        "cooldown": "Wait a moment before resending.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
+    "social": {
+      "comingSoon": "Coming very soon"
     }
   },
   "currency": {

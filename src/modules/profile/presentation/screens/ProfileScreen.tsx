@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useLogout } from '@/modules/auth/presentation';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
@@ -35,6 +36,7 @@ export function ProfileScreen() {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const { data, isLoading } = useProfile();
+  const logout = useLogout();
   const tier = usePlanStore((s) => s.tier);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const currency = useCurrencyStore((s) => s.currency);
@@ -188,10 +190,8 @@ export function ProfileScreen() {
 
         <Pressable
           accessibilityRole="button"
-          onPress={() => {
-            useOnboardingStore.getState().reset();
-            router.replace('/(onboarding)');
-          }}
+          disabled={logout.isPending}
+          onPress={() => logout.mutate()}
           style={({ pressed }) => ({
             backgroundColor: 'transparent',
             borderColor: theme.colors.borderSubtle,
@@ -200,12 +200,20 @@ export function ProfileScreen() {
             paddingVertical: 13,
             alignItems: 'center',
             marginTop: 8,
-            opacity: pressed ? 0.8 : 1,
+            opacity: logout.isPending ? 0.6 : pressed ? 0.8 : 1,
           })}
         >
-          <Text variant="label" color={theme.colors.accentCoral} style={{ fontSize: 13 }}>
-            {t('profile.signOut')}
-          </Text>
+          {logout.isPending ? (
+            <ActivityIndicator color={theme.colors.accentCoral} />
+          ) : (
+            <Text
+              variant="label"
+              color={theme.colors.accentCoral}
+              style={{ fontSize: 13 }}
+            >
+              {t('profile.signOut')}
+            </Text>
+          )}
         </Pressable>
 
         <View style={{ alignItems: 'center', marginTop: 18 }}>
