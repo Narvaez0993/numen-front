@@ -1,65 +1,125 @@
 import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { FilterChip, Text } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
-
 import {
-  emptyFilters,
-  hasActiveFilters,
-  type MovementsFilters,
-  type MovementsTypeFilter,
-} from '../../application/dto/MovementsFilters';
-import type { Transaction } from '../../domain/types/Transaction';
+  monthName,
+  monthRange,
+  shiftMonth,
+  toIsoDate,
+} from '@/shared/presentation/utils/dates';
+
+import { emptyFilters, hasActiveFilters, type MovementsFilters } from '../../application';
+import type { MovementType } from '../../domain';
 import { DayGroup } from '../components/DayGroup';
 import { EmptyState } from '../components/EmptyState';
 import { MovementsHeader } from '../components/MovementsHeader';
 import { SearchBar } from '../components/SearchBar';
-import { TxDetailSheet } from '../components/TxDetailSheet';
+import { useMovementCatalogs } from '../hooks/useMovementCatalogs';
 import { useMovements } from '../hooks/useMovements';
-import { useMovementsStore } from '../stores/useMovementsStore';
-import { filterTransactions } from '../utils/filterTransactions';
+import { filterMovements } from '../utils/filterMovements';
 import { groupByDay } from '../utils/groupByDay';
+
+/** How many months back the picker offers. */
+const MONTHS_BACK = 6;
 
 export function MovementsScreen() {
   const { theme } = useTheme();
-  const { t } = useTranslation();
-  const { data } = useMovements();
-  const [filters, setFilters] = useState<MovementsFilters>(emptyFilters);
-  const [detailTx, setDetailTx] = useState<Transaction | null>(null);
+  const { t, i18n } = useTranslation();
   const tabBarClearance = useFloatingTabBarClearance();
+  const currency = useCurrencyStore((s) => s.currency);
+  const language = i18n.language.startsWith('en') ? 'en' : 'es';
 
-  const initialized = useMovementsStore((s) => s.initialized);
-  const init = useMovementsStore((s) => s.init);
-  const transactions = useMovementsStore((s) => s.transactions);
-  const updateTransaction = useMovementsStore((s) => s.updateTransaction);
-  const removeTransaction = useMovementsStore((s) => s.removeTransaction);
+  // Pinned once per mount: every date label and range is derived from it, so the
+  // screen never disagrees with itself mid-render.
+  const [today] = useState(() => toIsoDate(new Date()));
+  const [filters, setFilters] = useState<MovementsFilters>(emptyFilters);
 
-  useEffect(() => {
-    if (data && !initialized) init(data.transactions);
-  }, [data, initialized, init]);
+  const month = filters.month ?? today;
+  const range = useMemo(() => monthRange(month), [month]);
+  const { data, isLoading, isError, refetch } = useMovements(range);
+  const catalogs = useMovementCatalogs();
+
+  const monthOptions = useMemo(
+    () =>
+      Array.from({ length: MONTHS_BACK }, (_, index) => {
+        const iso = shiftMonth(today, -(index + 1));
+        return { value: iso, label: monthName(iso, language) };
+      }),
+    [today, language],
+  );
 
   const { groups, count, monthTotal } = useMemo(() => {
-    if (!data || !initialized) return { groups: [], count: 0, monthTotal: 0 };
-    const filtered = filterTransactions(transactions, filters, {
-      categories: data.categories,
-      accounts: data.accounts,
-    });
-    const total = filtered
-      .filter((tx) => tx.tag !== 'transfer' && tx.amount < 0)
-      .reduce((sum, tx) => sum + tx.amount, 0);
+    const movements = data ?? [];
+    const filtered = filterMovements(movements, filters, catalogs);
     return {
-      groups: groupByDay(filtered),
+      groups: groupByDay(filtered, today, language, {
+        today: t('movements.days.today'),
+        yesterday: t('movements.days.yesterday'),
+      }),
       count: filtered.length,
-      monthTotal: total,
+      monthTotal: filtered.reduce(
+        (sum, movement) =>
+          movement.type === 'expense'
+            ? sum - movement.amount
+            : movement.type === 'income'
+              ? sum + movement.amount
+              : sum,
+        0,
+      ),
     };
-  }, [data, initialized, transactions, filters]);
+  }, [data, filters, catalogs, today, language, t]);
 
-  if (!data || !initialized) {
+  if (isError) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
+        edges={['top']}
+      >
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 32,
+            gap: 16,
+          }}
+        >
+          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
+            {t('movements.error.title')}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void refetch()}
+            style={({ pressed }) => ({
+              paddingHorizontal: 20,
+              paddingVertical: 11,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Text
+              variant="label"
+              color={theme.colors.accentMint}
+              style={{ fontSize: 13 }}
+            >
+              {t('movements.error.retry')}
+            </Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading || !data) {
     return (
       <SafeAreaView
         style={{
@@ -74,37 +134,21 @@ export function MovementsScreen() {
     );
   }
 
-  const accountOptions = Object.values(data.accounts).map((a) => ({
-    value: a.id,
-    label: a.name,
+  const sourceOptions = Object.values(catalogs.sourceById).map((source) => ({
+    value: source.id,
+    label: source.name,
   }));
-  const categoryOptions = Object.values(data.categories)
-    .filter((c) => c.id !== 'transfer')
-    .map((c) => ({ value: c.id, label: c.name }));
-  const typeOptions: { value: MovementsTypeFilter; label: string }[] = [
-    { value: 'gasto', label: t('movements.types.expenses') },
-    { value: 'ingreso', label: t('movements.types.income') },
-    { value: 'recurrente', label: t('movements.types.recurring') },
+  const categoryOptions = Object.values(catalogs.categoryById).map((category) => ({
+    value: category.id,
+    label: category.name,
+  }));
+  const typeOptions: { value: MovementType; label: string }[] = [
+    { value: 'expense', label: t('movements.types.expenses') },
+    { value: 'income', label: t('movements.types.income') },
     { value: 'transfer', label: t('movements.types.transfers') },
-  ];
-  const monthOptions = [
-    { value: 'abril', label: t('movements.months.april') },
-    { value: 'marzo', label: t('movements.months.march') },
-    { value: '90d', label: t('movements.months.last90') },
-    { value: 'year', label: t('movements.months.thisYear') },
   ];
 
   const active = hasActiveFilters(filters);
-
-  const handleSaveDetail = (patch: Parameters<typeof updateTransaction>[1]) => {
-    if (detailTx) updateTransaction(detailTx.id, patch);
-    setDetailTx(null);
-  };
-
-  const handleDeleteDetail = () => {
-    if (detailTx) removeTransaction(detailTx.id);
-    setDetailTx(null);
-  };
 
   return (
     <SafeAreaView
@@ -122,8 +166,9 @@ export function MovementsScreen() {
       >
         <View style={{ gap: 16 }}>
           <MovementsHeader
-            monthLabel={t('movements.currentMonth')}
+            monthLabel={monthName(month, language)}
             monthTotal={monthTotal}
+            currency={currency}
             onAvatarPress={() => router.push('/profile')}
           />
 
@@ -137,15 +182,15 @@ export function MovementsScreen() {
             <FilterChip
               label={t('movements.filters.month')}
               value={filters.month}
-              onChange={(month) => setFilters((f) => ({ ...f, month }))}
+              onChange={(value) => setFilters((f) => ({ ...f, month: value }))}
               options={monthOptions}
               allLabel={t('movements.filters.monthAll')}
             />
             <FilterChip
               label={t('movements.filters.account')}
-              value={filters.accountId}
-              onChange={(accountId) => setFilters((f) => ({ ...f, accountId }))}
-              options={accountOptions}
+              value={filters.sourceId}
+              onChange={(sourceId) => setFilters((f) => ({ ...f, sourceId }))}
+              options={sourceOptions}
             />
             <FilterChip
               label={t('movements.filters.category')}
@@ -157,7 +202,7 @@ export function MovementsScreen() {
               label={t('movements.filters.type')}
               value={filters.type}
               onChange={(value) =>
-                setFilters((f) => ({ ...f, type: value as MovementsTypeFilter | null }))
+                setFilters((f) => ({ ...f, type: value as MovementType | null }))
               }
               options={typeOptions}
             />
@@ -175,7 +220,10 @@ export function MovementsScreen() {
               <Text variant="caption" muted>
                 {t(count === 1 ? 'movements.resultsOne' : 'movements.results', { count })}
               </Text>
-              <Pressable onPress={() => setFilters(emptyFilters)} hitSlop={6}>
+              <Pressable
+                onPress={() => setFilters((f) => ({ ...emptyFilters, month: f.month }))}
+                hitSlop={6}
+              >
                 <Text
                   variant="label"
                   color={theme.colors.accentMint}
@@ -191,29 +239,18 @@ export function MovementsScreen() {
             <EmptyState />
           ) : (
             <View style={{ gap: 18 }}>
-              {groups.map((g) => (
+              {groups.map((group) => (
                 <DayGroup
-                  key={g.date}
-                  group={g}
-                  categories={data.categories}
-                  accounts={data.accounts}
-                  onItemPress={setDetailTx}
+                  key={group.date}
+                  group={group}
+                  catalogs={catalogs}
+                  currency={currency}
                 />
               ))}
             </View>
           )}
         </View>
       </ScrollView>
-
-      <TxDetailSheet
-        visible={detailTx !== null}
-        tx={detailTx}
-        categories={data.categories}
-        accounts={data.accounts}
-        onClose={() => setDetailTx(null)}
-        onSave={handleSaveDetail}
-        onDelete={handleDeleteDetail}
-      />
     </SafeAreaView>
   );
 }

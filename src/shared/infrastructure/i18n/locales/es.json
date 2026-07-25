@@ -11,46 +11,34 @@
   },
   "movements": {
     "title": "Movimientos",
-    "currentMonth": "Mayo",
-    "searchPlaceholder": "Buscar gasto, merchant, monto…",
+    "searchPlaceholder": "Buscar descripción, categoría, monto…",
     "results": "{{count}} resultados",
     "resultsOne": "{{count}} resultado",
     "clear": "Limpiar",
     "filters": {
       "month": "Mes",
-      "monthAll": "Este mes (mayo)",
-      "account": "Cuenta",
+      "monthAll": "Este mes",
+      "account": "Fuente",
       "category": "Categoría",
       "type": "Tipo"
     },
-    "months": {
-      "april": "Abril",
-      "march": "Marzo",
-      "last90": "Últimos 90 días",
-      "thisYear": "Este año"
-    },
     "types": {
       "expenses": "Solo gastos",
-      "recurring": "Recurrentes",
       "transfers": "Transferencias",
       "income": "Ingresos"
     },
     "empty": {
-      "title": "Sin resultados",
-      "hint": "Probá cambiar los filtros o la búsqueda"
+      "title": "Sin movimientos este mes",
+      "hint": "Toca + para registrar tu primer gasto o ingreso"
     },
     "transferTag": "Transferencia · no es gasto",
-    "detail": {
-      "title": "Detalle del movimiento",
-      "description": "Descripción",
-      "amount": "Monto",
-      "category": "Categoría",
-      "account": "Cuenta",
-      "save": "Guardar cambios",
-      "delete": "Eliminar movimiento",
-      "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
-      "deleteConfirm": "Sí, eliminar",
-      "cancel": "Cancelar"
+    "days": {
+      "today": "hoy",
+      "yesterday": "ayer"
+    },
+    "error": {
+      "title": "No pudimos cargar tus movimientos.",
+      "retry": "Reintentar"
     }
   },
   "budgets": {

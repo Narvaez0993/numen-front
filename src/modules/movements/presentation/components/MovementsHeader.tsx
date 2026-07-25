@@ -1,13 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
+import type { CurrencyCode } from '@/shared/domain';
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   monthLabel: string;
+  /** Net for the month: expenses against income, transfers excluded. */
   monthTotal: number;
+  currency: CurrencyCode;
   initials?: string;
   onAvatarPress?: () => void;
 };
@@ -15,6 +18,7 @@ type Props = {
 export function MovementsHeader({
   monthLabel,
   monthTotal,
+  currency,
   initials = 'SM',
   onAvatarPress,
 }: Props) {
@@ -59,7 +63,7 @@ export function MovementsHeader({
             tabular
             style={{ fontWeight: '500' }}
           >
-            {formatMoney(monthTotal)}
+            {formatMoney(monthTotal, currency)}
           </Text>
         </View>
       </View>

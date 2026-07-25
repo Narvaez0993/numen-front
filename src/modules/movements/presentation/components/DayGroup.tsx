@@ -1,36 +1,22 @@
 import { View } from 'react-native';
 
 import { Card, Text } from '@/shared/presentation/components';
+import type { CurrencyCode } from '@/shared/domain';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { Account, Category } from '../../domain/types/MovementsCatalog';
+import type { MovementCatalogs } from '../hooks/useMovementCatalogs';
+import { displaySource } from '../hooks/useMovementCatalogs';
 import type { DayGroup as DayGroupModel } from '../utils/groupByDay';
 
 import { TxRow } from './TxRow';
 
-import type { Transaction } from '../../domain/types/Transaction';
-
 type Props = {
   group: DayGroupModel;
-  categories: Record<string, Category>;
-  accounts: Record<string, Account>;
-  onItemPress?: (tx: Transaction) => void;
+  catalogs: MovementCatalogs;
+  currency: CurrencyCode;
 };
 
-const HEADER_LABELS: Record<string, [string, string]> = {
-  hoy: ['HOY', 'mar 14 may'],
-  ayer: ['AYER', 'lun 13 may'],
-};
-
-function formatHeader(group: DayGroupModel): [string, string] {
-  const known = HEADER_LABELS[group.dayBucket];
-  if (known) return known;
-  return [group.dayBucket.toUpperCase(), ''];
-}
-
-export function DayGroup({ group, categories, accounts, onItemPress }: Props) {
-  const [label, sub] = formatHeader(group);
-
+export function DayGroup({ group, catalogs, currency }: Props) {
   return (
     <View>
       <View
@@ -43,55 +29,31 @@ export function DayGroup({ group, categories, accounts, onItemPress }: Props) {
           gap: 12,
         }}
       >
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'baseline',
-            gap: 8,
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
-          <Text variant="micro" uppercase style={{ fontSize: 11, letterSpacing: 1.1 }}>
-            {label}
-          </Text>
-          {sub ? (
-            <Text
-              variant="micro"
-              muted
-              uppercase
-              style={{ fontSize: 10.5, letterSpacing: 0.84 }}
-            >
-              · {sub}
-            </Text>
-          ) : null}
-        </View>
+        <Text variant="micro" uppercase style={{ fontSize: 11, letterSpacing: 1.1 }}>
+          {group.label}
+        </Text>
         <Text
           variant="caption"
           muted
           tabular
           style={{ fontSize: 11.5, fontWeight: '500' }}
         >
-          {formatMoney(group.total)}
+          {formatMoney(group.total, currency)}
         </Text>
       </View>
 
       <Card padding={0}>
-        {group.items.map((tx, i) => {
-          const category = categories[tx.categoryId];
-          const account = accounts[tx.accountId];
-          if (!category || !account) return null;
-          return (
-            <TxRow
-              key={tx.id}
-              tx={tx}
-              category={category}
-              account={account}
-              last={i === group.items.length - 1}
-              onPress={onItemPress ? () => onItemPress(tx) : undefined}
-            />
-          );
-        })}
+        {group.items.map((movement, i) => (
+          <TxRow
+            key={movement.id}
+            movement={movement}
+            category={
+              movement.categoryId ? catalogs.categoryById[movement.categoryId] : undefined
+            }
+            source={displaySource(catalogs, movement.source, movement.destination)}
+            last={i === group.items.length - 1}
+          />
+        ))}
       </Card>
     </View>
   );

@@ -11,46 +11,34 @@
   },
   "movements": {
     "title": "Movements",
-    "currentMonth": "May",
-    "searchPlaceholder": "Search expense, merchant, amount…",
+    "searchPlaceholder": "Search description, category, amount…",
     "results": "{{count}} results",
     "resultsOne": "{{count}} result",
     "clear": "Clear",
     "filters": {
       "month": "Month",
-      "monthAll": "This month (May)",
-      "account": "Account",
+      "monthAll": "This month",
+      "account": "Source",
       "category": "Category",
       "type": "Type"
     },
-    "months": {
-      "april": "April",
-      "march": "March",
-      "last90": "Last 90 days",
-      "thisYear": "This year"
-    },
     "types": {
       "expenses": "Expenses only",
-      "recurring": "Recurring",
       "transfers": "Transfers",
       "income": "Income"
     },
     "empty": {
-      "title": "No results",
-      "hint": "Try changing the filters or the search"
+      "title": "No movements this month",
+      "hint": "Tap + to record your first expense or income"
     },
     "transferTag": "Transfer · not an expense",
-    "detail": {
-      "title": "Movement detail",
-      "description": "Description",
-      "amount": "Amount",
-      "category": "Category",
-      "account": "Account",
-      "save": "Save changes",
-      "delete": "Delete movement",
-      "deleteConfirmTitle": "Delete \"{{name}}\"?",
-      "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+    "days": {
+      "today": "today",
+      "yesterday": "yesterday"
+    },
+    "error": {
+      "title": "We couldn't load your movements.",
+      "retry": "Retry"
     }
   },
   "budgets": {
