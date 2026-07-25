@@ -290,8 +290,9 @@
     "title": "Fuentes y cuentas",
     "netBalance": {
       "label": "Saldo neto",
-      "breakdown_one": "{{accounts}} cuenta + efectivo − {{cards}} TC",
-      "breakdown_other": "{{accounts}} cuentas + efectivo − {{cards}} TC"
+      "breakdown_zero": "Aún sin fuentes registradas",
+      "breakdown_one": "{{accounts}} fuente · {{cards}} TC",
+      "breakdown_other": "{{accounts}} fuentes · {{cards}} TC"
     },
     "groups": {
       "debit": "Débito y efectivo",
@@ -302,7 +303,7 @@
       "usage": "{{pct}}% del cupo",
       "limit": "{{amount}} de cupo",
       "cutoff": "Corte {{day}}",
-      "due": "Pago próximo {{date}}"
+      "due": "Pago {{day}}"
     },
     "add": {
       "account": "Agregar cuenta",
@@ -333,12 +334,26 @@
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Eliminar {{name}}?",
       "deleteConfirm": "Sí, eliminar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "dueDay": "Día de pago",
+      "deleting": "Eliminando…"
     },
     "gate": {
       "accountTitle": "Tu plan Free llega hasta 2 cuentas",
       "cardTitle": "Tu plan Free incluye 1 tarjeta",
       "body": "Con Plus tienes cuentas y tarjetas ilimitadas, y tu agente revisándolo todo cada semana."
+    },
+    "empty": {
+      "title": "Todavía no tienes fuentes",
+      "body": "Agrega el banco, la billetera o el efectivo donde tienes tu plata. Con eso ya podemos llevarte la cuenta."
+    },
+    "error": {
+      "title": "No pudimos cargar tus cuentas.",
+      "retry": "Reintentar"
+    },
+    "errors": {
+      "saveFailed": "No pudimos guardar. Intenta de nuevo.",
+      "deleteFailed": "No pudimos eliminar. Intenta de nuevo."
     }
   },
   "assistant": {

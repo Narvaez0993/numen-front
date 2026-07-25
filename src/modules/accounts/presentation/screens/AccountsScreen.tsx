@@ -1,30 +1,41 @@
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAuthStore } from '@/modules/auth/presentation';
+import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
+import type { AccentColor } from '@/shared/domain';
 import {
   SectionLabel,
   SettingsGroup,
   SettingsRow,
   SubScreenHeader,
+  Text,
+  Toast,
 } from '@/shared/presentation/components';
-import type { AccentColor } from '@/shared/domain';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
-import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
-
-import type { Account, CreditCard } from '../../domain';
+import {
+  AccountLimitReachedError,
+  type Account,
+  type CreditCard,
+  CreditCardLimitReachedError,
+} from '../../domain';
 import { AccountFormSheet, type AccountFormInput } from '../components/AccountFormSheet';
 import { AddDashedButton } from '../components/AddDashedButton';
 import { CardFormSheet, type CardFormInput } from '../components/CardFormSheet';
 import { CreditCardItem } from '../components/CreditCardItem';
 import { NetBalanceCard } from '../components/NetBalanceCard';
 import { useAccounts } from '../hooks/useAccounts';
-import { useAccountsStore } from '../stores/useAccountsStore';
+import {
+  useCreateAccount,
+  useDeleteAccount,
+  useUpdateAccount,
+} from '../hooks/useAccountMutations';
+import { useCreateCard, useDeleteCard, useUpdateCard } from '../hooks/useCardMutations';
 
 const ACCOUNT_COLORS: readonly AccentColor[] = [
   'mint',
@@ -34,21 +45,21 @@ const ACCOUNT_COLORS: readonly AccentColor[] = [
   'coral',
 ];
 
+/** Free plan capacity; the backend is the authority and answers 403 as a backstop. */
+const FREE_ACCOUNTS = 2;
+const FREE_CARDS = 1;
+
 export function AccountsScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const { data } = useAccounts();
+  const { data, isLoading, isError, refetch } = useAccounts();
 
-  const initialized = useAccountsStore((s) => s.initialized);
-  const init = useAccountsStore((s) => s.init);
-  const accounts = useAccountsStore((s) => s.accounts);
-  const creditCards = useAccountsStore((s) => s.creditCards);
-  const addAccount = useAccountsStore((s) => s.addAccount);
-  const updateAccount = useAccountsStore((s) => s.updateAccount);
-  const removeAccount = useAccountsStore((s) => s.removeAccount);
-  const addCard = useAccountsStore((s) => s.addCard);
-  const updateCard = useAccountsStore((s) => s.updateCard);
-  const removeCard = useAccountsStore((s) => s.removeCard);
+  const createAccount = useCreateAccount();
+  const updateAccount = useUpdateAccount();
+  const deleteAccount = useDeleteAccount();
+  const createCard = useCreateCard();
+  const updateCard = useUpdateCard();
+  const deleteCard = useDeleteCard();
 
   const [accountSheet, setAccountSheet] = useState<{
     open: boolean;
@@ -59,13 +70,56 @@ export function AccountsScreen() {
     card: CreditCard | null;
   }>({ open: false, card: null });
   const [gate, setGate] = useState<'account' | 'card' | null>(null);
-  const tier = usePlanStore((s) => s.tier);
+  const [toast, setToast] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (data && !initialized) init(data);
-  }, [data, initialized, init]);
+  const tier = useAuthStore((s) => s.session?.tier);
+  const isPlus = tier === 'plus';
 
-  if (!initialized) {
+  if (isError) {
+    return (
+      <SafeAreaView
+        edges={['top']}
+        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
+      >
+        <SubScreenHeader title={t('accounts.title')} onBack={() => router.back()} />
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 32,
+            gap: 16,
+          }}
+        >
+          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
+            {t('accounts.error.title')}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void refetch()}
+            style={({ pressed }) => ({
+              paddingHorizontal: 20,
+              paddingVertical: 11,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Text
+              variant="label"
+              color={theme.colors.accentMint}
+              style={{ fontSize: 13 }}
+            >
+              {t('accounts.error.retry')}
+            </Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading || !data) {
     return (
       <SafeAreaView
         edges={['top']}
@@ -81,63 +135,87 @@ export function AccountsScreen() {
     );
   }
 
-  const debitTotal = accounts.reduce((sum, a) => sum + a.balance, 0);
-  const tcDebt = creditCards.reduce((sum, c) => sum + c.debt, 0);
-  const netBalance = debitTotal - tcDebt;
+  const { accounts, creditCards, currency } = data;
+  const atAccountLimit = !isPlus && accounts.length >= FREE_ACCOUNTS;
+  const atCardLimit = !isPlus && creditCards.length >= FREE_CARDS;
 
   const closeAccountSheet = () => setAccountSheet({ open: false, account: null });
   const closeCardSheet = () => setCardSheet({ open: false, card: null });
 
+  /** Capacity errors open the gate; anything else surfaces as a toast. */
+  const handleMutationError = (error: Error) => {
+    if (error instanceof AccountLimitReachedError) {
+      closeAccountSheet();
+      setGate('account');
+      return;
+    }
+    if (error instanceof CreditCardLimitReachedError) {
+      closeCardSheet();
+      setGate('card');
+      return;
+    }
+    setToast(t('accounts.errors.saveFailed'));
+  };
+
   const handleSaveAccount = (input: AccountFormInput) => {
     const existing = accountSheet.account;
     if (existing) {
-      updateAccount(existing.id, {
+      updateAccount.mutate(
+        {
+          id: existing.id,
+          patch: { name: input.name, sub: input.sub, balance: input.balance },
+        },
+        { onSuccess: closeAccountSheet, onError: handleMutationError },
+      );
+      return;
+    }
+    const color = ACCOUNT_COLORS[accounts.length % ACCOUNT_COLORS.length] ?? 'mint';
+    createAccount.mutate(
+      {
+        kind: input.kind,
         name: input.name,
         sub: input.sub,
-        balance: input.balance,
-      });
-    } else {
-      const color = ACCOUNT_COLORS[accounts.length % ACCOUNT_COLORS.length] ?? 'mint';
-      const base = {
-        id: `acc-${Date.now()}`,
-        name: input.name,
-        sub: input.sub,
+        icon: input.kind === 'debit' ? 'building-bank' : 'cash',
         color,
         balance: input.balance,
-      };
-      addAccount(
-        input.kind === 'debit'
-          ? { ...base, kind: 'debit', icon: 'building-bank' }
-          : { ...base, kind: 'cash', icon: 'cash' },
-      );
-    }
-    closeAccountSheet();
+      },
+      { onSuccess: closeAccountSheet, onError: handleMutationError },
+    );
   };
 
   const handleDeleteAccount = () => {
-    if (accountSheet.account) removeAccount(accountSheet.account.id);
-    closeAccountSheet();
+    const existing = accountSheet.account;
+    if (!existing) return;
+    deleteAccount.mutate(existing.id, {
+      onSuccess: closeAccountSheet,
+      onError: () => setToast(t('accounts.errors.deleteFailed')),
+    });
   };
 
   const handleSaveCard = (input: CardFormInput) => {
     const existing = cardSheet.card;
     if (existing) {
-      updateCard(existing.id, input);
-    } else {
-      addCard({
-        id: `card-${Date.now()}`,
-        icon: 'credit-card',
-        color: 'coral',
-        dueLabel: '—',
-        ...input,
-      });
+      updateCard.mutate(
+        // `dueDay: null` means "not provided" on the wire; the form guarantees a
+        // stored day is never blanked, so nothing is silently dropped here.
+        { id: existing.id, patch: { ...input, dueDay: input.dueDay ?? undefined } },
+        { onSuccess: closeCardSheet, onError: handleMutationError },
+      );
+      return;
     }
-    closeCardSheet();
+    createCard.mutate(
+      { ...input, icon: 'credit-card', color: 'coral' },
+      { onSuccess: closeCardSheet, onError: handleMutationError },
+    );
   };
 
   const handleDeleteCard = () => {
-    if (cardSheet.card) removeCard(cardSheet.card.id);
-    closeCardSheet();
+    const existing = cardSheet.card;
+    if (!existing) return;
+    deleteCard.mutate(existing.id, {
+      onSuccess: closeCardSheet,
+      onError: () => setToast(t('accounts.errors.deleteFailed')),
+    });
   };
 
   return (
@@ -155,45 +233,71 @@ export function AccountsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <NetBalanceCard
-          netBalance={netBalance}
-          accountsCount={accounts.length}
-          creditCardsCount={creditCards.length}
+          netBalance={data.netBalance}
+          currency={currency}
+          accountsCount={data.accountsCount}
+          creditCardsCount={data.creditCardsCount}
         />
 
-        <SettingsGroup label={t('accounts.groups.debit')}>
-          {accounts.map((account, i) => (
-            <SettingsRow
-              key={account.id}
-              icon={account.icon}
-              iconColor={account.color}
-              title={account.name}
-              subtitle={account.sub}
-              value={formatMoney(account.balance)}
-              last={i === accounts.length - 1}
-              onPress={() => setAccountSheet({ open: true, account })}
-            />
-          ))}
-        </SettingsGroup>
+        {accounts.length > 0 ? (
+          <SettingsGroup label={t('accounts.groups.debit')}>
+            {accounts.map((account, i) => (
+              <SettingsRow
+                key={account.id}
+                icon={account.icon}
+                iconColor={account.color}
+                title={account.name}
+                subtitle={account.sub || undefined}
+                value={formatMoney(account.balance, currency)}
+                last={i === accounts.length - 1}
+                onPress={() => setAccountSheet({ open: true, account })}
+              />
+            ))}
+          </SettingsGroup>
+        ) : (
+          <View
+            style={{
+              backgroundColor: theme.colors.bgSurface,
+              borderColor: theme.colors.borderSubtle,
+              borderWidth: 1,
+              borderRadius: 16,
+              padding: 18,
+              marginBottom: 18,
+              gap: 6,
+            }}
+          >
+            <Text variant="bodyLarge" style={{ fontSize: 14 }}>
+              {t('accounts.empty.title')}
+            </Text>
+            <Text variant="caption" muted style={{ fontSize: 12.5, lineHeight: 18 }}>
+              {t('accounts.empty.body')}
+            </Text>
+          </View>
+        )}
 
-        <SectionLabel style={{ marginBottom: 10 }}>
-          {t('accounts.groups.credit')}
-        </SectionLabel>
-        <View style={{ gap: 10, marginBottom: 16 }}>
-          {creditCards.map((card) => (
-            <CreditCardItem
-              key={card.id}
-              card={card}
-              onPress={() => setCardSheet({ open: true, card })}
-            />
-          ))}
-        </View>
+        {creditCards.length > 0 ? (
+          <>
+            <SectionLabel style={{ marginBottom: 10 }}>
+              {t('accounts.groups.credit')}
+            </SectionLabel>
+            <View style={{ gap: 10, marginBottom: 16 }}>
+              {creditCards.map((card) => (
+                <CreditCardItem
+                  key={card.id}
+                  card={card}
+                  onPress={() => setCardSheet({ open: true, card })}
+                />
+              ))}
+            </View>
+          </>
+        ) : null}
 
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <AddDashedButton
             icon="plus"
             label={t('accounts.add.account')}
             onPress={() =>
-              tier === 'free' && accounts.length >= 2
+              atAccountLimit
                 ? setGate('account')
                 : setAccountSheet({ open: true, account: null })
             }
@@ -202,9 +306,7 @@ export function AccountsScreen() {
             icon="plus"
             label={t('accounts.add.card')}
             onPress={() =>
-              tier === 'free' && creditCards.length >= 1
-                ? setGate('card')
-                : setCardSheet({ open: true, card: null })
+              atCardLimit ? setGate('card') : setCardSheet({ open: true, card: null })
             }
           />
         </View>
@@ -213,6 +315,9 @@ export function AccountsScreen() {
       <AccountFormSheet
         visible={accountSheet.open}
         account={accountSheet.account}
+        currency={currency}
+        submitting={createAccount.isPending || updateAccount.isPending}
+        deleting={deleteAccount.isPending}
         onClose={closeAccountSheet}
         onSave={handleSaveAccount}
         onDelete={handleDeleteAccount}
@@ -220,6 +325,9 @@ export function AccountsScreen() {
       <CardFormSheet
         visible={cardSheet.open}
         card={cardSheet.card}
+        currency={currency}
+        submitting={createCard.isPending || updateCard.isPending}
+        deleting={deleteCard.isPending}
         onClose={closeCardSheet}
         onSave={handleSaveCard}
         onDelete={handleDeleteCard}
@@ -231,6 +339,11 @@ export function AccountsScreen() {
         )}
         body={t('accounts.gate.body')}
         onClose={() => setGate(null)}
+      />
+      <Toast
+        visible={toast !== null}
+        message={toast ?? ''}
+        onDismiss={() => setToast(null)}
       />
     </SafeAreaView>
   );

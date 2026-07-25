@@ -1,61 +1,82 @@
-import type { Account, AccountsOverview, CreditCard } from '../../domain';
 import type { AccountsRepository } from '../../application';
+import type {
+  Account,
+  AccountPatch,
+  AccountsOverview,
+  CreditCard,
+  CreditCardPatch,
+  NewAccount,
+  NewCreditCard,
+} from '../../domain';
 
-const ACCOUNTS: readonly Account[] = [
-  {
-    id: 'bbva',
-    kind: 'debit',
-    name: 'BBVA Débito',
-    sub: 'Cuenta de ahorros',
-    icon: 'building-bank',
-    color: 'mint',
-    balance: 2_845_000,
-  },
-  {
-    id: 'bancolombia',
-    kind: 'debit',
-    name: 'Bancolombia',
-    sub: 'Cuenta corriente',
-    icon: 'building-bank',
-    color: 'purple',
-    balance: 2_245_000,
-  },
-  {
-    id: 'cash',
-    kind: 'cash',
-    name: 'Efectivo',
-    sub: 'Bolsillo',
-    icon: 'cash',
-    color: 'amber',
-    balance: 155_000,
-  },
-];
-
-const CREDIT_CARDS: readonly CreditCard[] = [
-  {
-    id: 'bbva_credit',
-    name: 'BBVA Crédito',
-    icon: 'credit-card',
-    color: 'coral',
-    cutoffDay: 25,
-    dueLabel: '5 jun',
-    debt: 850_000,
-    limit: 5_000_000,
-  },
-];
+/** Offline double: amounts are minor units of COP (a zero-decimal currency). */
+const CURRENCY = 'COP';
 
 export class InMemoryAccountsRepository implements AccountsRepository {
+  private accounts: Account[] = [];
+  private cards: CreditCard[] = [];
+  private seq = 0;
+
   async getOverview(): Promise<AccountsOverview> {
-    const debitTotal = ACCOUNTS.reduce((sum, a) => sum + a.balance, 0);
-    const tcDebt = CREDIT_CARDS.reduce((sum, t) => sum + t.debt, 0);
+    const debitTotal = this.accounts
+      .filter((a) => a.kind === 'debit')
+      .reduce((sum, a) => sum + a.balance, 0);
+    const cashTotal = this.accounts
+      .filter((a) => a.kind === 'cash')
+      .reduce((sum, a) => sum + a.balance, 0);
+    const tcDebt = this.cards.reduce((sum, c) => sum + c.debt, 0);
     return {
-      accounts: ACCOUNTS,
-      creditCards: CREDIT_CARDS,
+      currency: CURRENCY,
+      accounts: [...this.accounts],
+      creditCards: [...this.cards],
       debitTotal,
+      cashTotal,
       tcDebt,
-      netBalance: debitTotal - tcDebt,
-      accountsCount: ACCOUNTS.length,
-      creditCardsCount: CREDIT_CARDS.length,
+      netBalance: debitTotal + cashTotal - tcDebt,
+      accountsCount: this.accounts.length,
+      creditCardsCount: this.cards.length,
     };
+  }
+
+  async createAccount(input: NewAccount): Promise<Account> {
+    this.seq += 1;
+    const account: Account = { id: `acc-${this.seq}`, ...input, currency: CURRENCY };
+    this.accounts.push(account);
+    return account;
+  }
+
+  async updateAccount(id: string, patch: AccountPatch): Promise<Account> {
+    const existing = this.accounts.find((a) => a.id === id);
+    if (!existing) {
+      throw new Error('Account not found');
+    }
+    const updated: Account = { ...existing, ...patch };
+    this.accounts = this.accounts.map((a) => (a.id === id ? updated : a));
+    return updated;
+  }
+
+  async removeAccount(id: string): Promise<void> {
+    this.accounts = this.accounts.filter((a) => a.id !== id);
+  }
+
+  async createCard(input: NewCreditCard): Promise<CreditCard> {
+    this.seq += 1;
+    const card: CreditCard = { id: `card-${this.seq}`, ...input, currency: CURRENCY };
+    this.cards.push(card);
+    return card;
+  }
+
+  async updateCard(id: string, patch: CreditCardPatch): Promise<CreditCard> {
+    const existing = this.cards.find((c) => c.id === id);
+    if (!existing) {
+      throw new Error('Credit card not found');
+    }
+    const updated: CreditCard = { ...existing, ...patch };
+    this.cards = this.cards.map((c) => (c.id === id ? updated : c));
+    return updated;
+  }
+
+  async removeCard(id: string): Promise<void> {
+    this.cards = this.cards.filter((c) => c.id !== id);
   }
 }

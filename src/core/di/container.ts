@@ -1,6 +1,12 @@
 import type { AccountsRepository } from '@/modules/accounts/application/ports/AccountsRepository';
+import { CreateAccountUseCase } from '@/modules/accounts/application/use-cases/CreateAccountUseCase';
+import { CreateCreditCardUseCase } from '@/modules/accounts/application/use-cases/CreateCreditCardUseCase';
+import { DeleteAccountUseCase } from '@/modules/accounts/application/use-cases/DeleteAccountUseCase';
+import { DeleteCreditCardUseCase } from '@/modules/accounts/application/use-cases/DeleteCreditCardUseCase';
 import { GetAccountsOverviewUseCase } from '@/modules/accounts/application/use-cases/GetAccountsOverviewUseCase';
-import { InMemoryAccountsRepository } from '@/modules/accounts/infrastructure/repositories/InMemoryAccountsRepository';
+import { UpdateAccountUseCase } from '@/modules/accounts/application/use-cases/UpdateAccountUseCase';
+import { UpdateCreditCardUseCase } from '@/modules/accounts/application/use-cases/UpdateCreditCardUseCase';
+import { HttpAccountsRepository } from '@/modules/accounts/infrastructure';
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
 import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUseCase';
 import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
@@ -62,7 +68,7 @@ const movementsRepository: MovementsRepository = new InMemoryMovementsRepository
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
-const accountsRepository: AccountsRepository = new InMemoryAccountsRepository();
+const accountsRepository: AccountsRepository = new HttpAccountsRepository(httpClient);
 const subscriptionsRepository: SubscriptionsRepository =
   new InMemorySubscriptionsRepository();
 const categoriesRepository: CategoriesRepository = new HttpCategoriesRepository(
@@ -88,6 +94,12 @@ export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
 );
+export const createAccountUseCase = new CreateAccountUseCase(accountsRepository);
+export const updateAccountUseCase = new UpdateAccountUseCase(accountsRepository);
+export const deleteAccountUseCase = new DeleteAccountUseCase(accountsRepository);
+export const createCreditCardUseCase = new CreateCreditCardUseCase(accountsRepository);
+export const updateCreditCardUseCase = new UpdateCreditCardUseCase(accountsRepository);
+export const deleteCreditCardUseCase = new DeleteCreditCardUseCase(accountsRepository);
 export const getSubscriptionsUseCase = new GetSubscriptionsUseCase(
   subscriptionsRepository,
 );
@@ -129,6 +141,12 @@ export const container = {
   getDeudasUseCase,
   getAssistantUseCase,
   getAccountsOverviewUseCase,
+  createAccountUseCase,
+  updateAccountUseCase,
+  deleteAccountUseCase,
+  createCreditCardUseCase,
+  updateCreditCardUseCase,
+  deleteCreditCardUseCase,
   getSubscriptionsUseCase,
   getCategoriesUseCase,
   createCategoryUseCase,

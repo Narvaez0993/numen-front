@@ -1,25 +1,13 @@
+import { type CurrencyCode, MINOR_UNIT_EXPONENT } from '@/shared/domain';
 import { i18n } from '@/shared/infrastructure/i18n';
 
-import { type CurrencyCode, useCurrencyStore } from '../currency/useCurrencyStore';
+import { useCurrencyStore } from '../currency/useCurrencyStore';
 
 const SYMBOLS: Record<CurrencyCode, string> = {
   COP: '$',
   USD: '$',
   EUR: '€',
   MXN: '$',
-};
-
-/**
- * Digits after the decimal point per currency (ISO 4217 minor unit). Twin of the
- * backend's `shared/domain/money.py`: **every amount in the app is an integer in
- * the minor unit** (USD cents, COP pesos), so this table is the only place that
- * knows about decimals.
- */
-export const MINOR_UNIT_EXPONENT: Record<CurrencyCode, number> = {
-  COP: 0,
-  USD: 2,
-  EUR: 2,
-  MXN: 2,
 };
 
 type Separators = { group: string; decimal: string };
