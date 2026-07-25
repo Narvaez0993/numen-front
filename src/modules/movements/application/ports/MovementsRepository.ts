@@ -1,4 +1,4 @@
-import type { Movement, MovementType, NewMovement } from '../../domain';
+import type { Movement, MovementPatch, MovementType, NewMovement } from '../../domain';
 
 /** Inclusive `YYYY-MM-DD` bounds; the month filter is served by the API. */
 export type MovementsQuery = {
@@ -17,4 +17,8 @@ export interface MovementsRepository {
    * original movement instead of charging the user twice.
    */
   create(input: NewMovement, idempotencyKey?: string): Promise<Movement>;
+  /** Editing re-settles the money: the API reverts the old effect and applies the new one. */
+  update(id: string, patch: MovementPatch): Promise<Movement>;
+  /** Deleting gives the money back — this is what makes undo real. */
+  remove(id: string): Promise<void>;
 }

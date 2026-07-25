@@ -40,6 +40,32 @@
     "error": {
       "title": "We couldn't load your movements.",
       "retry": "Retry"
+    },
+    "detail": {
+      "title": "Movement detail",
+      "subtitle": "Fix whatever is off; balances are recalculated for you.",
+      "amount": "Amount",
+      "description": "Description",
+      "category": "Category",
+      "account": "Source",
+      "from": "From",
+      "to": "To",
+      "date": "Date",
+      "pickSource": "Pick a source",
+      "datePickerTitle": "When did it happen?",
+      "save": "Save changes",
+      "delete": "Delete movement",
+      "deleteConfirmTitle": "Delete \"{{name}}\"?",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "saveFailed": "We couldn't save the change. Try again.",
+      "deleteFailed": "We couldn't delete it. Try again.",
+      "undoFailed": "We couldn't undo it. Delete it from the detail view."
+    },
+    "actions": {
+      "undo": "Undo"
     }
   },
   "budgets": {

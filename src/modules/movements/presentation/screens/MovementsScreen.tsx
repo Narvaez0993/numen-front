@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
-import { FilterChip, Text } from '@/shared/presentation/components';
+import { FilterChip, Text, Toast } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import {
@@ -16,12 +16,14 @@ import {
 } from '@/shared/presentation/utils/dates';
 
 import { emptyFilters, hasActiveFilters, type MovementsFilters } from '../../application';
-import type { MovementType } from '../../domain';
+import type { Movement, MovementPatch, MovementType } from '../../domain';
 import { DayGroup } from '../components/DayGroup';
 import { EmptyState } from '../components/EmptyState';
+import { MovementDetailSheet } from '../components/MovementDetailSheet';
 import { MovementsHeader } from '../components/MovementsHeader';
 import { SearchBar } from '../components/SearchBar';
 import { useMovementCatalogs } from '../hooks/useMovementCatalogs';
+import { useDeleteMovement, useUpdateMovement } from '../hooks/useMovementMutations';
 import { useMovements } from '../hooks/useMovements';
 import { filterMovements } from '../utils/filterMovements';
 import { groupByDay } from '../utils/groupByDay';
@@ -40,6 +42,11 @@ export function MovementsScreen() {
   // screen never disagrees with itself mid-render.
   const [today] = useState(() => toIsoDate(new Date()));
   const [filters, setFilters] = useState<MovementsFilters>(emptyFilters);
+  const [detail, setDetail] = useState<Movement | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const updateMovement = useUpdateMovement();
+  const deleteMovement = useDeleteMovement();
 
   const month = filters.month ?? today;
   const range = useMemo(() => monthRange(month), [month]);
@@ -150,6 +157,25 @@ export function MovementsScreen() {
 
   const active = hasActiveFilters(filters);
 
+  const handleSave = (patch: MovementPatch) => {
+    if (!detail) return;
+    updateMovement.mutate(
+      { id: detail.id, patch },
+      {
+        onSuccess: () => setDetail(null),
+        onError: () => setToast(t('movements.errors.saveFailed')),
+      },
+    );
+  };
+
+  const handleDelete = () => {
+    if (!detail) return;
+    deleteMovement.mutate(detail.id, {
+      onSuccess: () => setDetail(null),
+      onError: () => setToast(t('movements.errors.deleteFailed')),
+    });
+  };
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
@@ -245,12 +271,28 @@ export function MovementsScreen() {
                   group={group}
                   catalogs={catalogs}
                   currency={currency}
+                  onItemPress={setDetail}
                 />
               ))}
             </View>
           )}
         </View>
       </ScrollView>
+
+      <MovementDetailSheet
+        visible={detail !== null}
+        movement={detail}
+        catalogs={catalogs}
+        submitting={updateMovement.isPending || deleteMovement.isPending}
+        onClose={() => setDetail(null)}
+        onSave={handleSave}
+        onDelete={handleDelete}
+      />
+      <Toast
+        visible={toast !== null}
+        message={toast ?? ''}
+        onDismiss={() => setToast(null)}
+      />
     </SafeAreaView>
   );
 }

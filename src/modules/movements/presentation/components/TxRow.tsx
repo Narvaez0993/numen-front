@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
@@ -13,12 +13,13 @@ type Props = {
   category: ResolvedCategory | undefined;
   source: ResolvedSource | undefined;
   last: boolean;
+  onPress?: () => void;
 };
 
 /** Fallback for a reference the catalogs could not resolve (deleted source). */
 const UNKNOWN_ICON = 'dots';
 
-export function TxRow({ movement, category, source, last }: Props) {
+export function TxRow({ movement, category, source, last, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -38,8 +39,11 @@ export function TxRow({ movement, category, source, last }: Props) {
     : [category?.name, source?.name].filter(Boolean).join(' · ');
 
   return (
-    <View
-      style={{
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      disabled={!onPress}
+      style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
@@ -47,8 +51,8 @@ export function TxRow({ movement, category, source, last }: Props) {
         paddingVertical: 12,
         borderBottomWidth: last ? 0 : 1,
         borderBottomColor: theme.colors.borderSubtle,
-        opacity: isTransfer ? 0.65 : 1,
-      }}
+        opacity: isTransfer ? 0.65 : pressed ? 0.85 : 1,
+      })}
     >
       <IconBox name={icon} color={iconColor} size={34} iconSize={16} radius={10} />
       <View style={{ flex: 1, minWidth: 0 }}>
@@ -65,6 +69,6 @@ export function TxRow({ movement, category, source, last }: Props) {
         {isIncome ? '+' : ''}
         {formatMoney(movement.amount, movement.currency)}
       </Text>
-    </View>
+    </Pressable>
   );
 }

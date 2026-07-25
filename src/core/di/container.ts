@@ -39,7 +39,9 @@ import { GetHomeOverviewUseCase } from '@/modules/home/application/use-cases/Get
 import { InMemoryHomeRepository } from '@/modules/home/infrastructure/repositories/InMemoryHomeRepository';
 import type { MovementsRepository } from '@/modules/movements/application/ports/MovementsRepository';
 import { CreateMovementUseCase } from '@/modules/movements/application/use-cases/CreateMovementUseCase';
+import { DeleteMovementUseCase } from '@/modules/movements/application/use-cases/DeleteMovementUseCase';
 import { GetMovementsUseCase } from '@/modules/movements/application/use-cases/GetMovementsUseCase';
+import { UpdateMovementUseCase } from '@/modules/movements/application/use-cases/UpdateMovementUseCase';
 import { HttpMovementsRepository } from '@/modules/movements/infrastructure';
 import type { OnboardingRepository } from '@/modules/onboarding/application/ports/OnboardingRepository';
 import { CompleteOnboardingUseCase } from '@/modules/onboarding/application/use-cases/CompleteOnboardingUseCase';
@@ -85,6 +87,8 @@ export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository)
 export const getProfileUseCase = new GetProfileUseCase(profileRepository);
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const createMovementUseCase = new CreateMovementUseCase(movementsRepository);
+export const updateMovementUseCase = new UpdateMovementUseCase(movementsRepository);
+export const deleteMovementUseCase = new DeleteMovementUseCase(movementsRepository);
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
 export const getDeudasUseCase = new GetDeudasUseCase(deudasRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
@@ -133,6 +137,8 @@ export const container = {
   getProfileUseCase,
   getMovementsUseCase,
   createMovementUseCase,
+  updateMovementUseCase,
+  deleteMovementUseCase,
   getBudgetsUseCase,
   getDeudasUseCase,
   getAssistantUseCase,

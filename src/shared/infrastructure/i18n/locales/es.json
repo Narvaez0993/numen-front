@@ -40,6 +40,32 @@
     "error": {
       "title": "No pudimos cargar tus movimientos.",
       "retry": "Reintentar"
+    },
+    "detail": {
+      "title": "Detalle del movimiento",
+      "subtitle": "Corrige lo que haga falta; los saldos se recalculan solos.",
+      "amount": "Monto",
+      "description": "Descripción",
+      "category": "Categoría",
+      "account": "Fuente",
+      "from": "Desde",
+      "to": "Hacia",
+      "date": "Fecha",
+      "pickSource": "Elegir fuente",
+      "datePickerTitle": "¿Cuándo pasó?",
+      "save": "Guardar cambios",
+      "delete": "Eliminar movimiento",
+      "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
+      "deleteConfirm": "Sí, eliminar",
+      "cancel": "Cancelar"
+    },
+    "errors": {
+      "saveFailed": "No pudimos guardar el cambio. Intenta de nuevo.",
+      "deleteFailed": "No pudimos eliminarlo. Intenta de nuevo.",
+      "undoFailed": "No pudimos deshacerlo. Bórralo desde el detalle."
+    },
+    "actions": {
+      "undo": "Deshacer"
     }
   },
   "budgets": {

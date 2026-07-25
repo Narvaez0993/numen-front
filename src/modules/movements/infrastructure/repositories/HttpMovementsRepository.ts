@@ -6,6 +6,7 @@ import type { MovementsQuery, MovementsRepository } from '../../application';
 import type {
   CapturedVia,
   Movement,
+  MovementPatch,
   MovementType,
   NewMovement,
   SourceRef,
@@ -72,6 +73,32 @@ export class HttpMovementsRepository implements MovementsRepository {
         idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined,
       );
       return toMovement(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async update(id: string, patch: MovementPatch): Promise<Movement> {
+    try {
+      const { data } = await this.http.patch<MovementResponse>(`/movements/${id}`, {
+        description: patch.description,
+        amount: patch.amount,
+        source_type: patch.source?.type,
+        source_id: patch.source?.id,
+        destination_type: patch.destination?.type,
+        destination_id: patch.destination?.id,
+        category_id: patch.categoryId,
+        occurred_on: patch.occurredOn,
+      });
+      return toMovement(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async remove(id: string): Promise<void> {
+    try {
+      await this.http.delete(`/movements/${id}`);
     } catch (error) {
       throw mapApiError(error);
     }

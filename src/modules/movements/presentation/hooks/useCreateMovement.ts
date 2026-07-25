@@ -4,7 +4,7 @@ import { createMovementUseCase } from '@/core/di/container';
 
 import type { Movement, NewMovement } from '../../domain';
 
-import { MOVEMENTS_KEY } from './useMovements';
+import { invalidateMoneyViews } from './useMovements';
 
 type CreateInput = {
   movement: NewMovement;
@@ -22,12 +22,6 @@ export function useCreateMovement() {
       }
       return result.value;
     },
-    onSuccess: () => {
-      // A movement changes three views at once: the list, the balances it moved
-      // and the spend of its category.
-      void queryClient.invalidateQueries({ queryKey: MOVEMENTS_KEY });
-      void queryClient.invalidateQueries({ queryKey: ['accounts', 'overview'] });
-      void queryClient.invalidateQueries({ queryKey: ['categories', 'overview'] });
-    },
+    onSuccess: () => invalidateMoneyViews(queryClient),
   });
 }

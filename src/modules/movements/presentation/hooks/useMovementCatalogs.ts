@@ -4,11 +4,13 @@ import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import type { AccentColor } from '@/shared/domain';
 
-import type { SourceRef } from '../../domain';
+import type { SourceRef, SourceType } from '../../domain';
 
-/** A movement's source, resolved for display. */
+/** A movement's source, resolved for display. Carries its `type` because an id
+ * alone cannot say whether it is an account or a card. */
 export type ResolvedSource = {
   id: string;
+  type: SourceType;
   name: string;
   icon: string;
   color: AccentColor;
@@ -54,6 +56,7 @@ export function useMovementCatalogs(): MovementCatalogs {
     for (const account of accounts.data?.accounts ?? []) {
       sourceById[account.id] = {
         id: account.id,
+        type: 'account',
         name: account.name,
         icon: account.icon,
         color: account.color,
@@ -62,6 +65,7 @@ export function useMovementCatalogs(): MovementCatalogs {
     for (const card of accounts.data?.creditCards ?? []) {
       sourceById[card.id] = {
         id: card.id,
+        type: 'credit_card',
         name: card.name,
         icon: card.icon,
         color: card.color,

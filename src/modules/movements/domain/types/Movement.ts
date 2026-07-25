@@ -41,6 +41,19 @@ export type NewMovement = {
 };
 
 /**
+ * Absent keys keep their stored value. `type` is not here: turning an expense into
+ * a transfer changes the whole shape, so it is a different movement, not an edit.
+ */
+export type MovementPatch = {
+  description?: string;
+  amount?: number;
+  source?: SourceRef;
+  destination?: SourceRef;
+  categoryId?: string;
+  occurredOn?: string;
+};
+
+/**
  * How this movement changed your position, for totals: an expense subtracts, an
  * income adds and a **transfer is zero** — moving money between your own sources
  * never makes you richer or poorer (see the cash-basis rule).

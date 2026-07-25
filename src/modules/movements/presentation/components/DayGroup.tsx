@@ -4,6 +4,7 @@ import { Card, Text } from '@/shared/presentation/components';
 import type { CurrencyCode } from '@/shared/domain';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
+import type { Movement } from '../../domain';
 import type { MovementCatalogs } from '../hooks/useMovementCatalogs';
 import { displaySource } from '../hooks/useMovementCatalogs';
 import type { DayGroup as DayGroupModel } from '../utils/groupByDay';
@@ -14,9 +15,10 @@ type Props = {
   group: DayGroupModel;
   catalogs: MovementCatalogs;
   currency: CurrencyCode;
+  onItemPress?: (movement: Movement) => void;
 };
 
-export function DayGroup({ group, catalogs, currency }: Props) {
+export function DayGroup({ group, catalogs, currency, onItemPress }: Props) {
   return (
     <View>
       <View
@@ -52,6 +54,7 @@ export function DayGroup({ group, catalogs, currency }: Props) {
             }
             source={displaySource(catalogs, movement.source, movement.destination)}
             last={i === group.items.length - 1}
+            onPress={onItemPress ? () => onItemPress(movement) : undefined}
           />
         ))}
       </Card>
