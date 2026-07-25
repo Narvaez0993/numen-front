@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View, type DimensionValue } from 'react-native';
 
 import { useCreateMovement } from '@/modules/movements/presentation/hooks/useCreateMovement';
+import { useDeleteMovement } from '@/modules/movements/presentation/hooks/useMovementMutations';
 import type { NewMovement } from '@/modules/movements/domain';
 import { BottomSheet, Icon, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
@@ -31,8 +32,12 @@ export function ExpenseSheet() {
   const setFlow = useExpenseSheetStore((s) => s.setFlow);
 
   const createMovement = useCreateMovement();
+  const deleteMovement = useDeleteMovement();
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  // The toast remembers what it just created so "undo" has something to remove.
+  const [toast, setToast] = useState<{ message: string; movementId: string } | null>(
+    null,
+  );
 
   const isSubScreen = flow === 'manual';
 
@@ -43,13 +48,26 @@ export function ExpenseSheet() {
       // movement instead of charging the user twice.
       { movement, idempotencyKey: `${movement.occurredOn}-${Date.now()}` },
       {
-        onSuccess: () => {
-          setToast(t(`expenses.toast.saved.${movement.type}`));
+        onSuccess: (created) => {
+          setToast({
+            message: t(`expenses.toast.saved.${movement.type}`),
+            movementId: created.id,
+          });
           closeSheet();
         },
         onError: () => setError(t('expenses.toast.saveFailed')),
       },
     );
+  };
+
+  /** Undo is a real delete: the API reverts the deltas, so balances go back too. */
+  const handleUndo = () => {
+    if (!toast) return;
+    const { movementId } = toast;
+    setToast(null);
+    deleteMovement.mutate(movementId, {
+      onError: () => setError(t('movements.errors.undoFailed')),
+    });
   };
 
   return (
@@ -101,7 +119,9 @@ export function ExpenseSheet() {
 
       <Toast
         visible={toast !== null}
-        message={toast ?? ''}
+        message={toast?.message ?? ''}
+        undoLabel={t('movements.actions.undo')}
+        onUndo={handleUndo}
         onDismiss={() => setToast(null)}
       />
     </>

@@ -852,7 +852,8 @@
         "noSources": {
           "title": "Primero necesitas una fuente",
           "body": "Agrega tu banco, billetera o efectivo en Perfil → Fuentes y cuentas y vuelve a registrar."
-        }
+        },
+        "pickDate": "Otra fecha…"
       }
     },
     "toast": {

@@ -852,7 +852,8 @@
         "noSources": {
           "title": "You need a source first",
           "body": "Add your bank, wallet or cash in Profile → Sources and accounts, then come back."
-        }
+        },
+        "pickDate": "Another date…"
       }
     },
     "toast": {

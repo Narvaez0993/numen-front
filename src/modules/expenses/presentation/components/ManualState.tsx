@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Pressable, TextInput, View } from 'react-native';
 
@@ -8,6 +8,7 @@ import type { MovementType, NewMovement, SourceRef } from '@/modules/movements/d
 import {
   Button,
   CategoryPickerInline,
+  DatePickerSheet,
   SelectListInline,
   SelectRow,
   Text,
@@ -25,9 +26,10 @@ type Props = {
 
 type ExpandedField = 'category' | 'source' | 'destination' | 'date' | null;
 
+/** Quick options; anything older opens the calendar. */
+const QUICK_DAYS = 3;
+
 const TYPES: MovementType[] = ['expense', 'income', 'transfer'];
-/** How far back the date list reaches; older days land with the calendar in 3b. */
-const RECENT_DAYS = 10;
 
 /** `type:id` keeps a source picker option unique — two accounts may share a name. */
 const refKey = (ref: SourceRef) => `${ref.type}:${ref.id}`;
@@ -54,6 +56,7 @@ export function ManualState({ onSave, saving = false, errorMessage }: Props) {
   const [destinationKey, setDestinationKey] = useState<string | null>(null);
   const [occurredOn, setOccurredOn] = useState(today);
   const [expanded, setExpanded] = useState<ExpandedField>(null);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   const amountRef = useRef<TextInput>(null);
   const opacity = useRef(new Animated.Value(0)).current;
@@ -96,16 +99,19 @@ export function ManualState({ onSave, saving = false, errorMessage }: Props) {
       }));
   }, [categories.data, type]);
 
+  const labelFor = useCallback(
+    (iso: string) =>
+      dayLabel(iso, today, language, {
+        today: t('movements.days.today'),
+        yesterday: t('movements.days.yesterday'),
+      }),
+    [today, language, t],
+  );
+
   const dateOptions = useMemo(
     () =>
-      recentDays(RECENT_DAYS, today).map((iso) => ({
-        value: iso,
-        label: dayLabel(iso, today, language, {
-          today: t('movements.days.today'),
-          yesterday: t('movements.days.yesterday'),
-        }),
-      })),
-    [today, language, t],
+      recentDays(QUICK_DAYS, today).map((iso) => ({ value: iso, label: labelFor(iso) })),
+    [today, labelFor],
   );
 
   // Keep the selections valid as the catalogs load or the type changes.
@@ -142,8 +148,9 @@ export function ManualState({ onSave, saving = false, errorMessage }: Props) {
     sourceOptions.find((option) => option.value === sourceKey)?.label ?? '—';
   const destinationLabel =
     destinationOptions.find((option) => option.value === destinationKey)?.label ?? '—';
-  const dateLabel =
-    dateOptions.find((option) => option.value === occurredOn)?.label ?? '';
+  // Derived, not looked up in the quick list: a date picked from the calendar is
+  // usually older than the shortcuts and would otherwise render blank.
+  const dateLabel = labelFor(occurredOn);
 
   const handleSave = () => {
     if (!valid || saving || source === null) return;
@@ -379,11 +386,18 @@ export function ManualState({ onSave, saving = false, errorMessage }: Props) {
         >
           <View style={{ paddingHorizontal: 12, paddingBottom: 10 }}>
             <SelectListInline
-              options={dateOptions}
+              options={[
+                ...dateOptions,
+                { value: 'pick', label: t('expenses.sheet.manualEntry.pickDate') },
+              ]}
               selected={occurredOn}
               onSelect={(value) => {
-                setOccurredOn(value);
                 setExpanded(null);
+                if (value === 'pick') {
+                  setDatePickerOpen(true);
+                  return;
+                }
+                setOccurredOn(value);
               }}
             />
           </View>
@@ -405,6 +419,16 @@ export function ManualState({ onSave, saving = false, errorMessage }: Props) {
         disabled={!valid}
         loading={saving}
         onPress={handleSave}
+      />
+
+      <DatePickerSheet
+        visible={datePickerOpen}
+        value={occurredOn}
+        today={today}
+        title={t('movements.detail.datePickerTitle')}
+        language={language}
+        onClose={() => setDatePickerOpen(false)}
+        onSelect={setOccurredOn}
       />
     </Animated.View>
   );
