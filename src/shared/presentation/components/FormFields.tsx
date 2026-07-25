@@ -1,15 +1,12 @@
 import type { ReactNode } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
+import type { CurrencyCode } from '../currency/useCurrencyStore';
 import { useTheme } from '../theme';
+import { currencySymbol, formatAmountDigits } from '../utils/formatMoney';
 
 import { Icon } from './Icon';
 import { Text } from './Text';
-
-export function formatDigits(digits: string): string {
-  if (!digits) return '';
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
 
 export function FieldLabel({ label }: { label: string }) {
   return (
@@ -58,12 +55,18 @@ export function TextField({
   );
 }
 
+/**
+ * Money input. `digits` are the raw keystrokes, read as the **minor unit** of the
+ * currency: in USD typing `45000` shows `$450.00`, in COP `$450.000`.
+ */
 export function AmountField({
   digits,
   onChangeDigits,
+  currency,
 }: {
   digits: string;
   onChangeDigits: (digits: string) => void;
+  currency?: CurrencyCode;
 }) {
   const { theme } = useTheme();
   return (
@@ -81,10 +84,10 @@ export function AmountField({
       }}
     >
       <Text variant="bodyLarge" tabular style={{ fontSize: 15 }}>
-        $
+        {currencySymbol(currency)}
       </Text>
       <TextInput
-        value={formatDigits(digits)}
+        value={formatAmountDigits(digits, currency)}
         onChangeText={(v) => onChangeDigits(v.replace(/\D/g, ''))}
         keyboardType="number-pad"
         placeholder="0"

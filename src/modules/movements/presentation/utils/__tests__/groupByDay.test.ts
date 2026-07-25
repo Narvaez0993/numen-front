@@ -1,39 +1,88 @@
-import type { Transaction } from '../../../domain/types/Transaction';
+import type { Movement } from '../../../domain';
 import { groupByDay } from '../groupByDay';
 
-const tx = (overrides: Partial<Transaction>): Transaction => ({
+const TODAY = '2026-07-25';
+
+const mov = (overrides: Partial<Movement>): Movement => ({
   id: 'x',
-  date: '2026-05-14',
-  dayBucket: 'hoy',
+  type: 'expense',
   description: 'X',
+  amount: 1000,
+  currency: 'COP',
+  source: { type: 'account', id: 'nequi' },
+  destination: null,
   categoryId: 'cafe',
-  accountId: 'bbva_d',
-  amount: -1000,
-  time: '00:00',
-  tag: null,
+  occurredOn: TODAY,
+  capturedVia: 'manual',
   ...overrides,
 });
 
 describe('groupByDay', () => {
-  it('groups by date preserving insertion order', () => {
-    const result = groupByDay([
-      tx({ id: 'a', date: '2026-05-14' }),
-      tx({ id: 'b', date: '2026-05-13', dayBucket: 'ayer' }),
-      tx({ id: 'c', date: '2026-05-14' }),
-    ]);
+  it('groups by day preserving the incoming order', () => {
+    const result = groupByDay(
+      [
+        mov({ id: 'a', occurredOn: '2026-07-25' }),
+        mov({ id: 'b', occurredOn: '2026-07-24' }),
+        mov({ id: 'c', occurredOn: '2026-07-25' }),
+      ],
+      TODAY,
+    );
+
     expect(result).toHaveLength(2);
-    expect(result[0]?.date).toBe('2026-05-14');
-    expect(result[0]?.items.map((t) => t.id)).toEqual(['a', 'c']);
-    expect(result[1]?.date).toBe('2026-05-13');
+    expect(result[0]?.date).toBe('2026-07-25');
+    expect(result[0]?.items.map((m) => m.id)).toEqual(['a', 'c']);
+    expect(result[1]?.date).toBe('2026-07-24');
   });
 
-  it('excludes transfers from the day total but keeps them in items', () => {
-    const result = groupByDay([
-      tx({ id: 'a', amount: -1000 }),
-      tx({ id: 'b', amount: -5000, tag: 'transfer' }),
-      tx({ id: 'c', amount: -2000 }),
-    ]);
+  it('derives the day label instead of reading a stored one', () => {
+    const result = groupByDay(
+      [
+        mov({ occurredOn: '2026-07-25' }),
+        mov({ occurredOn: '2026-07-24' }),
+        mov({ occurredOn: '2026-07-18' }),
+      ],
+      TODAY,
+    );
+
+    expect(result.map((g) => g.label)).toEqual(['hoy', 'ayer', 'sáb 18 jul']);
+  });
+
+  it('nets income against expenses in the day total', () => {
+    const result = groupByDay(
+      [mov({ amount: 1000 }), mov({ type: 'income', amount: 5000 })],
+      TODAY,
+    );
+
+    expect(result[0]?.total).toBe(4000);
+  });
+
+  it('leaves transfers out of the total but keeps them listed', () => {
+    const result = groupByDay(
+      [
+        mov({ id: 'a', amount: 1000 }),
+        mov({
+          id: 'b',
+          type: 'transfer',
+          amount: 500_000,
+          destination: { type: 'credit_card', id: 'visa' },
+          categoryId: null,
+        }),
+        mov({ id: 'c', amount: 2000 }),
+      ],
+      TODAY,
+    );
+
+    // Paying a card moves money without making you poorer.
     expect(result[0]?.total).toBe(-3000);
     expect(result[0]?.items).toHaveLength(3);
+  });
+
+  it('translates the relative labels', () => {
+    const result = groupByDay([mov({ occurredOn: TODAY })], TODAY, 'en', {
+      today: 'today',
+      yesterday: 'yesterday',
+    });
+
+    expect(result[0]?.label).toBe('today');
   });
 });

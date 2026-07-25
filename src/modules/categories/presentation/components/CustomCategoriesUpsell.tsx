@@ -5,8 +5,11 @@ import { Pressable, View } from 'react-native';
 import { Icon, Pill, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import { PreviewChip } from './PreviewChip';
-
+/**
+ * Gate shown when a Free user reaches the custom-category limit: the "create"
+ * button is replaced by this card. (Custom categories are Free up to the limit;
+ * Plus removes it.)
+ */
 export function CustomCategoriesUpsell() {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -51,51 +54,20 @@ export function CustomCategoriesUpsell() {
             }}
           >
             <Text variant="bodyLarge" style={{ fontSize: 13.5 }}>
-              {t('categories.upsell.title')}
+              {t('categories.limitReached.title')}
             </Text>
             <Pill
               variant="purple"
               uppercase
               style={{ paddingHorizontal: 6, paddingVertical: 2 }}
             >
-              {t('categories.upsell.plus')}
+              {t('categories.limitReached.plus')}
             </Pill>
           </View>
           <Text variant="caption" muted style={{ fontSize: 11.5, lineHeight: 16 }}>
-            {t('categories.upsell.description')}
+            {t('categories.limitReached.description')}
           </Text>
         </View>
-      </View>
-
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 6,
-          paddingTop: 10,
-          paddingBottom: 4,
-        }}
-      >
-        <PreviewChip
-          icon="heart"
-          color="pink"
-          label={t('categories.upsell.preview.mascotas')}
-        />
-        <PreviewChip
-          icon="bolt"
-          color="mint"
-          label={t('categories.upsell.preview.gym')}
-        />
-        <PreviewChip
-          icon="school"
-          color="amber"
-          label={t('categories.upsell.preview.cursos')}
-        />
-        <PreviewChip
-          icon="movie"
-          color="purple"
-          label={t('categories.upsell.preview.streaming')}
-        />
       </View>
 
       <Pressable
@@ -117,7 +89,7 @@ export function CustomCategoriesUpsell() {
           color={theme.colors.accentPurple}
           style={{ fontSize: 12.5 }}
         >
-          {t('categories.upsell.cta')}
+          {t('categories.limitReached.cta')}
         </Text>
         <Icon name="chevron-right" size={12} color={theme.colors.accentPurple} />
       </Pressable>

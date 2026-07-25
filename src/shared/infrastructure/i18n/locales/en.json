@@ -7,50 +7,65 @@
     "save": "Save",
     "continue": "Continue",
     "all": "All",
-    "recurring": "recurring"
+    "recurring": "recurring",
+    "soon": "Soon"
   },
   "movements": {
     "title": "Movements",
-    "currentMonth": "May",
-    "searchPlaceholder": "Search expense, merchant, amount…",
+    "searchPlaceholder": "Search description, category, amount…",
     "results": "{{count}} results",
     "resultsOne": "{{count}} result",
     "clear": "Clear",
     "filters": {
       "month": "Month",
-      "monthAll": "This month (May)",
-      "account": "Account",
+      "monthAll": "This month",
+      "account": "Source",
       "category": "Category",
       "type": "Type"
     },
-    "months": {
-      "april": "April",
-      "march": "March",
-      "last90": "Last 90 days",
-      "thisYear": "This year"
-    },
     "types": {
       "expenses": "Expenses only",
-      "recurring": "Recurring",
       "transfers": "Transfers",
       "income": "Income"
     },
     "empty": {
-      "title": "No results",
-      "hint": "Try changing the filters or the search"
+      "title": "No movements this month",
+      "hint": "Tap + to record your first expense or income"
     },
     "transferTag": "Transfer · not an expense",
+    "days": {
+      "today": "today",
+      "yesterday": "yesterday"
+    },
+    "error": {
+      "title": "We couldn't load your movements.",
+      "retry": "Retry"
+    },
     "detail": {
       "title": "Movement detail",
-      "description": "Description",
+      "subtitle": "Fix whatever is off; balances are recalculated for you.",
       "amount": "Amount",
+      "description": "Description",
       "category": "Category",
-      "account": "Account",
+      "account": "Source",
+      "from": "From",
+      "to": "To",
+      "date": "Date",
+      "pickSource": "Pick a source",
+      "datePickerTitle": "When did it happen?",
       "save": "Save changes",
       "delete": "Delete movement",
       "deleteConfirmTitle": "Delete \"{{name}}\"?",
       "deleteConfirm": "Yes, delete",
       "cancel": "Cancel"
+    },
+    "errors": {
+      "saveFailed": "We couldn't save the change. Try again.",
+      "deleteFailed": "We couldn't delete it. Try again.",
+      "undoFailed": "We couldn't undo it. Delete it from the detail view."
+    },
+    "actions": {
+      "undo": "Undo"
     }
   },
   "budgets": {
@@ -192,6 +207,10 @@
   },
   "categories": {
     "title": "Categories",
+    "error": {
+      "title": "We couldn't load your categories.",
+      "retry": "Retry"
+    },
     "thisMonth": {
       "label": "This month",
       "breakdown_one": "{{count}} category with activity · {{total}} standard available",
@@ -208,19 +227,45 @@
       "movements_one": "{{count}} expense · this month",
       "movements_other": "{{count}} expenses · this month"
     },
-    "upsell": {
-      "title": "Create your own categories",
+    "limitReached": {
+      "title": "You've reached the custom limit",
       "plus": "Plus",
-      "description": "Pick name, icon and color. Create individual budgets for each one.",
-      "preview": {
-        "mascotas": "Pets",
-        "gym": "Gym",
-        "cursos": "Courses",
-        "streaming": "Streaming"
-      },
+      "description": "The free plan includes 2 custom categories. Plus makes them unlimited.",
       "cta": "Learn about Plus"
     },
-    "footer": "Tap any category to change its icon or color."
+    "custom": {
+      "createButton": "Create category"
+    },
+    "form": {
+      "createTitle": "New category",
+      "editTitle": "Edit category",
+      "subtitle": "Give it a name, icon and color. You'll use it when logging movements.",
+      "previewPlaceholder": "Category name",
+      "flowLabel": "Type",
+      "flow": {
+        "expense": "Expense",
+        "income": "Income"
+      },
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Pets",
+      "iconLabel": "Icon",
+      "colorLabel": "Color",
+      "saveCreate": "Create category",
+      "saveEdit": "Save changes",
+      "delete": "Delete category",
+      "deleteConfirm": {
+        "title": "Delete category?",
+        "body": "This action can't be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "errors": {
+        "nameTaken": "A category with that name already exists.",
+        "generic": "Couldn't save. Try again.",
+        "deleteFailed": "Couldn't delete. Try again."
+      }
+    },
+    "footer": "Tap a custom category to edit it."
   },
   "subscriptions": {
     "title": "Subscriptions",
@@ -260,8 +305,9 @@
     "title": "Sources and accounts",
     "netBalance": {
       "label": "Net balance",
-      "breakdown_one": "{{accounts}} account + cash − {{cards}} CC",
-      "breakdown_other": "{{accounts}} accounts + cash − {{cards}} CC"
+      "breakdown_zero": "No sources yet",
+      "breakdown_one": "{{accounts}} source · {{cards}} CC",
+      "breakdown_other": "{{accounts}} sources · {{cards}} CC"
     },
     "groups": {
       "debit": "Debit and cash",
@@ -272,7 +318,7 @@
       "usage": "{{pct}}% of limit",
       "limit": "{{amount}} limit",
       "cutoff": "Cutoff {{day}}",
-      "due": "Next payment {{date}}"
+      "due": "Payment {{day}}"
     },
     "add": {
       "account": "Add account",
@@ -303,12 +349,26 @@
       "delete": "Delete",
       "deleteConfirmTitle": "Delete {{name}}?",
       "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "dueDay": "Payment day",
+      "deleting": "Deleting…"
     },
     "gate": {
       "accountTitle": "Free includes up to 2 accounts",
       "cardTitle": "Free includes 1 card",
       "body": "Plus gives you unlimited accounts and cards, with your agent reviewing everything weekly."
+    },
+    "empty": {
+      "title": "You don't have any sources yet",
+      "body": "Add the bank, wallet or cash where your money lives. That is all we need to start keeping track."
+    },
+    "error": {
+      "title": "We couldn't load your accounts.",
+      "retry": "Retry"
+    },
+    "errors": {
+      "saveFailed": "We couldn't save it. Try again.",
+      "deleteFailed": "We couldn't delete it. Try again."
     }
   },
   "assistant": {
@@ -760,92 +820,49 @@
   "expenses": {
     "sheet": {
       "title": {
-        "entry": "New expense",
-        "recording": "Listening…",
-        "processing": "Processing…",
-        "confirm": "{{count}} expenses detected",
-        "confirmOne": "{{count}} expense detected"
+        "entry": "New movement"
       },
       "sub": {
-        "entry": "The fastest way",
-        "recording": "Tap again when you're done",
-        "processing": "Identifying expenses",
-        "confirm": "Review and edit before saving"
+        "entry": "Record an expense, an income or a transfer"
       },
-      "tapAndSpeak": "Tap and speak",
-      "talking": "Speaking…",
-      "wait": "One moment",
-      "hint": "e.g. \"taxi to work, nine thousand\"",
+      "voiceSoon": "Recording by voice arrives with the assistant",
+      "manual": "Record by hand",
       "photoReceipt": "Photo",
       "write": "Write",
-      "quote": {
-        "voice": "You said",
-        "text": "You wrote",
-        "photo": "Detected from receipt"
-      },
-      "detectedAuto": "Auto-detected",
-      "amount": "Amount",
-      "addAnother": "Add another",
-      "total": "Total",
-      "save": "Save expenses",
       "back": "Back",
-      "writing": {
-        "title": "Write expense",
-        "subtitle": "Type one or several, AI splits them",
-        "placeholder": "Describe your expenses. e.g. taxi to work nine thousand and lunch at juan valdez",
-        "iaHint": "Identifies amount, category and account automatically",
-        "examplesLabel": "Examples",
-        "examples": [
-          "Taxi to work, 9,000",
-          "Lunch at Crepes, 25,000",
-          "Carulla grocery 68,400",
-          "Coffee Juan Valdez 5,500"
-        ],
-        "cta": "Process with AI"
-      },
-      "photo": {
-        "title": "Receipt photo",
-        "subtitle": "AI extracts everything from the receipt",
-        "dropzoneTitle": "Take or upload a photo",
-        "dropzoneHint": "JPG, PNG · max 10 MB",
-        "iaHint": "We detect merchant, amount, date and category automatically.",
-        "take": "Take photo",
-        "gallery": "Choose from gallery",
-        "analyzing": "Analyzing receipt…",
-        "demoTranscript": "Carulla receipt · May 14, 2026"
-      },
-      "transcript": {
-        "voice": "taxi to work, nine thousand and lunch at juan valdez eighteen thousand"
-      },
-      "manual": "Manual",
-      "addedManually": "Added by you",
       "manualEntry": {
-        "title": "Manual entry",
-        "subtitle": "Full control, no AI",
+        "title": "Record by hand",
+        "subtitle": "Amount, where and when",
+        "descriptionPlaceholder": "What was it? e.g. taxi to work",
+        "category": "Category",
+        "account": "Source",
+        "from": "From",
+        "to": "To",
+        "date": "Date",
         "type": {
           "expense": "Expense",
           "income": "Income",
           "transfer": "Transfer"
         },
-        "descriptionPlaceholder": "Description",
-        "category": "Category",
-        "account": "Account",
-        "from": "From",
-        "to": "To",
-        "date": "Date",
         "save": {
           "expense": "Save expense",
           "income": "Save income",
           "transfer": "Save transfer"
-        }
+        },
+        "noSources": {
+          "title": "You need a source first",
+          "body": "Add your bank, wallet or cash in Profile → Sources and accounts, then come back."
+        },
+        "pickDate": "Another date…"
       }
     },
     "toast": {
-      "saved": "{{count}} expenses saved · {{total}}",
-      "savedOne": "{{count}} expense saved · {{total}}",
-      "undo": "Undo",
-      "savedIncome": "Income saved · {{total}}",
-      "savedTransfer": "Transfer recorded · {{total}}"
+      "saved": {
+        "expense": "Expense saved",
+        "income": "Income saved",
+        "transfer": "Transfer saved"
+      },
+      "saveFailed": "We couldn't save it. Try again."
     }
   },
   "notFound": {

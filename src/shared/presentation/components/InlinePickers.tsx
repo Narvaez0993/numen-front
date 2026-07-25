@@ -58,24 +58,30 @@ export function CategoryPickerInline({
   );
 }
 
-export function OptionListInline({
+export type SelectOption = {
+  value: string;
+  label: string;
+};
+
+/** Picks by **id**, not by label — labels are not unique (two accounts can share a name). */
+export function SelectListInline({
   options,
   selected,
   onSelect,
 }: {
-  options: string[];
-  selected: string;
+  options: readonly SelectOption[];
+  selected: string | null;
   onSelect: (value: string) => void;
 }) {
   const { theme } = useTheme();
   return (
     <View style={{ gap: 2 }}>
       {options.map((option) => {
-        const active = option === selected;
+        const active = option.value === selected;
         return (
           <Pressable
-            key={option}
-            onPress={() => onSelect(option)}
+            key={option.value}
+            onPress={() => onSelect(option.value)}
             style={({ pressed }) => ({
               flexDirection: 'row',
               alignItems: 'center',
@@ -92,7 +98,7 @@ export function OptionListInline({
               color={active ? theme.colors.textPrimary : theme.colors.textSecondary}
               style={{ fontSize: 12.5 }}
             >
-              {option}
+              {option.label}
             </Text>
             {active ? (
               <Icon name="check" size={13} color={theme.colors.accentMint} />
@@ -101,5 +107,24 @@ export function OptionListInline({
         );
       })}
     </View>
+  );
+}
+
+/** Label-as-value list, for options that have no id of their own. */
+export function OptionListInline({
+  options,
+  selected,
+  onSelect,
+}: {
+  options: string[];
+  selected: string;
+  onSelect: (value: string) => void;
+}) {
+  return (
+    <SelectListInline
+      options={options.map((option) => ({ value: option, label: option }))}
+      selected={selected}
+      onSelect={onSelect}
+    />
   );
 }

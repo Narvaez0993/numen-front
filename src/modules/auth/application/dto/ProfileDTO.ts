@@ -6,6 +6,7 @@ export type ProfileDTO = {
   displayName: string;
   tier: string;
   emailVerified: boolean;
+  currency: string;
 };
 
 export function toProfileDTO(user: User): ProfileDTO {
@@ -15,5 +16,6 @@ export function toProfileDTO(user: User): ProfileDTO {
     displayName: user.displayName,
     tier: user.tier,
     emailVerified: user.emailVerified,
+    currency: user.currency,
   };
 }

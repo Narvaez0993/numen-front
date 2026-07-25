@@ -1,26 +1,44 @@
-import type { Transaction } from '../../domain/types/Transaction';
+import { dayLabel } from '@/shared/presentation/utils/dates';
+
+import type { Movement } from '../../domain';
+import { signedAmount } from '../../domain';
 
 export type DayGroup = {
   date: string;
-  dayBucket: string;
-  items: Transaction[];
-  /** Sum of non-transfer items only. */
+  /** Derived at render time, never stored (see `dayLabel`). */
+  label: string;
+  items: Movement[];
+  /** Net change of the day: transfers contribute zero. */
   total: number;
 };
 
-export function groupByDay(transactions: Transaction[]): DayGroup[] {
+type Labels = { today: string; yesterday: string };
+
+/** Groups an already-sorted (newest first) list into days. */
+export function groupByDay(
+  movements: readonly Movement[],
+  today: string,
+  language = 'es',
+  labels: Labels = { today: 'hoy', yesterday: 'ayer' },
+): DayGroup[] {
   const order: string[] = [];
   const map = new Map<string, DayGroup>();
-  for (const tx of transactions) {
-    if (!map.has(tx.date)) {
-      map.set(tx.date, { date: tx.date, dayBucket: tx.dayBucket, items: [], total: 0 });
-      order.push(tx.date);
+
+  for (const movement of movements) {
+    let group = map.get(movement.occurredOn);
+    if (!group) {
+      group = {
+        date: movement.occurredOn,
+        label: dayLabel(movement.occurredOn, today, language, labels),
+        items: [],
+        total: 0,
+      };
+      map.set(movement.occurredOn, group);
+      order.push(movement.occurredOn);
     }
-    const group = map.get(tx.date)!;
-    group.items.push(tx);
-    if (tx.tag !== 'transfer') {
-      group.total += tx.amount;
-    }
+    group.items.push(movement);
+    group.total += signedAmount(movement);
   }
-  return order.map((d) => map.get(d)!);
+
+  return order.map((date) => map.get(date)!);
 }

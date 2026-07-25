@@ -1,26 +1,30 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
-import { IconBox, Pill, Text } from '@/shared/presentation/components';
+import { IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { Account, Category } from '../../domain/types/MovementsCatalog';
-import type { Transaction } from '../../domain/types/Transaction';
+import type { Movement } from '../../domain';
+import type { ResolvedCategory, ResolvedSource } from '../hooks/useMovementCatalogs';
 
 type Props = {
-  tx: Transaction;
-  category: Category;
-  account: Account;
+  movement: Movement;
+  category: ResolvedCategory | undefined;
+  source: ResolvedSource | undefined;
   last: boolean;
   onPress?: () => void;
 };
 
-export function TxRow({ tx, category, account, last, onPress }: Props) {
+/** Fallback for a reference the catalogs could not resolve (deleted source). */
+const UNKNOWN_ICON = 'dots';
+
+export function TxRow({ movement, category, source, last, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const isTransfer = tx.tag === 'transfer';
-  const isIncome = !isTransfer && tx.amount > 0;
+
+  const isTransfer = movement.type === 'transfer';
+  const isIncome = movement.type === 'income';
   const lineColor = isTransfer ? theme.colors.textTertiary : theme.colors.textPrimary;
   const amountColor = isTransfer
     ? theme.colors.textTertiary
@@ -28,8 +32,15 @@ export function TxRow({ tx, category, account, last, onPress }: Props) {
       ? theme.colors.accentMint
       : theme.colors.textPrimary;
 
+  const icon = isTransfer ? 'refresh' : (category?.icon ?? source?.icon ?? UNKNOWN_ICON);
+  const iconColor = isTransfer ? 'mint' : (category?.color ?? source?.color ?? 'mint');
+  const subtitle = isTransfer
+    ? t('movements.transferTag')
+    : [category?.name, source?.name].filter(Boolean).join(' · ');
+
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
       disabled={!onPress}
       style={({ pressed }) => ({
@@ -43,59 +54,20 @@ export function TxRow({ tx, category, account, last, onPress }: Props) {
         opacity: isTransfer ? 0.65 : pressed ? 0.85 : 1,
       })}
     >
-      {isTransfer ? (
-        <View
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: 10,
-            backgroundColor: 'rgba(168,178,200,0.10)',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <IconBox
-            name={category.iconName}
-            color="mint"
-            size={34}
-            iconSize={16}
-            radius={10}
-            style={{ backgroundColor: 'transparent' }}
-          />
-        </View>
-      ) : (
-        <IconBox
-          name={category.iconName}
-          color={category.color === 'neutral' ? 'mint' : category.color}
-          size={34}
-          iconSize={16}
-          radius={10}
-        />
-      )}
+      <IconBox name={icon} color={iconColor} size={34} iconSize={16} radius={10} />
       <View style={{ flex: 1, minWidth: 0 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text
-            variant="bodyLarge"
-            color={lineColor}
-            numberOfLines={1}
-            style={{ flexShrink: 1 }}
-          >
-            {tx.description}
-          </Text>
-          {tx.tag === 'recurrente' ? (
-            <Pill variant="amber" style={{ paddingHorizontal: 6, paddingVertical: 2 }}>
-              {t('common.recurring')}
-            </Pill>
-          ) : null}
-        </View>
-        <Text variant="caption" muted numberOfLines={1} style={{ marginTop: 2 }}>
-          {isTransfer
-            ? t('movements.transferTag')
-            : `${category.name} · ${account.short} · ${tx.time}`}
+        <Text variant="bodyLarge" color={lineColor} numberOfLines={1}>
+          {movement.description}
         </Text>
+        {subtitle ? (
+          <Text variant="caption" muted numberOfLines={1} style={{ marginTop: 2 }}>
+            {subtitle}
+          </Text>
+        ) : null}
       </View>
       <Text variant="bodyLarge" tabular color={amountColor}>
-        {isIncome ? `+${formatMoney(tx.amount)}` : formatMoney(tx.amount)}
+        {isIncome ? '+' : ''}
+        {formatMoney(movement.amount, movement.currency)}
       </Text>
     </Pressable>
   );

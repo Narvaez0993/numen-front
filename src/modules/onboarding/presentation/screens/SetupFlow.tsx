@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useCreateAccount } from '@/modules/accounts/presentation/hooks/useAccountMutations';
 import { useAuthStore, useUpdateName } from '@/modules/auth/presentation';
 import { completeOnboardingUseCase } from '@/core/di/container';
 import { useGoalsStore } from '@/modules/goals/presentation/stores/useGoalsStore';
@@ -31,6 +32,7 @@ export function SetupFlow() {
   const flow = useOnboardingFlow<SetupStep>('name', SETUP_BACK_MAP);
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
   const updateName = useUpdateName();
+  const createAccount = useCreateAccount();
   const finishingRef = useRef(false);
 
   const finish = useCallback(async () => {
@@ -46,6 +48,21 @@ export function SetupFlow() {
     const result = await completeOnboardingUseCase.execute(profile);
     const persisted = result.ok ? result.value : profile;
     markCompleted(persisted);
+
+    // Turn the source the user just described into their first real account, so
+    // they land in the app with their own balance instead of an empty screen.
+    // Best-effort like the name: a failure must not trap them in the setup.
+    if (persisted.sourceName) {
+      const isCash = persisted.bankId === 'efectivo';
+      createAccount.mutate({
+        kind: isCash ? 'cash' : 'debit',
+        name: persisted.sourceName,
+        sub: '',
+        icon: isCash ? 'cash' : 'building-bank',
+        color: 'mint',
+        balance: persisted.balance,
+      });
+    }
     if (persisted.goal === 'ahorrar') {
       const goalsStore = useGoalsStore.getState();
       if (!goalsStore.goals.some((g) => g.id === 'goal-onboarding')) {
@@ -63,7 +80,7 @@ export function SetupFlow() {
     // Navigate explicitly to the tabs group. Expo Router v4 cross-group
     // imperative navigation works best with an explicit group path.
     router.replace('/(tabs)');
-  }, [flow.ctx, markCompleted]);
+  }, [flow.ctx, markCompleted, createAccount]);
 
   // Safety net: if we ever reach `confirm` without an expense (e.g. via dev
   // tweaks), finish from an effect, not during render.

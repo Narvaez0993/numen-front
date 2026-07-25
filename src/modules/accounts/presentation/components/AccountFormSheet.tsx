@@ -12,20 +12,25 @@ import {
   Text,
   TextField,
 } from '@/shared/presentation/components';
+import type { CurrencyCode } from '@/shared/domain';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type { Account } from '../../domain';
+import type { Account, AccountKind } from '../../domain';
 
 export type AccountFormInput = {
-  kind: 'debit' | 'cash';
+  kind: AccountKind;
   name: string;
   sub: string;
+  /** Minor units of the account's currency. */
   balance: number;
 };
 
 type Props = {
   visible: boolean;
   account: Account | null;
+  currency: CurrencyCode;
+  submitting?: boolean;
+  deleting?: boolean;
   onClose: () => void;
   onSave: (input: AccountFormInput) => void;
   onDelete: () => void;
@@ -33,12 +38,21 @@ type Props = {
 
 const KINDS = ['debit', 'cash'] as const;
 
-export function AccountFormSheet({ visible, account, onClose, onSave, onDelete }: Props) {
+export function AccountFormSheet({
+  visible,
+  account,
+  currency,
+  submitting = false,
+  deleting = false,
+  onClose,
+  onSave,
+  onDelete,
+}: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const editing = account != null;
 
-  const [kind, setKind] = useState<'debit' | 'cash'>('debit');
+  const [kind, setKind] = useState<AccountKind>('debit');
   const [name, setName] = useState('');
   const [sub, setSub] = useState('');
   const [digits, setDigits] = useState('');
@@ -56,7 +70,7 @@ export function AccountFormSheet({ visible, account, onClose, onSave, onDelete }
   const valid = name.trim().length >= 2;
 
   const handleSave = () => {
-    if (!valid) return;
+    if (!valid || submitting) return;
     onSave({
       kind,
       name: name.trim(),
@@ -114,19 +128,20 @@ export function AccountFormSheet({ visible, account, onClose, onSave, onDelete }
 
         <View>
           <FieldLabel label={t('accounts.form.balance')} />
-          <AmountField digits={digits} onChangeDigits={setDigits} />
+          <AmountField digits={digits} onChangeDigits={setDigits} currency={currency} />
         </View>
 
         <Button
           label={t('accounts.form.save')}
           full
           disabled={!valid}
+          loading={submitting}
           onPress={handleSave}
         />
 
         {editing ? (
           <DeleteFlow
-            label={t('accounts.form.delete')}
+            label={deleting ? t('accounts.form.deleting') : t('accounts.form.delete')}
             confirmTitle={t('accounts.form.deleteConfirmTitle', {
               name: account.name,
             })}

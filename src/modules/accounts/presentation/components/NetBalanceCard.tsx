@@ -1,15 +1,22 @@
 import { useTranslation } from 'react-i18next';
 
+import type { CurrencyCode } from '@/shared/domain';
 import { Card, Text } from '@/shared/presentation/components';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   netBalance: number;
+  currency: CurrencyCode;
   accountsCount: number;
   creditCardsCount: number;
 };
 
-export function NetBalanceCard({ netBalance, accountsCount, creditCardsCount }: Props) {
+export function NetBalanceCard({
+  netBalance,
+  currency,
+  accountsCount,
+  creditCardsCount,
+}: Props) {
   const { t } = useTranslation();
 
   return (
@@ -27,11 +34,12 @@ export function NetBalanceCard({ netBalance, accountsCount, creditCardsCount }: 
         tabular
         style={{ fontSize: 28, lineHeight: 28, letterSpacing: -0.56 }}
       >
-        {formatMoney(netBalance)}
+        {formatMoney(netBalance, currency)}
       </Text>
       <Text variant="caption" muted style={{ fontSize: 11.5, marginTop: 6 }}>
         {t('accounts.netBalance.breakdown', {
-          accounts: accountsCount - 1,
+          count: accountsCount,
+          accounts: accountsCount,
           cards: creditCardsCount,
         })}
       </Text>

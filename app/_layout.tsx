@@ -12,6 +12,7 @@ import { setOnSessionExpired } from '@/core/di/container';
 import { useAuthStore } from '@/modules/auth/presentation';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { ThemedStatusBar } from '@/shared/presentation/components';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { AppProviders } from '@/shared/presentation/providers';
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -28,6 +29,7 @@ function RootGate() {
   const authHydrated = useAuthStore((s) => s.hydrated);
   const session = useAuthStore((s) => s.session);
   const clearSession = useAuthStore((s) => s.clear);
+  const syncCurrency = useCurrencyStore((s) => s.syncFromServer);
   const onbHydrated = useOnboardingStore((s) => s.hydrated);
   const introSeen = useOnboardingStore((s) => s.introSeen);
   const profileDone = useOnboardingStore((s) => s.profileDone);
@@ -38,6 +40,13 @@ function RootGate() {
     setOnSessionExpired(() => clearSession());
     return () => setOnSessionExpired(() => {});
   }, [clearSession]);
+
+  // One place where the server's currency wins over the locally detected one:
+  // covers login, verification and rehydration, so every amount is formatted in
+  // the unit the backend stored it in.
+  useEffect(() => {
+    if (session?.currency) syncCurrency(session.currency);
+  }, [session?.currency, syncCurrency]);
 
   useEffect(() => {
     if (!ready) return;

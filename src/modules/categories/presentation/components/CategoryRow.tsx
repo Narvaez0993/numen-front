@@ -10,9 +10,11 @@ import type { Category } from '../../domain';
 type Props = {
   category: Category;
   last?: boolean;
+  /** When provided the row is tappable (custom categories); omit for read-only. */
+  onPress?: () => void;
 };
 
-export function CategoryRow({ category, last = false }: Props) {
+export function CategoryRow({ category, last = false, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const inactive = category.count === 0;
@@ -29,7 +31,9 @@ export function CategoryRow({ category, last = false }: Props) {
 
   return (
     <Pressable
-      accessibilityRole="button"
+      accessibilityRole={onPress ? 'button' : undefined}
+      disabled={!onPress}
+      onPress={onPress}
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
@@ -38,7 +42,7 @@ export function CategoryRow({ category, last = false }: Props) {
         paddingVertical: 12,
         borderBottomWidth: last ? 0 : 1,
         borderBottomColor: theme.colors.borderSubtle,
-        opacity: pressed ? 0.7 : inactive ? 0.6 : 1,
+        opacity: pressed && onPress ? 0.7 : inactive ? 0.6 : 1,
       })}
     >
       <View
@@ -77,9 +81,11 @@ export function CategoryRow({ category, last = false }: Props) {
           —
         </Text>
       )}
-      <View style={{ marginLeft: 4 }}>
-        <Icon name="chevron-right" size={15} color={theme.colors.textTertiary} />
-      </View>
+      {onPress ? (
+        <View style={{ marginLeft: 4 }}>
+          <Icon name="chevron-right" size={15} color={theme.colors.textTertiary} />
+        </View>
+      ) : null}
     </Pressable>
   );
 }

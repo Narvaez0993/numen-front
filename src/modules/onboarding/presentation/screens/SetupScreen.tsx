@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
+import { useUpdatePreferences } from '@/modules/auth/presentation';
 import { CurrencyPickerSheet, Icon, Text } from '@/shared/presentation/components';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { useTheme } from '@/shared/presentation/theme';
@@ -45,6 +46,7 @@ export function SetupScreen({
   const [balance, setBalance] = useState(initialBalance ? initialBalance.toString() : '');
   const currency = useCurrencyStore((s) => s.currency);
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const updatePreferences = useUpdatePreferences();
 
   const onTileClick = (id: BankId) => {
     if (id !== selected) {
@@ -168,6 +170,7 @@ export function SetupScreen({
       <CurrencyPickerSheet
         visible={currencyOpen}
         onClose={() => setCurrencyOpen(false)}
+        onChange={(code) => updatePreferences.mutate({ currency: code })}
       />
 
       {selectedBank && (

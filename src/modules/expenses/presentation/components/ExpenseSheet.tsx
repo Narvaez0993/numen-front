@@ -2,19 +2,16 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View, type DimensionValue } from 'react-native';
 
+import { useCreateMovement } from '@/modules/movements/presentation/hooks/useCreateMovement';
+import { useDeleteMovement } from '@/modules/movements/presentation/hooks/useMovementMutations';
+import type { NewMovement } from '@/modules/movements/domain';
 import { BottomSheet, Icon, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { DetectedExpense } from '../../domain/types/Expense';
-import { useCreateExpenses } from '../hooks/useCreateExpenses';
 import { useExpenseSheetStore, type SheetFlow } from '../stores/useExpenseSheetStore';
 
-import { ConfirmState } from './ConfirmState';
 import { EntryState } from './EntryState';
 import { ManualState } from './ManualState';
-import { PhotoState } from './PhotoState';
-import { WritingState } from './WritingState';
 
 const MAX_HEIGHT: Record<SheetFlow, DimensionValue> = {
   entry: '62%',
@@ -22,7 +19,7 @@ const MAX_HEIGHT: Record<SheetFlow, DimensionValue> = {
   processing: '62%',
   writing: '78%',
   photo: '80%',
-  manual: '88%',
+  manual: '92%',
   confirm: '88%',
 };
 
@@ -34,37 +31,43 @@ export function ExpenseSheet() {
   const closeSheet = useExpenseSheetStore((s) => s.closeSheet);
   const setFlow = useExpenseSheetStore((s) => s.setFlow);
 
-  const createExpenses = useCreateExpenses();
-  const [toast, setToast] = useState<{ visible: boolean; message: string }>({
-    visible: false,
-    message: '',
-  });
+  const createMovement = useCreateMovement();
+  const deleteMovement = useDeleteMovement();
+  const [error, setError] = useState<string | null>(null);
+  // The toast remembers what it just created so "undo" has something to remove.
+  const [toast, setToast] = useState<{ message: string; movementId: string } | null>(
+    null,
+  );
 
-  const isSubScreen = flow === 'writing' || flow === 'photo' || flow === 'manual';
+  const isSubScreen = flow === 'manual';
 
-  const handleSave = (items: DetectedExpense[], messageKey?: string) => {
-    createExpenses.mutate(
+  const handleSave = (movement: NewMovement) => {
+    setError(null);
+    createMovement.mutate(
+      // A key per attempt: if the request is retried the API returns the original
+      // movement instead of charging the user twice.
+      { movement, idempotencyKey: `${movement.occurredOn}-${Date.now()}` },
       {
-        expenses: items.map((it) => ({
-          description: it.description,
-          categoryName: it.categoryName,
-          amount: it.amount,
-          sourceName: it.sourceName,
-        })),
-      },
-      {
-        onSuccess: ({ savedCount, totalAmount }) => {
-          const key =
-            messageKey ??
-            (savedCount === 1 ? 'expenses.toast.savedOne' : 'expenses.toast.saved');
+        onSuccess: (created) => {
           setToast({
-            visible: true,
-            message: t(key, { count: savedCount, total: formatMoney(totalAmount) }),
+            message: t(`expenses.toast.saved.${movement.type}`),
+            movementId: created.id,
           });
           closeSheet();
         },
+        onError: () => setError(t('expenses.toast.saveFailed')),
       },
     );
+  };
+
+  /** Undo is a real delete: the API reverts the deltas, so balances go back too. */
+  const handleUndo = () => {
+    if (!toast) return;
+    const { movementId } = toast;
+    setToast(null);
+    deleteMovement.mutate(movementId, {
+      onError: () => setError(t('movements.errors.undoFailed')),
+    });
   };
 
   return (
@@ -101,25 +104,11 @@ export function ExpenseSheet() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {flow === 'confirm' ? (
-            <ConfirmState onSave={handleSave} saving={createExpenses.isPending} />
-          ) : flow === 'writing' ? (
-            <WritingState />
-          ) : flow === 'photo' ? (
-            <PhotoState />
-          ) : flow === 'manual' ? (
+          {flow === 'manual' ? (
             <ManualState
-              onSave={(item, type) =>
-                handleSave(
-                  [item],
-                  type === 'income'
-                    ? 'expenses.toast.savedIncome'
-                    : type === 'transfer'
-                      ? 'expenses.toast.savedTransfer'
-                      : undefined,
-                )
-              }
-              saving={createExpenses.isPending}
+              onSave={handleSave}
+              saving={createMovement.isPending}
+              errorMessage={error}
             />
           ) : (
             <EntryState />
@@ -129,11 +118,11 @@ export function ExpenseSheet() {
       </BottomSheet>
 
       <Toast
-        visible={toast.visible}
-        message={toast.message}
-        undoLabel={t('expenses.toast.undo')}
-        onUndo={() => setToast((p) => ({ ...p, visible: false }))}
-        onDismiss={() => setToast((p) => ({ ...p, visible: false }))}
+        visible={toast !== null}
+        message={toast?.message ?? ''}
+        undoLabel={t('movements.actions.undo')}
+        onUndo={handleUndo}
+        onDismiss={() => setToast(null)}
       />
     </>
   );

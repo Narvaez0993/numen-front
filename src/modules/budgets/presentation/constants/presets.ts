@@ -16,25 +16,7 @@ export const GENERIC_TOPE_PRESETS = [50000, 100000, 200000, 300000];
 export const TECHO_MIN = 50000;
 export const TOPE_MIN = 10000;
 
-export const CATEGORY_ICON_OPTIONS: string[] = [
-  'heart',
-  'bolt',
-  'school',
-  'home-2',
-  'star',
-  'tag',
-  'device-tv',
-  'brand-spotify',
-  'notebook',
-  'cash',
-  'building-bank',
-  'dots',
-];
-
-export const CATEGORY_COLOR_OPTIONS = [
-  'mint',
-  'coral',
-  'purple',
-  'amber',
-  'pink',
-] as const;
+export {
+  CATEGORY_ICON_OPTIONS,
+  CATEGORY_COLOR_OPTIONS,
+} from '@/shared/presentation/constants/categoryOptions';

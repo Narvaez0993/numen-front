@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAuthStore, useLogout } from '@/modules/auth/presentation';
+import {
+  useAuthStore,
+  useLogout,
+  useUpdatePreferences,
+} from '@/modules/auth/presentation';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
@@ -37,6 +41,7 @@ export function ProfileScreen() {
   const { t, i18n } = useTranslation();
   const { data, isLoading } = useProfile();
   const logout = useLogout();
+  const updatePreferences = useUpdatePreferences();
   const tier = usePlanStore((s) => s.tier);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const currency = useCurrencyStore((s) => s.currency);
@@ -229,6 +234,7 @@ export function ProfileScreen() {
       <CurrencyPickerSheet
         visible={currencyOpen}
         onClose={() => setCurrencyOpen(false)}
+        onChange={(code) => updatePreferences.mutate({ currency: code })}
       />
       <EditNameSheet
         visible={editOpen}
