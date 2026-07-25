@@ -18,6 +18,13 @@ export type AuthSession = {
   refreshToken: string;
 };
 
+/** Partial preferences patch; absent keys keep their stored value. */
+export type PreferencesPatch = {
+  currency?: string;
+  language?: string;
+  theme?: string;
+};
+
 export interface AuthRepository {
   register(credentials: RegisterCredentials): Promise<void>;
   verifyEmail(email: Email, code: string): Promise<AuthSession>;
@@ -26,5 +33,6 @@ export interface AuthRepository {
   refresh(): Promise<AuthSession>;
   logout(): Promise<void>;
   updateDisplayName(displayName: string): Promise<User>;
+  updatePreferences(patch: PreferencesPatch): Promise<User>;
   currentSession(): Promise<AuthSession | null>;
 }

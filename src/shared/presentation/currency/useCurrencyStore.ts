@@ -21,7 +21,13 @@ type State = {
 
 type Actions = {
   setCurrency: (currency: CurrencyCode) => void;
+  /** Adopt the server's currency, ignoring codes this build doesn't support. */
+  syncFromServer: (code: string) => void;
 };
+
+export function isSupportedCurrency(code: string): code is CurrencyCode {
+  return (SUPPORTED_CURRENCIES as readonly string[]).includes(code);
+}
 
 /** The user's home currency, picked at onboarding (free, core). */
 export const useCurrencyStore = create<State & Actions>()(
@@ -29,6 +35,9 @@ export const useCurrencyStore = create<State & Actions>()(
     (set) => ({
       currency: detectCurrency(),
       setCurrency: (currency) => set({ currency }),
+      syncFromServer: (code) => {
+        if (isSupportedCurrency(code)) set({ currency: code });
+      },
     }),
     {
       name: 'deshka.currency',

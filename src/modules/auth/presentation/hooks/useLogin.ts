@@ -32,6 +32,7 @@ export function useLogin(options?: Options) {
         displayName: session.displayName,
         tier: session.tier,
         emailVerified: session.emailVerified,
+        currency: session.currency,
       });
       options?.onSuccess?.(session);
     },

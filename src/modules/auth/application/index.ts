@@ -9,3 +9,4 @@ export * from './use-cases/VerifyEmailUseCase';
 export * from './use-cases/ResendCodeUseCase';
 export * from './use-cases/LogoutUseCase';
 export * from './use-cases/UpdateDisplayNameUseCase';
+export * from './use-cases/UpdatePreferencesUseCase';

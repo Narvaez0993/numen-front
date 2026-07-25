@@ -7,6 +7,7 @@ import {
   AuthRepository,
   AuthSession,
   Email,
+  PreferencesPatch,
   RegisterCredentials,
   SessionExpiredError,
   Tier,
@@ -19,6 +20,9 @@ type AuthResponse = {
   email: string;
   display_name: string;
   tier: string;
+  language: string;
+  currency: string;
+  theme: string;
   access_token: string;
   refresh_token: string;
 };
@@ -29,7 +33,21 @@ type CurrentUserResponse = {
   display_name: string;
   tier: string;
   email_verified: boolean;
+  language: string;
+  currency: string;
+  theme: string;
 };
+
+function toUser(data: CurrentUserResponse): User {
+  return new User({
+    id: data.user_id,
+    email: Email.create(data.email),
+    displayName: data.display_name,
+    tier: data.tier as Tier,
+    emailVerified: data.email_verified,
+    currency: data.currency,
+  });
+}
 
 export class HttpAuthRepository implements AuthRepository {
   constructor(private readonly http: AxiosInstance) {}
@@ -110,13 +128,23 @@ export class HttpAuthRepository implements AuthRepository {
       const { data } = await this.http.patch<CurrentUserResponse>('/auth/me', {
         display_name: displayName,
       });
-      return new User({
-        id: data.user_id,
-        email: Email.create(data.email),
-        displayName: data.display_name,
-        tier: data.tier as Tier,
-        emailVerified: data.email_verified,
-      });
+      return toUser(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async updatePreferences(patch: PreferencesPatch): Promise<User> {
+    try {
+      const { data } = await this.http.patch<CurrentUserResponse>(
+        '/auth/me/preferences',
+        {
+          currency: patch.currency,
+          language: patch.language,
+          theme: patch.theme,
+        },
+      );
+      return toUser(data);
     } catch (error) {
       throw mapApiError(error);
     }
@@ -132,17 +160,7 @@ export class HttpAuthRepository implements AuthRepository {
     }
     try {
       const { data } = await this.http.get<CurrentUserResponse>('/auth/me');
-      return {
-        user: new User({
-          id: data.user_id,
-          email: Email.create(data.email),
-          displayName: data.display_name,
-          tier: data.tier as Tier,
-          emailVerified: data.email_verified,
-        }),
-        accessToken,
-        refreshToken,
-      };
+      return { user: toUser(data), accessToken, refreshToken };
     } catch {
       return null;
     }
@@ -158,6 +176,7 @@ export class HttpAuthRepository implements AuthRepository {
         displayName: data.display_name,
         tier: data.tier as Tier,
         emailVerified: true,
+        currency: data.currency,
       }),
       accessToken: data.access_token,
       refreshToken: data.refresh_token,

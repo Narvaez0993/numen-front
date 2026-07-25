@@ -5,6 +5,7 @@ import {
   Email,
   InvalidCodeError,
   InvalidCredentialsError,
+  PreferencesPatch,
   RegisterCredentials,
   SessionExpiredError,
   User,
@@ -98,6 +99,24 @@ export class InMemoryAuthRepository implements AuthRepository {
       displayName,
       tier: current.tier,
       emailVerified: current.emailVerified,
+      currency: current.currency,
+    });
+    this.session = { ...this.session, user: updated };
+    return updated;
+  }
+
+  async updatePreferences(patch: PreferencesPatch): Promise<User> {
+    if (!this.session) {
+      throw new SessionExpiredError();
+    }
+    const current = this.session.user;
+    const updated = new User({
+      id: current.id,
+      email: current.email,
+      displayName: current.displayName,
+      tier: current.tier,
+      emailVerified: current.emailVerified,
+      currency: patch.currency ?? current.currency,
     });
     this.session = { ...this.session, user: updated };
     return updated;

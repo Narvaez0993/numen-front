@@ -22,10 +22,12 @@ const DISPLAY_SYMBOLS: Record<CurrencyCode, string> = {
 type Props = {
   visible: boolean;
   onClose: () => void;
+  /** Fired after the local switch so the host can persist the choice. */
+  onChange?: (currency: CurrencyCode) => void;
 };
 
 /** Full currency list; the row that opens it shows the detected/selected one. */
-export function CurrencyPickerSheet({ visible, onClose }: Props) {
+export function CurrencyPickerSheet({ visible, onClose, onChange }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const currency = useCurrencyStore((s) => s.currency);
@@ -63,6 +65,7 @@ export function CurrencyPickerSheet({ visible, onClose }: Props) {
                 accessibilityRole="button"
                 onPress={() => {
                   setCurrency(code);
+                  onChange?.(code);
                   onClose();
                 }}
                 style={({ pressed }) => ({
