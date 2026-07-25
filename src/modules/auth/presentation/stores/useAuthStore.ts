@@ -8,6 +8,8 @@ export type AuthSessionState = {
   displayName: string;
   tier: string;
   emailVerified: boolean;
+  /** Home currency from the server: the unit every stored amount is in. */
+  currency: string;
 };
 
 type AuthStoreState = {

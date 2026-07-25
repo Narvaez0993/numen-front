@@ -10,8 +10,10 @@ import {
 
 import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-
-import { formatBalanceInput } from '../utils/formatBalanceInput';
+import {
+  currencySymbol,
+  formatAmountDigits,
+} from '@/shared/presentation/utils/formatMoney';
 
 import { OnbCTA } from './OnbCTA';
 import { OnbTextLink } from './OnbTextLink';
@@ -61,7 +63,8 @@ export function SetupBalanceSheet({
     }
   }, [visible]);
 
-  const formatted = formatBalanceInput(value);
+  // `value` holds raw keystrokes; they read as minor units of the chosen currency.
+  const formatted = formatAmountDigits(value);
 
   return (
     <Modal
@@ -188,12 +191,12 @@ export function SetupBalanceSheet({
               color={theme.colors.textTertiary}
               style={{ fontSize: 22 }}
             >
-              $
+              {currencySymbol()}
             </Text>
             <TextInput
               ref={inputRef}
               value={formatted}
-              onChangeText={onChange}
+              onChangeText={(text) => onChange(text.replace(/\D/g, ''))}
               placeholder="0"
               placeholderTextColor={theme.colors.textTertiary}
               keyboardType="numeric"

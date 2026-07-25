@@ -28,6 +28,7 @@ export function useUpdateName() {
         displayName: profile.displayName,
         tier: profile.tier,
         emailVerified: profile.emailVerified,
+        currency: profile.currency,
       });
     },
   });

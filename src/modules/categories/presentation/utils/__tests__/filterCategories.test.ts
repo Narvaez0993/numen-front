@@ -1,8 +1,18 @@
 import type { Category } from '../../../domain';
 import { filterCategories } from '../filterCategories';
 
+const base = { flow: 'expense', isStandard: true } as const;
+
 const CATEGORIES: Category[] = [
-  { id: 'cafe', name: 'Café', icon: 'coffee', color: 'amber', spent: 1000, count: 1 },
+  {
+    id: 'cafe',
+    name: 'Café',
+    icon: 'coffee',
+    color: 'amber',
+    spent: 1000,
+    count: 1,
+    ...base,
+  },
   {
     id: 'mercado',
     name: 'Mercado',
@@ -10,6 +20,7 @@ const CATEGORIES: Category[] = [
     color: 'mint',
     spent: 2000,
     count: 2,
+    ...base,
   },
   {
     id: 'comida',
@@ -18,6 +29,7 @@ const CATEGORIES: Category[] = [
     color: 'pink',
     spent: 3000,
     count: 3,
+    ...base,
   },
 ];
 

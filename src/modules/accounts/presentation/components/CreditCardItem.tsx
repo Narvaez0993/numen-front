@@ -46,8 +46,7 @@ export function CreditCardItem({ card, onPress }: Props) {
             numberOfLines={1}
           >
             {t('accounts.tc.cutoff', { day: card.cutoffDay })}
-            {' · '}
-            {t('accounts.tc.due', { date: card.dueLabel })}
+            {card.dueDay ? ` · ${t('accounts.tc.due', { day: card.dueDay })}` : ''}
           </Text>
         </View>
         <Icon name="chevron-right" size={15} color={theme.colors.textTertiary} />
@@ -72,7 +71,7 @@ export function CreditCardItem({ card, onPress }: Props) {
             {t('accounts.tc.debt')}
           </Text>
           <Text variant="bodyLarge" tabular style={{ fontSize: 16 }}>
-            {formatMoney(card.debt)}
+            {formatMoney(card.debt, card.currency)}
           </Text>
         </View>
         <ProgressBar pct={usage} height={5} />
@@ -98,7 +97,9 @@ export function CreditCardItem({ card, onPress }: Props) {
             tabular
             style={{ fontSize: 10.5, letterSpacing: 0 }}
           >
-            {t('accounts.tc.limit', { amount: formatMoney(card.limit) })}
+            {t('accounts.tc.limit', {
+              amount: formatMoney(card.limit, card.currency),
+            })}
           </Text>
         </View>
       </View>

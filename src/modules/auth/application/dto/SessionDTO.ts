@@ -6,6 +6,7 @@ export type AuthSessionDTO = {
   displayName: string;
   tier: string;
   emailVerified: boolean;
+  currency: string;
   accessToken: string;
   refreshToken: string;
 };
@@ -17,6 +18,7 @@ export function toAuthSessionDTO(session: AuthSession): AuthSessionDTO {
     displayName: session.user.displayName,
     tier: session.user.tier,
     emailVerified: session.user.emailVerified,
+    currency: session.user.currency,
     accessToken: session.accessToken,
     refreshToken: session.refreshToken,
   };

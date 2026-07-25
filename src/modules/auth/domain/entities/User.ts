@@ -8,6 +8,8 @@ export type UserProps = {
   displayName: string;
   tier?: Tier;
   emailVerified?: boolean;
+  /** ISO 4217 home currency: the unit every amount stored for this user is in. */
+  currency?: string;
 };
 
 export class User {
@@ -16,6 +18,7 @@ export class User {
   readonly displayName: string;
   readonly tier: Tier;
   readonly emailVerified: boolean;
+  readonly currency: string;
 
   constructor(props: UserProps) {
     this.id = props.id;
@@ -23,6 +26,7 @@ export class User {
     this.displayName = props.displayName;
     this.tier = props.tier ?? 'free';
     this.emailVerified = props.emailVerified ?? false;
+    this.currency = props.currency ?? 'USD';
   }
 
   equals(other: User): boolean {
