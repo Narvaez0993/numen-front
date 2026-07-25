@@ -10,6 +10,7 @@ import {
   Text,
 } from '@/shared/presentation/components';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
+import { formatAmountDigits } from '@/shared/presentation/utils/formatMoney';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
 import {
@@ -30,11 +31,6 @@ type Props = {
 type ExpandedField = 'category' | 'account' | 'accountTo' | 'date' | null;
 
 const TYPES: ManualEntryType[] = ['expense', 'income', 'transfer'];
-
-function formatDigits(digits: string): string {
-  if (!digits) return '';
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
 
 export function ManualState({ onSave, saving = false }: Props) {
   const { theme } = useTheme();
@@ -166,7 +162,7 @@ export function ManualState({ onSave, saving = false }: Props) {
           </Text>
           <TextInput
             ref={amountRef}
-            value={formatDigits(digits)}
+            value={formatAmountDigits(digits)}
             onChangeText={(v) => setDigits(v.replace(/\D/g, ''))}
             keyboardType="number-pad"
             placeholder="0"

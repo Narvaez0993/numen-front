@@ -10,6 +10,7 @@ import {
   Text,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { formatAmountDigits } from '@/shared/presentation/utils/formatMoney';
 
 import type { DetectedExpense } from '../../domain/types/Expense';
 import { ACCOUNTS, EXPENSE_CATEGORIES } from '../constants/manualOptions';
@@ -24,11 +25,6 @@ type Props = {
 };
 
 type ExpandedPicker = 'category' | 'source' | null;
-
-function formatDigits(digits: string): string {
-  if (!digits) return '';
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
 
 export function DetectedCard({ item, onRemove, onChange, manual = false }: Props) {
   const { theme } = useTheme();
@@ -142,7 +138,7 @@ export function DetectedCard({ item, onRemove, onChange, manual = false }: Props
             $
           </Text>
           <TextInput
-            value={formatDigits(String(item.amount || ''))}
+            value={formatAmountDigits(String(item.amount || ''))}
             onChangeText={(v) =>
               onChange({ amount: Number(v.replace(/\D/g, '') || '0') })
             }
