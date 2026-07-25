@@ -34,9 +34,6 @@ import { InMemoryBudgetsRepository } from '@/modules/budgets/infrastructure/repo
 import type { DeudasRepository } from '@/modules/deudas/application/ports/DeudasRepository';
 import { GetDeudasUseCase } from '@/modules/deudas/application/use-cases/GetDeudasUseCase';
 import { InMemoryDeudasRepository } from '@/modules/deudas/infrastructure/repositories/InMemoryDeudasRepository';
-import type { ExpenseRepository } from '@/modules/expenses/application/ports/ExpenseRepository';
-import { CreateExpensesUseCase } from '@/modules/expenses/application/use-cases/CreateExpensesUseCase';
-import { InMemoryExpenseRepository } from '@/modules/expenses/infrastructure/repositories/InMemoryExpenseRepository';
 import type { HomeRepository } from '@/modules/home/application/ports/HomeRepository';
 import { GetHomeOverviewUseCase } from '@/modules/home/application/use-cases/GetHomeOverviewUseCase';
 import { InMemoryHomeRepository } from '@/modules/home/infrastructure/repositories/InMemoryHomeRepository';
@@ -64,7 +61,6 @@ export { setOnSessionExpired } from '@/shared/infrastructure/http/client';
 const authRepository: AuthRepository = new HttpAuthRepository(httpClient);
 const homeRepository: HomeRepository = new InMemoryHomeRepository();
 const profileRepository: ProfileRepository = new InMemoryProfileRepository();
-const expenseRepository: ExpenseRepository = new InMemoryExpenseRepository();
 const movementsRepository: MovementsRepository = new HttpMovementsRepository(httpClient);
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
@@ -87,7 +83,6 @@ export const updateDisplayNameUseCase = new UpdateDisplayNameUseCase(authReposit
 export const updatePreferencesUseCase = new UpdatePreferencesUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);
 export const getProfileUseCase = new GetProfileUseCase(profileRepository);
-export const createExpensesUseCase = new CreateExpensesUseCase(expenseRepository);
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const createMovementUseCase = new CreateMovementUseCase(movementsRepository);
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
@@ -118,7 +113,6 @@ export const container = {
   authRepository,
   homeRepository,
   profileRepository,
-  expenseRepository,
   movementsRepository,
   budgetsRepository,
   deudasRepository,
@@ -137,7 +131,6 @@ export const container = {
   updatePreferencesUseCase,
   getHomeOverviewUseCase,
   getProfileUseCase,
-  createExpensesUseCase,
   getMovementsUseCase,
   createMovementUseCase,
   getBudgetsUseCase,

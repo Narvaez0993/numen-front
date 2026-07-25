@@ -7,7 +7,8 @@
     "save": "Save",
     "continue": "Continue",
     "all": "All",
-    "recurring": "recurring"
+    "recurring": "recurring",
+    "soon": "Soon"
   },
   "movements": {
     "title": "Movements",
@@ -793,92 +794,48 @@
   "expenses": {
     "sheet": {
       "title": {
-        "entry": "New expense",
-        "recording": "Listening…",
-        "processing": "Processing…",
-        "confirm": "{{count}} expenses detected",
-        "confirmOne": "{{count}} expense detected"
+        "entry": "New movement"
       },
       "sub": {
-        "entry": "The fastest way",
-        "recording": "Tap again when you're done",
-        "processing": "Identifying expenses",
-        "confirm": "Review and edit before saving"
+        "entry": "Record an expense, an income or a transfer"
       },
-      "tapAndSpeak": "Tap and speak",
-      "talking": "Speaking…",
-      "wait": "One moment",
-      "hint": "e.g. \"taxi to work, nine thousand\"",
+      "voiceSoon": "Recording by voice arrives with the assistant",
+      "manual": "Record by hand",
       "photoReceipt": "Photo",
       "write": "Write",
-      "quote": {
-        "voice": "You said",
-        "text": "You wrote",
-        "photo": "Detected from receipt"
-      },
-      "detectedAuto": "Auto-detected",
-      "amount": "Amount",
-      "addAnother": "Add another",
-      "total": "Total",
-      "save": "Save expenses",
       "back": "Back",
-      "writing": {
-        "title": "Write expense",
-        "subtitle": "Type one or several, AI splits them",
-        "placeholder": "Describe your expenses. e.g. taxi to work nine thousand and lunch at juan valdez",
-        "iaHint": "Identifies amount, category and account automatically",
-        "examplesLabel": "Examples",
-        "examples": [
-          "Taxi to work, 9,000",
-          "Lunch at Crepes, 25,000",
-          "Carulla grocery 68,400",
-          "Coffee Juan Valdez 5,500"
-        ],
-        "cta": "Process with AI"
-      },
-      "photo": {
-        "title": "Receipt photo",
-        "subtitle": "AI extracts everything from the receipt",
-        "dropzoneTitle": "Take or upload a photo",
-        "dropzoneHint": "JPG, PNG · max 10 MB",
-        "iaHint": "We detect merchant, amount, date and category automatically.",
-        "take": "Take photo",
-        "gallery": "Choose from gallery",
-        "analyzing": "Analyzing receipt…",
-        "demoTranscript": "Carulla receipt · May 14, 2026"
-      },
-      "transcript": {
-        "voice": "taxi to work, nine thousand and lunch at juan valdez eighteen thousand"
-      },
-      "manual": "Manual",
-      "addedManually": "Added by you",
       "manualEntry": {
-        "title": "Manual entry",
-        "subtitle": "Full control, no AI",
+        "title": "Record by hand",
+        "subtitle": "Amount, where and when",
+        "descriptionPlaceholder": "What was it? e.g. taxi to work",
+        "category": "Category",
+        "account": "Source",
+        "from": "From",
+        "to": "To",
+        "date": "Date",
         "type": {
           "expense": "Expense",
           "income": "Income",
           "transfer": "Transfer"
         },
-        "descriptionPlaceholder": "Description",
-        "category": "Category",
-        "account": "Account",
-        "from": "From",
-        "to": "To",
-        "date": "Date",
         "save": {
           "expense": "Save expense",
           "income": "Save income",
           "transfer": "Save transfer"
+        },
+        "noSources": {
+          "title": "You need a source first",
+          "body": "Add your bank, wallet or cash in Profile → Sources and accounts, then come back."
         }
       }
     },
     "toast": {
-      "saved": "{{count}} expenses saved · {{total}}",
-      "savedOne": "{{count}} expense saved · {{total}}",
-      "undo": "Undo",
-      "savedIncome": "Income saved · {{total}}",
-      "savedTransfer": "Transfer recorded · {{total}}"
+      "saved": {
+        "expense": "Expense saved",
+        "income": "Income saved",
+        "transfer": "Transfer saved"
+      },
+      "saveFailed": "We couldn't save it. Try again."
     }
   },
   "notFound": {

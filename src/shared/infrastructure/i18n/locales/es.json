@@ -7,7 +7,8 @@
     "save": "Guardar",
     "continue": "Continuar",
     "all": "Todas",
-    "recurring": "recurrente"
+    "recurring": "recurrente",
+    "soon": "Pronto"
   },
   "movements": {
     "title": "Movimientos",
@@ -793,92 +794,48 @@
   "expenses": {
     "sheet": {
       "title": {
-        "entry": "Nuevo gasto",
-        "recording": "Escuchando…",
-        "processing": "Procesando…",
-        "confirm": "{{count}} gastos detectados",
-        "confirmOne": "{{count}} gasto detectado"
+        "entry": "Nuevo movimiento"
       },
       "sub": {
-        "entry": "La forma más rápida",
-        "recording": "Toca de nuevo cuando termines",
-        "processing": "Identificando los gastos",
-        "confirm": "Revisa y edita antes de guardar"
+        "entry": "Registra un gasto, un ingreso o una transferencia"
       },
-      "tapAndSpeak": "Toca y habla",
-      "talking": "Hablando…",
-      "wait": "Un momento",
-      "hint": "ej: \"taxi al trabajo, nueve mil\"",
+      "voiceSoon": "Registrar hablando llega con el asistente",
+      "manual": "Registrar a mano",
       "photoReceipt": "Foto",
       "write": "Escribir",
-      "quote": {
-        "voice": "Dijiste",
-        "text": "Escribiste",
-        "photo": "Detectado en el recibo"
-      },
-      "detectedAuto": "Detectado automáticamente",
-      "amount": "Monto",
-      "addAnother": "Agregar otro",
-      "total": "Total",
-      "save": "Guardar gastos",
       "back": "Volver",
-      "writing": {
-        "title": "Escribir gasto",
-        "subtitle": "Tipea uno o varios, la IA los separa",
-        "placeholder": "Describe tus gastos. ej: taxi al trabajo nueve mil y almuerzo en juan valdez",
-        "iaHint": "Identifica monto, categoría y cuenta automáticamente",
-        "examplesLabel": "Ejemplos",
-        "examples": [
-          "Taxi al trabajo, 9.000",
-          "Almuerzo en Crepes, 25.000",
-          "Mercado Carulla 68.400",
-          "Café Juan Valdez 5.500"
-        ],
-        "cta": "Procesar con IA"
-      },
-      "photo": {
-        "title": "Foto del recibo",
-        "subtitle": "La IA extrae todo del recibo",
-        "dropzoneTitle": "Toma o sube una foto",
-        "dropzoneHint": "JPG, PNG · máx 10 MB",
-        "iaHint": "Detectamos comercio, monto, fecha y categoría automáticamente.",
-        "take": "Tomar foto",
-        "gallery": "Elegir de galería",
-        "analyzing": "Analizando recibo…",
-        "demoTranscript": "Recibo de Carulla · 14 may 2026"
-      },
-      "transcript": {
-        "voice": "taxi al trabajo, nueve mil y almuerzo en juan valdez dieciocho mil"
-      },
-      "manual": "Manual",
-      "addedManually": "Agregado por ti",
       "manualEntry": {
-        "title": "Registro manual",
-        "subtitle": "Control total, sin IA",
+        "title": "Registrar a mano",
+        "subtitle": "Monto, dónde y cuándo",
+        "descriptionPlaceholder": "¿En qué fue? ej: taxi al trabajo",
+        "category": "Categoría",
+        "account": "Fuente",
+        "from": "Desde",
+        "to": "Hacia",
+        "date": "Fecha",
         "type": {
           "expense": "Gasto",
           "income": "Ingreso",
           "transfer": "Transferencia"
         },
-        "descriptionPlaceholder": "Descripción",
-        "category": "Categoría",
-        "account": "Cuenta",
-        "from": "Desde",
-        "to": "Hacia",
-        "date": "Fecha",
         "save": {
           "expense": "Guardar gasto",
           "income": "Guardar ingreso",
           "transfer": "Guardar transferencia"
+        },
+        "noSources": {
+          "title": "Primero necesitas una fuente",
+          "body": "Agrega tu banco, billetera o efectivo en Perfil → Fuentes y cuentas y vuelve a registrar."
         }
       }
     },
     "toast": {
-      "saved": "{{count}} gastos guardados · {{total}}",
-      "savedOne": "{{count}} gasto guardado · {{total}}",
-      "undo": "Deshacer",
-      "savedIncome": "Ingreso guardado · {{total}}",
-      "savedTransfer": "Transferencia registrada · {{total}}"
+      "saved": {
+        "expense": "Gasto guardado",
+        "income": "Ingreso guardado",
+        "transfer": "Transferencia guardada"
+      },
+      "saveFailed": "No pudimos guardar. Intenta de nuevo."
     }
   },
   "notFound": {

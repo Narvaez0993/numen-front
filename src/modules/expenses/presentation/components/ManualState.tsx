@@ -1,48 +1,58 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Pressable, TextInput, View } from 'react-native';
 
+import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
+import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
+import type { MovementType, NewMovement, SourceRef } from '@/modules/movements/domain';
 import {
   Button,
   CategoryPickerInline,
-  OptionListInline,
+  SelectListInline,
   SelectRow,
   Text,
 } from '@/shared/presentation/components';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
+import { dayLabel, recentDays, toIsoDate } from '@/shared/presentation/utils/dates';
 import { formatAmountDigits } from '@/shared/presentation/utils/formatMoney';
 
-import type { DetectedExpense } from '../../domain/types/Expense';
-import {
-  ACCOUNTS,
-  DATE_OPTIONS,
-  EXPENSE_CATEGORIES,
-  INCOME_CATEGORIES,
-  categoryColor,
-} from '../constants/manualOptions';
-
-export type ManualEntryType = 'expense' | 'income' | 'transfer';
-
 type Props = {
-  onSave: (item: DetectedExpense, type: ManualEntryType) => void;
+  onSave: (movement: NewMovement) => void;
   saving?: boolean;
+  errorMessage?: string | null;
 };
 
-type ExpandedField = 'category' | 'account' | 'accountTo' | 'date' | null;
+type ExpandedField = 'category' | 'source' | 'destination' | 'date' | null;
 
-const TYPES: ManualEntryType[] = ['expense', 'income', 'transfer'];
+const TYPES: MovementType[] = ['expense', 'income', 'transfer'];
+/** How far back the date list reaches; older days land with the calendar in 3b. */
+const RECENT_DAYS = 10;
 
-export function ManualState({ onSave, saving = false }: Props) {
+/** `type:id` keeps a source picker option unique — two accounts may share a name. */
+const refKey = (ref: SourceRef) => `${ref.type}:${ref.id}`;
+const parseRefKey = (key: string): SourceRef => {
+  const [type, ...rest] = key.split(':');
+  return { type: type as SourceRef['type'], id: rest.join(':') };
+};
+
+export function ManualState({ onSave, saving = false, errorMessage }: Props) {
   const { theme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currency = useCurrencyStore((s) => s.currency);
+  const language = i18n.language.startsWith('en') ? 'en' : 'es';
 
-  const [type, setType] = useState<ManualEntryType>('expense');
+  const categories = useCategories();
+  const accounts = useAccounts();
+
+  const [today] = useState(() => toIsoDate(new Date()));
+  const [type, setType] = useState<MovementType>('expense');
   const [digits, setDigits] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Mercado');
-  const [account, setAccount] = useState(ACCOUNTS[0] ?? 'Efectivo');
-  const [accountTo, setAccountTo] = useState('BBVA Crédito');
-  const [date, setDate] = useState(DATE_OPTIONS[0] ?? 'Hoy');
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [sourceKey, setSourceKey] = useState<string | null>(null);
+  const [destinationKey, setDestinationKey] = useState<string | null>(null);
+  const [occurredOn, setOccurredOn] = useState(today);
   const [expanded, setExpanded] = useState<ExpandedField>(null);
 
   const amountRef = useRef<TextInput>(null);
@@ -58,38 +68,96 @@ export function ManualState({ onSave, saving = false }: Props) {
     return () => clearTimeout(tid);
   }, [opacity]);
 
-  const amount = Number(digits || '0');
-  const valid = amount > 0 && (type === 'transfer' || description.trim().length >= 2);
-  const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  // An income lands on an account; a card is somewhere you owe, not somewhere you
+  // get paid (a refund is handled by adjusting the card's debt).
+  const sourceOptions = useMemo(() => {
+    const list = (accounts.data?.accounts ?? []).map((account) => ({
+      value: refKey({ type: 'account', id: account.id }),
+      label: account.name,
+    }));
+    if (type === 'income') return list;
+    return [
+      ...list,
+      ...(accounts.data?.creditCards ?? []).map((card) => ({
+        value: refKey({ type: 'credit_card', id: card.id }),
+        label: card.name,
+      })),
+    ];
+  }, [accounts.data, type]);
 
-  const changeType = (next: ManualEntryType) => {
-    setType(next);
-    setExpanded(null);
-    if (next === 'income' && !INCOME_CATEGORIES.some((c) => c.name === category)) {
-      setCategory(INCOME_CATEGORIES[0]?.name ?? 'Salario');
+  const categoryOptions = useMemo(() => {
+    const flow = type === 'income' ? 'income' : 'expense';
+    return (categories.data?.categories ?? [])
+      .filter((category) => category.flow === flow)
+      .map((category) => ({
+        id: category.id,
+        name: category.name,
+        color: category.color === 'neutral' ? ('mint' as const) : category.color,
+      }));
+  }, [categories.data, type]);
+
+  const dateOptions = useMemo(
+    () =>
+      recentDays(RECENT_DAYS, today).map((iso) => ({
+        value: iso,
+        label: dayLabel(iso, today, language, {
+          today: t('movements.days.today'),
+          yesterday: t('movements.days.yesterday'),
+        }),
+      })),
+    [today, language, t],
+  );
+
+  // Keep the selections valid as the catalogs load or the type changes.
+  useEffect(() => {
+    if (sourceOptions.length === 0) return;
+    if (!sourceOptions.some((option) => option.value === sourceKey)) {
+      setSourceKey(sourceOptions[0]!.value);
     }
-    if (next === 'expense' && !EXPENSE_CATEGORIES.some((c) => c.name === category)) {
-      setCategory(EXPENSE_CATEGORIES[0]?.name ?? 'Mercado');
+  }, [sourceOptions, sourceKey]);
+
+  useEffect(() => {
+    if (type === 'transfer') {
+      setCategoryId(null);
+      return;
     }
-  };
+    setDestinationKey(null);
+    if (!categoryOptions.some((option) => option.id === categoryId)) {
+      setCategoryId(categoryOptions[0]?.id ?? null);
+    }
+  }, [type, categoryOptions, categoryId]);
+
+  const destinationOptions = sourceOptions.filter((option) => option.value !== sourceKey);
+  const amount = Number(digits || '0');
+  const source = sourceKey ? parseRefKey(sourceKey) : null;
+  const destination = destinationKey ? parseRefKey(destinationKey) : null;
+  const needsDestination = type === 'transfer';
+  const valid =
+    amount > 0 &&
+    source !== null &&
+    (needsDestination ? destination !== null : description.trim().length >= 2);
+
+  const selectedCategory = categoryOptions.find((option) => option.id === categoryId);
+  const sourceLabel =
+    sourceOptions.find((option) => option.value === sourceKey)?.label ?? '—';
+  const destinationLabel =
+    destinationOptions.find((option) => option.value === destinationKey)?.label ?? '—';
+  const dateLabel =
+    dateOptions.find((option) => option.value === occurredOn)?.label ?? '';
 
   const handleSave = () => {
-    if (!valid) return;
-    const fallbackDescription =
-      type === 'transfer'
-        ? `${account} → ${accountTo}`
-        : t(`expenses.sheet.manualEntry.type.${type}`);
-    onSave(
-      {
-        id: `m-${Date.now()}`,
-        description: description.trim() || fallbackDescription,
-        categoryName: type === 'transfer' ? 'Transferencia' : category,
-        categoryColor: type === 'transfer' ? 'mint' : categoryColor(category),
-        amount,
-        sourceName: account,
-      },
+    if (!valid || saving || source === null) return;
+    onSave({
       type,
-    );
+      description:
+        description.trim() || `${sourceLabel} → ${destinationLabel}`.slice(0, 80),
+      amount,
+      source,
+      destination: needsDestination ? destination : null,
+      categoryId: needsDestination ? null : categoryId,
+      occurredOn,
+      capturedVia: 'manual',
+    });
   };
 
   const amountColor =
@@ -98,6 +166,23 @@ export function ManualState({ onSave, saving = false }: Props) {
       : type === 'transfer'
         ? theme.colors.textSecondary
         : theme.colors.textPrimary;
+
+  if (accounts.data && accounts.data.accounts.length === 0) {
+    return (
+      <View style={{ paddingVertical: 24, paddingHorizontal: 10, gap: 8 }}>
+        <Text variant="h1" style={{ fontSize: 16, textAlign: 'center' }}>
+          {t('expenses.sheet.manualEntry.noSources.title')}
+        </Text>
+        <Text
+          variant="caption"
+          color={theme.colors.textSecondary}
+          style={{ textAlign: 'center', lineHeight: 19 }}
+        >
+          {t('expenses.sheet.manualEntry.noSources.body')}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <Animated.View style={{ gap: 14, paddingTop: 4, opacity }}>
@@ -131,7 +216,10 @@ export function ManualState({ onSave, saving = false }: Props) {
             <Pressable
               key={option}
               accessibilityRole="button"
-              onPress={() => changeType(option)}
+              onPress={() => {
+                setType(option);
+                setExpanded(null);
+              }}
               style={({ pressed }) => ({
                 flex: 1,
                 alignItems: 'center',
@@ -162,7 +250,7 @@ export function ManualState({ onSave, saving = false }: Props) {
           </Text>
           <TextInput
             ref={amountRef}
-            value={formatAmountDigits(digits)}
+            value={formatAmountDigits(digits, currency)}
             onChangeText={(v) => setDigits(v.replace(/\D/g, ''))}
             keyboardType="number-pad"
             placeholder="0"
@@ -184,6 +272,7 @@ export function ManualState({ onSave, saving = false }: Props) {
         onChangeText={setDescription}
         placeholder={t('expenses.sheet.manualEntry.descriptionPlaceholder')}
         placeholderTextColor={theme.colors.textTertiary}
+        maxLength={80}
         style={{
           backgroundColor: theme.colors.bgFloat,
           borderWidth: 1,
@@ -208,17 +297,27 @@ export function ManualState({ onSave, saving = false }: Props) {
         {type !== 'transfer' ? (
           <SelectRow
             label={t('expenses.sheet.manualEntry.category')}
-            value={category}
-            valueColor={theme.colors[accentColorKey(categoryColor(category), 'fg')]}
+            value={selectedCategory?.name ?? '—'}
+            valueColor={
+              selectedCategory
+                ? theme.colors[accentColorKey(selectedCategory.color, 'fg')]
+                : undefined
+            }
             expanded={expanded === 'category'}
             onToggle={() => setExpanded((e) => (e === 'category' ? null : 'category'))}
           >
             <View style={{ paddingHorizontal: 12, paddingBottom: 12 }}>
               <CategoryPickerInline
-                categories={categories}
-                selected={category}
+                categories={categoryOptions.map((option) => ({
+                  name: option.name,
+                  color: option.color,
+                }))}
+                selected={selectedCategory?.name ?? ''}
                 onSelect={(name) => {
-                  setCategory(name);
+                  // Names are unique per flow (the API enforces it), so the label
+                  // maps back to exactly one category.
+                  const match = categoryOptions.find((option) => option.name === name);
+                  if (match) setCategoryId(match.id);
                   setExpanded(null);
                 }}
               />
@@ -232,35 +331,38 @@ export function ManualState({ onSave, saving = false }: Props) {
               ? t('expenses.sheet.manualEntry.from')
               : t('expenses.sheet.manualEntry.account')
           }
-          value={account}
-          expanded={expanded === 'account'}
-          onToggle={() => setExpanded((e) => (e === 'account' ? null : 'account'))}
+          value={sourceLabel}
+          expanded={expanded === 'source'}
+          onToggle={() => setExpanded((e) => (e === 'source' ? null : 'source'))}
         >
           <View style={{ paddingHorizontal: 12, paddingBottom: 10 }}>
-            <OptionListInline
-              options={ACCOUNTS}
-              selected={account}
-              onSelect={(v) => {
-                setAccount(v);
+            <SelectListInline
+              options={sourceOptions}
+              selected={sourceKey}
+              onSelect={(value) => {
+                setSourceKey(value);
+                if (value === destinationKey) setDestinationKey(null);
                 setExpanded(null);
               }}
             />
           </View>
         </SelectRow>
 
-        {type === 'transfer' ? (
+        {needsDestination ? (
           <SelectRow
             label={t('expenses.sheet.manualEntry.to')}
-            value={accountTo}
-            expanded={expanded === 'accountTo'}
-            onToggle={() => setExpanded((e) => (e === 'accountTo' ? null : 'accountTo'))}
+            value={destinationLabel}
+            expanded={expanded === 'destination'}
+            onToggle={() =>
+              setExpanded((e) => (e === 'destination' ? null : 'destination'))
+            }
           >
             <View style={{ paddingHorizontal: 12, paddingBottom: 10 }}>
-              <OptionListInline
-                options={ACCOUNTS.filter((a) => a !== account)}
-                selected={accountTo}
-                onSelect={(v) => {
-                  setAccountTo(v);
+              <SelectListInline
+                options={destinationOptions}
+                selected={destinationKey}
+                onSelect={(value) => {
+                  setDestinationKey(value);
                   setExpanded(null);
                 }}
               />
@@ -270,23 +372,32 @@ export function ManualState({ onSave, saving = false }: Props) {
 
         <SelectRow
           label={t('expenses.sheet.manualEntry.date')}
-          value={date}
+          value={dateLabel}
           expanded={expanded === 'date'}
           onToggle={() => setExpanded((e) => (e === 'date' ? null : 'date'))}
           last
         >
           <View style={{ paddingHorizontal: 12, paddingBottom: 10 }}>
-            <OptionListInline
-              options={DATE_OPTIONS}
-              selected={date}
-              onSelect={(v) => {
-                setDate(v);
+            <SelectListInline
+              options={dateOptions}
+              selected={occurredOn}
+              onSelect={(value) => {
+                setOccurredOn(value);
                 setExpanded(null);
               }}
             />
           </View>
         </SelectRow>
       </View>
+
+      {errorMessage ? (
+        <Text
+          variant="caption"
+          style={{ color: theme.colors.accentCoral, fontSize: 12, textAlign: 'center' }}
+        >
+          {errorMessage}
+        </Text>
+      ) : null}
 
       <Button
         label={t(`expenses.sheet.manualEntry.save.${type}`)}
