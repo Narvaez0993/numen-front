@@ -18,5 +18,6 @@ export * from './BottomSheet';
 export * from './Toast';
 export * from './FilterChip';
 export * from './CurrencyPickerSheet';
+export * from './DatePickerSheet';
 export * from './FormFields';
 export * from './InlinePickers';

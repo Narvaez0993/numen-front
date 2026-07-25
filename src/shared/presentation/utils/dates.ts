@@ -157,3 +157,40 @@ export function dayLabel(
 export function recentDays(count: number, today: string): string[] {
   return Array.from({ length: count }, (_, index) => addDays(today, -index));
 }
+
+/** Is `iso` strictly later than `other`? Plain string compare: ISO dates sort. */
+export function isAfter(iso: string, other: string): boolean {
+  return iso > other;
+}
+
+const WEEKDAYS_SHORT: Record<string, readonly string[]> = {
+  es: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
+  en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+};
+
+/** Column headers of a calendar, rotated to start the week where the locale does. */
+export function weekdayInitials(language = 'es', weekStartsOn = 1): string[] {
+  const names = table(WEEKDAYS_SHORT, language);
+  return Array.from({ length: 7 }, (_, index) => names[(index + weekStartsOn) % 7]!);
+}
+
+/**
+ * The month `iso` falls in, laid out as calendar weeks. `null` is padding before
+ * the 1st or after the last day, so the grid always has 7 columns.
+ */
+export function monthMatrix(iso: string, weekStartsOn = 1): (string | null)[][] {
+  const { from, to } = monthRange(iso);
+  const firstWeekday = fromIsoDate(from).getDay();
+  const lead = (firstWeekday - weekStartsOn + 7) % 7;
+  const totalDays = fromIsoDate(to).getDate();
+
+  const cells: (string | null)[] = [
+    ...Array.from({ length: lead }, () => null),
+    ...Array.from({ length: totalDays }, (_, index) => addDays(from, index)),
+  ];
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  return Array.from({ length: cells.length / 7 }, (_, week) =>
+    cells.slice(week * 7, week * 7 + 7),
+  );
+}

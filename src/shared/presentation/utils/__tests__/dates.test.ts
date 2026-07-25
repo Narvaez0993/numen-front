@@ -1,13 +1,16 @@
 import {
   addDays,
   dayLabel,
+  isAfter,
   monthKey,
+  monthMatrix,
   monthName,
   monthRange,
   recentDays,
   shiftMonth,
   shortDate,
   toIsoDate,
+  weekdayInitials,
 } from '../dates';
 
 // Every case pins "today" explicitly: these helpers never read the clock.
@@ -108,5 +111,60 @@ describe('recentDays', () => {
 describe('toIsoDate', () => {
   it('pads month and day', () => {
     expect(toIsoDate(new Date(2026, 0, 5, 12))).toBe('2026-01-05');
+  });
+});
+
+describe('isAfter', () => {
+  it('compares ISO days as plain strings', () => {
+    expect(isAfter('2026-07-26', TODAY)).toBe(true);
+    expect(isAfter(TODAY, TODAY)).toBe(false);
+    expect(isAfter('2026-07-24', TODAY)).toBe(false);
+    expect(isAfter('2027-01-01', '2026-12-31')).toBe(true);
+  });
+});
+
+describe('weekdayInitials', () => {
+  it('starts on Monday by default', () => {
+    expect(weekdayInitials()).toEqual(['L', 'M', 'M', 'J', 'V', 'S', 'D']);
+  });
+
+  it('can start on Sunday', () => {
+    expect(weekdayInitials('en', 0)).toEqual(['S', 'M', 'T', 'W', 'T', 'F', 'S']);
+  });
+});
+
+describe('monthMatrix', () => {
+  it('always lays out rows of seven', () => {
+    for (const week of monthMatrix(TODAY)) {
+      expect(week).toHaveLength(7);
+    }
+  });
+
+  it('pads before the first day and after the last', () => {
+    // July 2026 starts on a Wednesday, so two blanks with a Monday-first week.
+    const weeks = monthMatrix('2026-07-15');
+    expect(weeks[0]?.slice(0, 3)).toEqual([null, null, '2026-07-01']);
+    expect(weeks.at(-1)?.filter(Boolean).at(-1)).toBe('2026-07-31');
+  });
+
+  it('contains every day of the month exactly once', () => {
+    const days = monthMatrix('2026-02-10').flat().filter(Boolean);
+    expect(days).toHaveLength(28);
+    expect(new Set(days).size).toBe(28);
+    expect(days[0]).toBe('2026-02-01');
+  });
+
+  it('handles a leap February', () => {
+    expect(monthMatrix('2028-02-10').flat().filter(Boolean)).toHaveLength(29);
+  });
+
+  it('respects the week start', () => {
+    const monday = monthMatrix('2026-07-15', 1)[0]!;
+    const sunday = monthMatrix('2026-07-15', 0)[0]!;
+    expect(monday.filter(Boolean)[0]).toBe('2026-07-01');
+    expect(sunday.filter(Boolean)[0]).toBe('2026-07-01');
+    // A Wednesday 1st sits one column later when the week starts on Sunday.
+    expect(monday.indexOf('2026-07-01')).toBe(2);
+    expect(sunday.indexOf('2026-07-01')).toBe(3);
   });
 });
