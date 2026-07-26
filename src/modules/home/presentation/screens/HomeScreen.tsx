@@ -144,6 +144,13 @@ export function HomeScreen() {
             // No income and no budget: the hero shows what to do about it.
             start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
           />
+          <MonthTrend spent={data.month.spent} today={today} />
+          <IncomeSummaryRow
+            total={data.month.income}
+            savingsRate={data.month.savingsRate}
+            period={data.period}
+            onPress={goMovements}
+          />
           <UpcomingCharges
             items={data.upcoming}
             today={today}
@@ -151,13 +158,6 @@ export function HomeScreen() {
             onConfirm={(id) => confirmCharge.mutate({ id })}
             onSkip={(id) => skipCharge.mutate(id)}
             onSeeAll={() => router.push('/subscriptions')}
-          />
-          <MonthTrend spent={data.month.spent} today={today} />
-          <IncomeSummaryRow
-            total={data.month.income}
-            savingsRate={data.month.savingsRate}
-            period={data.period}
-            onPress={goMovements}
           />
           <RecentList items={data.recent} onSeeAll={goMovements} />
           <TopCategoriesCard categories={data.topCategories} />
