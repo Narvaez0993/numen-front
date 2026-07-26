@@ -608,10 +608,6 @@
       },
       "footer": "With this month's income we work out how much you can spend each day."
     },
-    "accounts": {
-      "title": "Your accounts",
-      "seeAll": "See all"
-    },
     "trend": {
       "less": "{{pct}}% less than in {{month}}",
       "more": "{{pct}}% more than in {{month}}",

@@ -16,7 +16,6 @@ import { useFloatingTabBarClearance } from '@/shared/presentation/components/Gla
 import { useTheme } from '@/shared/presentation/theme';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
-import { AccountsStrip } from '../components/AccountsStrip';
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
 import { MonthTrend } from '../components/MonthTrend';
@@ -160,7 +159,6 @@ export function HomeScreen() {
             period={data.period}
             onPress={goMovements}
           />
-          <AccountsStrip onPress={() => router.push('/accounts')} />
           <RecentList items={data.recent} onSeeAll={goMovements} />
           <TopCategoriesCard categories={data.topCategories} />
         </View>

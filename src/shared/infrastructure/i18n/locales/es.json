@@ -608,10 +608,6 @@
       },
       "footer": "Con tu ingreso del mes calculamos cuánto puedes gastar cada día."
     },
-    "accounts": {
-      "title": "Tus cuentas",
-      "seeAll": "Ver todas"
-    },
     "trend": {
       "less": "{{pct}}% menos que en {{month}}",
       "more": "{{pct}}% más que en {{month}}",
