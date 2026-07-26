@@ -781,16 +781,16 @@
     },
     "rows": {
       "accounts": {
-        "title": "Accounts and sources",
-        "subtitle": "4 active · net balance $5,245,000"
+        "title": "Sources and accounts",
+        "subtitle_one": "{{count}} active · net balance {{net}}",
+        "subtitle_other": "{{count}} active · net balance {{net}}"
       },
       "subs": {
-        "title": "Subscriptions",
-        "subtitle": "3 active · $92,800/month"
+        "title": "Subscriptions"
       },
       "categories": {
         "title": "Categories",
-        "subtitle": "12 standard · 0 custom"
+        "subtitle": "{{standard}} standard · {{custom}} custom"
       },
       "deudas": {
         "title": "Debts",
@@ -956,6 +956,16 @@
       "USD": "US dollar",
       "EUR": "Euro",
       "MXN": "Mexican peso"
+    }
+  },
+  "comingSoon": {
+    "subscriptions": {
+      "title": "Subscriptions",
+      "body": "Not wired yet. Once it is, you will see your recurring charges, when each one hits and what is left of the month after them."
+    },
+    "debts": {
+      "title": "Debts",
+      "body": "Not wired yet. Once it is, you will track what you owe and what you are owed, with partial payments and a summary you can share."
     }
   }
 }

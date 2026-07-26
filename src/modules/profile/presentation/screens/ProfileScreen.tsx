@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
 import {
   useAuthStore,
   useLogout,
   useUpdatePreferences,
 } from '@/modules/auth/presentation';
+import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
@@ -20,6 +22,7 @@ import {
   Text,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { AppearanceRow } from '../components/AppearanceRow';
 import { EditNameSheet } from '../components/EditNameSheet';
@@ -43,6 +46,10 @@ export function ProfileScreen() {
   const logout = useLogout();
   const updatePreferences = useUpdatePreferences();
   const tier = usePlanStore((s) => s.tier);
+  // Real subtitles: these two rows used to carry hardcoded figures ("4 activas ·
+  // saldo neto $5.245.000") over data that has been real for a while.
+  const accounts = useAccounts();
+  const categories = useCategories();
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const currency = useCurrencyStore((s) => s.currency);
   const [editOpen, setEditOpen] = useState(false);
@@ -99,21 +106,35 @@ export function ProfileScreen() {
             icon="credit-card"
             iconColor="mint"
             title={t('profile.rows.accounts.title')}
-            subtitle={t('profile.rows.accounts.subtitle')}
+            subtitle={
+              accounts.data
+                ? t('profile.rows.accounts.subtitle', {
+                    count: accounts.data.accountsCount + accounts.data.creditCardsCount,
+                    net: formatMoney(accounts.data.netBalance, accounts.data.currency),
+                  })
+                : undefined
+            }
             onPress={() => router.push('/accounts')}
           />
           <SettingsRow
             icon="refresh"
             iconColor="amber"
             title={t('profile.rows.subs.title')}
-            subtitle={t('profile.rows.subs.subtitle')}
+            value={t('profile.soon')}
             onPress={() => router.push('/subscriptions')}
           />
           <SettingsRow
             icon="tag"
             iconColor="purple"
             title={t('profile.rows.categories.title')}
-            subtitle={t('profile.rows.categories.subtitle')}
+            subtitle={
+              categories.data
+                ? t('profile.rows.categories.subtitle', {
+                    standard: categories.data.filter((c) => c.isStandard).length,
+                    custom: categories.data.filter((c) => !c.isStandard).length,
+                  })
+                : undefined
+            }
             onPress={() => router.push('/categories')}
           />
           <SettingsRow
