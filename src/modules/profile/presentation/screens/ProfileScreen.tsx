@@ -1,5 +1,6 @@
+import Constants from 'expo-constants';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,8 +27,9 @@ import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { AppearanceRow } from '../components/AppearanceRow';
 import { EditNameSheet } from '../components/EditNameSheet';
+import type { UserProfile } from '../../domain/types/UserProfile';
+
 import { ProfileBlock } from '../components/ProfileBlock';
-import { useProfile } from '../hooks/useProfile';
 
 function initialsOf(name: string): string {
   return name
@@ -42,7 +44,7 @@ function initialsOf(name: string): string {
 export function ProfileScreen() {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
-  const { data, isLoading } = useProfile();
+  const session = useAuthStore((s) => s.session);
   const logout = useLogout();
   const updatePreferences = useUpdatePreferences();
   const tier = usePlanStore((s) => s.tier);
@@ -55,24 +57,22 @@ export function ProfileScreen() {
   const [editOpen, setEditOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
 
+  // Who you are comes from the session; the version from the build. The old
+  // in-memory repo answered "Sebastián Mejía · sebas@gastos.app" to everyone.
+  const profile = useMemo<UserProfile>(() => {
+    const name = onboardingName?.trim() || session?.displayName?.trim() || '';
+    return {
+      id: session?.userId ?? '',
+      displayName: name,
+      email: session?.email ?? '',
+      initials: initialsOf(name || session?.email || ''),
+      version: `v${Constants.expoConfig?.version ?? '0.0.0'}`,
+    };
+  }, [session, onboardingName]);
+
   const cycleLanguage = () => {
     void i18n.changeLanguage(i18n.language.startsWith('en') ? 'es' : 'en');
   };
-
-  if (isLoading || !data) {
-    return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: theme.colors.bgBase,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <ActivityIndicator color={theme.colors.accentMint} />
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView
@@ -88,18 +88,7 @@ export function ProfileScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <ProfileBlock
-          profile={
-            onboardingName?.trim()
-              ? {
-                  ...data,
-                  displayName: onboardingName,
-                  initials: initialsOf(onboardingName),
-                }
-              : data
-          }
-          onEdit={() => setEditOpen(true)}
-        />
+        <ProfileBlock profile={profile} onEdit={() => setEditOpen(true)} />
 
         <SettingsGroup label={t('profile.groups.myData')}>
           <SettingsRow
@@ -247,7 +236,7 @@ export function ProfileScreen() {
 
         <View style={{ alignItems: 'center', marginTop: 18 }}>
           <Text variant="micro" muted style={{ fontSize: 10.5, letterSpacing: 0.42 }}>
-            {data.version} · Deshka
+            {profile.version} · Deshka
           </Text>
         </View>
       </ScrollView>
@@ -259,7 +248,7 @@ export function ProfileScreen() {
       />
       <EditNameSheet
         visible={editOpen}
-        initialName={onboardingName ?? data.displayName}
+        initialName={profile.displayName}
         onClose={() => setEditOpen(false)}
         onSave={(name) => {
           const store = useOnboardingStore.getState();

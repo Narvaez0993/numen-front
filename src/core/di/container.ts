@@ -50,9 +50,6 @@ import { InMemoryOnboardingRepository } from '@/modules/onboarding/infrastructur
 import type { PlanRepository } from '@/modules/plan/application/ports/PlanRepository';
 import { GetPlanComparisonUseCase } from '@/modules/plan/application/use-cases/GetPlanComparisonUseCase';
 import { InMemoryPlanRepository } from '@/modules/plan/infrastructure/repositories/InMemoryPlanRepository';
-import type { ProfileRepository } from '@/modules/profile/application/ports/ProfileRepository';
-import { GetProfileUseCase } from '@/modules/profile/application/use-cases/GetProfileUseCase';
-import { InMemoryProfileRepository } from '@/modules/profile/infrastructure/repositories/InMemoryProfileRepository';
 import type { SubscriptionsRepository } from '@/modules/subscriptions/application/ports/SubscriptionsRepository';
 import { GetSubscriptionsUseCase } from '@/modules/subscriptions/application/use-cases/GetSubscriptionsUseCase';
 import { InMemorySubscriptionsRepository } from '@/modules/subscriptions/infrastructure/repositories/InMemorySubscriptionsRepository';
@@ -63,7 +60,6 @@ export { setOnSessionExpired } from '@/shared/infrastructure/http/client';
 
 const authRepository: AuthRepository = new HttpAuthRepository(httpClient);
 const homeRepository: HomeRepository = new HttpHomeRepository(httpClient);
-const profileRepository: ProfileRepository = new InMemoryProfileRepository();
 const movementsRepository: MovementsRepository = new HttpMovementsRepository(httpClient);
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
@@ -85,7 +81,6 @@ export const logoutUseCase = new LogoutUseCase(authRepository);
 export const updateDisplayNameUseCase = new UpdateDisplayNameUseCase(authRepository);
 export const updatePreferencesUseCase = new UpdatePreferencesUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);
-export const getProfileUseCase = new GetProfileUseCase(profileRepository);
 export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const createMovementUseCase = new CreateMovementUseCase(movementsRepository);
 export const updateMovementUseCase = new UpdateMovementUseCase(movementsRepository);
@@ -120,7 +115,6 @@ export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
 export const container = {
   authRepository,
   homeRepository,
-  profileRepository,
   movementsRepository,
   budgetsRepository,
   deudasRepository,
@@ -138,7 +132,6 @@ export const container = {
   updateDisplayNameUseCase,
   updatePreferencesUseCase,
   getHomeOverviewUseCase,
-  getProfileUseCase,
   getMovementsUseCase,
   createMovementUseCase,
   updateMovementUseCase,
