@@ -42,3 +42,15 @@ export class ChargeAlreadySettledError extends DomainError {
     super('This charge was already settled');
   }
 }
+
+/**
+ * The source and the home currency disagree. Its own error because it is the one
+ * failure no form field can fix — it means the account was stamped in another
+ * currency, and the message has to say which.
+ */
+export class SubscriptionSourceCurrencyMismatchError extends DomainError {
+  readonly code = 'subscriptions.source_currency_mismatch';
+  constructor(message = 'This source is in another currency') {
+    super(message);
+  }
+}

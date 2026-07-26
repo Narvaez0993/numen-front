@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import {
+  CurrencyChangeBlockedError,
   CodeExpiredError,
   EmailAlreadyExistsError,
   EmailNotVerifiedError,
@@ -24,6 +25,7 @@ const BY_CODE: Record<string, () => Error> = {
   'auth.resend_cooldown': () => new ResendCooldownError(),
   'auth.invalid_refresh_token': () => new SessionExpiredError(),
   'auth.refresh_token_reused': () => new SessionExpiredError(),
+  'auth.currency_change_blocked': () => new CurrencyChangeBlockedError(),
 };
 
 /** Translate a backend `{ code, message }` error into a domain error. */

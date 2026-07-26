@@ -334,7 +334,8 @@
       "invalid": "Check the subscription details.",
       "generic": "We could not save it. Try again.",
       "deleteFailed": "We could not delete it.",
-      "alreadySettled": "That charge was already registered."
+      "alreadySettled": "That charge was already registered.",
+      "currencyMismatch": "That account is registered in another currency. Check it in Accounts first."
     }
   },
   "accounts": {
@@ -888,6 +889,10 @@
       "label": "Name",
       "placeholder": "Your name",
       "save": "Save"
+    },
+    "currency": {
+      "blocked": "Your data is already registered in another currency. Changing it would re-label amounts you saved, so we left it as is.",
+      "failed": "We could not change the currency."
     }
   },
   "expenses": {

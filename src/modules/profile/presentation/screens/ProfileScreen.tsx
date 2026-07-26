@@ -14,6 +14,7 @@ import {
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
+import { CurrencyChangeBlockedError } from '@/modules/auth/domain';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import {
   CurrencyPickerSheet,
@@ -21,6 +22,7 @@ import {
   SettingsRow,
   SubScreenHeader,
   Text,
+  Toast,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
@@ -56,6 +58,7 @@ export function ProfileScreen() {
   const currency = useCurrencyStore((s) => s.currency);
   const [editOpen, setEditOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   // Who you are comes from the session; the version from the build. The old
   // in-memory repo answered "Sebastián Mejía · sebas@gastos.app" to everyone.
@@ -244,7 +247,27 @@ export function ProfileScreen() {
       <CurrencyPickerSheet
         visible={currencyOpen}
         onClose={() => setCurrencyOpen(false)}
-        onChange={(code) => updatePreferences.mutate({ currency: code })}
+        onChange={(code) =>
+          updatePreferences.mutate(
+            { currency: code },
+            {
+              // Not a failure to retry: the app is refusing to re-label money the
+              // user already registered, and the copy has to say why.
+              onError: (error) =>
+                setToast(
+                  error instanceof CurrencyChangeBlockedError
+                    ? t('profile.currency.blocked')
+                    : t('profile.currency.failed'),
+                ),
+            },
+          )
+        }
+      />
+      <Toast
+        visible={toast !== null}
+        message={toast ?? ''}
+        onDismiss={() => setToast(null)}
+        durationMs={4000}
       />
       <EditNameSheet
         visible={editOpen}

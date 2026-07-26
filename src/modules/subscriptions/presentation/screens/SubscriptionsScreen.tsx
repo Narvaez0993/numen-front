@@ -12,6 +12,7 @@ import { toIsoDate } from '@/shared/presentation/utils/dates';
 import {
   ChargeAlreadySettledError,
   InvalidSubscriptionError,
+  SubscriptionSourceCurrencyMismatchError,
   type Subscription,
 } from '../../domain';
 import { AddSubscriptionButton } from '../components/AddSubscriptionButton';
@@ -59,6 +60,12 @@ export function SubscriptionsScreen() {
   };
 
   const handleFormError = (error: Error) => {
+    if (error instanceof SubscriptionSourceCurrencyMismatchError) {
+      // Nothing in the form fixes this one: the account itself is in another
+      // currency, so the message points at where the problem actually is.
+      setFormError(t('subscriptions.errors.currencyMismatch'));
+      return;
+    }
     setFormError(
       error instanceof InvalidSubscriptionError
         ? t('subscriptions.errors.invalid')
