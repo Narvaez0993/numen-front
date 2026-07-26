@@ -12,8 +12,10 @@ import { useFloatingTabBarClearance } from '@/shared/presentation/components/Gla
 import { useTheme } from '@/shared/presentation/theme';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
+import { AccountsStrip } from '../components/AccountsStrip';
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
+import { MonthTrend } from '../components/MonthTrend';
 import { RecentList } from '../components/RecentList';
 import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
@@ -136,6 +138,8 @@ export function HomeScreen() {
             // No income and no budget: the hero shows what to do about it.
             start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
           />
+          <AccountsStrip onPress={() => router.push('/accounts')} />
+          <MonthTrend spent={data.month.spent} today={today} />
           <IncomeSummaryRow
             total={data.month.income}
             savingsRate={data.month.savingsRate}

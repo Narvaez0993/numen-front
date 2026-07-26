@@ -570,6 +570,16 @@
         "income": "Registra tu ingreso de {{month}}"
       },
       "footer": "Con tu ingreso del mes calculamos cuánto puedes gastar cada día."
+    },
+    "accounts": {
+      "title": "Dónde está tu plata",
+      "seeAll": "Ver todas"
+    },
+    "trend": {
+      "less": "{{pct}}% menos que en {{month}}",
+      "more": "{{pct}}% más que en {{month}}",
+      "same": "Vas igual que en {{month}}",
+      "caption": "{{amount}} hasta el {{day}} del mes pasado"
     }
   },
   "goals": {

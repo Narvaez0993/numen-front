@@ -570,6 +570,16 @@
         "income": "Register your {{month}} income"
       },
       "footer": "With this month's income we work out how much you can spend each day."
+    },
+    "accounts": {
+      "title": "Where your money is",
+      "seeAll": "See all"
+    },
+    "trend": {
+      "less": "{{pct}}% less than in {{month}}",
+      "more": "{{pct}}% more than in {{month}}",
+      "same": "Same pace as {{month}}",
+      "caption": "{{amount}} through the {{day}}th last month"
     }
   },
   "goals": {

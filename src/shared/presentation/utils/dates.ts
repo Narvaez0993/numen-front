@@ -47,6 +47,18 @@ export function shiftMonth(iso: string, offset: number): string {
   return toIsoDate(new Date(date.getFullYear(), date.getMonth() + offset, 1, 12));
 }
 
+/**
+ * Last month, cut at the same day of the month as `iso` — the only fair way to
+ * compare a month in progress: July 1–26 against June 1–26, never against the
+ * whole of June. Clamped when the previous month is shorter (31 → 28).
+ */
+export function sameSpanLastMonth(iso: string): DateRange {
+  const { from, to } = monthRange(shiftMonth(iso, -1));
+  const day = fromIsoDate(iso).getDate();
+  const lastDay = fromIsoDate(to).getDate();
+  return { from, to: addDays(from, Math.min(day, lastDay) - 1) };
+}
+
 /** `2026-07` — the key the UI uses to name a month. */
 export function monthKey(iso: string): string {
   return iso.slice(0, 7);
