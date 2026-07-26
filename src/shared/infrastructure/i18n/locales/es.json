@@ -531,9 +531,7 @@
       "basis": {
         "income": "según tus ingresos",
         "budget": "según tu presupuesto"
-      },
-      "noBasis": "Registra un ingreso y calculamos cuánto puedes gastar cada día.",
-      "registerIncome": "Registrar ingreso"
+      }
     },
     "saldo": {
       "label": "Saldo neto"
@@ -541,8 +539,6 @@
     "month": {
       "label": "{{month}} · {{daysLeft}} días",
       "labelOne": "{{month}} · {{daysLeft}} día",
-      "spentLabel": "Gastado este mes",
-      "spentSuffix": "en total",
       "movements_one": "{{count}} mov",
       "movements_other": "{{count}} mov"
     },
@@ -563,6 +559,17 @@
     "error": {
       "title": "No pudimos cargar tu inicio.",
       "retry": "Reintentar"
+    },
+    "start": {
+      "title": "Empieza aquí",
+      "titleReturning": "Para calcular tu cupo",
+      "progress": "{{done}} de {{total}}",
+      "steps": {
+        "source": "Crea tu primera cuenta",
+        "expense": "Registra un gasto",
+        "income": "Registra tu ingreso de {{month}}"
+      },
+      "footer": "Con tu ingreso del mes calculamos cuánto puedes gastar cada día."
     }
   },
   "goals": {

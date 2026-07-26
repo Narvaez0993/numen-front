@@ -10,7 +10,7 @@ import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/use
 import { Text } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
-import { toIsoDate } from '@/shared/presentation/utils/dates';
+import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
@@ -21,7 +21,7 @@ import { useHomeOverview } from '../hooks/useHomeOverview';
 
 export function HomeScreen() {
   const { theme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // The device's local day, pinned once per mount: the server answers about the
   // user's calendar, and a re-render must not move the question.
   const today = useMemo(() => toIsoDate(new Date()), []);
@@ -80,6 +80,32 @@ export function HomeScreen() {
 
   const goMovements = () => router.push('/movements');
 
+  // The three things that turn the daily figure on, each answered by the payload
+  // itself — nothing is remembered on the device, so this cannot drift from what
+  // the user actually has.
+  const startSteps = [
+    {
+      key: 'source',
+      label: t('home.start.steps.source'),
+      done: data.accountsCount + data.creditCardsCount > 0,
+      onPress: () => router.push('/accounts'),
+    },
+    {
+      key: 'expense',
+      label: t('home.start.steps.expense'),
+      done: data.month.spent > 0 || data.recent.some((m) => m.type === 'expense'),
+      onPress: () => openSheet('manual', 'expense'),
+    },
+    {
+      key: 'income',
+      label: t('home.start.steps.income', {
+        month: monthName(`${data.period}-01`, i18n.language),
+      }),
+      done: data.month.income > 0,
+      onPress: () => openSheet('manual', 'income'),
+    },
+  ];
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
@@ -107,9 +133,8 @@ export function HomeScreen() {
             onSaldoPress={() => router.push('/accounts')}
             // The month's spend is the movements that made it, not a budget.
             onMonthPress={goMovements}
-            // Straight to the manual form: registering an income is the one thing
-            // that turns the hero on.
-            onRegisterIncome={() => openSheet('manual')}
+            // No income and no budget: the hero shows what to do about it.
+            start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
           />
           <IncomeSummaryRow
             total={data.month.income}

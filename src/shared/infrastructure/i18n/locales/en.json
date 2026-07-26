@@ -531,9 +531,7 @@
       "basis": {
         "income": "based on your income",
         "budget": "based on your budget"
-      },
-      "noBasis": "Register an income and we will work out how much you can spend each day.",
-      "registerIncome": "Add income"
+      }
     },
     "saldo": {
       "label": "Net balance"
@@ -541,8 +539,6 @@
     "month": {
       "label": "{{month}} · {{daysLeft}} days",
       "labelOne": "{{month}} · {{daysLeft}} day",
-      "spentLabel": "Spent this month",
-      "spentSuffix": "in total",
       "movements_one": "{{count}} mov",
       "movements_other": "{{count}} mov"
     },
@@ -563,6 +559,17 @@
     "error": {
       "title": "We could not load your home.",
       "retry": "Try again"
+    },
+    "start": {
+      "title": "Start here",
+      "titleReturning": "To work out your daily figure",
+      "progress": "{{done}} of {{total}}",
+      "steps": {
+        "source": "Create your first account",
+        "expense": "Register an expense",
+        "income": "Register your {{month}} income"
+      },
+      "footer": "With this month's income we work out how much you can spend each day."
     }
   },
   "goals": {

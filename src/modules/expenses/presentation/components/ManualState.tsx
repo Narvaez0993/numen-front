@@ -19,6 +19,8 @@ import { dayLabel, recentDays, toIsoDate } from '@/shared/presentation/utils/dat
 import { formatAmountDigits } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
+  /** Which movement type the form opens on (default `expense`). */
+  initialType?: MovementType;
   onSave: (movement: NewMovement) => void;
   saving?: boolean;
   errorMessage?: string | null;
@@ -38,7 +40,12 @@ const parseRefKey = (key: string): SourceRef => {
   return { type: type as SourceRef['type'], id: rest.join(':') };
 };
 
-export function ManualState({ onSave, saving = false, errorMessage }: Props) {
+export function ManualState({
+  initialType = 'expense',
+  onSave,
+  saving = false,
+  errorMessage,
+}: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const currency = useCurrencyStore((s) => s.currency);
@@ -48,7 +55,7 @@ export function ManualState({ onSave, saving = false, errorMessage }: Props) {
   const accounts = useAccounts();
 
   const [today] = useState(() => toIsoDate(new Date()));
-  const [type, setType] = useState<MovementType>('expense');
+  const [type, setType] = useState<MovementType>(initialType);
   const [digits, setDigits] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState<string | null>(null);

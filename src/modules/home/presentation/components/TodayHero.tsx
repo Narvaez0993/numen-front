@@ -8,6 +8,8 @@ import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DailyAllowance, MonthSummary } from '../../domain/types/HomeOverview';
 
+import { GettingStarted, type StartStep } from './GettingStarted';
+
 type Props = {
   daily: DailyAllowance;
   month: MonthSummary;
@@ -17,8 +19,8 @@ type Props = {
   daysLeft: number;
   onSaldoPress?: () => void;
   onMonthPress?: () => void;
-  /** Offered only while there is no basis for a daily figure. */
-  onRegisterIncome?: () => void;
+  /** Shown in place of the daily figure while there is no basis for one. */
+  start: { steps: StartStep[]; firstTime: boolean };
 };
 
 /**
@@ -27,10 +29,11 @@ type Props = {
  *
  * - with a basis (income today, a budget in phase 3) it leads with what is left
  *   for today — negative included, an overspent month is not rounded up to zero;
- * - without one it leads with the month's spending and asks for an income,
- *   instead of inventing an allowance out of nothing.
+ * - without one it leads with **what to do about it**: a checklist of the three
+ *   things that turn the figure on. A brand-new user used to land on a hero of
+ *   zeros, which is the worst thing a money app can say on its first screen.
  *
- * Net balance and the month row stay in both.
+ * Net balance and the month's spend stay in both.
  */
 export function TodayHero({
   daily,
@@ -40,7 +43,7 @@ export function TodayHero({
   daysLeft,
   onSaldoPress,
   onMonthPress,
-  onRegisterIncome,
+  start,
 }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -56,97 +59,9 @@ export function TodayHero({
     daysLeft,
   });
 
-  return (
-    <Card padding={18} radius={20}>
-      <Text
-        variant="micro"
-        muted
-        uppercase
-        style={{ marginBottom: 8, letterSpacing: 1.05 }}
-      >
-        {t(hasAllowance ? 'home.daily.label' : 'home.month.spentLabel')}
-      </Text>
-
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'baseline',
-          gap: 8,
-          marginBottom: 6,
-          flexWrap: 'wrap',
-        }}
-      >
-        <Text
-          variant="display"
-          tabular
-          color={
-            hasAllowance && overspent
-              ? theme.colors.accentCoral
-              : theme.colors.textPrimary
-          }
-        >
-          {formatMoney(hasAllowance ? daily.available : month.spent)}
-        </Text>
-        <Text variant="caption" muted>
-          {hasAllowance
-            ? t(overspent ? 'home.daily.overspent' : 'home.daily.availableToday')
-            : t('home.month.spentSuffix')}
-        </Text>
-      </View>
-
-      {hasAllowance ? (
-        <>
-          <Text
-            variant="caption"
-            color={theme.colors.textSecondary}
-            style={{ marginBottom: 14 }}
-          >
-            <Text variant="caption" color={theme.colors.textSecondary} tabular>
-              {formatMoney(daily.spentToday)}
-            </Text>{' '}
-            {t('home.daily.spentToday')}{' '}
-            <Text variant="caption" muted>
-              ·
-            </Text>{' '}
-            {t(`home.daily.basis.${daily.basis}`)}
-          </Text>
-          <ProgressBar pct={pct} height={7} />
-        </>
-      ) : (
-        <>
-          <Text variant="caption" color={theme.colors.textSecondary}>
-            {t('home.daily.noBasis')}
-          </Text>
-          {onRegisterIncome ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={onRegisterIncome}
-              style={({ pressed }) => ({
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 6,
-                alignSelf: 'flex-start',
-                marginTop: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                borderRadius: 11,
-                backgroundColor: theme.colors.accentMintBg,
-                opacity: pressed ? 0.7 : 1,
-              })}
-            >
-              <Icon name="plus" size={14} color={theme.colors.accentMint} />
-              <Text
-                variant="label"
-                color={theme.colors.accentMint}
-                style={{ fontSize: 12.5 }}
-              >
-                {t('home.daily.registerIncome')}
-              </Text>
-            </Pressable>
-          ) : null}
-        </>
-      )}
-
+  // Position and month: the same two rows under either face of the hero.
+  const secondaryRows = (
+    <>
       <View
         style={{
           height: 1,
@@ -198,18 +113,80 @@ export function TodayHero({
           {monthLabel}
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          {/* The month's spend already leads the hero when there is no allowance. */}
-          {hasAllowance ? (
-            <Text variant="caption" color={theme.colors.textSecondary} tabular>
-              {formatMoney(month.spent)}
-            </Text>
-          ) : null}
+          <Text variant="caption" color={theme.colors.textSecondary} tabular>
+            {formatMoney(month.spent)}
+          </Text>
           <Text variant="caption" muted tabular>
             {t('home.month.movements', { count: month.movements })}
           </Text>
           <Icon name="chevron-right" size={14} color={theme.colors.textTertiary} />
         </View>
       </Pressable>
+    </>
+  );
+
+  if (!hasAllowance) {
+    return (
+      <Card padding={18} radius={20}>
+        <GettingStarted
+          steps={start.steps}
+          firstTime={start.firstTime}
+          footer={t('home.start.footer')}
+        />
+        {secondaryRows}
+      </Card>
+    );
+  }
+
+  return (
+    <Card padding={18} radius={20}>
+      <Text
+        variant="micro"
+        muted
+        uppercase
+        style={{ marginBottom: 8, letterSpacing: 1.05 }}
+      >
+        {t('home.daily.label')}
+      </Text>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'baseline',
+          gap: 8,
+          marginBottom: 6,
+          flexWrap: 'wrap',
+        }}
+      >
+        <Text
+          variant="display"
+          tabular
+          color={overspent ? theme.colors.accentCoral : theme.colors.textPrimary}
+        >
+          {formatMoney(daily.available)}
+        </Text>
+        <Text variant="caption" muted>
+          {t(overspent ? 'home.daily.overspent' : 'home.daily.availableToday')}
+        </Text>
+      </View>
+
+      <Text
+        variant="caption"
+        color={theme.colors.textSecondary}
+        style={{ marginBottom: 14 }}
+      >
+        <Text variant="caption" color={theme.colors.textSecondary} tabular>
+          {formatMoney(daily.spentToday)}
+        </Text>{' '}
+        {t('home.daily.spentToday')}{' '}
+        <Text variant="caption" muted>
+          ·
+        </Text>{' '}
+        {t(`home.daily.basis.${daily.basis}`)}
+      </Text>
+      <ProgressBar pct={pct} height={7} />
+
+      {secondaryRows}
     </Card>
   );
 }
