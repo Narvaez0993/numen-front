@@ -153,7 +153,6 @@ export function HomeScreen() {
             onSkip={(id) => skipCharge.mutate(id)}
             onSeeAll={() => router.push('/subscriptions')}
           />
-          <AccountsStrip onPress={() => router.push('/accounts')} />
           <MonthTrend spent={data.month.spent} today={today} />
           <IncomeSummaryRow
             total={data.month.income}
@@ -161,6 +160,7 @@ export function HomeScreen() {
             period={data.period}
             onPress={goMovements}
           />
+          <AccountsStrip onPress={() => router.push('/accounts')} />
           <RecentList items={data.recent} onSeeAll={goMovements} />
           <TopCategoriesCard categories={data.topCategories} />
         </View>
