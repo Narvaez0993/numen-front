@@ -14,7 +14,10 @@ type Props = {
    * from "you have none". An empty list would say the wrong thing. */
   body: string;
   icon: IconName;
+  /** Sub-screens get a back header; a tab has no back, so the title moves inline. */
   onBack?: () => void;
+  /** Clearance for the floating tab bar when this is a tab. */
+  bottomPadding?: number;
 };
 
 /**
@@ -25,21 +28,21 @@ type Props = {
  * ready: the user cannot tell which numbers to trust. Same call we made for the
  * voice/photo/text capture.
  */
-export function ComingSoon({ title, body, icon, onBack }: Props) {
+export function ComingSoon({ title, body, icon, onBack, bottomPadding = 60 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.bgBase }}>
-      <SubScreenHeader title={title} onBack={onBack} />
+      {onBack ? <SubScreenHeader title={title} onBack={onBack} /> : null}
       <View
         style={{
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 16,
+          gap: 14,
           paddingHorizontal: 32,
-          paddingBottom: 60,
+          paddingBottom: bottomPadding,
         }}
       >
         <View
@@ -56,6 +59,7 @@ export function ComingSoon({ title, body, icon, onBack }: Props) {
         >
           <Icon name={icon} size={25} stroke={1.6} color={theme.colors.textTertiary} />
         </View>
+        {onBack ? null : <Text variant="h1">{title}</Text>}
         <Pill variant="amber">{t('common.soon')}</Pill>
         <Text
           variant="body"

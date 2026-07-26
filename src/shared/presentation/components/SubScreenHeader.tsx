@@ -24,22 +24,28 @@ export function SubScreenHeader({ title, onBack, rightAction }: Props) {
         gap: 4,
       }}
     >
-      <Pressable
-        onPress={onBack}
-        style={({ pressed }) => ({
-          width: 38,
-          height: 38,
-          borderRadius: 19,
-          backgroundColor: theme.colors.bgSurface,
-          borderColor: theme.colors.borderSubtle,
-          borderWidth: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: pressed ? 0.85 : 1,
-        })}
-      >
-        <Icon name="chevron-left" size={18} color={theme.colors.textPrimary} />
-      </Pressable>
+      {onBack ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onBack}
+          style={({ pressed }) => ({
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            backgroundColor: theme.colors.bgSurface,
+            borderColor: theme.colors.borderSubtle,
+            borderWidth: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: pressed ? 0.85 : 1,
+          })}
+        >
+          <Icon name="chevron-left" size={18} color={theme.colors.textPrimary} />
+        </Pressable>
+      ) : (
+        // Same width, so the title stays centred without a button to tap.
+        <View style={{ width: 38, height: 38 }} />
+      )}
       <View style={{ flex: 1, alignItems: 'center' }}>
         <Text variant="h1" style={{ fontSize: 15, letterSpacing: -0.3 }}>
           {title}

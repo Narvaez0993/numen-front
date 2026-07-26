@@ -7,7 +7,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCreateAccount } from '@/modules/accounts/presentation/hooks/useAccountMutations';
 import { useAuthStore, useUpdateName } from '@/modules/auth/presentation';
 import { completeOnboardingUseCase } from '@/core/di/container';
-import { useGoalsStore } from '@/modules/goals/presentation/stores/useGoalsStore';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { SETUP_BACK_MAP, type SetupStep } from '../hooks/flowTransitions';
@@ -63,20 +62,9 @@ export function SetupFlow() {
         balance: persisted.balance,
       });
     }
-    if (persisted.goal === 'ahorrar') {
-      const goalsStore = useGoalsStore.getState();
-      if (!goalsStore.goals.some((g) => g.id === 'goal-onboarding')) {
-        goalsStore.addGoal({
-          id: 'goal-onboarding',
-          name: 'Mi primera meta',
-          iconName: 'target',
-          color: 'mint',
-          target: 1_000_000,
-          saved: 0,
-          projectionMonth: '',
-        });
-      }
-    }
+    // The objective the user picked stays in the onboarding store as context for
+    // when `goals` is real. It used to create a "Mi primera meta" of $1.000.000
+    // — a target nobody asked for, in a store that empties on restart.
     // Navigate explicitly to the tabs group. Expo Router v4 cross-group
     // imperative navigation works best with an explicit group path.
     router.replace('/(tabs)');

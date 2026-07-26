@@ -970,6 +970,14 @@
     "goals": {
       "title": "Goals",
       "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."
+    },
+    "budgets": {
+      "title": "Budgets",
+      "body": "Not wired yet. Once it is, you will set a monthly and per-category cap, and your daily figure will come from that cap instead of your income."
+    },
+    "assistant": {
+      "title": "Assistant",
+      "body": "Not wired yet. Once it is, it will read your real movements to answer you and flag things worth a look."
     }
   }
 }

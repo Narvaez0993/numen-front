@@ -970,6 +970,14 @@
     "goals": {
       "title": "Metas",
       "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
+    },
+    "budgets": {
+      "title": "Presupuestos",
+      "body": "Aún no está conectado. Cuando lo esté vas a poner un tope al mes y por categoría, y tu cupo diario saldrá de ese tope en vez de tus ingresos."
+    },
+    "assistant": {
+      "title": "Asistente",
+      "body": "Aún no está conectado. Cuando lo esté va a leer tus movimientos reales para responderte y avisarte cosas que valga la pena mirar."
     }
   }
 }
