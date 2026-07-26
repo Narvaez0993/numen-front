@@ -90,7 +90,7 @@ export function ManualState({ onSave, saving = false, errorMessage }: Props) {
 
   const categoryOptions = useMemo(() => {
     const flow = type === 'income' ? 'income' : 'expense';
-    return (categories.data?.categories ?? [])
+    return (categories.data ?? [])
       .filter((category) => category.flow === flow)
       .map((category) => ({
         id: category.id,

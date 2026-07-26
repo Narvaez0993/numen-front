@@ -10,9 +10,6 @@ export type Category = {
   color: CategoryColor;
   flow: CategoryFlow;
   isStandard: boolean;
-  /** Movement-derived aggregates (0 until the movements module exists). */
-  spent: number;
-  count: number;
 };
 
 export type NewCategory = {

@@ -9,8 +9,6 @@ const CATEGORIES: Category[] = [
     name: 'Café',
     icon: 'coffee',
     color: 'amber',
-    spent: 1000,
-    count: 1,
     ...base,
   },
   {
@@ -18,8 +16,6 @@ const CATEGORIES: Category[] = [
     name: 'Mercado',
     icon: 'shopping-cart',
     color: 'mint',
-    spent: 2000,
-    count: 2,
     ...base,
   },
   {
@@ -27,8 +23,6 @@ const CATEGORIES: Category[] = [
     name: 'Comida fuera',
     icon: 'tools-kitchen-2',
     color: 'pink',
-    spent: 3000,
-    count: 3,
     ...base,
   },
 ];

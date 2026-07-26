@@ -43,7 +43,7 @@ export function useMovementCatalogs(): MovementCatalogs {
 
   return useMemo(() => {
     const categoryById: Record<string, ResolvedCategory> = {};
-    for (const category of categories.data?.categories ?? []) {
+    for (const category of categories.data ?? []) {
       categoryById[category.id] = {
         id: category.id,
         name: category.name,
