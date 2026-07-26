@@ -1,15 +1,17 @@
 import { useTranslation } from 'react-i18next';
 
 import { Card, Text } from '@/shared/presentation/components';
+import type { CurrencyCode } from '@/shared/domain';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   monthly: number;
   yearly: number;
   count: number;
+  currency: CurrencyCode;
 };
 
-export function MonthlyTotalCard({ monthly, yearly, count }: Props) {
+export function MonthlyTotalCard({ monthly, yearly, count, currency }: Props) {
   const { t } = useTranslation();
   return (
     <Card padding={18} radius={18} style={{ marginBottom: 18 }}>
@@ -26,12 +28,12 @@ export function MonthlyTotalCard({ monthly, yearly, count }: Props) {
         tabular
         style={{ fontSize: 28, lineHeight: 28, letterSpacing: -0.56 }}
       >
-        {formatMoney(monthly)}
+        {formatMoney(monthly, currency)}
       </Text>
       <Text variant="caption" muted style={{ fontSize: 11.5, marginTop: 6 }}>
         {t('subscriptions.monthlyTotal.breakdown', {
           count,
-          yearly: formatMoney(yearly),
+          yearly: formatMoney(yearly, currency),
         })}
       </Text>
     </Card>

@@ -271,15 +271,33 @@
     "title": "Subscriptions",
     "monthlyTotal": {
       "label": "Monthly total",
-      "breakdown_one": "{{count}} active · yearly projection {{yearly}}",
-      "breakdown_other": "{{count}} active · yearly projection {{yearly}}"
+      "breakdown_one": "{{count}} active · {{yearly}} a year",
+      "breakdown_other": "{{count}} active · {{yearly}} a year"
+    },
+    "frequency": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
     },
     "card": {
-      "cadence": "Every {{days}} days · {{account}}",
-      "next_one": "In {{count}} day",
-      "next_other": "In {{count}} days"
+      "next_one": "in {{count}} day",
+      "next_other": "in {{count}} days",
+      "today": "today",
+      "paused": "paused"
+    },
+    "pending": {
+      "title_one": "{{count}} charge to confirm",
+      "title_other": "{{count}} charges to confirm",
+      "hint": "If you do not answer within 3 hours we register it for you. You can always delete the movement afterwards.",
+      "dueToday": "Due today",
+      "overdue": "Was due on {{date}}",
+      "confirm": "Yes, I was charged",
+      "skip": "Did not happen",
+      "unknown": "Subscription"
     },
     "add": "Add subscription",
+    "empty": "No subscriptions yet. Add the first one to see what leaves every month.",
+    "footer": "A subscription is a forecast: on the due date we ask before registering it.",
     "form": {
       "newTitle": "New subscription",
       "editTitle": "Edit subscription",
@@ -293,12 +311,30 @@
         "monthly": "Monthly",
         "yearly": "Yearly"
       },
-      "account": "Account",
+      "firstCharge": "First charge",
+      "source": "Charged to",
+      "category": "Category",
+      "noSource": "Pick an account",
+      "noCategory": "No category",
+      "pause": "Pause charges",
+      "resume": "Resume charges",
       "save": "Save",
       "delete": "Delete",
       "deleteConfirmTitle": "Delete {{name}}?",
       "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "tomorrow": "Tomorrow",
+      "pickDate": "Pick a date…"
+    },
+    "error": {
+      "title": "We could not load your subscriptions.",
+      "retry": "Try again"
+    },
+    "errors": {
+      "invalid": "Check the subscription details.",
+      "generic": "We could not save it. Try again.",
+      "deleteFailed": "We could not delete it.",
+      "alreadySettled": "That charge was already registered."
     }
   },
   "accounts": {

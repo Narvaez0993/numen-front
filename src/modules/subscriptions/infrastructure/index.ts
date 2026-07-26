@@ -1,1 +1,1 @@
-export * from './repositories/InMemorySubscriptionsRepository';
+export * from './repositories/HttpSubscriptionsRepository';

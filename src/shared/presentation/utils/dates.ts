@@ -59,6 +59,15 @@ export function sameSpanLastMonth(iso: string): DateRange {
   return { from, to: addDays(from, Math.min(day, lastDay) - 1) };
 }
 
+/**
+ * Whole days from `from` to `to`; negative when `to` already passed. Used to say
+ * "in 3 days" without storing it — a persisted "in 3 days" is wrong tomorrow.
+ */
+export function daysBetween(from: string, to: string): number {
+  const ms = fromIsoDate(to).getTime() - fromIsoDate(from).getTime();
+  return Math.round(ms / 86_400_000);
+}
+
 /** `2026-07` — the key the UI uses to name a month. */
 export function monthKey(iso: string): string {
   return iso.slice(0, 7);

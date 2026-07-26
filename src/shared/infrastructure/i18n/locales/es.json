@@ -274,12 +274,30 @@
       "breakdown_one": "{{count}} activa · proyección anual {{yearly}}",
       "breakdown_other": "{{count}} activas · proyección anual {{yearly}}"
     },
+    "frequency": {
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
     "card": {
-      "cadence": "Cada {{days}} días · {{account}}",
-      "next_one": "En {{count}} día",
-      "next_other": "En {{count}} días"
+      "next_one": "en {{count}} día",
+      "next_other": "en {{count}} días",
+      "today": "hoy",
+      "paused": "pausada"
+    },
+    "pending": {
+      "title_one": "{{count}} cobro por confirmar",
+      "title_other": "{{count}} cobros por confirmar",
+      "hint": "Si no respondes en 3 horas lo registramos por ti. Siempre puedes borrar el movimiento después.",
+      "dueToday": "Se cobra hoy",
+      "overdue": "Vencía el {{date}}",
+      "confirm": "Sí, me cobraron",
+      "skip": "No pasó",
+      "unknown": "Suscripción"
     },
     "add": "Agregar suscripción",
+    "empty": "Aún no registras suscripciones. Agrega la primera y verás cuánto se te va cada mes.",
+    "footer": "Una suscripción es un pronóstico: el día del cobro te preguntamos antes de registrarlo.",
     "form": {
       "newTitle": "Nueva suscripción",
       "editTitle": "Editar suscripción",
@@ -293,12 +311,30 @@
         "monthly": "Mensual",
         "yearly": "Anual"
       },
-      "account": "Cuenta",
+      "firstCharge": "Primer cobro",
+      "source": "Se cobra de",
+      "category": "Categoría",
+      "noSource": "Elige una cuenta",
+      "noCategory": "Sin categoría",
+      "pause": "Pausar cobros",
+      "resume": "Reactivar cobros",
       "save": "Guardar",
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Eliminar {{name}}?",
       "deleteConfirm": "Sí, eliminar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "tomorrow": "Mañana",
+      "pickDate": "Elegir fecha…"
+    },
+    "error": {
+      "title": "No pudimos cargar tus suscripciones.",
+      "retry": "Reintentar"
+    },
+    "errors": {
+      "invalid": "Revisa los datos de la suscripción.",
+      "generic": "No pudimos guardar. Intenta de nuevo.",
+      "deleteFailed": "No pudimos eliminarla.",
+      "alreadySettled": "Ese cobro ya se registró."
     }
   },
   "accounts": {

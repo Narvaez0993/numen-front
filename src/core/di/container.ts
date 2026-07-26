@@ -51,8 +51,13 @@ import type { PlanRepository } from '@/modules/plan/application/ports/PlanReposi
 import { GetPlanComparisonUseCase } from '@/modules/plan/application/use-cases/GetPlanComparisonUseCase';
 import { InMemoryPlanRepository } from '@/modules/plan/infrastructure/repositories/InMemoryPlanRepository';
 import type { SubscriptionsRepository } from '@/modules/subscriptions/application/ports/SubscriptionsRepository';
+import { CreateSubscriptionUseCase } from '@/modules/subscriptions/application/use-cases/CreateSubscriptionUseCase';
+import { DeleteSubscriptionUseCase } from '@/modules/subscriptions/application/use-cases/DeleteSubscriptionUseCase';
+import { GetChargesUseCase } from '@/modules/subscriptions/application/use-cases/GetChargesUseCase';
 import { GetSubscriptionsUseCase } from '@/modules/subscriptions/application/use-cases/GetSubscriptionsUseCase';
-import { InMemorySubscriptionsRepository } from '@/modules/subscriptions/infrastructure/repositories/InMemorySubscriptionsRepository';
+import { SettleChargeUseCase } from '@/modules/subscriptions/application/use-cases/SettleChargeUseCase';
+import { UpdateSubscriptionUseCase } from '@/modules/subscriptions/application/use-cases/UpdateSubscriptionUseCase';
+import { HttpSubscriptionsRepository } from '@/modules/subscriptions/infrastructure';
 
 // Re-exported so the app layer can register a session-expiry handler without
 // importing shared-infrastructure directly (boundaries: app → core is allowed).
@@ -65,8 +70,9 @@ const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
 const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
 const accountsRepository: AccountsRepository = new HttpAccountsRepository(httpClient);
-const subscriptionsRepository: SubscriptionsRepository =
-  new InMemorySubscriptionsRepository();
+const subscriptionsRepository: SubscriptionsRepository = new HttpSubscriptionsRepository(
+  httpClient,
+);
 const categoriesRepository: CategoriesRepository = new HttpCategoriesRepository(
   httpClient,
 );
@@ -103,6 +109,17 @@ export const deleteCreditCardUseCase = new DeleteCreditCardUseCase(accountsRepos
 export const getSubscriptionsUseCase = new GetSubscriptionsUseCase(
   subscriptionsRepository,
 );
+export const createSubscriptionUseCase = new CreateSubscriptionUseCase(
+  subscriptionsRepository,
+);
+export const updateSubscriptionUseCase = new UpdateSubscriptionUseCase(
+  subscriptionsRepository,
+);
+export const deleteSubscriptionUseCase = new DeleteSubscriptionUseCase(
+  subscriptionsRepository,
+);
+export const getChargesUseCase = new GetChargesUseCase(subscriptionsRepository);
+export const settleChargeUseCase = new SettleChargeUseCase(subscriptionsRepository);
 export const getCategoriesUseCase = new GetCategoriesUseCase(categoriesRepository);
 export const createCategoryUseCase = new CreateCategoryUseCase(categoriesRepository);
 export const updateCategoryUseCase = new UpdateCategoryUseCase(categoriesRepository);
@@ -148,6 +165,11 @@ export const container = {
   updateCreditCardUseCase,
   deleteCreditCardUseCase,
   getSubscriptionsUseCase,
+  createSubscriptionUseCase,
+  updateSubscriptionUseCase,
+  deleteSubscriptionUseCase,
+  getChargesUseCase,
+  settleChargeUseCase,
   getCategoriesUseCase,
   createCategoryUseCase,
   updateCategoryUseCase,
