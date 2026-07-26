@@ -966,6 +966,10 @@
     "debts": {
       "title": "Debts",
       "body": "Not wired yet. Once it is, you will track what you owe and what you are owed, with partial payments and a summary you can share."
+    },
+    "goals": {
+      "title": "Goals",
+      "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."
     }
   }
 }

@@ -966,6 +966,10 @@
     "debts": {
       "title": "Deudas",
       "body": "Aún no está conectado. Cuando lo esté vas a registrar lo que debes y lo que te deben, con abonos parciales y un resumen para compartir."
+    },
+    "goals": {
+      "title": "Metas",
+      "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
     }
   }
 }
