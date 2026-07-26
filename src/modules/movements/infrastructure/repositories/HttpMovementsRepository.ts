@@ -5,8 +5,10 @@ import type { CurrencyCode } from '@/shared/domain';
 import type { MovementsQuery, MovementsRepository } from '../../application';
 import type {
   CapturedVia,
+  CategorySpend,
   Movement,
   MovementPatch,
+  MovementsSummary,
   MovementType,
   NewMovement,
   SourceRef,
@@ -31,6 +33,21 @@ type MovementResponse = {
 
 type MovementsListResponse = {
   movements: MovementResponse[];
+};
+
+type CategorySpendResponse = {
+  category_id: string | null;
+  spent: number;
+  count: number;
+};
+
+type MovementSummaryResponse = {
+  date_from: string;
+  date_to: string;
+  expense_total: number;
+  income_total: number;
+  count: number;
+  by_category: CategorySpendResponse[];
 };
 
 export class HttpMovementsRepository implements MovementsRepository {
@@ -103,6 +120,29 @@ export class HttpMovementsRepository implements MovementsRepository {
       throw mapApiError(error);
     }
   }
+
+  async summarize(range: { from: string; to: string }): Promise<MovementsSummary> {
+    try {
+      const { data } = await this.http.get<MovementSummaryResponse>(
+        '/movements/summary',
+        { params: { from: range.from, to: range.to } },
+      );
+      return {
+        from: data.date_from,
+        to: data.date_to,
+        expenseTotal: data.expense_total,
+        incomeTotal: data.income_total,
+        count: data.count,
+        byCategory: data.by_category.map(toCategorySpend),
+      };
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+}
+
+function toCategorySpend(dto: CategorySpendResponse): CategorySpend {
+  return { categoryId: dto.category_id, spent: dto.spent, count: dto.count };
 }
 
 function toSourceRef(type: string | null, id: string | null): SourceRef | null {

@@ -41,6 +41,7 @@ import type { MovementsRepository } from '@/modules/movements/application/ports/
 import { CreateMovementUseCase } from '@/modules/movements/application/use-cases/CreateMovementUseCase';
 import { DeleteMovementUseCase } from '@/modules/movements/application/use-cases/DeleteMovementUseCase';
 import { GetMovementsUseCase } from '@/modules/movements/application/use-cases/GetMovementsUseCase';
+import { SummarizeMovementsUseCase } from '@/modules/movements/application/use-cases/SummarizeMovementsUseCase';
 import { UpdateMovementUseCase } from '@/modules/movements/application/use-cases/UpdateMovementUseCase';
 import { HttpMovementsRepository } from '@/modules/movements/infrastructure';
 import type { OnboardingRepository } from '@/modules/onboarding/application/ports/OnboardingRepository';
@@ -89,6 +90,9 @@ export const getMovementsUseCase = new GetMovementsUseCase(movementsRepository);
 export const createMovementUseCase = new CreateMovementUseCase(movementsRepository);
 export const updateMovementUseCase = new UpdateMovementUseCase(movementsRepository);
 export const deleteMovementUseCase = new DeleteMovementUseCase(movementsRepository);
+export const summarizeMovementsUseCase = new SummarizeMovementsUseCase(
+  movementsRepository,
+);
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
 export const getDeudasUseCase = new GetDeudasUseCase(deudasRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
@@ -139,6 +143,7 @@ export const container = {
   createMovementUseCase,
   updateMovementUseCase,
   deleteMovementUseCase,
+  summarizeMovementsUseCase,
   getBudgetsUseCase,
   getDeudasUseCase,
   getAssistantUseCase,
