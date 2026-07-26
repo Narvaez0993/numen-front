@@ -1,39 +1,78 @@
 import { router } from 'expo-router';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { DeudasInicioCard } from '@/modules/deudas/presentation/components/DeudasInicioCard';
-import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
-import { GoalsInicioCard } from '@/modules/goals/presentation/components/GoalsInicioCard';
+import { useAuthStore } from '@/modules/auth/presentation';
+import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import { Text } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
 import { RecentList } from '../components/RecentList';
 import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
-import { UpcomingSubs } from '../components/UpcomingSubs';
 import { useHomeOverview } from '../hooks/useHomeOverview';
 
 export function HomeScreen() {
   const { theme } = useTheme();
-  const { data, isLoading } = useHomeOverview();
+  const { t } = useTranslation();
+  // The device's local day, pinned once per mount: the server answers about the
+  // user's calendar, and a re-render must not move the question.
+  const today = useMemo(() => toIsoDate(new Date()), []);
+  const { data, isLoading, isError, refetch } = useHomeOverview(today);
+  const displayName = useAuthStore((s) => s.session?.displayName);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
+  const openSheet = useExpenseSheetStore((s) => s.openSheet);
   const tabBarClearance = useFloatingTabBarClearance();
-  useDeudas();
+
+  const centered = {
+    flex: 1,
+    backgroundColor: theme.colors.bgBase,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  };
+
+  if (isError) {
+    return (
+      <SafeAreaView style={centered}>
+        <View style={{ paddingHorizontal: 32, alignItems: 'center', gap: 16 }}>
+          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
+            {t('home.error.title')}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void refetch()}
+            style={({ pressed }) => ({
+              paddingHorizontal: 20,
+              paddingVertical: 11,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Text
+              variant="label"
+              color={theme.colors.accentMint}
+              style={{ fontSize: 13 }}
+            >
+              {t('home.error.retry')}
+            </Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (isLoading || !data) {
     return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: theme.colors.bgBase,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <SafeAreaView style={centered}>
         <ActivityIndicator color={theme.colors.accentMint} />
       </SafeAreaView>
     );
@@ -56,26 +95,30 @@ export function HomeScreen() {
       >
         <View style={{ gap: 18 }}>
           <HomeHeader
-            name={onboardingName?.trim() || data.greeting}
+            name={displayName?.trim() || onboardingName?.trim() || t('home.greeting.you')}
             onAvatarPress={() => router.push('/profile')}
           />
           <TodayHero
             daily={data.daily}
-            saldo={data.saldo}
             month={data.month}
+            netBalance={data.netBalance}
+            period={data.period}
+            daysLeft={data.daysLeft}
             onSaldoPress={() => router.push('/accounts')}
-            onMonthPress={() => router.push('/budgets')}
+            // The month's spend is the movements that made it, not a budget.
+            onMonthPress={goMovements}
+            // Straight to the manual form: registering an income is the one thing
+            // that turns the hero on.
+            onRegisterIncome={() => openSheet('manual')}
           />
           <IncomeSummaryRow
-            income={data.income}
-            monthName={data.month.name}
+            total={data.month.income}
+            savingsRate={data.month.savingsRate}
+            period={data.period}
             onPress={goMovements}
           />
           <RecentList items={data.recent} onSeeAll={goMovements} />
-          <GoalsInicioCard onPress={() => router.push('/goals')} />
-          <UpcomingSubs items={data.upcoming} />
           <TopCategoriesCard categories={data.topCategories} />
-          <DeudasInicioCard onPress={() => router.push('/deudas')} />
         </View>
       </ScrollView>
     </SafeAreaView>

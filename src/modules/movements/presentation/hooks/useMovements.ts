@@ -17,6 +17,7 @@ export function invalidateMoneyViews(queryClient: QueryClient): void {
   void queryClient.invalidateQueries({ queryKey: MOVEMENTS_KEY });
   void queryClient.invalidateQueries({ queryKey: ['accounts', 'overview'] });
   void queryClient.invalidateQueries({ queryKey: ['categories', 'overview'] });
+  void queryClient.invalidateQueries({ queryKey: ['home'] });
 }
 
 export function useMovements(query: MovementsQuery) {

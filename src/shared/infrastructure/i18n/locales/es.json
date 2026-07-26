@@ -520,40 +520,49 @@
     "greeting": {
       "morning": "Buenos días",
       "day": "Hola",
-      "night": "Buenas noches"
+      "night": "Buenas noches",
+      "you": "Tú"
     },
     "daily": {
       "label": "Para hoy",
       "availableToday": "disponibles hoy",
-      "spent": "gastado",
-      "of": "de",
-      "suggested": "sugeridos"
+      "overspent": "de más este mes",
+      "spentToday": "gastado hoy",
+      "basis": {
+        "income": "según tus ingresos",
+        "budget": "según tu presupuesto"
+      },
+      "noBasis": "Registra un ingreso y calculamos cuánto puedes gastar cada día.",
+      "registerIncome": "Registrar ingreso"
     },
     "saldo": {
       "label": "Saldo neto"
     },
     "month": {
       "label": "{{month}} · {{daysLeft}} días",
-      "labelOne": "{{month}} · {{daysLeft}} día"
+      "labelOne": "{{month}} · {{daysLeft}} día",
+      "spentLabel": "Gastado este mes",
+      "spentSuffix": "en total",
+      "movements_one": "{{count}} mov",
+      "movements_other": "{{count}} mov"
     },
     "categories": {
       "title": "Tus categorías",
-      "thisMonth": "este mes"
-    },
-    "upcoming": {
-      "title": "Próximos cobros",
-      "window": "7 días",
-      "inDays_one": "en {{count}} día",
-      "inDays_other": "en {{count}} días"
+      "thisMonth": "este mes",
+      "unclassified": "Sin clasificar"
     },
     "recent": {
       "title": "Últimos movimientos",
       "seeAll": "Ver todos",
-      "transferTag": "Transferencia · no es gasto"
+      "empty": "Aún no registras movimientos"
     },
     "income": {
       "title": "Ingresos de {{month}}",
       "savings": "ahorro {{pct}}%"
+    },
+    "error": {
+      "title": "No pudimos cargar tu inicio.",
+      "retry": "Reintentar"
     }
   },
   "goals": {

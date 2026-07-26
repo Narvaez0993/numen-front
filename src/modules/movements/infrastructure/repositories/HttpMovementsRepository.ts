@@ -1,35 +1,15 @@
 import { AxiosInstance } from 'axios';
 
-import type { CurrencyCode } from '@/shared/domain';
-
 import type { MovementsQuery, MovementsRepository } from '../../application';
 import type {
-  CapturedVia,
   CategorySpend,
   Movement,
   MovementPatch,
   MovementsSummary,
-  MovementType,
   NewMovement,
-  SourceRef,
-  SourceType,
 } from '../../domain';
 import { mapApiError } from '../mappers/mapApiError';
-
-type MovementResponse = {
-  id: string;
-  type: string;
-  description: string;
-  amount: number;
-  currency: string;
-  source_type: string;
-  source_id: string;
-  destination_type: string | null;
-  destination_id: string | null;
-  category_id: string | null;
-  occurred_on: string;
-  captured_via: string;
-};
+import { type MovementResponse, toMovement } from '../mappers/toMovement';
 
 type MovementsListResponse = {
   movements: MovementResponse[];
@@ -143,24 +123,4 @@ export class HttpMovementsRepository implements MovementsRepository {
 
 function toCategorySpend(dto: CategorySpendResponse): CategorySpend {
   return { categoryId: dto.category_id, spent: dto.spent, count: dto.count };
-}
-
-function toSourceRef(type: string | null, id: string | null): SourceRef | null {
-  if (type === null || id === null) return null;
-  return { type: type as SourceType, id };
-}
-
-function toMovement(dto: MovementResponse): Movement {
-  return {
-    id: dto.id,
-    type: dto.type as MovementType,
-    description: dto.description,
-    amount: dto.amount,
-    currency: dto.currency as CurrencyCode,
-    source: { type: dto.source_type as SourceType, id: dto.source_id },
-    destination: toSourceRef(dto.destination_type, dto.destination_id),
-    categoryId: dto.category_id,
-    occurredOn: dto.occurred_on,
-    capturedVia: dto.captured_via as CapturedVia,
-  };
 }

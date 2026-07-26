@@ -36,7 +36,7 @@ import { GetDeudasUseCase } from '@/modules/deudas/application/use-cases/GetDeud
 import { InMemoryDeudasRepository } from '@/modules/deudas/infrastructure/repositories/InMemoryDeudasRepository';
 import type { HomeRepository } from '@/modules/home/application/ports/HomeRepository';
 import { GetHomeOverviewUseCase } from '@/modules/home/application/use-cases/GetHomeOverviewUseCase';
-import { InMemoryHomeRepository } from '@/modules/home/infrastructure/repositories/InMemoryHomeRepository';
+import { HttpHomeRepository } from '@/modules/home/infrastructure';
 import type { MovementsRepository } from '@/modules/movements/application/ports/MovementsRepository';
 import { CreateMovementUseCase } from '@/modules/movements/application/use-cases/CreateMovementUseCase';
 import { DeleteMovementUseCase } from '@/modules/movements/application/use-cases/DeleteMovementUseCase';
@@ -62,7 +62,7 @@ import { InMemorySubscriptionsRepository } from '@/modules/subscriptions/infrast
 export { setOnSessionExpired } from '@/shared/infrastructure/http/client';
 
 const authRepository: AuthRepository = new HttpAuthRepository(httpClient);
-const homeRepository: HomeRepository = new InMemoryHomeRepository();
+const homeRepository: HomeRepository = new HttpHomeRepository(httpClient);
 const profileRepository: ProfileRepository = new InMemoryProfileRepository();
 const movementsRepository: MovementsRepository = new HttpMovementsRepository(httpClient);
 const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();

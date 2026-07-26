@@ -520,40 +520,49 @@
     "greeting": {
       "morning": "Good morning",
       "day": "Hello",
-      "night": "Good evening"
+      "night": "Good evening",
+      "you": "You"
     },
     "daily": {
       "label": "For today",
       "availableToday": "available today",
-      "spent": "spent",
-      "of": "of",
-      "suggested": "suggested"
+      "overspent": "over for this month",
+      "spentToday": "spent today",
+      "basis": {
+        "income": "based on your income",
+        "budget": "based on your budget"
+      },
+      "noBasis": "Register an income and we will work out how much you can spend each day.",
+      "registerIncome": "Add income"
     },
     "saldo": {
       "label": "Net balance"
     },
     "month": {
       "label": "{{month}} · {{daysLeft}} days",
-      "labelOne": "{{month}} · {{daysLeft}} day"
+      "labelOne": "{{month}} · {{daysLeft}} day",
+      "spentLabel": "Spent this month",
+      "spentSuffix": "in total",
+      "movements_one": "{{count}} mov",
+      "movements_other": "{{count}} mov"
     },
     "categories": {
       "title": "Your categories",
-      "thisMonth": "this month"
-    },
-    "upcoming": {
-      "title": "Upcoming charges",
-      "window": "7 days",
-      "inDays_one": "in {{count}} day",
-      "inDays_other": "in {{count}} days"
+      "thisMonth": "this month",
+      "unclassified": "Unclassified"
     },
     "recent": {
       "title": "Recent activity",
       "seeAll": "See all",
-      "transferTag": "Transfer · not an expense"
+      "empty": "Nothing registered yet"
     },
     "income": {
       "title": "{{month}} income",
       "savings": "{{pct}}% saved"
+    },
+    "error": {
+      "title": "We could not load your home.",
+      "retry": "Try again"
     }
   },
   "goals": {

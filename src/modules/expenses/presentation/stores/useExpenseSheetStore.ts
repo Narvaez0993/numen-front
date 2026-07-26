@@ -16,7 +16,7 @@ type State = {
   flow: SheetFlow;
   method: SheetMethod;
   transcript: string | null;
-  openSheet: () => void;
+  openSheet: (flow?: SheetFlow) => void;
   closeSheet: () => void;
   setFlow: (flow: SheetFlow) => void;
   setMethod: (method: SheetMethod) => void;
@@ -28,7 +28,8 @@ export const useExpenseSheetStore = create<State>((set) => ({
   flow: 'entry',
   method: 'voice',
   transcript: null,
-  openSheet: () => set({ open: true, flow: 'entry', method: 'voice', transcript: null }),
+  openSheet: (flow = 'entry') =>
+    set({ open: true, flow, method: 'voice', transcript: null }),
   closeSheet: () =>
     set({ open: false, flow: 'entry', method: 'voice', transcript: null }),
   setFlow: (flow) => set({ flow }),
