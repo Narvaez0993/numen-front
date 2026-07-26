@@ -5,19 +5,11 @@ import {
   deleteSubscriptionUseCase,
   updateSubscriptionUseCase,
 } from '@/core/di/container';
-import { invalidateMoneyViews } from '@/modules/movements/presentation/hooks/useMovements';
+import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 
 import type { NewSubscription, Subscription, SubscriptionPatch } from '../../domain';
 
-import { invalidateSubscriptions } from './useSubscriptions';
-
 type UpdateInput = { id: string; patch: SubscriptionPatch };
-
-/** A subscription changes the forecast, and Home shows the forecast. */
-function refresh(queryClient: ReturnType<typeof useQueryClient>): void {
-  invalidateSubscriptions(queryClient);
-  invalidateMoneyViews(queryClient);
-}
 
 export function useCreateSubscription() {
   const queryClient = useQueryClient();
@@ -29,7 +21,7 @@ export function useCreateSubscription() {
       }
       return result.value;
     },
-    onSuccess: () => refresh(queryClient),
+    onSuccess: () => invalidateMoneyViews(queryClient),
   });
 }
 
@@ -43,7 +35,7 @@ export function useUpdateSubscription() {
       }
       return result.value;
     },
-    onSuccess: () => refresh(queryClient),
+    onSuccess: () => invalidateMoneyViews(queryClient),
   });
 }
 
@@ -56,6 +48,6 @@ export function useDeleteSubscription() {
         throw result.error;
       }
     },
-    onSuccess: () => refresh(queryClient),
+    onSuccess: () => invalidateMoneyViews(queryClient),
   });
 }

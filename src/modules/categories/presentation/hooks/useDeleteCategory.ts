@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { deleteCategoryUseCase } from '@/core/di/container';
+import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 
 export function useDeleteCategory() {
   const queryClient = useQueryClient();
@@ -12,7 +13,7 @@ export function useDeleteCategory() {
       }
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['categories', 'overview'] });
+      invalidateMoneyViews(queryClient);
     },
   });
 }

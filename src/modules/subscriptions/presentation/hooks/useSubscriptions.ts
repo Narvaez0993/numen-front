@@ -1,15 +1,11 @@
-import { type QueryClient, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { container } from '@/core/di/container';
+import { MONEY_VIEW_KEYS } from '@/shared/presentation/query/moneyViews';
 
 import type { SubscriptionsOverview } from '../../domain';
 
-/** Anything that changes a subscription or one of its charges invalidates this. */
-export const SUBSCRIPTIONS_KEY = ['subscriptions'] as const;
-
-export function invalidateSubscriptions(queryClient: QueryClient): void {
-  void queryClient.invalidateQueries({ queryKey: SUBSCRIPTIONS_KEY });
-}
+export const SUBSCRIPTIONS_KEY = MONEY_VIEW_KEYS.subscriptions;
 
 /**
  * `today` is part of the key: `nextChargeOn` is derived by the server for that day,

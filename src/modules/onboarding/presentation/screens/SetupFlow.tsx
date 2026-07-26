@@ -50,17 +50,25 @@ export function SetupFlow() {
 
     // Turn the source the user just described into their first real account, so
     // they land in the app with their own balance instead of an empty screen.
-    // Best-effort like the name: a failure must not trap them in the setup.
+    //
+    // Awaited on purpose: navigating while the POST was still in flight made Home
+    // load before the account existed, so the user who had *just* created one landed
+    // on "create your first account" with a $0 net balance. Still best-effort — a
+    // failure must not trap them in the setup, so it only logs and moves on.
     if (persisted.sourceName) {
       const isCash = persisted.bankId === 'efectivo';
-      createAccount.mutate({
-        kind: isCash ? 'cash' : 'debit',
-        name: persisted.sourceName,
-        sub: '',
-        icon: isCash ? 'cash' : 'building-bank',
-        color: 'mint',
-        balance: persisted.balance,
-      });
+      try {
+        await createAccount.mutateAsync({
+          kind: isCash ? 'cash' : 'debit',
+          name: persisted.sourceName,
+          sub: '',
+          icon: isCash ? 'cash' : 'building-bank',
+          color: 'mint',
+          balance: persisted.balance,
+        });
+      } catch (error) {
+        console.warn('onboarding: first account could not be created', error);
+      }
     }
     // The objective the user picked stays in the onboarding store as context for
     // when `goals` is real. It used to create a "Mi primera meta" of $1.000.000
