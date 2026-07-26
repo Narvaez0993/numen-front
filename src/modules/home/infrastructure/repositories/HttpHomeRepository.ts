@@ -8,6 +8,7 @@ import type {
   AllowanceBasis,
   HomeOverview,
   TopCategory,
+  UpcomingCharge,
 } from '../../domain/types/HomeOverview';
 import { mapApiError } from '../mappers/mapApiError';
 
@@ -27,6 +28,13 @@ type HomeOverviewResponse = {
     share: number;
   }[];
   recent: MovementResponse[];
+  upcoming: {
+    subscription_id: string;
+    charge_on: string;
+    amount: number;
+    status: string;
+    charge_id: string | null;
+  }[];
 };
 
 export class HttpHomeRepository implements HomeRepository {
@@ -59,11 +67,22 @@ export class HttpHomeRepository implements HomeRepository {
         },
         topCategories: data.top_categories.map(toTopCategory),
         recent: data.recent.map(toMovement),
+        upcoming: data.upcoming.map(toUpcomingCharge),
       };
     } catch (error) {
       throw mapApiError(error);
     }
   }
+}
+
+function toUpcomingCharge(dto: HomeOverviewResponse['upcoming'][number]): UpcomingCharge {
+  return {
+    subscriptionId: dto.subscription_id,
+    chargeOn: dto.charge_on,
+    amount: dto.amount,
+    status: dto.status as UpcomingCharge['status'],
+    chargeId: dto.charge_id,
+  };
 }
 
 function toTopCategory(dto: HomeOverviewResponse['top_categories'][number]): TopCategory {

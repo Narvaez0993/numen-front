@@ -616,6 +616,17 @@
       "more": "{{pct}}% más que en {{month}}",
       "same": "Vas igual que en {{month}}",
       "caption": "{{amount}} hasta el {{day}} del mes pasado"
+    },
+    "upcoming": {
+      "title": "Próximos cobros",
+      "seeAll": "Ver todos",
+      "inDays_one": "en {{count}} día",
+      "inDays_other": "en {{count}} días",
+      "today": "hoy",
+      "pending": "por confirmar",
+      "confirm": "Sí",
+      "skip": "No pasó",
+      "unknown": "Suscripción"
     }
   },
   "goals": {

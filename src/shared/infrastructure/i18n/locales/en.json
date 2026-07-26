@@ -616,6 +616,17 @@
       "more": "{{pct}}% more than in {{month}}",
       "same": "Same pace as {{month}}",
       "caption": "{{amount}} through the {{day}}th last month"
+    },
+    "upcoming": {
+      "title": "Upcoming charges",
+      "seeAll": "See all",
+      "inDays_one": "in {{count}} day",
+      "inDays_other": "in {{count}} days",
+      "today": "today",
+      "pending": "to confirm",
+      "confirm": "Yes",
+      "skip": "Did not happen",
+      "unknown": "Subscription"
     }
   },
   "goals": {

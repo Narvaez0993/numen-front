@@ -26,6 +26,19 @@ export type MonthSummary = {
   movements: number;
 };
 
+/**
+ * A recurring charge about to land. `pending` means its day arrived and it is
+ * waiting for an answer — `chargeId` is what confirm/skip act on. References only:
+ * the name and icon come from the subscriptions catalog the client caches.
+ */
+export type UpcomingCharge = {
+  subscriptionId: string;
+  chargeOn: string;
+  amount: number;
+  status: 'pending' | 'scheduled';
+  chargeId: string | null;
+};
+
 /** A category's weight in the month's expenses. `categoryId: null` = unclassified. */
 export type TopCategory = {
   categoryId: string | null;
@@ -53,4 +66,5 @@ export type HomeOverview = {
   daily: DailyAllowance;
   topCategories: TopCategory[];
   recent: Movement[];
+  upcoming: UpcomingCharge[];
 };

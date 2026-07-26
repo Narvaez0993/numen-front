@@ -2,7 +2,8 @@ import type { CurrencyCode } from '@/shared/domain';
 
 export type MovementType = 'expense' | 'income' | 'transfer';
 export type SourceType = 'account' | 'credit_card';
-export type CapturedVia = 'manual' | 'voice' | 'photo' | 'text';
+/** `recurring` is a charge the subscription engine registered, not a user capture. */
+export type CapturedVia = 'manual' | 'voice' | 'photo' | 'text' | 'recurring';
 
 /** Where the money sits: an account or a credit card, so both parts are needed. */
 export type SourceRef = {
@@ -27,6 +28,9 @@ export type Movement = {
   categoryId: string | null;
   occurredOn: string;
   capturedVia: CapturedVia;
+  /** Set when a subscription's charge produced it — that is where the "recurring"
+   * badge comes from. Read-only: only the server sets it. */
+  subscriptionId: string | null;
 };
 
 export type NewMovement = {

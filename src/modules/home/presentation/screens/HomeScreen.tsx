@@ -7,6 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/modules/auth/presentation';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import {
+  useConfirmCharge,
+  useSkipCharge,
+} from '@/modules/subscriptions/presentation/hooks/useCharges';
 import { Text } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
@@ -19,6 +23,7 @@ import { MonthTrend } from '../components/MonthTrend';
 import { RecentList } from '../components/RecentList';
 import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
+import { UpcomingCharges } from '../components/UpcomingCharges';
 import { useHomeOverview } from '../hooks/useHomeOverview';
 
 export function HomeScreen() {
@@ -31,6 +36,8 @@ export function HomeScreen() {
   const displayName = useAuthStore((s) => s.session?.displayName);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
+  const confirmCharge = useConfirmCharge();
+  const skipCharge = useSkipCharge();
   const tabBarClearance = useFloatingTabBarClearance();
 
   const centered = {
@@ -137,6 +144,14 @@ export function HomeScreen() {
             onMonthPress={goMovements}
             // No income and no budget: the hero shows what to do about it.
             start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
+          />
+          <UpcomingCharges
+            items={data.upcoming}
+            today={today}
+            busy={confirmCharge.isPending || skipCharge.isPending}
+            onConfirm={(id) => confirmCharge.mutate({ id })}
+            onSkip={(id) => skipCharge.mutate(id)}
+            onSeeAll={() => router.push('/subscriptions')}
           />
           <AccountsStrip onPress={() => router.push('/accounts')} />
           <MonthTrend spent={data.month.spent} today={today} />

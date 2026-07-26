@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
-import { IconBox, Text } from '@/shared/presentation/components';
+import { IconBox, Pill, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
@@ -56,9 +56,20 @@ export function TxRow({ movement, category, source, last, onPress }: Props) {
     >
       <IconBox name={icon} color={iconColor} size={34} iconSize={16} radius={10} />
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text variant="bodyLarge" color={lineColor} numberOfLines={1}>
-          {movement.description}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text
+            variant="bodyLarge"
+            color={lineColor}
+            numberOfLines={1}
+            style={{ flexShrink: 1 }}
+          >
+            {movement.description}
+          </Text>
+          {/* Derived from the subscription link: no `tag` field that could disagree. */}
+          {movement.subscriptionId !== null ? (
+            <Pill variant="amber">{t('common.recurring')}</Pill>
+          ) : null}
+        </View>
         {subtitle ? (
           <Text variant="caption" muted numberOfLines={1} style={{ marginTop: 2 }}>
             {subtitle}
