@@ -1,4 +1,10 @@
-import type { Movement, MovementPatch, MovementType, NewMovement } from '../../domain';
+import type {
+  Movement,
+  MovementPatch,
+  MovementsSummary,
+  MovementType,
+  NewMovement,
+} from '../../domain';
 
 /** Inclusive `YYYY-MM-DD` bounds; the month filter is served by the API. */
 export type MovementsQuery = {
@@ -21,4 +27,6 @@ export interface MovementsRepository {
   update(id: string, patch: MovementPatch): Promise<Movement>;
   /** Deleting gives the money back — this is what makes undo real. */
   remove(id: string): Promise<void>;
+  /** Period aggregates, computed by the store (Home, categories, later budgets). */
+  summarize(range: { from: string; to: string }): Promise<MovementsSummary>;
 }

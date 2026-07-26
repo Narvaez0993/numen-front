@@ -4,7 +4,7 @@ import type { HomeRepository } from '../ports/HomeRepository';
 export class GetHomeOverviewUseCase {
   constructor(private readonly homeRepository: HomeRepository) {}
 
-  async execute(): Promise<HomeOverview> {
-    return this.homeRepository.getOverview();
+  async execute(today: string): Promise<HomeOverview> {
+    return this.homeRepository.getOverview(today);
   }
 }

@@ -5,10 +5,11 @@ import { Icon, Text } from '@/shared/presentation/components';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { Category } from '../../domain';
+import type { CategoryWithSpend } from '../utils/joinCategorySpend';
 
 type Props = {
-  category: Category;
+  /** Carries the spend of the period being shown, joined by the screen. */
+  category: CategoryWithSpend;
   last?: boolean;
   /** When provided the row is tappable (custom categories); omit for read-only. */
   onPress?: () => void;

@@ -1,68 +1,56 @@
-import type { AccentColor } from '@/shared/domain';
+import type { Movement } from '@/modules/movements/domain';
+import type { CurrencyCode } from '@/shared/domain';
+
+/**
+ * Where the daily figure comes from. The app says it out loud instead of
+ * presenting a projection as advice:
+ * - `income` — derived from the income registered this month.
+ * - `budget` — a budget the user set (phase 3); it outranks income.
+ * - `none` — nothing to divide, so there is no figure to show.
+ */
+export type AllowanceBasis = 'budget' | 'income' | 'none';
 
 export type DailyAllowance = {
-  suggested: number;
+  /** Negative when the month is already overspent — never dressed up as zero. */
+  available: number;
+  spentToday: number;
+  basis: AllowanceBasis;
+};
+
+export type MonthSummary = {
   spent: number;
-};
-
-export type Saldo = {
-  net: number;
-  accounts: number;
-  hasCash: boolean;
-  hasTC: number;
-};
-
-export type MonthProgress = {
-  name: string;
-  spent: number;
-  target: number;
-  daysLeft: number;
-};
-
-export type MonthIncome = {
-  total: number;
-  /** 0..1 — share of income not yet spent this month. */
+  income: number;
+  /** 0..1 — share of the month's income not spent. 0 without income. */
   savingsRate: number;
+  /** Transfers included: they are movements, they just are not spending. */
+  movements: number;
 };
 
-export type CategoryProgress = {
-  id: string;
-  name: string;
-  iconName: string;
-  color: AccentColor;
+/** A category's weight in the month's expenses. `categoryId: null` = unclassified. */
+export type TopCategory = {
+  categoryId: string | null;
   spent: number;
-  target: number;
+  count: number;
+  /** 0..1 — share of the month's expenses. */
+  share: number;
 };
 
-export type UpcomingSub = {
-  id: string;
-  name: string;
-  amount: number;
-  daysUntil: number;
-  iconName: string;
-  color: AccentColor;
-};
-
-export type RecentExpenseTag = 'recurrente' | 'transfer' | null;
-
-export type RecentExpense = {
-  id: string;
-  description: string;
-  category: string;
-  iconName: string;
-  color: AccentColor;
-  amount: number;
-  time: string;
-  tag: RecentExpenseTag;
-};
-
+/**
+ * The whole Home screen in one read. Amounts are integers in the minor unit of
+ * `currency`; `recent` carries plain movements, so renaming a category updates
+ * Home for free — the client resolves every label from its own catalog.
+ */
 export type HomeOverview = {
-  greeting: string;
+  currency: CurrencyCode;
+  /** `2026-07` — the month every figure belongs to. */
+  period: string;
+  /** Days remaining in the month, today included. */
+  daysLeft: number;
+  netBalance: number;
+  accountsCount: number;
+  creditCardsCount: number;
+  month: MonthSummary;
   daily: DailyAllowance;
-  saldo: Saldo;
-  month: MonthProgress;
-  income: MonthIncome;
-  topCategories: CategoryProgress[];
-  upcoming: UpcomingSub[];
-  recent: RecentExpense[];
+  topCategories: TopCategory[];
+  recent: Movement[];
 };

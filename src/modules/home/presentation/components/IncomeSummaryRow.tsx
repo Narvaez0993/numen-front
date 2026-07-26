@@ -3,22 +3,25 @@ import { View } from 'react-native';
 
 import { Card, Icon, IconBox, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { monthName } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { MonthIncome } from '../../domain/types/HomeOverview';
-
 type Props = {
-  income: MonthIncome;
-  monthName: string;
+  total: number;
+  /** 0..1 — share of the month's income not spent. */
+  savingsRate: number;
+  /** `2026-07` — the month being summarised. */
+  period: string;
   onPress?: () => void;
 };
 
-export function IncomeSummaryRow({ income, monthName, onPress }: Props) {
+/** Only shown once there is income registered: nothing to summarise otherwise. */
+export function IncomeSummaryRow({ total, savingsRate, period, onPress }: Props) {
   const { theme } = useTheme();
-  const { t } = useTranslation();
-  if (income.total <= 0) return null;
+  const { t, i18n } = useTranslation();
+  if (total <= 0) return null;
 
-  const pct = Math.round(income.savingsRate * 100);
+  const pct = Math.round(savingsRate * 100);
 
   return (
     <Card padding={14} onPress={onPress}>
@@ -29,7 +32,7 @@ export function IncomeSummaryRow({ income, monthName, onPress }: Props) {
             variant="bodyLarge"
             style={{ fontSize: 13.5, letterSpacing: -0.135, marginBottom: 4 }}
           >
-            {t('home.income.title', { month: monthName })}
+            {t('home.income.title', { month: monthName(`${period}-01`, i18n.language) })}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
             <Text
@@ -38,7 +41,7 @@ export function IncomeSummaryRow({ income, monthName, onPress }: Props) {
               tabular
               style={{ fontSize: 11.5, fontFamily: 'Geist_500Medium' }}
             >
-              {formatMoney(income.total)}
+              {formatMoney(total)}
             </Text>
             <Text
               variant="caption"

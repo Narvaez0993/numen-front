@@ -1,27 +1,29 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
+import type { Movement } from '@/modules/movements/domain';
+import { TxRow } from '@/modules/movements/presentation/components/TxRow';
 import {
-  Card,
-  IconBox,
-  Pill,
-  SectionLabel,
-  Text,
-} from '@/shared/presentation/components';
+  displaySource,
+  useMovementCatalogs,
+} from '@/modules/movements/presentation/hooks/useMovementCatalogs';
+import { Card, SectionLabel, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { formatMoney } from '@/shared/presentation/utils/formatMoney';
-
-import type { RecentExpense } from '../../domain/types/HomeOverview';
 
 type Props = {
-  items: RecentExpense[];
-  onItemPress?: () => void;
+  items: Movement[];
   onSeeAll?: () => void;
 };
 
-export function RecentList({ items, onItemPress, onSeeAll }: Props) {
+/**
+ * The last movements, rendered by the very same row the movements list uses: a
+ * movement looks identical wherever it shows up, and there is one place to change
+ * how it looks.
+ */
+export function RecentList({ items, onSeeAll }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const catalogs = useMovementCatalogs();
 
   return (
     <View>
@@ -46,89 +48,28 @@ export function RecentList({ items, onItemPress, onSeeAll }: Props) {
         </Pressable>
       </View>
       <Card padding={4}>
-        {items.map((r, i) => {
-          const isTransfer = r.tag === 'transfer';
-          const isIncome = !isTransfer && r.amount > 0;
-          const lineColor = isTransfer
-            ? theme.colors.textTertiary
-            : theme.colors.textPrimary;
-          const amountColor = isTransfer
-            ? theme.colors.textTertiary
-            : isIncome
-              ? theme.colors.accentMint
-              : theme.colors.textPrimary;
-          const subtitle = isTransfer
-            ? t('home.recent.transferTag')
-            : `${r.category} · ${r.time}`;
-          return (
-            <Pressable
-              key={r.id}
-              onPress={onItemPress}
-              disabled={!onItemPress}
-              style={({ pressed }) => ({
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 11,
-                borderBottomWidth: i === items.length - 1 ? 0 : 1,
-                borderBottomColor: theme.colors.borderSubtle,
-                opacity: isTransfer ? 0.55 : pressed ? 0.85 : 1,
-              })}
-            >
-              {isTransfer ? (
-                <View
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 10,
-                    backgroundColor: 'rgba(168,178,200,0.10)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <IconBox
-                    name={r.iconName}
-                    color="mint"
-                    size={34}
-                    iconSize={16}
-                    radius={10}
-                    style={{ backgroundColor: 'transparent' }}
-                  />
-                </View>
-              ) : (
-                <IconBox
-                  name={r.iconName}
-                  color={r.color}
-                  size={34}
-                  iconSize={16}
-                  radius={10}
-                />
-              )}
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text
-                    variant="bodyLarge"
-                    color={lineColor}
-                    numberOfLines={1}
-                    style={{ flexShrink: 1 }}
-                  >
-                    {r.description}
-                  </Text>
-                  {r.tag === 'recurrente' ? (
-                    <Pill variant="amber">{t('common.recurring')}</Pill>
-                  ) : null}
-                </View>
-                <Text variant="caption" muted style={{ marginTop: 2 }}>
-                  {subtitle}
-                </Text>
-              </View>
-              <Text variant="bodyLarge" tabular color={amountColor}>
-                {isIncome ? `+${formatMoney(r.amount)}` : formatMoney(r.amount)}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {items.length === 0 ? (
+          <View style={{ paddingHorizontal: 12, paddingVertical: 26 }}>
+            <Text variant="body" muted style={{ fontSize: 13, textAlign: 'center' }}>
+              {t('home.recent.empty')}
+            </Text>
+          </View>
+        ) : (
+          items.map((movement, i) => (
+            <TxRow
+              key={movement.id}
+              movement={movement}
+              category={
+                movement.categoryId
+                  ? catalogs.categoryById[movement.categoryId]
+                  : undefined
+              }
+              source={displaySource(catalogs, movement.source, movement.destination)}
+              last={i === items.length - 1}
+              onPress={onSeeAll}
+            />
+          ))
+        )}
       </Card>
     </View>
   );
