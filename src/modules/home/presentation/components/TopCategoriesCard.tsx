@@ -1,17 +1,32 @@
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
+import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
 import { Card, IconBox, ProgressBar, Text } from '@/shared/presentation/components';
-import { useTheme } from '@/shared/presentation/theme';
+import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { CategoryProgress } from '../../domain/types/HomeOverview';
+import type { TopCategory } from '../../domain/types/HomeOverview';
 
-type Props = { categories: CategoryProgress[] };
+type Props = { categories: TopCategory[] };
 
+/** Icon for the unclassified bucket and for a category no longer in the catalog. */
+const FALLBACK_ICON = 'dots';
+
+/**
+ * Where the month's money went, by **share of the month's expenses** — a real
+ * number, not progress against a budget that does not exist yet.
+ *
+ * Names and icons come from the catalog the client already caches: the API sends
+ * only references, so a rename shows up here without touching the history.
+ */
 export function TopCategoriesCard({ categories }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const catalogs = useMovementCatalogs();
+
+  if (categories.length === 0) return null;
+
   return (
     <Card padding={16}>
       <View
@@ -30,13 +45,18 @@ export function TopCategoriesCard({ categories }: Props) {
       </View>
       <View style={{ gap: 14 }}>
         {categories.map((c) => {
-          const pct = c.spent / c.target;
+          const resolved = c.categoryId ? catalogs.categoryById[c.categoryId] : undefined;
           return (
             <View
-              key={c.id}
+              key={c.categoryId ?? 'unclassified'}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
             >
-              <IconBox name={c.iconName} color={c.color} size={34} iconSize={16} />
+              <IconBox
+                name={resolved?.icon ?? FALLBACK_ICON}
+                color={resolved?.color ?? 'mint'}
+                size={34}
+                iconSize={16}
+              />
               <View style={{ flex: 1, minWidth: 0 }}>
                 <View
                   style={{
@@ -52,7 +72,7 @@ export function TopCategoriesCard({ categories }: Props) {
                     numberOfLines={1}
                     style={{ fontWeight: '500', flex: 1 }}
                   >
-                    {c.name}
+                    {resolved?.name ?? t('home.categories.unclassified')}
                   </Text>
                   <Text
                     variant="body"
@@ -63,11 +83,17 @@ export function TopCategoriesCard({ categories }: Props) {
                     {formatMoney(c.spent)}
                     <Text variant="caption" muted>
                       {' '}
-                      · {Math.round(pct * 100)}%
+                      · {Math.round(c.share * 100)}%
                     </Text>
                   </Text>
                 </View>
-                <ProgressBar pct={pct} height={5} />
+                <ProgressBar
+                  pct={c.share}
+                  height={5}
+                  // Share of the month, not progress against a limit: the bar
+                  // wears the category's own colour instead of a warning ramp.
+                  color={theme.colors[accentColorKey(resolved?.color ?? 'mint', 'fg')]}
+                />
               </View>
             </View>
           );

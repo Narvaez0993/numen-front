@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthStore } from '@/modules/auth/presentation';
+import { useMovementsSummary } from '@/modules/movements/presentation/hooks/useMovementsSummary';
 import {
   Icon,
   SectionLabel,
@@ -13,6 +14,7 @@ import {
   Toast,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { monthRange, toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { CategoryNameTakenError, type Category } from '../../domain';
 
@@ -29,6 +31,7 @@ import { useCreateCategory } from '../hooks/useCreateCategory';
 import { useDeleteCategory } from '../hooks/useDeleteCategory';
 import { useUpdateCategory } from '../hooks/useUpdateCategory';
 import { filterCategories } from '../utils/filterCategories';
+import { joinCategorySpend } from '../utils/joinCategorySpend';
 
 const FREE_CUSTOM_LIMIT = 2;
 
@@ -38,6 +41,9 @@ export function CategoriesScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { data, isLoading, isError, refetch } = useCategories();
+  // The month is pinned once per mount: a re-render must not move the range.
+  const month = useMemo(() => monthRange(toIsoDate(new Date())), []);
+  const summary = useMovementsSummary(month);
   const tier = useAuthStore((s) => s.session?.tier);
 
   const [query, setQuery] = useState('');
@@ -49,25 +55,34 @@ export function CategoriesScreen() {
   const update = useUpdateCategory();
   const remove = useDeleteCategory();
 
-  const standard = useMemo(() => {
-    if (!data) return [];
-    return [
-      ...filterCategories(
+  // The catalog says which categories exist; the summary, what they cost this
+  // month. Neither knows about the other until here.
+  const categories = useMemo(
+    () => joinCategorySpend(data ?? [], summary.data?.byCategory ?? []),
+    [data, summary.data],
+  );
+
+  const standard = useMemo(
+    () =>
+      [
+        ...filterCategories(
+          query,
+          categories.filter((c) => c.isStandard),
+        ),
+      ].sort((a, b) => b.spent - a.spent),
+    [query, categories],
+  );
+
+  const custom = useMemo(
+    () =>
+      filterCategories(
         query,
-        data.categories.filter((c) => c.isStandard),
+        categories.filter((c) => !c.isStandard),
       ),
-    ].sort((a, b) => b.spent - a.spent);
-  }, [query, data]);
+    [query, categories],
+  );
 
-  const custom = useMemo(() => {
-    if (!data) return [];
-    return filterCategories(
-      query,
-      data.categories.filter((c) => !c.isStandard),
-    );
-  }, [query, data]);
-
-  const customCount = data ? data.categories.filter((c) => !c.isStandard).length : 0;
+  const customCount = categories.filter((c) => !c.isStandard).length;
   const atLimit = tier !== 'plus' && customCount >= FREE_CUSTOM_LIMIT;
   const submitting = create.isPending || update.isPending;
 
@@ -151,7 +166,9 @@ export function CategoriesScreen() {
     );
   }
 
-  if (isLoading || !data) {
+  // The summary is part of the first paint: showing $0 and correcting it a moment
+  // later reads as "you spent nothing this month".
+  if (isLoading || !data || summary.isLoading) {
     return (
       <SafeAreaView
         edges={['top']}
@@ -191,9 +208,10 @@ export function CategoriesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThisMonthCard
-          totalSpent={data.totalSpent}
-          activeCount={data.activeCount}
-          totalCount={data.totalCount}
+          // The month total, unclassified spend included, so it matches Home.
+          totalSpent={summary.data?.expenseTotal ?? 0}
+          activeCount={categories.filter((c) => c.count > 0).length}
+          totalCount={categories.length}
         />
 
         <CategorySearchBar value={query} onChange={setQuery} />

@@ -520,40 +520,66 @@
     "greeting": {
       "morning": "Buenos días",
       "day": "Hola",
-      "night": "Buenas noches"
+      "night": "Buenas noches",
+      "you": "Tú"
     },
     "daily": {
       "label": "Para hoy",
       "availableToday": "disponibles hoy",
-      "spent": "gastado",
-      "of": "de",
-      "suggested": "sugeridos"
+      "overspent": "de más este mes",
+      "spentToday": "gastado hoy",
+      "basis": {
+        "income": "según tus ingresos",
+        "budget": "según tu presupuesto"
+      }
     },
     "saldo": {
       "label": "Saldo neto"
     },
     "month": {
       "label": "{{month}} · {{daysLeft}} días",
-      "labelOne": "{{month}} · {{daysLeft}} día"
+      "labelOne": "{{month}} · {{daysLeft}} día",
+      "movements_one": "{{count}} mov",
+      "movements_other": "{{count}} mov"
     },
     "categories": {
       "title": "Tus categorías",
-      "thisMonth": "este mes"
-    },
-    "upcoming": {
-      "title": "Próximos cobros",
-      "window": "7 días",
-      "inDays_one": "en {{count}} día",
-      "inDays_other": "en {{count}} días"
+      "thisMonth": "este mes",
+      "unclassified": "Sin clasificar"
     },
     "recent": {
       "title": "Últimos movimientos",
       "seeAll": "Ver todos",
-      "transferTag": "Transferencia · no es gasto"
+      "empty": "Aún no registras movimientos"
     },
     "income": {
       "title": "Ingresos de {{month}}",
       "savings": "ahorro {{pct}}%"
+    },
+    "error": {
+      "title": "No pudimos cargar tu inicio.",
+      "retry": "Reintentar"
+    },
+    "start": {
+      "title": "Empieza aquí",
+      "titleReturning": "Para calcular tu cupo",
+      "progress": "{{done}} de {{total}}",
+      "steps": {
+        "source": "Crea tu primera cuenta",
+        "expense": "Registra un gasto",
+        "income": "Registra tu ingreso de {{month}}"
+      },
+      "footer": "Con tu ingreso del mes calculamos cuánto puedes gastar cada día."
+    },
+    "accounts": {
+      "title": "Dónde está tu plata",
+      "seeAll": "Ver todas"
+    },
+    "trend": {
+      "less": "{{pct}}% menos que en {{month}}",
+      "more": "{{pct}}% más que en {{month}}",
+      "same": "Vas igual que en {{month}}",
+      "caption": "{{amount}} hasta el {{day}} del mes pasado"
     }
   },
   "goals": {
@@ -756,15 +782,15 @@
     "rows": {
       "accounts": {
         "title": "Fuentes y cuentas",
-        "subtitle": "4 activas · saldo neto $5.245.000"
+        "subtitle_one": "{{count}} activa · saldo neto {{net}}",
+        "subtitle_other": "{{count}} activas · saldo neto {{net}}"
       },
       "subs": {
-        "title": "Suscripciones",
-        "subtitle": "3 activas · $92.800/mes"
+        "title": "Suscripciones"
       },
       "categories": {
         "title": "Categorías",
-        "subtitle": "12 estándar · 0 personalizadas"
+        "subtitle": "{{standard}} estándar · {{custom}} personalizadas"
       },
       "deudas": {
         "title": "Deudas",
@@ -930,6 +956,28 @@
       "USD": "Dólar estadounidense",
       "EUR": "Euro",
       "MXN": "Peso mexicano"
+    }
+  },
+  "comingSoon": {
+    "subscriptions": {
+      "title": "Suscripciones",
+      "body": "Aún no está conectado. Cuando lo esté vas a ver tus cobros recurrentes, qué día cobran y cuánto te queda del mes después de ellos."
+    },
+    "debts": {
+      "title": "Deudas",
+      "body": "Aún no está conectado. Cuando lo esté vas a registrar lo que debes y lo que te deben, con abonos parciales y un resumen para compartir."
+    },
+    "goals": {
+      "title": "Metas",
+      "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
+    },
+    "budgets": {
+      "title": "Presupuestos",
+      "body": "Aún no está conectado. Cuando lo esté vas a poner un tope al mes y por categoría, y tu cupo diario saldrá de ese tope en vez de tus ingresos."
+    },
+    "assistant": {
+      "title": "Asistente",
+      "body": "Aún no está conectado. Cuando lo esté va a leer tus movimientos reales para responderte y avisarte cosas que valga la pena mirar."
     }
   }
 }

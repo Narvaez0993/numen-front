@@ -520,40 +520,66 @@
     "greeting": {
       "morning": "Good morning",
       "day": "Hello",
-      "night": "Good evening"
+      "night": "Good evening",
+      "you": "You"
     },
     "daily": {
       "label": "For today",
       "availableToday": "available today",
-      "spent": "spent",
-      "of": "of",
-      "suggested": "suggested"
+      "overspent": "over for this month",
+      "spentToday": "spent today",
+      "basis": {
+        "income": "based on your income",
+        "budget": "based on your budget"
+      }
     },
     "saldo": {
       "label": "Net balance"
     },
     "month": {
       "label": "{{month}} · {{daysLeft}} days",
-      "labelOne": "{{month}} · {{daysLeft}} day"
+      "labelOne": "{{month}} · {{daysLeft}} day",
+      "movements_one": "{{count}} mov",
+      "movements_other": "{{count}} mov"
     },
     "categories": {
       "title": "Your categories",
-      "thisMonth": "this month"
-    },
-    "upcoming": {
-      "title": "Upcoming charges",
-      "window": "7 days",
-      "inDays_one": "in {{count}} day",
-      "inDays_other": "in {{count}} days"
+      "thisMonth": "this month",
+      "unclassified": "Unclassified"
     },
     "recent": {
       "title": "Recent activity",
       "seeAll": "See all",
-      "transferTag": "Transfer · not an expense"
+      "empty": "Nothing registered yet"
     },
     "income": {
       "title": "{{month}} income",
       "savings": "{{pct}}% saved"
+    },
+    "error": {
+      "title": "We could not load your home.",
+      "retry": "Try again"
+    },
+    "start": {
+      "title": "Start here",
+      "titleReturning": "To work out your daily figure",
+      "progress": "{{done}} of {{total}}",
+      "steps": {
+        "source": "Create your first account",
+        "expense": "Register an expense",
+        "income": "Register your {{month}} income"
+      },
+      "footer": "With this month's income we work out how much you can spend each day."
+    },
+    "accounts": {
+      "title": "Where your money is",
+      "seeAll": "See all"
+    },
+    "trend": {
+      "less": "{{pct}}% less than in {{month}}",
+      "more": "{{pct}}% more than in {{month}}",
+      "same": "Same pace as {{month}}",
+      "caption": "{{amount}} through the {{day}}th last month"
     }
   },
   "goals": {
@@ -755,16 +781,16 @@
     },
     "rows": {
       "accounts": {
-        "title": "Accounts and sources",
-        "subtitle": "4 active · net balance $5,245,000"
+        "title": "Sources and accounts",
+        "subtitle_one": "{{count}} active · net balance {{net}}",
+        "subtitle_other": "{{count}} active · net balance {{net}}"
       },
       "subs": {
-        "title": "Subscriptions",
-        "subtitle": "3 active · $92,800/month"
+        "title": "Subscriptions"
       },
       "categories": {
         "title": "Categories",
-        "subtitle": "12 standard · 0 custom"
+        "subtitle": "{{standard}} standard · {{custom}} custom"
       },
       "deudas": {
         "title": "Debts",
@@ -930,6 +956,28 @@
       "USD": "US dollar",
       "EUR": "Euro",
       "MXN": "Mexican peso"
+    }
+  },
+  "comingSoon": {
+    "subscriptions": {
+      "title": "Subscriptions",
+      "body": "Not wired yet. Once it is, you will see your recurring charges, when each one hits and what is left of the month after them."
+    },
+    "debts": {
+      "title": "Debts",
+      "body": "Not wired yet. Once it is, you will track what you owe and what you are owed, with partial payments and a summary you can share."
+    },
+    "goals": {
+      "title": "Goals",
+      "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."
+    },
+    "budgets": {
+      "title": "Budgets",
+      "body": "Not wired yet. Once it is, you will set a monthly and per-category cap, and your daily figure will come from that cap instead of your income."
+    },
+    "assistant": {
+      "title": "Assistant",
+      "body": "Not wired yet. Once it is, it will read your real movements to answer you and flag things worth a look."
     }
   }
 }

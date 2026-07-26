@@ -63,3 +63,23 @@ export function signedAmount(movement: Movement): number {
   if (movement.type === 'income') return movement.amount;
   return 0;
 }
+
+/** Expenses of a period grouped by category. `categoryId: null` = unclassified. */
+export type CategorySpend = {
+  categoryId: string | null;
+  spent: number;
+  count: number;
+};
+
+/**
+ * What a period added up to, aggregated by the API. Transfers are in `count` but
+ * in neither total: moving money between your own sources is not spending.
+ */
+export type MovementsSummary = {
+  from: string;
+  to: string;
+  expenseTotal: number;
+  incomeTotal: number;
+  count: number;
+  byCategory: CategorySpend[];
+};

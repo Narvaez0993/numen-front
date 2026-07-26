@@ -30,6 +30,7 @@ export function ExpenseSheet() {
   const flow = useExpenseSheetStore((s) => s.flow);
   const closeSheet = useExpenseSheetStore((s) => s.closeSheet);
   const setFlow = useExpenseSheetStore((s) => s.setFlow);
+  const initialType = useExpenseSheetStore((s) => s.initialType);
 
   const createMovement = useCreateMovement();
   const deleteMovement = useDeleteMovement();
@@ -106,6 +107,7 @@ export function ExpenseSheet() {
         >
           {flow === 'manual' ? (
             <ManualState
+              initialType={initialType}
               onSave={handleSave}
               saving={createMovement.isPending}
               errorMessage={error}
