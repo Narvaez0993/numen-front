@@ -29,6 +29,7 @@ export function useUpdateName() {
         tier: profile.tier,
         emailVerified: profile.emailVerified,
         currency: profile.currency,
+        objective: profile.objective,
       });
     },
   });

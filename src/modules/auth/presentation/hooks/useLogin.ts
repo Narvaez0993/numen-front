@@ -33,6 +33,7 @@ export function useLogin(options?: Options) {
         tier: session.tier,
         emailVerified: session.emailVerified,
         currency: session.currency,
+        objective: session.objective,
       });
       options?.onSuccess?.(session);
     },

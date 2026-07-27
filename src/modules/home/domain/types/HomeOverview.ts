@@ -1,29 +1,52 @@
 import type { Movement } from '@/modules/movements/domain';
-import type { CurrencyCode } from '@/shared/domain';
+import type { CurrencyCode, Objective } from '@/shared/domain';
 
 /**
- * Where the daily figure comes from. The app says it out loud instead of
- * presenting a projection as advice:
- * - `income` — derived from the income registered this month.
- * - `budget` — a budget the user set (phase 3); it outranks income.
- * - `none` — nothing to divide, so there is no figure to show.
+ * Which figure the hero leads with. Chosen by the server from the user's objective
+ * and the data they actually have — the objective says what is *preferred*, the data
+ * says what is *possible*, and a figure is never shown without its data.
+ *
+ * - `start` — nothing registered yet: the getting-started checklist.
+ * - `pace` — how fast the month is going and where it lands. The honest default.
+ * - `debt` — what they owe on their cards, for whoever came to get out of debt.
+ * - `saving` — what they put aside this month.
+ * - `invite` — they told us their objective and we cannot answer it yet: ask for the
+ *   missing piece. Read it together with `objective`.
  */
-export type AllowanceBasis = 'budget' | 'income' | 'none';
+export type HeroFocus = 'start' | 'pace' | 'debt' | 'saving' | 'invite';
 
-export type DailyAllowance = {
-  /** Negative when the month is already overspent — never dressed up as zero. */
-  available: number;
-  spentToday: number;
-  basis: AllowanceBasis;
+/**
+ * Where the month lands at the current rate. `null` in the month's first days, when a
+ * projection would be noise rather than information.
+ *
+ * This replaced *"available today"*, which divided the leftover income by the days
+ * remaining: that figure **rose whenever the user held back**, which is the opposite
+ * of what an app that helps you reach a goal should say.
+ */
+export type SpendingPace = {
+  dailyAverage: number;
+  projected: number;
+};
+
+/** The same stretch of last month — July 1–26 against June 1–26, never the whole month. */
+export type PreviousMonth = {
+  spent: number;
+  income: number;
 };
 
 export type MonthSummary = {
   spent: number;
   income: number;
+  /** `income - spent`. Negative when the month cost more than it brought in. */
+  saved: number;
   /** 0..1 — share of the month's income not spent. 0 without income. */
   savingsRate: number;
   /** Transfers included: they are movements, they just are not spending. */
   movements: number;
+  spentToday: number;
+  previous: PreviousMonth | null;
+  /** Signed share of change in spending. `null` on a first month. */
+  change: number | null;
 };
 
 /**
@@ -50,8 +73,8 @@ export type TopCategory = {
 
 /**
  * The whole Home screen in one read. Amounts are integers in the minor unit of
- * `currency`; `recent` carries plain movements, so renaming a category updates
- * Home for free — the client resolves every label from its own catalog.
+ * `currency`; `recent` carries plain movements, so renaming a category updates Home
+ * for free — the client resolves every label from its own catalog.
  */
 export type HomeOverview = {
   currency: CurrencyCode;
@@ -59,11 +82,18 @@ export type HomeOverview = {
   period: string;
   /** Days remaining in the month, today included. */
   daysLeft: number;
+  /** Days gone in the month, today included — the denominator of the pace. */
+  daysElapsed: number;
+  objective: Objective | null;
+  focus: HeroFocus;
   netBalance: number;
   accountsCount: number;
   creditCardsCount: number;
+  /** What is owed on cards — the only debt figure that exists today. */
+  cardDebt: number;
+  cardLimit: number;
   month: MonthSummary;
-  daily: DailyAllowance;
+  pace: SpendingPace | null;
   topCategories: TopCategory[];
   recent: Movement[];
   upcoming: UpcomingCharge[];

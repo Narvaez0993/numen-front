@@ -1,6 +1,8 @@
 import { AxiosInstance } from 'axios';
 import { getLocales } from 'expo-localization';
 
+import type { Objective } from '@/shared/domain';
+
 import { SecureStorage, SecureStorageKeys } from '@/shared/infrastructure/storage';
 
 import {
@@ -24,6 +26,7 @@ type AuthResponse = {
   language: string;
   currency: string;
   theme: string;
+  objective: string | null;
   access_token: string;
   refresh_token: string;
 };
@@ -37,6 +40,7 @@ type CurrentUserResponse = {
   language: string;
   currency: string;
   theme: string;
+  objective: string | null;
 };
 
 function toUser(data: CurrentUserResponse): User {
@@ -47,6 +51,7 @@ function toUser(data: CurrentUserResponse): User {
     tier: data.tier as Tier,
     emailVerified: data.email_verified,
     currency: data.currency,
+    objective: data.objective as Objective | null,
   });
 }
 
@@ -149,6 +154,7 @@ export class HttpAuthRepository implements AuthRepository {
           currency: patch.currency,
           language: patch.language,
           theme: patch.theme,
+          objective: patch.objective,
         },
       );
       return toUser(data);
@@ -184,6 +190,7 @@ export class HttpAuthRepository implements AuthRepository {
         tier: data.tier as Tier,
         emailVerified: true,
         currency: data.currency,
+        objective: data.objective as Objective | null,
       }),
       accessToken: data.access_token,
       refreshToken: data.refresh_token,

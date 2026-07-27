@@ -18,7 +18,6 @@ import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
-import { MonthTrend } from '../components/MonthTrend';
 import { RecentList } from '../components/RecentList';
 import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
@@ -133,18 +132,26 @@ export function HomeScreen() {
             onAvatarPress={() => router.push('/profile')}
           />
           <TodayHero
-            daily={data.daily}
+            focus={data.focus}
+            objective={data.objective}
             month={data.month}
+            pace={data.pace}
             netBalance={data.netBalance}
+            cardDebt={data.cardDebt}
+            cardLimit={data.cardLimit}
             period={data.period}
             daysLeft={data.daysLeft}
             onSaldoPress={() => router.push('/accounts')}
             // The month's spend is the movements that made it, not a budget.
             onMonthPress={goMovements}
-            // No income and no budget: the hero shows what to do about it.
             start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
+            // Both invitations point at something that exists today.
+            onInvite={
+              data.objective === 'deudas'
+                ? () => router.push('/accounts')
+                : () => openSheet('manual', 'income')
+            }
           />
-          <MonthTrend spent={data.month.spent} today={today} />
           <IncomeSummaryRow
             total={data.month.income}
             savingsRate={data.month.savingsRate}

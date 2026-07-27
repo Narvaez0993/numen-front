@@ -1,3 +1,5 @@
+import type { Objective } from '@/shared/domain';
+
 import type { User } from '../../domain';
 
 export type ProfileDTO = {
@@ -7,6 +9,7 @@ export type ProfileDTO = {
   tier: string;
   emailVerified: boolean;
   currency: string;
+  objective: Objective | null;
 };
 
 export function toProfileDTO(user: User): ProfileDTO {
@@ -17,5 +20,6 @@ export function toProfileDTO(user: User): ProfileDTO {
     tier: user.tier,
     emailVerified: user.emailVerified,
     currency: user.currency,
+    objective: user.objective,
   };
 }

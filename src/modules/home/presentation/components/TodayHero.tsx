@@ -1,65 +1,79 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
+import type { Objective } from '@/shared/domain';
 import { Card, Icon, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { monthName } from '@/shared/presentation/utils/dates';
+import { monthName, shiftMonth } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { DailyAllowance, MonthSummary } from '../../domain/types/HomeOverview';
+import type {
+  HeroFocus,
+  MonthSummary,
+  SpendingPace,
+} from '../../domain/types/HomeOverview';
 
 import { GettingStarted, type StartStep } from './GettingStarted';
 
 type Props = {
-  daily: DailyAllowance;
+  focus: HeroFocus;
+  objective: Objective | null;
   month: MonthSummary;
+  pace: SpendingPace | null;
   netBalance: number;
+  cardDebt: number;
+  cardLimit: number;
   /** `2026-07` — the month every figure belongs to. */
   period: string;
   daysLeft: number;
   onSaldoPress?: () => void;
   onMonthPress?: () => void;
-  /** Shown in place of the daily figure while there is no basis for one. */
+  /** Shown when `focus` is `start`. */
   start: { steps: StartStep[]; firstTime: boolean };
+  /** What the `invite` face asks for, per objective. */
+  onInvite?: () => void;
 };
 
+/** Below this, calling a change "more" or "less" is noise. */
+const FLAT_THRESHOLD = 0.01;
+
 /**
- * The Home hero. It has two faces because the app only promises what it can
- * derive from real data:
+ * The Home hero. It answers **"how am I going?"** — never "how much may I spend
+ * today".
  *
- * - with a basis (income today, a budget in phase 3) it leads with what is left
- *   for today — negative included, an overspent month is not rounded up to zero;
- * - without one it leads with **what to do about it**: a checklist of the three
- *   things that turn the figure on. A brand-new user used to land on a hero of
- *   zeros, which is the worst thing a money app can say on its first screen.
+ * The figure it used to show was `(income - spent) / days left`, and it had the
+ * incentive backwards: holding back today made tomorrow's number **bigger**. This one
+ * leads with the figure that serves what the user said they came for, and falls back
+ * to the month's pace, which can only get better by spending less.
  *
- * Net balance and the month's spend stay in both.
+ * `focus` comes from the server, which is the only place that knows both the objective
+ * and what data exists. The component renders the face it is told to and never guesses.
  */
 export function TodayHero({
-  daily,
+  focus,
+  objective,
   month,
+  pace,
   netBalance,
+  cardDebt,
+  cardLimit,
   period,
   daysLeft,
   onSaldoPress,
   onMonthPress,
   start,
+  onInvite,
 }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
-  const hasAllowance = daily.basis !== 'none';
-  const overspent = daily.available < 0;
-
-  // What today started with, so the bar measures today against today.
-  const todayShare = daily.available + daily.spentToday;
-  const pct = todayShare > 0 ? daily.spentToday / todayShare : 1;
+  const thisMonth = monthName(`${period}-01`, i18n.language);
 
   const monthLabel = t(daysLeft === 1 ? 'home.month.labelOne' : 'home.month.label', {
-    month: monthName(`${period}-01`, i18n.language),
+    month: thisMonth,
     daysLeft,
   });
 
-  // Position and month: the same two rows under either face of the hero.
+  // Position and month: the same two rows under every face.
   const secondaryRows = (
     <>
       <View
@@ -125,68 +139,244 @@ export function TodayHero({
     </>
   );
 
-  if (!hasAllowance) {
-    return (
-      <Card padding={18} radius={20}>
+  const trend = <Trend change={month.change} period={period} />;
+
+  return (
+    <Card padding={18} radius={20}>
+      {focus === 'start' ? (
         <GettingStarted
           steps={start.steps}
           firstTime={start.firstTime}
           footer={t('home.start.footer')}
         />
-        {secondaryRows}
-      </Card>
-    );
-  }
+      ) : null}
 
-  return (
-    <Card padding={18} radius={20}>
-      <Text
-        variant="micro"
-        muted
-        uppercase
-        style={{ marginBottom: 8, letterSpacing: 1.05 }}
-      >
-        {t('home.daily.label')}
-      </Text>
+      {focus === 'pace' ? (
+        <>
+          <Label>{t('home.pace.label')}</Label>
+          <Figure amount={month.spent} suffix={t('home.pace.spent')} />
+          {pace === null ? null : (
+            <Text variant="caption" color={theme.colors.textSecondary}>
+              {t('home.pace.rate', { amount: formatMoney(pace.dailyAverage) })}
+              {' · '}
+              {t('home.pace.projection', {
+                month: thisMonth,
+                amount: formatMoney(pace.projected),
+              })}
+            </Text>
+          )}
+          {trend}
+        </>
+      ) : null}
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'baseline',
-          gap: 8,
-          marginBottom: 6,
-          flexWrap: 'wrap',
-        }}
-      >
-        <Text
-          variant="display"
-          tabular
-          color={overspent ? theme.colors.accentCoral : theme.colors.textPrimary}
-        >
-          {formatMoney(daily.available)}
-        </Text>
-        <Text variant="caption" muted>
-          {t(overspent ? 'home.daily.overspent' : 'home.daily.availableToday')}
-        </Text>
-      </View>
+      {focus === 'debt' ? (
+        <>
+          <Label>{t('home.debt.label')}</Label>
+          <Figure
+            amount={cardDebt}
+            suffix={t('home.debt.caption')}
+            color={theme.colors.accentCoral}
+          />
+          {cardLimit > 0 ? (
+            <>
+              <Text
+                variant="caption"
+                color={theme.colors.textSecondary}
+                style={{ marginBottom: 8 }}
+              >
+                {t('home.debt.utilization', {
+                  pct: Math.round((cardDebt / cardLimit) * 100),
+                  amount: formatMoney(cardLimit),
+                })}
+              </Text>
+              {/* A ratio with a real ceiling, so the warning ramp applies here. */}
+              <ProgressBar pct={cardDebt / cardLimit} height={7} />
+            </>
+          ) : null}
+        </>
+      ) : null}
 
-      <Text
-        variant="caption"
-        color={theme.colors.textSecondary}
-        style={{ marginBottom: 14 }}
-      >
-        <Text variant="caption" color={theme.colors.textSecondary} tabular>
-          {formatMoney(daily.spentToday)}
-        </Text>{' '}
-        {t('home.daily.spentToday')}{' '}
-        <Text variant="caption" muted>
-          ·
-        </Text>{' '}
-        {t(`home.daily.basis.${daily.basis}`)}
-      </Text>
-      <ProgressBar pct={pct} height={7} />
+      {focus === 'saving' ? (
+        <>
+          <Label>{t('home.saving.label')}</Label>
+          <Figure
+            amount={month.saved}
+            suffix={
+              month.saved < 0 ? t('home.saving.negative') : t('home.saving.thisMonth')
+            }
+            color={month.saved < 0 ? theme.colors.accentCoral : undefined}
+          />
+          {month.saved > 0 ? (
+            <>
+              <Text
+                variant="caption"
+                color={theme.colors.textSecondary}
+                style={{ marginBottom: 8 }}
+              >
+                {t('home.saving.rate', {
+                  pct: Math.round(month.savingsRate * 100),
+                })}
+              </Text>
+              {/* Share of income kept: more is better, so no warning ramp. */}
+              <ProgressBar
+                pct={month.savingsRate}
+                height={7}
+                color={theme.colors.accentMint}
+              />
+            </>
+          ) : (
+            trend
+          )}
+        </>
+      ) : null}
+
+      {focus === 'invite' ? (
+        <Invite objective={objective} pace={pace} onPress={onInvite} />
+      ) : null}
 
       {secondaryRows}
     </Card>
+  );
+}
+
+function Label({ children }: { children: string }) {
+  return (
+    <Text
+      variant="micro"
+      muted
+      uppercase
+      style={{ marginBottom: 8, letterSpacing: 1.05 }}
+    >
+      {children}
+    </Text>
+  );
+}
+
+function Figure({
+  amount,
+  suffix,
+  color,
+}: {
+  amount: number;
+  suffix: string;
+  color?: string;
+}) {
+  const { theme } = useTheme();
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 8,
+        marginBottom: 6,
+        flexWrap: 'wrap',
+      }}
+    >
+      <Text variant="display" tabular color={color ?? theme.colors.textPrimary}>
+        {formatMoney(amount)}
+      </Text>
+      <Text variant="caption" muted>
+        {suffix}
+      </Text>
+    </View>
+  );
+}
+
+/** The same stretch of last month. Absent on a first month — nothing to compare to. */
+function Trend({ change, period }: { change: number | null; period: string }) {
+  const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
+  if (change === null) return null;
+
+  const flat = Math.abs(change) < FLAT_THRESHOLD;
+  const up = change > 0;
+  const previousMonth = monthName(shiftMonth(`${period}-01`, -1), i18n.language);
+  const tone = flat
+    ? theme.colors.textSecondary
+    : up
+      ? theme.colors.accentCoral
+      : theme.colors.accentMint;
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 }}>
+      {flat ? null : (
+        <Icon name={up ? 'arrow-up-right' : 'arrow-down-left'} size={13} color={tone} />
+      )}
+      <Text variant="caption" color={tone} style={{ fontSize: 11.5 }}>
+        {flat
+          ? t('home.pace.same', { month: previousMonth })
+          : t(up ? 'home.pace.more' : 'home.pace.less', {
+              pct: Math.abs(Math.round(change * 100)),
+              month: previousMonth,
+            })}
+      </Text>
+    </View>
+  );
+}
+
+/**
+ * "You told us what you came for and we cannot answer it yet."
+ *
+ * Not a fallback: turning the objective the user already stated into the next action is
+ * the most useful thing this card can do. Both invitations point at something that
+ * exists today — a card to register, an income to add — never at a "coming soon".
+ */
+function Invite({
+  objective,
+  pace,
+  onPress,
+}: {
+  objective: Objective | null;
+  pace: SpendingPace | null;
+  onPress?: () => void;
+}) {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+  const key = objective ?? 'gastos';
+
+  return (
+    <View>
+      <Label>{t(`home.invite.${key}.title`)}</Label>
+      <Text
+        variant="body"
+        color={theme.colors.textSecondary}
+        style={{ fontSize: 13.5, lineHeight: 20, marginBottom: 12 }}
+      >
+        {t(`home.invite.${key}.body`)}
+      </Text>
+      {onPress ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onPress}
+          style={({ pressed }) => ({
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            alignSelf: 'flex-start',
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 11,
+            backgroundColor: theme.colors.accentMintBg,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Icon name="plus" size={14} color={theme.colors.accentMint} />
+          <Text
+            variant="label"
+            color={theme.colors.accentMint}
+            style={{ fontSize: 12.5 }}
+          >
+            {t(`home.invite.${key}.action`)}
+          </Text>
+        </Pressable>
+      ) : null}
+      {pace === null ? null : (
+        <Text variant="caption" muted style={{ fontSize: 11.5, marginTop: 12 }}>
+          {t('home.invite.meanwhile', {
+            amount: formatMoney(pace.dailyAverage),
+          })}
+        </Text>
+      )}
+    </View>
   );
 }

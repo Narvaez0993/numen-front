@@ -560,16 +560,6 @@
       "night": "Good evening",
       "you": "You"
     },
-    "daily": {
-      "label": "For today",
-      "availableToday": "available today",
-      "overspent": "over for this month",
-      "spentToday": "spent today",
-      "basis": {
-        "income": "based on your income",
-        "budget": "based on your budget"
-      }
-    },
     "saldo": {
       "label": "Net balance"
     },
@@ -608,12 +598,6 @@
       },
       "footer": "With this month's income we work out how much you can spend each day."
     },
-    "trend": {
-      "less": "{{pct}}% less than in {{month}}",
-      "more": "{{pct}}% more than in {{month}}",
-      "same": "Same pace as {{month}}",
-      "caption": "{{amount}} through the {{day}}th last month"
-    },
     "upcoming": {
       "title": "Upcoming charges",
       "seeAll": "See all",
@@ -624,6 +608,44 @@
       "confirm": "Yes",
       "skip": "Did not happen",
       "unknown": "Subscription"
+    },
+    "pace": {
+      "label": "This month",
+      "spent": "spent",
+      "rate": "{{amount}} a day",
+      "projection": "at this rate {{month}} closes at {{amount}}",
+      "less": "{{pct}}% less than in {{month}} by this date",
+      "more": "{{pct}}% more than in {{month}} by this date",
+      "same": "same as {{month}} by this date"
+    },
+    "debt": {
+      "label": "Getting out of debt",
+      "caption": "on your cards",
+      "utilization": "{{pct}}% of your {{amount}} limit"
+    },
+    "saving": {
+      "label": "Saving",
+      "thisMonth": "kept this month",
+      "negative": "over this month",
+      "rate": "{{pct}}% of your income"
+    },
+    "invite": {
+      "deudas": {
+        "title": "Your goal: get out of debt",
+        "body": "No card registered yet. Add one and I will show you what you owe and how it goes down.",
+        "action": "Add a card"
+      },
+      "ahorrar": {
+        "title": "Your goal: save",
+        "body": "Register this month's income and I will show you what you are really keeping.",
+        "action": "Add income"
+      },
+      "gastos": {
+        "title": "Your goal",
+        "body": "Register an expense to start seeing where your money goes.",
+        "action": "Add an expense"
+      },
+      "meanwhile": "Meanwhile you are spending {{amount}} a day"
     }
   },
   "goals": {
@@ -871,6 +893,9 @@
       },
       "currency": {
         "title": "Currency"
+      },
+      "objective": {
+        "title": "Your goal"
       }
     },
     "appearance": {
@@ -889,6 +914,17 @@
     "currency": {
       "blocked": "Your data is already registered in another currency. Changing it would re-label amounts you saved, so we left it as is.",
       "failed": "We could not change the currency."
+    },
+    "objective": {
+      "title": "What do you use Deshka for?",
+      "subtitle": "It decides what Home shows you first.",
+      "none": "Not set",
+      "failed": "We could not save your goal.",
+      "options": {
+        "gastos": "Know where my money goes",
+        "ahorrar": "Save for something specific",
+        "deudas": "Get out of debt"
+      }
     }
   },
   "expenses": {

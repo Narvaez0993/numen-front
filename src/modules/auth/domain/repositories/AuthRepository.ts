@@ -1,3 +1,5 @@
+import type { Objective } from '@/shared/domain';
+
 import { Email } from '../value-objects/Email';
 import { Password } from '../value-objects/Password';
 import { User } from '../entities/User';
@@ -23,6 +25,7 @@ export type PreferencesPatch = {
   currency?: string;
   language?: string;
   theme?: string;
+  objective?: Objective;
 };
 
 export interface AuthRepository {

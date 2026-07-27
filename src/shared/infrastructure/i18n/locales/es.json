@@ -560,16 +560,6 @@
       "night": "Buenas noches",
       "you": "Tú"
     },
-    "daily": {
-      "label": "Para hoy",
-      "availableToday": "disponibles hoy",
-      "overspent": "de más este mes",
-      "spentToday": "gastado hoy",
-      "basis": {
-        "income": "según tus ingresos",
-        "budget": "según tu presupuesto"
-      }
-    },
     "saldo": {
       "label": "Saldo neto"
     },
@@ -608,12 +598,6 @@
       },
       "footer": "Con tu ingreso del mes calculamos cuánto puedes gastar cada día."
     },
-    "trend": {
-      "less": "{{pct}}% menos que en {{month}}",
-      "more": "{{pct}}% más que en {{month}}",
-      "same": "Vas igual que en {{month}}",
-      "caption": "{{amount}} hasta el {{day}} del mes pasado"
-    },
     "upcoming": {
       "title": "Próximos cobros",
       "seeAll": "Ver todos",
@@ -624,6 +608,44 @@
       "confirm": "Sí",
       "skip": "No pasó",
       "unknown": "Suscripción"
+    },
+    "pace": {
+      "label": "Este mes",
+      "spent": "gastado",
+      "rate": "{{amount}} al día",
+      "projection": "a este ritmo cierras {{month}} en {{amount}}",
+      "less": "{{pct}}% menos que en {{month}} a esta fecha",
+      "more": "{{pct}}% más que en {{month}} a esta fecha",
+      "same": "vas igual que en {{month}} a esta fecha"
+    },
+    "debt": {
+      "label": "Salir de deudas",
+      "caption": "en tus tarjetas",
+      "utilization": "{{pct}}% de tu cupo de {{amount}}"
+    },
+    "saving": {
+      "label": "Ahorrando",
+      "thisMonth": "guardado este mes",
+      "negative": "de más este mes",
+      "rate": "{{pct}}% de tus ingresos"
+    },
+    "invite": {
+      "deudas": {
+        "title": "Tu objetivo: salir de deudas",
+        "body": "Aún no registras ninguna tarjeta. Regístrala y te muestro cuánto debes y cómo va bajando.",
+        "action": "Registrar una tarjeta"
+      },
+      "ahorrar": {
+        "title": "Tu objetivo: ahorrar",
+        "body": "Registra tu ingreso del mes y te muestro cuánto estás guardando de verdad.",
+        "action": "Registrar ingreso"
+      },
+      "gastos": {
+        "title": "Tu objetivo",
+        "body": "Registra un gasto para empezar a ver en qué se te va la plata.",
+        "action": "Registrar un gasto"
+      },
+      "meanwhile": "Mientras tanto vas gastando {{amount}} al día"
     }
   },
   "goals": {
@@ -871,6 +893,9 @@
       },
       "currency": {
         "title": "Moneda"
+      },
+      "objective": {
+        "title": "Tu objetivo"
       }
     },
     "appearance": {
@@ -889,6 +914,17 @@
     "currency": {
       "blocked": "Tu información ya está registrada en otra moneda. Cambiarla re-etiquetaría montos que ya guardaste, así que la dejamos como está.",
       "failed": "No pudimos cambiar la moneda."
+    },
+    "objective": {
+      "title": "¿Para qué usas Deshka?",
+      "subtitle": "Con esto decidimos qué te mostramos primero en Inicio.",
+      "none": "Sin elegir",
+      "failed": "No pudimos guardar tu objetivo.",
+      "options": {
+        "gastos": "Saber dónde se va mi plata",
+        "ahorrar": "Ahorrar para algo específico",
+        "deudas": "Salir de deudas"
+      }
     }
   },
   "expenses": {

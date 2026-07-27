@@ -15,6 +15,7 @@ import { useCategories } from '@/modules/categories/presentation/hooks/useCatego
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { CurrencyChangeBlockedError } from '@/modules/auth/domain';
+import type { Objective } from '@/shared/domain';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import {
   CurrencyPickerSheet,
@@ -28,6 +29,7 @@ import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { AppearanceRow } from '../components/AppearanceRow';
+import { ObjectivePickerSheet } from '../components/ObjectivePickerSheet';
 import { EditNameSheet } from '../components/EditNameSheet';
 import type { UserProfile } from '../../domain/types/UserProfile';
 
@@ -58,6 +60,7 @@ export function ProfileScreen() {
   const currency = useCurrencyStore((s) => s.currency);
   const [editOpen, setEditOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [objectiveOpen, setObjectiveOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   // Who you are comes from the session; the version from the build. The old
@@ -114,6 +117,17 @@ export function ProfileScreen() {
             title={t('profile.rows.subs.title')}
             value={t('profile.soon')}
             onPress={() => router.push('/subscriptions')}
+          />
+          <SettingsRow
+            icon="target"
+            iconColor="coral"
+            title={t('profile.rows.objective.title')}
+            subtitle={
+              session?.objective
+                ? t(`profile.objective.options.${session.objective}`)
+                : t('profile.objective.none')
+            }
+            onPress={() => setObjectiveOpen(true)}
           />
           <SettingsRow
             icon="tag"
@@ -263,6 +277,19 @@ export function ProfileScreen() {
           )
         }
       />
+      <ObjectivePickerSheet
+        visible={objectiveOpen}
+        selected={session?.objective ?? null}
+        onClose={() => setObjectiveOpen(false)}
+        onChange={(objective: Objective) => {
+          setObjectiveOpen(false);
+          updatePreferences.mutate(
+            { objective },
+            { onError: () => setToast(t('profile.objective.failed')) },
+          );
+        }}
+      />
+
       <Toast
         visible={toast !== null}
         message={toast ?? ''}
