@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { verifyEmailUseCase } from '@/core/di/container';
 
 import type { AuthSessionDTO, VerifyEmailInputDTO } from '../../application';
+import { toSessionState } from '../stores/toSessionState';
 import { useAuthStore } from '../stores/useAuthStore';
 
 type Options = {
@@ -25,15 +26,7 @@ export function useVerifyEmail(options?: Options) {
       return result.value;
     },
     onSuccess: (session) => {
-      setSession({
-        userId: session.userId,
-        email: session.email,
-        displayName: session.displayName,
-        tier: session.tier,
-        emailVerified: session.emailVerified,
-        currency: session.currency,
-        objective: session.objective,
-      });
+      setSession(toSessionState(session));
       options?.onSuccess?.(session);
     },
   });
