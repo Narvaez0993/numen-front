@@ -136,12 +136,14 @@ export function HomeScreen() {
             objective={data.objective}
             month={data.month}
             pace={data.pace}
+            budget={data.budget}
             netBalance={data.netBalance}
             cardDebt={data.cardDebt}
             cardLimit={data.cardLimit}
             period={data.period}
             daysLeft={data.daysLeft}
             onSaldoPress={() => router.push('/accounts')}
+            onBudgetPress={() => router.push('/(tabs)/budgets')}
             // The month's spend is the movements that made it, not a budget.
             onMonthPress={goMovements}
             start={{ steps: startSteps, firstTime: data.recent.length === 0 }}

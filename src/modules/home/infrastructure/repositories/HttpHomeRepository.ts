@@ -35,6 +35,15 @@ type HomeOverviewResponse = {
     change: number | null;
   };
   pace: { daily_average: number; projected: number } | null;
+  budget: {
+    target: number;
+    spent: number;
+    remaining: number;
+    used: number;
+    per_day: number | null;
+    projected: number | null;
+    over: number | null;
+  } | null;
   top_categories: {
     category_id: string | null;
     spent: number;
@@ -83,6 +92,18 @@ export class HttpHomeRepository implements HomeRepository {
           previous: data.month.previous,
           change: data.month.change,
         },
+        budget:
+          data.budget === null
+            ? null
+            : {
+                target: data.budget.target,
+                spent: data.budget.spent,
+                remaining: data.budget.remaining,
+                used: data.budget.used,
+                perDay: data.budget.per_day,
+                projected: data.budget.projected,
+                over: data.budget.over,
+              },
         pace:
           data.pace === null
             ? null

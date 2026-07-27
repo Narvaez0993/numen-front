@@ -10,10 +10,12 @@ import type { CurrencyCode, Objective } from '@/shared/domain';
  * - `pace` — how fast the month is going and where it lands. The honest default.
  * - `debt` — what they owe on their cards, for whoever came to get out of debt.
  * - `saving` — what they put aside this month.
+ * - `budget` — the month against the ceiling they set. It replaces the bare `pace`, but
+ *   sits below a declared objective: `budget` never hides the debt someone asked to see.
  * - `invite` — they told us their objective and we cannot answer it yet: ask for the
  *   missing piece. Read it together with `objective`.
  */
-export type HeroFocus = 'start' | 'pace' | 'debt' | 'saving' | 'invite';
+export type HeroFocus = 'start' | 'pace' | 'debt' | 'saving' | 'budget' | 'invite';
 
 /**
  * Where the month lands at the current rate. `null` in the month's first days, when a
@@ -26,6 +28,28 @@ export type HeroFocus = 'start' | 'pace' | 'debt' | 'saving' | 'invite';
 export type SpendingPace = {
   dailyAverage: number;
   projected: number;
+};
+
+/**
+ * The month against the ceiling the user set, `null` when they set none.
+ *
+ * `perDay` is the **only** daily figure in this payload, and the reason it is allowed to
+ * exist is that it comes from a number the user chose: what is left of their own cap over
+ * the days that are left. The figure it replaced divided their income, which made it a
+ * permission the app had no business granting.
+ */
+export type BudgetCap = {
+  target: number;
+  spent: number;
+  /** Negative once they are over the cap — shown as such, never clamped to 0. */
+  remaining: number;
+  /** `spent / target`, uncapped: `1.4` is 140%. */
+  used: number;
+  /** `null` once the cap is spent: nothing left to spread over the days. */
+  perDay: number | null;
+  projected: number | null;
+  /** How much past the cap the month would close; `null` when it closes inside. */
+  over: number | null;
 };
 
 /** The same stretch of last month — July 1–26 against June 1–26, never the whole month. */
@@ -94,6 +118,11 @@ export type HomeOverview = {
   cardLimit: number;
   month: MonthSummary;
   pace: SpendingPace | null;
+  /**
+   * Present whenever a global cap exists, whatever `focus` says: with an objective of
+   * debt or saving the hero leads with that and keeps the cap as a secondary row.
+   */
+  budget: BudgetCap | null;
   topCategories: TopCategory[];
   recent: Movement[];
   upcoming: UpcomingCharge[];

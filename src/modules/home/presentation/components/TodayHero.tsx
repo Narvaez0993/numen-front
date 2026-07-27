@@ -8,6 +8,7 @@ import { monthName, shiftMonth } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type {
+  BudgetCap,
   HeroFocus,
   MonthSummary,
   SpendingPace,
@@ -20,6 +21,8 @@ type Props = {
   objective: Objective | null;
   month: MonthSummary;
   pace: SpendingPace | null;
+  /** The ceiling the user set; `null` when they set none. */
+  budget: BudgetCap | null;
   netBalance: number;
   cardDebt: number;
   cardLimit: number;
@@ -32,6 +35,7 @@ type Props = {
   start: { steps: StartStep[]; firstTime: boolean };
   /** What the `invite` face asks for, per objective. */
   onInvite?: () => void;
+  onBudgetPress?: () => void;
 };
 
 /** Below this, calling a change "more" or "less" is noise. */
@@ -54,6 +58,7 @@ export function TodayHero({
   objective,
   month,
   pace,
+  budget,
   netBalance,
   cardDebt,
   cardLimit,
@@ -63,6 +68,7 @@ export function TodayHero({
   onMonthPress,
   start,
   onInvite,
+  onBudgetPress,
 }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -72,6 +78,48 @@ export function TodayHero({
     month: thisMonth,
     daysLeft,
   });
+
+  /**
+   * The cap, small, for the faces that a declared objective won. `focus: budget` already
+   * leads with these numbers, so repeating them there would be noise.
+   */
+  const capRow =
+    budget === null || focus === 'budget' || focus === 'start' ? null : (
+      <Pressable
+        accessibilityRole="button"
+        onPress={onBudgetPress}
+        disabled={!onBudgetPress}
+        style={({ pressed }) => ({
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: 11,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.colors.borderSubtle,
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
+        <Text variant="caption" muted>
+          {t('home.budget.row', { pct: Math.round(budget.used * 100) })}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text
+            variant="caption"
+            color={
+              budget.perDay === null
+                ? theme.colors.accentCoral
+                : theme.colors.textSecondary
+            }
+            tabular
+          >
+            {budget.perDay === null
+              ? t('home.budget.spent')
+              : t('home.budget.perDay', { amount: formatMoney(budget.perDay) })}
+          </Text>
+          <Icon name="chevron-right" size={14} color={theme.colors.textTertiary} />
+        </View>
+      </Pressable>
+    );
 
   // Position and month: the same two rows under every face.
   const secondaryRows = (
@@ -84,6 +132,8 @@ export function TodayHero({
           marginBottom: 2,
         }}
       />
+
+      {capRow}
 
       <Pressable
         accessibilityRole="button"
@@ -226,6 +276,47 @@ export function TodayHero({
             </>
           ) : (
             trend
+          )}
+        </>
+      ) : null}
+
+      {focus === 'budget' && budget !== null ? (
+        <>
+          <Label>{t('home.budget.label', { month: thisMonth })}</Label>
+          <Figure
+            amount={budget.spent}
+            suffix={t('home.budget.of', { amount: formatMoney(budget.target) })}
+            color={budget.remaining < 0 ? theme.colors.accentCoral : undefined}
+          />
+          <Text
+            variant="caption"
+            color={theme.colors.textSecondary}
+            style={{ marginBottom: 8 }}
+          >
+            {budget.perDay === null
+              ? t('home.budget.over', {
+                  amount: formatMoney(Math.abs(budget.remaining)),
+                })
+              : t('home.budget.ceiling', {
+                  amount: formatMoney(budget.perDay),
+                  count: daysLeft,
+                })}
+          </Text>
+          {/* A ratio with a real ceiling, so the warning ramp applies here. */}
+          <ProgressBar pct={budget.used} height={7} />
+          {budget.projected === null ? null : (
+            <Text
+              variant="caption"
+              color={
+                budget.over === null ? theme.colors.accentMint : theme.colors.accentAmber
+              }
+              style={{ fontSize: 11.5, marginTop: 8 }}
+            >
+              {t(budget.over === null ? 'home.budget.willFit' : 'home.budget.willBust', {
+                amount: formatMoney(budget.projected),
+                gap: formatMoney(budget.over ?? budget.target - budget.projected),
+              })}
+            </Text>
           )}
         </>
       ) : null}
