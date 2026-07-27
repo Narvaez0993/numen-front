@@ -51,7 +51,7 @@ export function ProjectionCallout({ cap }: Props) {
         }}
       >
         <Icon
-          name={over ? 'alert-triangle' : 'trending-up'}
+          name={over ? 'alert-triangle' : 'check'}
           size={18}
           color={theme.colors.bgBase}
           stroke={1.9}

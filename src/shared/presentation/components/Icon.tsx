@@ -301,7 +301,17 @@ const TABLER_PATHS: Record<string, string[]> = {
   ],
 };
 
+/**
+ * A name from the table below, or any string — because most icons arrive from the API
+ * (a category's `icon`), where the client cannot know the set in advance.
+ *
+ * That `| string` is also why a **typo in our own code compiles**: it did, and shipped a
+ * mint square with a hole in it where a check should have been. The warning in `Icon`
+ * exists to make the next one loud instead of invisible.
+ */
 export type IconName = keyof typeof TABLER_PATHS | string;
+
+export const ICON_NAMES = Object.keys(TABLER_PATHS);
 
 type IconProps = {
   name: IconName;
@@ -319,7 +329,13 @@ export function Icon({
   filled = false,
 }: IconProps) {
   const paths = TABLER_PATHS[name];
-  if (!paths) return null;
+  if (!paths) {
+    // Nothing is still the right thing to draw — a placeholder glyph inside a coloured
+    // box looks worse than an empty one — but in dev it says so, because a silent hole
+    // is exactly how `trending-up` (a name that never existed) reached a screenshot.
+    if (__DEV__) console.warn(`[Icon] unknown name "${name}"`);
+    return null;
+  }
   return (
     <Svg
       width={size}
