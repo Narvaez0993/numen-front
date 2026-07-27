@@ -185,7 +185,11 @@
       "footnote": "Custom categories are part of Plus."
     },
     "limitReached": "Free watches 2 categories. Go Plus to watch as many as you like.",
-    "alreadyExists": "You already have a cap for that — tap it to change it."
+    "alreadyExists": "You already have a cap for that — tap it to change it.",
+    "error": {
+      "title": "We couldn't load your budgets.",
+      "retry": "Try again"
+    }
   },
   "plan": {
     "title": "Your plan",
@@ -867,7 +871,10 @@
         "subtitle_other": "{{count}} active · net balance {{net}}"
       },
       "subs": {
-        "title": "Subscriptions"
+        "title": "Subscriptions",
+        "subtitle_one": "{{count}} active · {{monthly}} a month",
+        "subtitle_other": "{{count}} active · {{monthly}} a month",
+        "subtitleEmpty": "None registered yet"
       },
       "categories": {
         "title": "Categories",

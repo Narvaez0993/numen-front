@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
-import { FilterChip, Text, Toast } from '@/shared/presentation/components';
+import { FilterChip, RetryState, Text, Toast } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import {
@@ -89,39 +89,11 @@ export function MovementsScreen() {
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
         edges={['top']}
       >
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 32,
-            gap: 16,
-          }}
-        >
-          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
-            {t('movements.error.title')}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void refetch()}
-            style={({ pressed }) => ({
-              paddingHorizontal: 20,
-              paddingVertical: 11,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={theme.colors.accentMint}
-              style={{ fontSize: 13 }}
-            >
-              {t('movements.error.retry')}
-            </Text>
-          </Pressable>
-        </View>
+        <RetryState
+          titleKey="movements.error.title"
+          retryKey="movements.error.retry"
+          onRetry={() => void refetch()}
+        />
       </SafeAreaView>
     );
   }

@@ -1,13 +1,14 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthStore } from '@/modules/auth/presentation';
 import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
 import type { AccentColor } from '@/shared/domain';
 import {
+  RetryState,
   SectionLabel,
   SettingsGroup,
   SettingsRow,
@@ -82,39 +83,11 @@ export function AccountsScreen() {
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       >
         <SubScreenHeader title={t('accounts.title')} onBack={() => router.back()} />
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 32,
-            gap: 16,
-          }}
-        >
-          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
-            {t('accounts.error.title')}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void refetch()}
-            style={({ pressed }) => ({
-              paddingHorizontal: 20,
-              paddingVertical: 11,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={theme.colors.accentMint}
-              style={{ fontSize: 13 }}
-            >
-              {t('accounts.error.retry')}
-            </Text>
-          </Pressable>
-        </View>
+        <RetryState
+          titleKey="accounts.error.title"
+          retryKey="accounts.error.retry"
+          onRetry={() => void refetch()}
+        />
       </SafeAreaView>
     );
   }

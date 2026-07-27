@@ -185,7 +185,11 @@
       "footnote": "Las categorías personalizadas son parte de Plus."
     },
     "limitReached": "Con Free vigilas 2 categorías. Hazte Plus para vigilar todas las que quieras.",
-    "alreadyExists": "Ya tienes un tope para eso: tócalo para cambiarlo."
+    "alreadyExists": "Ya tienes un tope para eso: tócalo para cambiarlo.",
+    "error": {
+      "title": "No pudimos cargar tus presupuestos.",
+      "retry": "Reintentar"
+    }
   },
   "plan": {
     "title": "Tu plan",
@@ -867,7 +871,10 @@
         "subtitle_other": "{{count}} activas · saldo neto {{net}}"
       },
       "subs": {
-        "title": "Suscripciones"
+        "title": "Suscripciones",
+        "subtitle_one": "{{count}} activa · {{monthly}} al mes",
+        "subtitle_other": "{{count}} activas · {{monthly}} al mes",
+        "subtitleEmpty": "Aún no registras ninguna"
       },
       "categories": {
         "title": "Categorías",
