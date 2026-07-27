@@ -5,33 +5,23 @@ import { Icon, IconBox, ProgressBar, Text } from '@/shared/presentation/componen
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { CategoryBudget } from '../../domain/types/Budget';
+import type { WatchedCategory } from '../hooks/useWatchedCategories';
 
 import { MerchantList } from './MerchantList';
 
 type Props = {
-  category: CategoryBudget;
-  tope: number;
+  category: WatchedCategory;
   expanded: boolean;
   onToggle: () => void;
   onEdit?: () => void;
   onViewAll?: () => void;
 };
 
-export function CategoryItem({
-  category,
-  tope,
-  expanded,
-  onToggle,
-  onEdit,
-  onViewAll,
-}: Props) {
+/** Every figure comes measured from the server: this row divides nothing. */
+export function CategoryItem({ category, expanded, onToggle, onEdit, onViewAll }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const safeTope = tope > 0 ? tope : category.target;
-  const pct = category.spent / safeTope;
-  const pctLabel = Math.round(pct * 100);
-  const remaining = safeTope - category.spent;
+  const pctLabel = Math.round(category.used * 100);
 
   return (
     <View
@@ -53,12 +43,7 @@ export function CategoryItem({
           opacity: pressed ? 0.92 : 1,
         })}
       >
-        <IconBox
-          name={category.iconName}
-          color={category.color}
-          size={36}
-          iconSize={17}
-        />
+        <IconBox name={category.icon} color={category.color} size={36} iconSize={17} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <View
             style={{
@@ -81,11 +66,11 @@ export function CategoryItem({
               {formatMoney(category.spent)}
               <Text variant="body" muted style={{ fontSize: 12.5 }}>
                 {' '}
-                / {formatMoney(safeTope)}
+                / {formatMoney(category.target)}
               </Text>
             </Text>
           </View>
-          <ProgressBar pct={pct} height={6} />
+          <ProgressBar pct={category.used} height={6} />
           <View
             style={{
               flexDirection: 'row',
@@ -97,9 +82,11 @@ export function CategoryItem({
               {pctLabel}% {t('budgets.used')}
             </Text>
             <Text variant="caption" muted tabular style={{ fontSize: 11 }}>
-              {remaining >= 0
-                ? t('budgets.remaining', { amount: formatMoney(remaining) })
-                : t('budgets.over', { amount: formatMoney(Math.abs(remaining)) })}
+              {category.remaining >= 0
+                ? t('budgets.remaining', { amount: formatMoney(category.remaining) })
+                : t('budgets.over', {
+                    amount: formatMoney(Math.abs(category.remaining)),
+                  })}
             </Text>
           </View>
         </View>

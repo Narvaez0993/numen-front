@@ -28,9 +28,14 @@ import {
 import { AuthRepository } from '@/modules/auth/domain';
 import { HttpAuthRepository } from '@/modules/auth/infrastructure';
 import { httpClient } from '@/shared/infrastructure/http/client';
-import type { BudgetsRepository } from '@/modules/budgets/application/ports/BudgetsRepository';
-import { GetBudgetsUseCase } from '@/modules/budgets/application/use-cases/GetBudgetsUseCase';
-import { InMemoryBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/InMemoryBudgetsRepository';
+import type { BudgetsRepository } from '@/modules/budgets/application';
+import {
+  CreateBudgetUseCase,
+  DeleteBudgetUseCase,
+  GetBudgetsUseCase,
+  UpdateBudgetUseCase,
+} from '@/modules/budgets/application';
+import { HttpBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/HttpBudgetsRepository';
 import type { DeudasRepository } from '@/modules/deudas/application/ports/DeudasRepository';
 import { GetDeudasUseCase } from '@/modules/deudas/application/use-cases/GetDeudasUseCase';
 import { InMemoryDeudasRepository } from '@/modules/deudas/infrastructure/repositories/InMemoryDeudasRepository';
@@ -66,7 +71,7 @@ export { setOnSessionExpired } from '@/shared/infrastructure/http/client';
 const authRepository: AuthRepository = new HttpAuthRepository(httpClient);
 const homeRepository: HomeRepository = new HttpHomeRepository(httpClient);
 const movementsRepository: MovementsRepository = new HttpMovementsRepository(httpClient);
-const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
+const budgetsRepository: BudgetsRepository = new HttpBudgetsRepository(httpClient);
 const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
 const accountsRepository: AccountsRepository = new HttpAccountsRepository(httpClient);
@@ -95,6 +100,9 @@ export const summarizeMovementsUseCase = new SummarizeMovementsUseCase(
   movementsRepository,
 );
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
+export const createBudgetUseCase = new CreateBudgetUseCase(budgetsRepository);
+export const updateBudgetUseCase = new UpdateBudgetUseCase(budgetsRepository);
+export const deleteBudgetUseCase = new DeleteBudgetUseCase(budgetsRepository);
 export const getDeudasUseCase = new GetDeudasUseCase(deudasRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
@@ -155,6 +163,9 @@ export const container = {
   deleteMovementUseCase,
   summarizeMovementsUseCase,
   getBudgetsUseCase,
+  createBudgetUseCase,
+  updateBudgetUseCase,
+  deleteBudgetUseCase,
   getDeudasUseCase,
   getAssistantUseCase,
   getAccountsOverviewUseCase,

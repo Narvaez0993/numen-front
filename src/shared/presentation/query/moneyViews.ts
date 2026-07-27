@@ -20,6 +20,7 @@ export const MONEY_VIEW_KEYS = {
   movements: ['movements'],
   categories: ['categories', 'overview'],
   subscriptions: ['subscriptions'],
+  budgets: ['budgets'],
 } as const;
 
 /**

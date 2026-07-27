@@ -7,27 +7,21 @@ import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { SheetHeader } from './SheetHeader';
 
-import type { CategoryBudget } from '../../../domain/types/Budget';
+import type { CandidateCategory } from '../../hooks/useWatchedCategories';
 
 type Props = {
   visible: boolean;
-  categories: CategoryBudget[];
-  topes: Record<string, number>;
+  /** Already filtered to what is not watched yet, most expensive first. */
+  candidates: CandidateCategory[];
   onClose: () => void;
-  onPick: (category: CategoryBudget) => void;
+  onPick: (category: CandidateCategory) => void;
 };
 
-export function AddVigilanceSheet({
-  visible,
-  categories,
-  topes,
-  onClose,
-  onPick,
-}: Props) {
+export function AddVigilanceSheet({ visible, candidates, onClose, onPick }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
-  const available = categories.filter((c) => topes[c.id] == null);
+  const available = candidates;
 
   return (
     <BottomSheet visible={visible} onClose={onClose} maxHeight="82%">
@@ -104,7 +98,7 @@ export function AddVigilanceSheet({
                   opacity: pressed ? 0.85 : 1,
                 })}
               >
-                <IconBox name={c.iconName} color={c.color} size={36} iconSize={17} />
+                <IconBox name={c.icon} color={c.color} size={36} iconSize={17} />
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text variant="bodyLarge" style={{ fontSize: 14 }}>
                     {c.name}

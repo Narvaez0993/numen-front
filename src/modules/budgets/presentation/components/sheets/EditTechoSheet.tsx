@@ -7,23 +7,30 @@ import { useTheme } from '@/shared/presentation/theme';
 
 import { BUDGET_TECHO_PRESETS, TECHO_MIN } from '../../constants/presets';
 import { BudgetInputHero } from '../BudgetInputHero';
-import { ToggleSwitch } from '../ToggleSwitch';
 
 import { SheetHeader } from './SheetHeader';
 
 type Props = {
   visible: boolean;
   current: number | null;
-  monthName?: string;
+  /** The real month of the snapshot — never a hardcoded label. */
+  monthName: string;
+  saving?: boolean;
   onClose: () => void;
-  onSave: (amount: number, applyFuture: boolean) => void;
+  onSave: (amount: number) => void;
   onDelete: () => void;
 };
 
+/**
+ * There used to be an "apply to future months" toggle here that did nothing. It is gone
+ * because that is now what a cap **is**: it stands until the user changes it, so August
+ * measures against this number without anyone opting in.
+ */
 export function EditTechoSheet({
   visible,
   current,
-  monthName = 'mayo',
+  monthName,
+  saving = false,
   onClose,
   onSave,
   onDelete,
@@ -31,12 +38,10 @@ export function EditTechoSheet({
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [value, setValue] = useState(current ?? 3000000);
-  const [applyFuture, setApplyFuture] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setValue(current ?? 3000000);
-      setApplyFuture(false);
     }
   }, [visible, current]);
 
@@ -71,41 +76,12 @@ export function EditTechoSheet({
           {t('budgets.editTecho.helper', { month: monthName })}
         </Text>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'flex-start',
-            gap: 12,
-            marginTop: 16,
-            paddingTop: 14,
-            paddingBottom: 14,
-            borderTopWidth: 1,
-            borderTopColor: theme.colors.borderSubtle,
-          }}
-        >
-          <View style={{ marginTop: 2 }}>
-            <ToggleSwitch value={applyFuture} onChange={setApplyFuture} />
-          </View>
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text variant="bodyLarge" style={{ fontSize: 13.5 }}>
-              {t('budgets.editTecho.applyFuture')}
-            </Text>
-            <Text
-              variant="caption"
-              color={theme.colors.textTertiary}
-              style={{ fontSize: 11.5, marginTop: 3, lineHeight: 16.1 }}
-            >
-              {t('budgets.editTecho.applyFutureHint')}
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ marginTop: 10 }}>
+        <View style={{ marginTop: 20 }}>
           <Button
             full
             label={t('budgets.editTecho.save')}
-            disabled={!valid}
-            onPress={() => valid && onSave(value, applyFuture)}
+            disabled={!valid || saving}
+            onPress={() => valid && onSave(value)}
           />
         </View>
 

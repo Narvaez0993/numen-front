@@ -70,21 +70,24 @@
   },
   "budgets": {
     "title": "Budgets",
-    "subtitle": "May · live tracking",
+    "subtitle": "{{month}} · live tracking",
     "noActiveBudget": "No active budget",
     "month": {
-      "label": "May budget",
+      "label": "Your {{month}} cap",
       "daysLeft": "days left",
       "daysLeftOne": "day left",
       "of": "of",
       "youCarry": "You're at",
       "ofTheMonth": "of the month",
       "available": "Available",
-      "dailySuggested": "Daily suggested"
+      "dailySuggested": "Don't go past",
+      "perDay": "{{amount}} a day",
+      "overBy": "Over by"
     },
     "projection": {
-      "willEnd": "At this pace you'll end the month at",
-      "over": "above your target"
+      "willEnd": "At this pace you close the month at",
+      "over": "above your cap",
+      "under": "below your cap"
     },
     "byCategory": "By category",
     "urgencyOrder": "ordered by urgency",
@@ -112,10 +115,8 @@
     },
     "editTecho": {
       "title": "Your {{month}} cap",
-      "subtitle": "Edit the amount if you need to. Applies to this month only.",
-      "helper": "The change applies only to {{month}}. Future months keep the original value.",
-      "applyFuture": "Apply to future months too",
-      "applyFutureHint": "Updates the default value starting next month.",
+      "subtitle": "Change it whenever you want. It applies right away, this month included.",
+      "helper": "Your cap stays in place month after month until you change it, so you will not have to set it again next {{month}}.",
       "save": "Save",
       "delete": "Delete budget"
     },
@@ -137,7 +138,7 @@
     },
     "confirmSheet": {
       "techoTitle": "Delete your {{month}} budget?",
-      "techoBody": "The per-category caps will also be removed. This action can't be undone.",
+      "techoBody": "We stop measuring the month against a cap. Your category caps stay as they are.",
       "techoCta": "Delete budget",
       "topeTitle": "Delete the cap for {{name}}?",
       "topeBody": "The category will keep showing under 'No cap' this month. You can turn it back on whenever you want.",
@@ -182,7 +183,9 @@
       "colorLabel": "Color",
       "save": "Create category",
       "footnote": "Custom categories are part of Plus."
-    }
+    },
+    "limitReached": "Free watches 2 categories. Go Plus to watch as many as you like.",
+    "alreadyExists": "You already have a cap for that — tap it to change it."
   },
   "plan": {
     "title": "Your plan",
@@ -646,6 +649,18 @@
         "action": "Add an expense"
       },
       "meanwhile": "Meanwhile you are spending {{amount}} a day"
+    },
+    "budget": {
+      "label": "Your {{month}} cap",
+      "of": "of {{amount}}",
+      "ceiling_one": "Don't go past {{amount}} today, the month's last day",
+      "ceiling_other": "Don't go past {{amount}} a day for the {{count}} that are left",
+      "over": "You went past your cap by {{amount}}",
+      "willFit": "At this pace you close at {{amount}} · {{gap}} to spare",
+      "willBust": "At this pace you close at {{amount}} · {{gap}} over",
+      "row": "Your cap · {{pct}}% used",
+      "perDay": "{{amount}}/day",
+      "spent": "nothing left"
     }
   },
   "goals": {
@@ -1043,10 +1058,6 @@
     }
   },
   "comingSoon": {
-    "subscriptions": {
-      "title": "Subscriptions",
-      "body": "Not wired yet. Once it is, you will see your recurring charges, when each one hits and what is left of the month after them."
-    },
     "debts": {
       "title": "Debts",
       "body": "Not wired yet. Once it is, you will track what you owe and what you are owed, with partial payments and a summary you can share."
@@ -1054,10 +1065,6 @@
     "goals": {
       "title": "Goals",
       "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."
-    },
-    "budgets": {
-      "title": "Budgets",
-      "body": "Not wired yet. Once it is, you will set a monthly and per-category cap, and your daily figure will come from that cap instead of your income."
     },
     "assistant": {
       "title": "Assistant",

@@ -5,21 +5,36 @@ import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { BudgetProjection } from '../../domain/types/Budget';
+import type { Cap } from '../../domain';
 
-type Props = { projection: BudgetProjection };
+type Props = { cap: Cap };
 
-export function ProjectionCallout({ projection }: Props) {
+/**
+ * Where the month lands, compared to the cap — the sentence that makes having both
+ * numbers worth it.
+ *
+ * It has two faces because the projection has two outcomes. It used to have one: an amber
+ * alert triangle reading "you will end at $X" no matter what, which over a month closing
+ * *inside* its cap was a warning about nothing. A `null` projection (the first days of a
+ * month, when a single bill would forecast a month of them) renders nothing at all.
+ */
+export function ProjectionCallout({ cap }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
+
+  if (cap.projected === null) return null;
+
+  const over = cap.over !== null;
+  const gap = cap.over ?? cap.target - cap.projected;
+  const accent = over ? theme.colors.accentAmber : theme.colors.accentMint;
 
   return (
     <View
       style={{
         flexDirection: 'row',
         gap: 12,
-        backgroundColor: theme.colors.accentAmberBg,
-        borderColor: 'rgba(255, 181, 71, 0.18)',
+        backgroundColor: over ? theme.colors.accentAmberBg : theme.colors.accentMintBg,
+        borderColor: over ? 'rgba(255, 181, 71, 0.18)' : 'rgba(94, 234, 190, 0.18)',
         borderWidth: 1,
         borderRadius: 16,
         padding: 14,
@@ -30,23 +45,23 @@ export function ProjectionCallout({ projection }: Props) {
           width: 36,
           height: 36,
           borderRadius: 10,
-          backgroundColor: theme.colors.accentAmber,
+          backgroundColor: accent,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Icon name="alert-triangle" size={18} color={theme.colors.bgBase} stroke={1.9} />
+        <Icon
+          name={over ? 'alert-triangle' : 'trending-up'}
+          size={18}
+          color={theme.colors.bgBase}
+          stroke={1.9}
+        />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text variant="label" style={{ fontSize: 12.5, marginBottom: 2 }}>
           {t('budgets.projection.willEnd')}{' '}
-          <Text
-            variant="label"
-            color={theme.colors.accentAmber}
-            tabular
-            style={{ fontSize: 12.5 }}
-          >
-            {formatMoney(projection.willEnd)}
+          <Text variant="label" color={accent} tabular style={{ fontSize: 12.5 }}>
+            {formatMoney(cap.projected)}
           </Text>
         </Text>
         <Text
@@ -55,9 +70,9 @@ export function ProjectionCallout({ projection }: Props) {
           style={{ fontSize: 11.5 }}
         >
           <Text variant="caption" tabular style={{ fontWeight: '500', fontSize: 11.5 }}>
-            {formatMoney(projection.over)}
+            {formatMoney(gap)}
           </Text>{' '}
-          {t('budgets.projection.over')}
+          {t(over ? 'budgets.projection.over' : 'budgets.projection.under')}
         </Text>
       </View>
     </View>

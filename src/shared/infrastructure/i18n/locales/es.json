@@ -70,21 +70,24 @@
   },
   "budgets": {
     "title": "Presupuestos",
-    "subtitle": "Mayo · seguimiento en vivo",
+    "subtitle": "{{month}} · seguimiento en vivo",
     "noActiveBudget": "Sin presupuesto activo",
     "month": {
-      "label": "Presupuesto de mayo",
+      "label": "Tu tope de {{month}}",
       "daysLeft": "días restantes",
       "daysLeftOne": "día restante",
       "of": "de",
       "youCarry": "Llevas",
       "ofTheMonth": "del mes",
       "available": "Disponible",
-      "dailySuggested": "Diario sugerido"
+      "dailySuggested": "No pases de",
+      "perDay": "{{amount}} al día",
+      "overBy": "Te pasaste"
     },
     "projection": {
-      "willEnd": "A tu ritmo cerrarás el mes en",
-      "over": "por encima de tu meta"
+      "willEnd": "A este ritmo cierras el mes en",
+      "over": "por encima de tu tope",
+      "under": "por debajo de tu tope"
     },
     "byCategory": "Por categoría",
     "urgencyOrder": "orden por urgencia",
@@ -112,10 +115,8 @@
     },
     "editTecho": {
       "title": "Tu techo de {{month}}",
-      "subtitle": "Edita el monto si necesitas. Aplica solo a este mes.",
-      "helper": "El cambio aplica solo a {{month}}. Los meses siguientes mantienen el valor original.",
-      "applyFuture": "Aplicar también a meses futuros",
-      "applyFutureHint": "Cambia el valor por defecto desde el próximo mes.",
+      "subtitle": "Cámbialo cuando quieras. Aplica desde ya, incluido este mes.",
+      "helper": "Tu tope sigue vigente mes a mes hasta que lo cambies, así que no tienes que volver a ponerlo en {{month}} que viene.",
       "save": "Guardar",
       "delete": "Eliminar presupuesto"
     },
@@ -137,7 +138,7 @@
     },
     "confirmSheet": {
       "techoTitle": "¿Eliminar tu presupuesto de {{month}}?",
-      "techoBody": "Los topes por categoría también se eliminarán. Esta acción no se puede deshacer.",
+      "techoBody": "Dejamos de medir el mes contra un tope. Tus topes por categoría se quedan como están.",
       "techoCta": "Eliminar presupuesto",
       "topeTitle": "¿Eliminar el tope de {{name}}?",
       "topeBody": "La categoría seguirá apareciendo en 'Sin tope' este mes. Puedes activarlo de nuevo cuando quieras.",
@@ -182,7 +183,9 @@
       "colorLabel": "Color",
       "save": "Crear categoría",
       "footnote": "Las categorías personalizadas son parte de Plus."
-    }
+    },
+    "limitReached": "Con Free vigilas 2 categorías. Hazte Plus para vigilar todas las que quieras.",
+    "alreadyExists": "Ya tienes un tope para eso: tócalo para cambiarlo."
   },
   "plan": {
     "title": "Tu plan",
@@ -646,6 +649,18 @@
         "action": "Registrar un gasto"
       },
       "meanwhile": "Mientras tanto vas gastando {{amount}} al día"
+    },
+    "budget": {
+      "label": "Tu tope de {{month}}",
+      "of": "de {{amount}}",
+      "ceiling_one": "No pases de {{amount}} hoy, el último día del mes",
+      "ceiling_other": "No pases de {{amount}} al día por los {{count}} que quedan",
+      "over": "Te pasaste del tope por {{amount}}",
+      "willFit": "A este ritmo cierras en {{amount}} · te sobran {{gap}}",
+      "willBust": "A este ritmo cierras en {{amount}} · te pasas por {{gap}}",
+      "row": "Tu tope · {{pct}}% usado",
+      "perDay": "{{amount}}/día",
+      "spent": "sin margen"
     }
   },
   "goals": {
@@ -1043,10 +1058,6 @@
     }
   },
   "comingSoon": {
-    "subscriptions": {
-      "title": "Suscripciones",
-      "body": "Aún no está conectado. Cuando lo esté vas a ver tus cobros recurrentes, qué día cobran y cuánto te queda del mes después de ellos."
-    },
     "debts": {
       "title": "Deudas",
       "body": "Aún no está conectado. Cuando lo esté vas a registrar lo que debes y lo que te deben, con abonos parciales y un resumen para compartir."
@@ -1054,10 +1065,6 @@
     "goals": {
       "title": "Metas",
       "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
-    },
-    "budgets": {
-      "title": "Presupuestos",
-      "body": "Aún no está conectado. Cuando lo esté vas a poner un tope al mes y por categoría, y tu cupo diario saldrá de ese tope en vez de tus ingresos."
     },
     "assistant": {
       "title": "Asistente",

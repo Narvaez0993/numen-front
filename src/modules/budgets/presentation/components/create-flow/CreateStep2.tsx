@@ -7,13 +7,13 @@ import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { DashedButton } from '../DashedButton';
 
-import type { CategoryBudget } from '../../../domain/types/Budget';
+import type { CandidateCategory } from '../../hooks/useWatchedCategories';
 
 type Props = {
   techo: number;
-  categories: CategoryBudget[];
+  categories: CandidateCategory[];
   topes: Record<string, number>;
-  onOpenTope: (category: CategoryBudget) => void;
+  onOpenTope: (category: CandidateCategory) => void;
   onCreateCategory: () => void;
 };
 
@@ -118,7 +118,7 @@ export function CreateStep2({
                   opacity: pressed ? 0.85 : 1,
                 })}
               >
-                <IconBox name={c.iconName} color={c.color} size={36} iconSize={16} />
+                <IconBox name={c.icon} color={c.color} size={36} iconSize={16} />
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text variant="bodyLarge" style={{ fontSize: 13.5 }}>
                     {c.name}
