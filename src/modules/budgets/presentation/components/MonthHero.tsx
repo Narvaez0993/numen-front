@@ -5,20 +5,28 @@ import { Card, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { MonthBudget } from '../../domain/types/Budget';
+import type { Cap } from '../../domain';
 
 import { BudgetStat } from './BudgetStat';
 
 type Props = {
-  month: MonthBudget;
+  month: Cap;
+  monthName: string;
+  daysLeft: number;
   onPress?: () => void;
 };
 
-export function MonthHero({ month, onPress }: Props) {
+/**
+ * The month against its ceiling.
+ *
+ * Both stats at the bottom tell the truth about being over: `remaining` flips to "te
+ * pasaste" in coral instead of showing a friendlier $0, and the daily ceiling disappears
+ * rather than showing a negative — there is nothing left to spread over the days.
+ */
+export function MonthHero({ month, monthName, daysLeft, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const pct = month.spent / month.target;
-  const available = month.target - month.spent;
+  const over = month.remaining < 0;
 
   return (
     <Card padding={20} radius={22} onPress={onPress}>
@@ -32,15 +40,13 @@ export function MonthHero({ month, onPress }: Props) {
         }}
       >
         <Text variant="micro" muted uppercase style={{ letterSpacing: 1.05 }}>
-          {t('budgets.month.label')}
+          {t('budgets.month.label', { month: monthName })}
         </Text>
         <Text variant="micro" muted style={{ fontSize: 10.5, letterSpacing: 0.5 }}>
           <Text variant="micro" muted tabular style={{ fontSize: 10.5 }}>
-            {month.daysLeft}
+            {daysLeft}
           </Text>{' '}
-          {t(
-            month.daysLeft === 1 ? 'budgets.month.daysLeftOne' : 'budgets.month.daysLeft',
-          )}
+          {t(daysLeft === 1 ? 'budgets.month.daysLeftOne' : 'budgets.month.daysLeft')}
         </Text>
       </View>
 
@@ -67,20 +73,26 @@ export function MonthHero({ month, onPress }: Props) {
       >
         {t('budgets.month.youCarry')}{' '}
         <Text variant="caption" tabular style={{ fontWeight: '500' }}>
-          {Math.round(pct * 100)}%
+          {Math.round(month.used * 100)}%
         </Text>{' '}
         {t('budgets.month.ofTheMonth')}
       </Text>
 
-      <ProgressBar pct={pct} height={9} />
+      <ProgressBar pct={month.used} height={9} />
 
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
-        <BudgetStat label={t('budgets.month.available')} value={formatMoney(available)} />
         <BudgetStat
-          label={t('budgets.month.dailySuggested')}
-          value={formatMoney(month.dailySuggested)}
-          variant="mint"
+          label={t(over ? 'budgets.month.overBy' : 'budgets.month.available')}
+          value={formatMoney(Math.abs(month.remaining))}
+          variant={over ? 'coral' : 'primary'}
         />
+        {month.perDay !== null && (
+          <BudgetStat
+            label={t('budgets.month.dailySuggested')}
+            value={t('budgets.month.perDay', { amount: formatMoney(month.perDay) })}
+            variant="mint"
+          />
+        )}
       </View>
     </Card>
   );

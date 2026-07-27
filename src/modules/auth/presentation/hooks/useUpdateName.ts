@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { updateDisplayNameUseCase } from '@/core/di/container';
 
 import type { ProfileDTO } from '../../application';
+import { toSessionState } from '../stores/toSessionState';
 import { useAuthStore } from '../stores/useAuthStore';
 
 /**
@@ -22,14 +23,7 @@ export function useUpdateName() {
       return result.value;
     },
     onSuccess: (profile) => {
-      setSession({
-        userId: profile.userId,
-        email: profile.email,
-        displayName: profile.displayName,
-        tier: profile.tier,
-        emailVerified: profile.emailVerified,
-        currency: profile.currency,
-      });
+      setSession(toSessionState(profile));
     },
   });
 }

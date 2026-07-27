@@ -70,21 +70,24 @@
   },
   "budgets": {
     "title": "Presupuestos",
-    "subtitle": "Mayo · seguimiento en vivo",
+    "subtitle": "{{month}} · seguimiento en vivo",
     "noActiveBudget": "Sin presupuesto activo",
     "month": {
-      "label": "Presupuesto de mayo",
+      "label": "Tu tope de {{month}}",
       "daysLeft": "días restantes",
       "daysLeftOne": "día restante",
       "of": "de",
       "youCarry": "Llevas",
       "ofTheMonth": "del mes",
       "available": "Disponible",
-      "dailySuggested": "Diario sugerido"
+      "dailySuggested": "No pases de",
+      "perDay": "{{amount}} al día",
+      "overBy": "Te pasaste"
     },
     "projection": {
-      "willEnd": "A tu ritmo cerrarás el mes en",
-      "over": "por encima de tu meta"
+      "willEnd": "A este ritmo cierras el mes en",
+      "over": "por encima de tu tope",
+      "under": "por debajo de tu tope"
     },
     "byCategory": "Por categoría",
     "urgencyOrder": "orden por urgencia",
@@ -112,10 +115,8 @@
     },
     "editTecho": {
       "title": "Tu techo de {{month}}",
-      "subtitle": "Edita el monto si necesitas. Aplica solo a este mes.",
-      "helper": "El cambio aplica solo a {{month}}. Los meses siguientes mantienen el valor original.",
-      "applyFuture": "Aplicar también a meses futuros",
-      "applyFutureHint": "Cambia el valor por defecto desde el próximo mes.",
+      "subtitle": "Cámbialo cuando quieras. Aplica desde ya, incluido este mes.",
+      "helper": "Tu tope sigue vigente mes a mes hasta que lo cambies, así que no tienes que volver a ponerlo en {{month}} que viene.",
       "save": "Guardar",
       "delete": "Eliminar presupuesto"
     },
@@ -137,7 +138,7 @@
     },
     "confirmSheet": {
       "techoTitle": "¿Eliminar tu presupuesto de {{month}}?",
-      "techoBody": "Los topes por categoría también se eliminarán. Esta acción no se puede deshacer.",
+      "techoBody": "Dejamos de medir el mes contra un tope. Tus topes por categoría se quedan como están.",
       "techoCta": "Eliminar presupuesto",
       "topeTitle": "¿Eliminar el tope de {{name}}?",
       "topeBody": "La categoría seguirá apareciendo en 'Sin tope' este mes. Puedes activarlo de nuevo cuando quieras.",
@@ -182,7 +183,9 @@
       "colorLabel": "Color",
       "save": "Crear categoría",
       "footnote": "Las categorías personalizadas son parte de Plus."
-    }
+    },
+    "limitReached": "Con Free vigilas 2 categorías. Hazte Plus para vigilar todas las que quieras.",
+    "alreadyExists": "Ya tienes un tope para eso: tócalo para cambiarlo."
   },
   "plan": {
     "title": "Tu plan",
@@ -274,12 +277,30 @@
       "breakdown_one": "{{count}} activa · proyección anual {{yearly}}",
       "breakdown_other": "{{count}} activas · proyección anual {{yearly}}"
     },
+    "frequency": {
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
     "card": {
-      "cadence": "Cada {{days}} días · {{account}}",
-      "next_one": "En {{count}} día",
-      "next_other": "En {{count}} días"
+      "next_one": "en {{count}} día",
+      "next_other": "en {{count}} días",
+      "today": "hoy",
+      "paused": "pausada"
+    },
+    "pending": {
+      "title_one": "{{count}} cobro por confirmar",
+      "title_other": "{{count}} cobros por confirmar",
+      "hint": "Si no respondes en 3 horas lo registramos por ti. Siempre puedes borrar el movimiento después.",
+      "dueToday": "Se cobra hoy",
+      "overdue": "Vencía el {{date}}",
+      "confirm": "Sí, me cobraron",
+      "skip": "No pasó",
+      "unknown": "Suscripción"
     },
     "add": "Agregar suscripción",
+    "empty": "Aún no registras suscripciones. Agrega la primera y verás cuánto se te va cada mes.",
+    "footer": "Una suscripción es un pronóstico: el día del cobro te preguntamos antes de registrarlo.",
     "form": {
       "newTitle": "Nueva suscripción",
       "editTitle": "Editar suscripción",
@@ -293,12 +314,31 @@
         "monthly": "Mensual",
         "yearly": "Anual"
       },
-      "account": "Cuenta",
+      "firstCharge": "Primer cobro",
+      "source": "Se cobra de",
+      "category": "Categoría",
+      "noSource": "Elige una cuenta",
+      "noCategory": "Sin categoría",
+      "pause": "Pausar cobros",
+      "resume": "Reactivar cobros",
       "save": "Guardar",
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Eliminar {{name}}?",
       "deleteConfirm": "Sí, eliminar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "tomorrow": "Mañana",
+      "pickDate": "Elegir fecha…"
+    },
+    "error": {
+      "title": "No pudimos cargar tus suscripciones.",
+      "retry": "Reintentar"
+    },
+    "errors": {
+      "invalid": "Revisa los datos de la suscripción.",
+      "generic": "No pudimos guardar. Intenta de nuevo.",
+      "deleteFailed": "No pudimos eliminarla.",
+      "alreadySettled": "Ese cobro ya se registró.",
+      "currencyMismatch": "Esa cuenta está registrada en otra moneda. Revísala en Cuentas antes de usarla aquí."
     }
   },
   "accounts": {
@@ -523,16 +563,6 @@
       "night": "Buenas noches",
       "you": "Tú"
     },
-    "daily": {
-      "label": "Para hoy",
-      "availableToday": "disponibles hoy",
-      "overspent": "de más este mes",
-      "spentToday": "gastado hoy",
-      "basis": {
-        "income": "según tus ingresos",
-        "budget": "según tu presupuesto"
-      }
-    },
     "saldo": {
       "label": "Saldo neto"
     },
@@ -571,15 +601,66 @@
       },
       "footer": "Con tu ingreso del mes calculamos cuánto puedes gastar cada día."
     },
-    "accounts": {
-      "title": "Dónde está tu plata",
-      "seeAll": "Ver todas"
+    "upcoming": {
+      "title": "Próximos cobros",
+      "seeAll": "Ver todos",
+      "inDays_one": "en {{count}} día",
+      "inDays_other": "en {{count}} días",
+      "today": "hoy",
+      "pending": "por confirmar",
+      "confirm": "Sí",
+      "skip": "No pasó",
+      "unknown": "Suscripción"
     },
-    "trend": {
-      "less": "{{pct}}% menos que en {{month}}",
-      "more": "{{pct}}% más que en {{month}}",
-      "same": "Vas igual que en {{month}}",
-      "caption": "{{amount}} hasta el {{day}} del mes pasado"
+    "pace": {
+      "label": "Este mes",
+      "spent": "gastado",
+      "rate": "{{amount}} al día",
+      "projection": "a este ritmo cierras {{month}} en {{amount}}",
+      "less": "{{pct}}% menos que en {{month}} a esta fecha",
+      "more": "{{pct}}% más que en {{month}} a esta fecha",
+      "same": "vas igual que en {{month}} a esta fecha"
+    },
+    "debt": {
+      "label": "Salir de deudas",
+      "caption": "en tus tarjetas",
+      "utilization": "{{pct}}% de tu cupo de {{amount}}"
+    },
+    "saving": {
+      "label": "Ahorrando",
+      "thisMonth": "guardado este mes",
+      "negative": "de más este mes",
+      "rate": "{{pct}}% de tus ingresos"
+    },
+    "invite": {
+      "deudas": {
+        "title": "Tu objetivo: salir de deudas",
+        "body": "Aún no registras ninguna tarjeta. Regístrala y te muestro cuánto debes y cómo va bajando.",
+        "action": "Registrar una tarjeta"
+      },
+      "ahorrar": {
+        "title": "Tu objetivo: ahorrar",
+        "body": "Registra tu ingreso del mes y te muestro cuánto estás guardando de verdad.",
+        "action": "Registrar ingreso"
+      },
+      "gastos": {
+        "title": "Tu objetivo",
+        "body": "Registra un gasto para empezar a ver en qué se te va la plata.",
+        "action": "Registrar un gasto"
+      },
+      "meanwhile": "Mientras tanto vas gastando {{amount}} al día"
+    },
+    "budget": {
+      "label": "Tu tope de {{month}}",
+      "of": "de {{amount}}",
+      "ceiling_one": "No pases de {{amount}} hoy, el último día del mes",
+      "ceiling_other": "No pases de {{amount}} al día por los {{count}} que quedan",
+      "over": "Te pasaste del tope por {{amount}}",
+      "willFit": "A este ritmo cierras en {{amount}} · te sobran {{gap}}",
+      "willBust": "A este ritmo cierras en {{amount}} · te pasas por {{gap}}",
+      "row": "Tu tope · {{pct}}% usado",
+      "perDay": "{{amount}}/día",
+      "spent": "sin margen"
     }
   },
   "goals": {
@@ -827,6 +908,9 @@
       },
       "currency": {
         "title": "Moneda"
+      },
+      "objective": {
+        "title": "Tu objetivo"
       }
     },
     "appearance": {
@@ -841,6 +925,21 @@
       "label": "Nombre",
       "placeholder": "Tu nombre",
       "save": "Guardar"
+    },
+    "currency": {
+      "blocked": "Tu información ya está registrada en otra moneda. Cambiarla re-etiquetaría montos que ya guardaste, así que la dejamos como está.",
+      "failed": "No pudimos cambiar la moneda."
+    },
+    "objective": {
+      "title": "¿Para qué usas Deshka?",
+      "subtitle": "Con esto decidimos qué te mostramos primero en Inicio.",
+      "none": "Sin elegir",
+      "failed": "No pudimos guardar tu objetivo.",
+      "options": {
+        "gastos": "Saber dónde se va mi plata",
+        "ahorrar": "Ahorrar para algo específico",
+        "deudas": "Salir de deudas"
+      }
     }
   },
   "expenses": {
@@ -959,10 +1058,6 @@
     }
   },
   "comingSoon": {
-    "subscriptions": {
-      "title": "Suscripciones",
-      "body": "Aún no está conectado. Cuando lo esté vas a ver tus cobros recurrentes, qué día cobran y cuánto te queda del mes después de ellos."
-    },
     "debts": {
       "title": "Deudas",
       "body": "Aún no está conectado. Cuando lo esté vas a registrar lo que debes y lo que te deben, con abonos parciales y un resumen para compartir."
@@ -970,10 +1065,6 @@
     "goals": {
       "title": "Metas",
       "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
-    },
-    "budgets": {
-      "title": "Presupuestos",
-      "body": "Aún no está conectado. Cuando lo esté vas a poner un tope al mes y por categoría, y tu cupo diario saldrá de ese tope en vez de tus ingresos."
     },
     "assistant": {
       "title": "Asistente",

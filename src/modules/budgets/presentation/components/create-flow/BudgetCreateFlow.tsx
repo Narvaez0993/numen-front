@@ -16,24 +16,30 @@ import { EditTopeSheet } from '../sheets/EditTopeSheet';
 import { CreateStep1 } from './CreateStep1';
 import { CreateStep2 } from './CreateStep2';
 
-import type { CategoryBudget } from '../../../domain/types/Budget';
+import type { CandidateCategory } from '../../hooks/useWatchedCategories';
+import type { CreatedCategory } from '../sheets/CreateCategorySheet';
 
 type Props = {
   visible: boolean;
-  categories: CategoryBudget[];
-  monthName?: string;
+  categories: CandidateCategory[];
+  /** The real month of the snapshot. */
+  monthName: string;
+  saving?: boolean;
   onClose: () => void;
   onSave: (techo: number, topes: Record<string, number>) => void;
-  onCreateCategory: (cat: CategoryBudget) => void;
 };
 
+/**
+ * Two steps: the month's ceiling, then the categories to watch. Both are saved by the
+ * caller in one go, so a flow abandoned halfway leaves nothing behind.
+ */
 export function BudgetCreateFlow({
   visible,
   categories,
-  monthName = 'mayo',
+  monthName,
+  saving = false,
   onClose,
   onSave,
-  onCreateCategory,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -41,7 +47,7 @@ export function BudgetCreateFlow({
   const [step, setStep] = useState<1 | 2>(1);
   const [techo, setTecho] = useState(2500000);
   const [draftTopes, setDraftTopes] = useState<Record<string, number>>({});
-  const [topeSheetFor, setTopeSheetFor] = useState<CategoryBudget | null>(null);
+  const [topeSheetFor, setTopeSheetFor] = useState<CandidateCategory | null>(null);
   const [createCatOpen, setCreateCatOpen] = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
 
@@ -186,7 +192,7 @@ export function BudgetCreateFlow({
           <Button
             full
             label={step === 1 ? t('budgets.create.next') : t('budgets.create.save')}
-            disabled={step === 1 && !validTecho}
+            disabled={saving || (step === 1 && !validTecho)}
             onPress={handlePrimary}
           />
         </View>
@@ -194,7 +200,17 @@ export function BudgetCreateFlow({
         {/* Nested tope sheet */}
         <EditTopeSheet
           visible={topeSheetFor != null}
-          category={topeSheetFor}
+          category={
+            topeSheetFor
+              ? {
+                  categoryId: topeSheetFor.id,
+                  name: topeSheetFor.name,
+                  icon: topeSheetFor.icon,
+                  color: topeSheetFor.color,
+                  spent: topeSheetFor.spent,
+                }
+              : null
+          }
           current={topeSheetFor ? (draftTopes[topeSheetFor.id] ?? 0) : 0}
           onClose={() => setTopeSheetFor(null)}
           onSave={(amount) => {
@@ -217,12 +233,11 @@ export function BudgetCreateFlow({
         <CreateCategorySheet
           visible={createCatOpen}
           onClose={() => setCreateCatOpen(false)}
-          onSave={(newCat) => {
+          onSave={(created: CreatedCategory) => {
             setCreateCatOpen(false);
-            onCreateCategory(newCat);
-            // Wait for the create-category sheet to fully close before opening
-            // the tope sheet — RN can't have two Modals visible at the same time.
-            setTimeout(() => setTopeSheetFor(newCat), 280);
+            // Wait for the create-category sheet to fully close before opening the tope
+            // sheet — RN can't have two Modals visible at the same time.
+            setTimeout(() => setTopeSheetFor({ ...created, spent: 0 }), 280);
           }}
         />
 

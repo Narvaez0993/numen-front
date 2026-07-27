@@ -4,7 +4,7 @@ import type { SubscriptionsRepository } from '../ports/SubscriptionsRepository';
 export class GetSubscriptionsUseCase {
   constructor(private readonly subscriptionsRepository: SubscriptionsRepository) {}
 
-  async execute(): Promise<SubscriptionsOverview> {
-    return this.subscriptionsRepository.getOverview();
+  async execute(today: string): Promise<SubscriptionsOverview> {
+    return this.subscriptionsRepository.getOverview(today);
   }
 }

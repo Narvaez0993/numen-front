@@ -5,10 +5,10 @@ import { Text } from '@/shared/presentation/components';
 import { AccentColor, accentColorKey, useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { MerchantStat } from '../../domain/types/Budget';
+import type { Merchant } from '../../domain';
 
 type Props = {
-  merchants: MerchantStat[];
+  merchants: Merchant[];
   color: AccentColor;
 };
 
@@ -30,7 +30,7 @@ export function MerchantList({ merchants, color }: Props) {
       <View style={{ gap: 8 }}>
         {merchants.map((m, i) => (
           <View
-            key={`${m.description}-${i}`}
+            key={`${m.label}-${i}`}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -51,7 +51,7 @@ export function MerchantList({ merchants, color }: Props) {
               style={{ flex: 1, minWidth: 0, fontSize: 12.5 }}
               numberOfLines={1}
             >
-              {m.description}
+              {m.label}
             </Text>
             <Text variant="caption" muted tabular style={{ fontSize: 11 }}>
               {m.count}×
@@ -62,7 +62,7 @@ export function MerchantList({ merchants, color }: Props) {
               tabular
               style={{ fontSize: 12.5, minWidth: 70, textAlign: 'right' }}
             >
-              {formatMoney(m.amount)}
+              {formatMoney(m.spent)}
             </Text>
           </View>
         ))}

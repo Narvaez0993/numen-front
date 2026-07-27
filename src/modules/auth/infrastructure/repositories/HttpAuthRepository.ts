@@ -1,4 +1,7 @@
 import { AxiosInstance } from 'axios';
+import { getLocales } from 'expo-localization';
+
+import type { Objective } from '@/shared/domain';
 
 import { SecureStorage, SecureStorageKeys } from '@/shared/infrastructure/storage';
 
@@ -23,6 +26,7 @@ type AuthResponse = {
   language: string;
   currency: string;
   theme: string;
+  objective: string | null;
   access_token: string;
   refresh_token: string;
 };
@@ -36,6 +40,7 @@ type CurrentUserResponse = {
   language: string;
   currency: string;
   theme: string;
+  objective: string | null;
 };
 
 function toUser(data: CurrentUserResponse): User {
@@ -46,6 +51,7 @@ function toUser(data: CurrentUserResponse): User {
     tier: data.tier as Tier,
     emailVerified: data.email_verified,
     currency: data.currency,
+    objective: data.objective as Objective | null,
   });
 }
 
@@ -54,9 +60,15 @@ export class HttpAuthRepository implements AuthRepository {
 
   async register(credentials: RegisterCredentials): Promise<void> {
     try {
+      const locale = getLocales()[0];
       await this.http.post('/auth/register', {
         email: credentials.email.value,
         password: credentials.password.value,
+        // The device knows its region better than the server does. Anything the
+        // server does not support falls back there — a Colombian used to be handed
+        // USD in silence and type "1.000.000" meaning pesos.
+        language: locale?.languageCode ?? undefined,
+        currency: locale?.currencyCode ?? undefined,
       });
     } catch (error) {
       throw mapApiError(error);
@@ -142,6 +154,7 @@ export class HttpAuthRepository implements AuthRepository {
           currency: patch.currency,
           language: patch.language,
           theme: patch.theme,
+          objective: patch.objective,
         },
       );
       return toUser(data);
@@ -177,6 +190,7 @@ export class HttpAuthRepository implements AuthRepository {
         tier: data.tier as Tier,
         emailVerified: true,
         currency: data.currency,
+        objective: data.objective as Objective | null,
       }),
       accessToken: data.access_token,
       refreshToken: data.refresh_token,

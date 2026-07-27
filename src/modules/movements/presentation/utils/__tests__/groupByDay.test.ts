@@ -14,6 +14,7 @@ const mov = (overrides: Partial<Movement>): Movement => ({
   categoryId: 'cafe',
   occurredOn: TODAY,
   capturedVia: 'manual',
+  subscriptionId: null,
   ...overrides,
 });
 

@@ -5,10 +5,9 @@ import {
   deleteCreditCardUseCase,
   updateCreditCardUseCase,
 } from '@/core/di/container';
+import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 
 import type { CreditCard, CreditCardPatch, NewCreditCard } from '../../domain';
-
-import { ACCOUNTS_OVERVIEW_KEY } from './useAccounts';
 
 type UpdateInput = { id: string; patch: CreditCardPatch };
 
@@ -23,7 +22,7 @@ export function useCreateCard() {
       return result.value;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ACCOUNTS_OVERVIEW_KEY });
+      invalidateMoneyViews(queryClient);
     },
   });
 }
@@ -39,7 +38,7 @@ export function useUpdateCard() {
       return result.value;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ACCOUNTS_OVERVIEW_KEY });
+      invalidateMoneyViews(queryClient);
     },
   });
 }
@@ -54,7 +53,7 @@ export function useDeleteCard() {
       }
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ACCOUNTS_OVERVIEW_KEY });
+      invalidateMoneyViews(queryClient);
     },
   });
 }

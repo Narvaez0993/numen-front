@@ -48,3 +48,15 @@ export class SessionExpiredError extends DomainError {
     super('Session expired; sign in again');
   }
 }
+
+/**
+ * The home currency cannot change once money has been registered: amounts are
+ * stored in the currency's minor unit and the exponent differs (COP 0, USD 2), so
+ * re-labelling a history would move every decimal point.
+ */
+export class CurrencyChangeBlockedError extends DomainError {
+  readonly code = 'auth.currency_change_blocked';
+  constructor() {
+    super('Your data is registered in another currency');
+  }
+}

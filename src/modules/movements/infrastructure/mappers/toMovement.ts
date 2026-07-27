@@ -22,6 +22,7 @@ export type MovementResponse = {
   category_id: string | null;
   occurred_on: string;
   captured_via: string;
+  subscription_id: string | null;
 };
 
 /**
@@ -41,6 +42,7 @@ export function toMovement(dto: MovementResponse): Movement {
     categoryId: dto.category_id,
     occurredOn: dto.occurred_on,
     capturedVia: dto.captured_via as CapturedVia,
+    subscriptionId: dto.subscription_id,
   };
 }
 

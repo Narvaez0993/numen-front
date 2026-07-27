@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { updateCategoryUseCase } from '@/core/di/container';
+import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 
 import type { Category, CategoryPatch } from '../../domain';
 
@@ -17,7 +18,7 @@ export function useUpdateCategory() {
       return result.value;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['categories', 'overview'] });
+      invalidateMoneyViews(queryClient);
     },
   });
 }
