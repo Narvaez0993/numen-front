@@ -8,6 +8,7 @@ import { useAuthStore } from '@/modules/auth/presentation';
 import { useMovementsSummary } from '@/modules/movements/presentation/hooks/useMovementsSummary';
 import {
   Icon,
+  RetryState,
   SectionLabel,
   SubScreenHeader,
   Text,
@@ -129,39 +130,11 @@ export function CategoriesScreen() {
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       >
         <SubScreenHeader title={t('categories.title')} onBack={() => router.back()} />
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 32,
-            gap: 16,
-          }}
-        >
-          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
-            {t('categories.error.title')}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void refetch()}
-            style={({ pressed }) => ({
-              paddingHorizontal: 20,
-              paddingVertical: 11,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={theme.colors.accentMint}
-              style={{ fontSize: 13 }}
-            >
-              {t('categories.error.retry')}
-            </Text>
-          </Pressable>
-        </View>
+        <RetryState
+          titleKey="categories.error.title"
+          retryKey="categories.error.retry"
+          onRetry={() => void refetch()}
+        />
       </SafeAreaView>
     );
   }

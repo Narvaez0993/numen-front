@@ -1,11 +1,16 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
-import { SubScreenHeader, Text, Toast } from '@/shared/presentation/components';
+import {
+  RetryState,
+  SubScreenHeader,
+  Text,
+  Toast,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
 
@@ -108,39 +113,11 @@ export function SubscriptionsScreen() {
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       >
         <SubScreenHeader title={t('subscriptions.title')} onBack={() => router.back()} />
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 32,
-            gap: 16,
-          }}
-        >
-          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
-            {t('subscriptions.error.title')}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void refetch()}
-            style={({ pressed }) => ({
-              paddingHorizontal: 20,
-              paddingVertical: 11,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={theme.colors.accentMint}
-              style={{ fontSize: 13 }}
-            >
-              {t('subscriptions.error.retry')}
-            </Text>
-          </Pressable>
-        </View>
+        <RetryState
+          titleKey="subscriptions.error.title"
+          retryKey="subscriptions.error.retry"
+          onRetry={() => void refetch()}
+        />
       </SafeAreaView>
     );
   }
