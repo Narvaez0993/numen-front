@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMovementsSummary } from '@/modules/movements/presentation/hooks/useMovementsSummary';
 import { DomainError } from '@/shared/domain';
-import { Icon, SectionLabel, Text } from '@/shared/presentation/components';
+import { Icon, RetryState, SectionLabel, Text } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import { monthName, monthRange, toIsoDate } from '@/shared/presentation/utils/dates';
@@ -74,7 +74,7 @@ export function BudgetsScreen() {
   const today = useMemo(() => toIsoDate(new Date()), []);
   const month = useMemo(() => monthRange(today), [today]);
 
-  const { data, isLoading } = useBudgets(today);
+  const { data, isLoading, isError, refetch } = useBudgets(today);
   // Already cached by the categories screen for the same range: it is what tells the
   // "watch a category" sheet how much each candidate has cost this month.
   const summary = useMovementsSummary(month);
@@ -103,6 +103,21 @@ export function BudgetsScreen() {
   const [addVigOpen, setAddVigOpen] = useState(false);
   const [confirm, setConfirm] = useState<Confirm | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
+
+  if (isError) {
+    return (
+      <SafeAreaView
+        edges={['top']}
+        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
+      >
+        <RetryState
+          titleKey="budgets.error.title"
+          retryKey="budgets.error.retry"
+          onRetry={() => void refetch()}
+        />
+      </SafeAreaView>
+    );
+  }
 
   if (isLoading || !data) {
     return (

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthStore } from '@/modules/auth/presentation';
@@ -11,7 +11,7 @@ import {
   useConfirmCharge,
   useSkipCharge,
 } from '@/modules/subscriptions/presentation/hooks/useCharges';
-import { Text } from '@/shared/presentation/components';
+import { RetryState } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
@@ -48,31 +48,11 @@ export function HomeScreen() {
   if (isError) {
     return (
       <SafeAreaView style={centered}>
-        <View style={{ paddingHorizontal: 32, alignItems: 'center', gap: 16 }}>
-          <Text variant="body" muted style={{ fontSize: 14, textAlign: 'center' }}>
-            {t('home.error.title')}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void refetch()}
-            style={({ pressed }) => ({
-              paddingHorizontal: 20,
-              paddingVertical: 11,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={theme.colors.accentMint}
-              style={{ fontSize: 13 }}
-            >
-              {t('home.error.retry')}
-            </Text>
-          </Pressable>
-        </View>
+        <RetryState
+          titleKey="home.error.title"
+          retryKey="home.error.retry"
+          onRetry={() => void refetch()}
+        />
       </SafeAreaView>
     );
   }
