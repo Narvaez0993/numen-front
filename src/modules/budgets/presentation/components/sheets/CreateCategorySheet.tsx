@@ -19,31 +19,46 @@ import {
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 import type { AccentColor } from '@/shared/domain';
 
+import { useCreateCategory } from '@/modules/categories/presentation/hooks/useCreateCategory';
+
 import { CATEGORY_COLOR_OPTIONS, CATEGORY_ICON_OPTIONS } from '../../constants/presets';
 
-import type { CategoryBudget } from '../../../domain/types/Budget';
+/** What the caller gets back: a category that exists, with the id the server gave it. */
+export type CreatedCategory = {
+  id: string;
+  name: string;
+  icon: string;
+  color: AccentColor;
+};
 
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onSave: (category: CategoryBudget) => void;
+  onSave: (category: CreatedCategory) => void;
 };
 
+/**
+ * Creates a real category through the categories module — it used to mint an id from
+ * `Date.now()` and hand back a local object that no cap could ever be attached to.
+ */
 export function CreateCategorySheet({ visible, onClose, onSave }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const inputRef = useRef<TextInputType>(null);
+  const create = useCreateCategory();
 
   const [name, setName] = useState('');
   const [icon, setIcon] = useState<IconName>('tag');
   const [color, setColor] = useState<AccentColor>('purple');
   const [focused, setFocused] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
 
   useEffect(() => {
     if (visible) {
       setName('');
       setIcon('tag');
       setColor('purple');
+      setFailed(null);
       const t = setTimeout(() => inputRef.current?.focus(), 280);
       return () => clearTimeout(t);
     }
@@ -53,25 +68,26 @@ export function CreateCategorySheet({ visible, onClose, onSave }: Props) {
   const previewBg = theme.colors[accentColorKey(color, 'bg')];
   const previewFg = theme.colors[accentColorKey(color, 'fg')];
 
-  const handleSave = () => {
-    if (!valid) return;
-    const id =
-      name
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .slice(0, 16) +
-      '-' +
-      Date.now().toString(36).slice(-4);
-    onSave({
-      id,
-      name: name.trim(),
-      iconName: String(icon),
-      color,
-      spent: 0,
-      target: 0,
-      topMerchants: [],
-    });
+  const handleSave = async () => {
+    if (!valid || create.isPending) return;
+    setFailed(null);
+    try {
+      const created = await create.mutateAsync({
+        name: name.trim(),
+        icon: String(icon),
+        color,
+        // A cap watches spending, so this sheet only ever makes expense categories.
+        flow: 'expense',
+      });
+      onSave({
+        id: created.id,
+        name: created.name,
+        icon: created.icon,
+        color: created.color === 'neutral' ? 'mint' : (created.color as AccentColor),
+      });
+    } catch (error) {
+      setFailed(error instanceof Error ? error.message : t('common.error'));
+    }
   };
 
   return (
@@ -283,9 +299,19 @@ export function CreateCategorySheet({ visible, onClose, onSave }: Props) {
         <Button
           full
           label={t('budgets.createCategory.save')}
-          disabled={!valid}
+          disabled={!valid || create.isPending}
           onPress={handleSave}
         />
+
+        {failed && (
+          <Text
+            variant="caption"
+            color={theme.colors.accentCoral}
+            style={{ fontSize: 11.5, textAlign: 'center', marginTop: 10 }}
+          >
+            {failed}
+          </Text>
+        )}
 
         <Text
           variant="caption"

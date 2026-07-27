@@ -7,18 +7,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/modules/auth/presentation';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import {
+  useConfirmCharge,
+  useSkipCharge,
+} from '@/modules/subscriptions/presentation/hooks/useCharges';
 import { Text } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
-import { AccountsStrip } from '../components/AccountsStrip';
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
-import { MonthTrend } from '../components/MonthTrend';
 import { RecentList } from '../components/RecentList';
 import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
+import { UpcomingCharges } from '../components/UpcomingCharges';
 import { useHomeOverview } from '../hooks/useHomeOverview';
 
 export function HomeScreen() {
@@ -31,6 +34,8 @@ export function HomeScreen() {
   const displayName = useAuthStore((s) => s.session?.displayName);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
+  const confirmCharge = useConfirmCharge();
+  const skipCharge = useSkipCharge();
   const tabBarClearance = useFloatingTabBarClearance();
 
   const centered = {
@@ -127,24 +132,41 @@ export function HomeScreen() {
             onAvatarPress={() => router.push('/profile')}
           />
           <TodayHero
-            daily={data.daily}
+            focus={data.focus}
+            objective={data.objective}
             month={data.month}
+            pace={data.pace}
+            budget={data.budget}
             netBalance={data.netBalance}
+            cardDebt={data.cardDebt}
+            cardLimit={data.cardLimit}
             period={data.period}
             daysLeft={data.daysLeft}
             onSaldoPress={() => router.push('/accounts')}
+            onBudgetPress={() => router.push('/(tabs)/budgets')}
             // The month's spend is the movements that made it, not a budget.
             onMonthPress={goMovements}
-            // No income and no budget: the hero shows what to do about it.
             start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
+            // Both invitations point at something that exists today.
+            onInvite={
+              data.objective === 'deudas'
+                ? () => router.push('/accounts')
+                : () => openSheet('manual', 'income')
+            }
           />
-          <AccountsStrip onPress={() => router.push('/accounts')} />
-          <MonthTrend spent={data.month.spent} today={today} />
           <IncomeSummaryRow
             total={data.month.income}
             savingsRate={data.month.savingsRate}
             period={data.period}
             onPress={goMovements}
+          />
+          <UpcomingCharges
+            items={data.upcoming}
+            today={today}
+            busy={confirmCharge.isPending || skipCharge.isPending}
+            onConfirm={(id) => confirmCharge.mutate({ id })}
+            onSkip={(id) => skipCharge.mutate(id)}
+            onSeeAll={() => router.push('/subscriptions')}
           />
           <RecentList items={data.recent} onSeeAll={goMovements} />
           <TopCategoriesCard categories={data.topCategories} />

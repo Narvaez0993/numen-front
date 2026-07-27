@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
+
+import type { Objective } from '@/shared/domain';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type AuthSessionState = {
@@ -10,6 +12,8 @@ export type AuthSessionState = {
   emailVerified: boolean;
   /** Home currency from the server: the unit every stored amount is in. */
   currency: string;
+  /** What the user came for. Home leads with the figure that serves it. */
+  objective: Objective | null;
 };
 
 type AuthStoreState = {

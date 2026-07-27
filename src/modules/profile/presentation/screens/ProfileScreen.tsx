@@ -14,6 +14,8 @@ import {
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
+import { CurrencyChangeBlockedError } from '@/modules/auth/domain';
+import type { Objective } from '@/shared/domain';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import {
   CurrencyPickerSheet,
@@ -21,11 +23,13 @@ import {
   SettingsRow,
   SubScreenHeader,
   Text,
+  Toast,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { AppearanceRow } from '../components/AppearanceRow';
+import { ObjectivePickerSheet } from '../components/ObjectivePickerSheet';
 import { EditNameSheet } from '../components/EditNameSheet';
 import type { UserProfile } from '../../domain/types/UserProfile';
 
@@ -56,6 +60,8 @@ export function ProfileScreen() {
   const currency = useCurrencyStore((s) => s.currency);
   const [editOpen, setEditOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [objectiveOpen, setObjectiveOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   // Who you are comes from the session; the version from the build. The old
   // in-memory repo answered "Sebastián Mejía · sebas@gastos.app" to everyone.
@@ -111,6 +117,17 @@ export function ProfileScreen() {
             title={t('profile.rows.subs.title')}
             value={t('profile.soon')}
             onPress={() => router.push('/subscriptions')}
+          />
+          <SettingsRow
+            icon="target"
+            iconColor="coral"
+            title={t('profile.rows.objective.title')}
+            subtitle={
+              session?.objective
+                ? t(`profile.objective.options.${session.objective}`)
+                : t('profile.objective.none')
+            }
+            onPress={() => setObjectiveOpen(true)}
           />
           <SettingsRow
             icon="tag"
@@ -244,7 +261,40 @@ export function ProfileScreen() {
       <CurrencyPickerSheet
         visible={currencyOpen}
         onClose={() => setCurrencyOpen(false)}
-        onChange={(code) => updatePreferences.mutate({ currency: code })}
+        onChange={(code) =>
+          updatePreferences.mutate(
+            { currency: code },
+            {
+              // Not a failure to retry: the app is refusing to re-label money the
+              // user already registered, and the copy has to say why.
+              onError: (error) =>
+                setToast(
+                  error instanceof CurrencyChangeBlockedError
+                    ? t('profile.currency.blocked')
+                    : t('profile.currency.failed'),
+                ),
+            },
+          )
+        }
+      />
+      <ObjectivePickerSheet
+        visible={objectiveOpen}
+        selected={session?.objective ?? null}
+        onClose={() => setObjectiveOpen(false)}
+        onChange={(objective: Objective) => {
+          setObjectiveOpen(false);
+          updatePreferences.mutate(
+            { objective },
+            { onError: () => setToast(t('profile.objective.failed')) },
+          );
+        }}
+      />
+
+      <Toast
+        visible={toast !== null}
+        message={toast ?? ''}
+        onDismiss={() => setToast(null)}
+        durationMs={4000}
       />
       <EditNameSheet
         visible={editOpen}

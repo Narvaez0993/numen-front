@@ -6,13 +6,19 @@ import { useTheme } from '@/shared/presentation/theme';
 type Props = {
   label: string;
   value: string;
-  variant?: 'primary' | 'mint';
+  /** `coral` is for a figure that is bad news — being past the cap, mainly. */
+  variant?: 'primary' | 'mint' | 'coral';
 };
+
+const COLORS = {
+  primary: 'textPrimary',
+  mint: 'accentMint',
+  coral: 'accentCoral',
+} as const;
 
 export function BudgetStat({ label, value, variant = 'primary' }: Props) {
   const { theme } = useTheme();
-  const valueColor =
-    variant === 'mint' ? theme.colors.accentMint : theme.colors.textPrimary;
+  const valueColor = theme.colors[COLORS[variant]];
 
   return (
     <View

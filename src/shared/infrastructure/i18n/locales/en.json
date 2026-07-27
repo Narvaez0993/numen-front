@@ -70,21 +70,24 @@
   },
   "budgets": {
     "title": "Budgets",
-    "subtitle": "May · live tracking",
+    "subtitle": "{{month}} · live tracking",
     "noActiveBudget": "No active budget",
     "month": {
-      "label": "May budget",
+      "label": "Your {{month}} cap",
       "daysLeft": "days left",
       "daysLeftOne": "day left",
       "of": "of",
       "youCarry": "You're at",
       "ofTheMonth": "of the month",
       "available": "Available",
-      "dailySuggested": "Daily suggested"
+      "dailySuggested": "Don't go past",
+      "perDay": "{{amount}} a day",
+      "overBy": "Over by"
     },
     "projection": {
-      "willEnd": "At this pace you'll end the month at",
-      "over": "above your target"
+      "willEnd": "At this pace you close the month at",
+      "over": "above your cap",
+      "under": "below your cap"
     },
     "byCategory": "By category",
     "urgencyOrder": "ordered by urgency",
@@ -112,10 +115,8 @@
     },
     "editTecho": {
       "title": "Your {{month}} cap",
-      "subtitle": "Edit the amount if you need to. Applies to this month only.",
-      "helper": "The change applies only to {{month}}. Future months keep the original value.",
-      "applyFuture": "Apply to future months too",
-      "applyFutureHint": "Updates the default value starting next month.",
+      "subtitle": "Change it whenever you want. It applies right away, this month included.",
+      "helper": "Your cap stays in place month after month until you change it, so you will not have to set it again next {{month}}.",
       "save": "Save",
       "delete": "Delete budget"
     },
@@ -137,7 +138,7 @@
     },
     "confirmSheet": {
       "techoTitle": "Delete your {{month}} budget?",
-      "techoBody": "The per-category caps will also be removed. This action can't be undone.",
+      "techoBody": "We stop measuring the month against a cap. Your category caps stay as they are.",
       "techoCta": "Delete budget",
       "topeTitle": "Delete the cap for {{name}}?",
       "topeBody": "The category will keep showing under 'No cap' this month. You can turn it back on whenever you want.",
@@ -182,7 +183,9 @@
       "colorLabel": "Color",
       "save": "Create category",
       "footnote": "Custom categories are part of Plus."
-    }
+    },
+    "limitReached": "Free watches 2 categories. Go Plus to watch as many as you like.",
+    "alreadyExists": "You already have a cap for that — tap it to change it."
   },
   "plan": {
     "title": "Your plan",
@@ -271,15 +274,33 @@
     "title": "Subscriptions",
     "monthlyTotal": {
       "label": "Monthly total",
-      "breakdown_one": "{{count}} active · yearly projection {{yearly}}",
-      "breakdown_other": "{{count}} active · yearly projection {{yearly}}"
+      "breakdown_one": "{{count}} active · {{yearly}} a year",
+      "breakdown_other": "{{count}} active · {{yearly}} a year"
+    },
+    "frequency": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
     },
     "card": {
-      "cadence": "Every {{days}} days · {{account}}",
-      "next_one": "In {{count}} day",
-      "next_other": "In {{count}} days"
+      "next_one": "in {{count}} day",
+      "next_other": "in {{count}} days",
+      "today": "today",
+      "paused": "paused"
+    },
+    "pending": {
+      "title_one": "{{count}} charge to confirm",
+      "title_other": "{{count}} charges to confirm",
+      "hint": "If you do not answer within 3 hours we register it for you. You can always delete the movement afterwards.",
+      "dueToday": "Due today",
+      "overdue": "Was due on {{date}}",
+      "confirm": "Yes, I was charged",
+      "skip": "Did not happen",
+      "unknown": "Subscription"
     },
     "add": "Add subscription",
+    "empty": "No subscriptions yet. Add the first one to see what leaves every month.",
+    "footer": "A subscription is a forecast: on the due date we ask before registering it.",
     "form": {
       "newTitle": "New subscription",
       "editTitle": "Edit subscription",
@@ -293,12 +314,31 @@
         "monthly": "Monthly",
         "yearly": "Yearly"
       },
-      "account": "Account",
+      "firstCharge": "First charge",
+      "source": "Charged to",
+      "category": "Category",
+      "noSource": "Pick an account",
+      "noCategory": "No category",
+      "pause": "Pause charges",
+      "resume": "Resume charges",
       "save": "Save",
       "delete": "Delete",
       "deleteConfirmTitle": "Delete {{name}}?",
       "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "tomorrow": "Tomorrow",
+      "pickDate": "Pick a date…"
+    },
+    "error": {
+      "title": "We could not load your subscriptions.",
+      "retry": "Try again"
+    },
+    "errors": {
+      "invalid": "Check the subscription details.",
+      "generic": "We could not save it. Try again.",
+      "deleteFailed": "We could not delete it.",
+      "alreadySettled": "That charge was already registered.",
+      "currencyMismatch": "That account is registered in another currency. Check it in Accounts first."
     }
   },
   "accounts": {
@@ -523,16 +563,6 @@
       "night": "Good evening",
       "you": "You"
     },
-    "daily": {
-      "label": "For today",
-      "availableToday": "available today",
-      "overspent": "over for this month",
-      "spentToday": "spent today",
-      "basis": {
-        "income": "based on your income",
-        "budget": "based on your budget"
-      }
-    },
     "saldo": {
       "label": "Net balance"
     },
@@ -571,15 +601,66 @@
       },
       "footer": "With this month's income we work out how much you can spend each day."
     },
-    "accounts": {
-      "title": "Where your money is",
-      "seeAll": "See all"
+    "upcoming": {
+      "title": "Upcoming charges",
+      "seeAll": "See all",
+      "inDays_one": "in {{count}} day",
+      "inDays_other": "in {{count}} days",
+      "today": "today",
+      "pending": "to confirm",
+      "confirm": "Yes",
+      "skip": "Did not happen",
+      "unknown": "Subscription"
     },
-    "trend": {
-      "less": "{{pct}}% less than in {{month}}",
-      "more": "{{pct}}% more than in {{month}}",
-      "same": "Same pace as {{month}}",
-      "caption": "{{amount}} through the {{day}}th last month"
+    "pace": {
+      "label": "This month",
+      "spent": "spent",
+      "rate": "{{amount}} a day",
+      "projection": "at this rate {{month}} closes at {{amount}}",
+      "less": "{{pct}}% less than in {{month}} by this date",
+      "more": "{{pct}}% more than in {{month}} by this date",
+      "same": "same as {{month}} by this date"
+    },
+    "debt": {
+      "label": "Getting out of debt",
+      "caption": "on your cards",
+      "utilization": "{{pct}}% of your {{amount}} limit"
+    },
+    "saving": {
+      "label": "Saving",
+      "thisMonth": "kept this month",
+      "negative": "over this month",
+      "rate": "{{pct}}% of your income"
+    },
+    "invite": {
+      "deudas": {
+        "title": "Your goal: get out of debt",
+        "body": "No card registered yet. Add one and I will show you what you owe and how it goes down.",
+        "action": "Add a card"
+      },
+      "ahorrar": {
+        "title": "Your goal: save",
+        "body": "Register this month's income and I will show you what you are really keeping.",
+        "action": "Add income"
+      },
+      "gastos": {
+        "title": "Your goal",
+        "body": "Register an expense to start seeing where your money goes.",
+        "action": "Add an expense"
+      },
+      "meanwhile": "Meanwhile you are spending {{amount}} a day"
+    },
+    "budget": {
+      "label": "Your {{month}} cap",
+      "of": "of {{amount}}",
+      "ceiling_one": "Don't go past {{amount}} today, the month's last day",
+      "ceiling_other": "Don't go past {{amount}} a day for the {{count}} that are left",
+      "over": "You went past your cap by {{amount}}",
+      "willFit": "At this pace you close at {{amount}} · {{gap}} to spare",
+      "willBust": "At this pace you close at {{amount}} · {{gap}} over",
+      "row": "Your cap · {{pct}}% used",
+      "perDay": "{{amount}}/day",
+      "spent": "nothing left"
     }
   },
   "goals": {
@@ -827,6 +908,9 @@
       },
       "currency": {
         "title": "Currency"
+      },
+      "objective": {
+        "title": "Your goal"
       }
     },
     "appearance": {
@@ -841,6 +925,21 @@
       "label": "Name",
       "placeholder": "Your name",
       "save": "Save"
+    },
+    "currency": {
+      "blocked": "Your data is already registered in another currency. Changing it would re-label amounts you saved, so we left it as is.",
+      "failed": "We could not change the currency."
+    },
+    "objective": {
+      "title": "What do you use Deshka for?",
+      "subtitle": "It decides what Home shows you first.",
+      "none": "Not set",
+      "failed": "We could not save your goal.",
+      "options": {
+        "gastos": "Know where my money goes",
+        "ahorrar": "Save for something specific",
+        "deudas": "Get out of debt"
+      }
     }
   },
   "expenses": {
@@ -959,10 +1058,6 @@
     }
   },
   "comingSoon": {
-    "subscriptions": {
-      "title": "Subscriptions",
-      "body": "Not wired yet. Once it is, you will see your recurring charges, when each one hits and what is left of the month after them."
-    },
     "debts": {
       "title": "Debts",
       "body": "Not wired yet. Once it is, you will track what you owe and what you are owed, with partial payments and a summary you can share."
@@ -970,10 +1065,6 @@
     "goals": {
       "title": "Goals",
       "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."
-    },
-    "budgets": {
-      "title": "Budgets",
-      "body": "Not wired yet. Once it is, you will set a monthly and per-category cap, and your daily figure will come from that cap instead of your income."
     },
     "assistant": {
       "title": "Assistant",

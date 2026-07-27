@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { loginUseCase } from '@/core/di/container';
 
 import type { AuthSessionDTO, LoginInputDTO } from '../../application';
+import { toSessionState } from '../stores/toSessionState';
 import { useAuthStore } from '../stores/useAuthStore';
 
 type Options = {
@@ -26,14 +27,7 @@ export function useLogin(options?: Options) {
       return result.value;
     },
     onSuccess: (session) => {
-      setSession({
-        userId: session.userId,
-        email: session.email,
-        displayName: session.displayName,
-        tier: session.tier,
-        emailVerified: session.emailVerified,
-        currency: session.currency,
-      });
+      setSession(toSessionState(session));
       options?.onSuccess?.(session);
     },
   });

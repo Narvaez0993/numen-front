@@ -18,8 +18,10 @@ type Props = {
   visible: boolean;
   /** Currently selected day (`YYYY-MM-DD`). */
   value: string;
-  /** The user's today: days after it cannot be picked. */
+  /** The user's today: highlighted, and the upper bound unless `allowFuture`. */
   today: string;
+  /** Let future days be picked — a subscription's first charge can be ahead. */
+  allowFuture?: boolean;
   title: string;
   language?: string;
   onClose: () => void;
@@ -30,13 +32,15 @@ type Props = {
  * Month calendar, built with plain views — no date library and no native picker,
  * so it looks the same on both platforms and adds no dependency.
  *
- * Future days are disabled: a movement is something that already happened (a
- * charge that has not posted yet is a subscription, not a movement).
+ * Future days are disabled by default: a movement is something that already
+ * happened (a charge that has not posted yet is a subscription, not a movement).
+ * `allowFuture` lifts that for the things that *are* scheduled ahead.
  */
 export function DatePickerSheet({
   visible,
   value,
   today,
+  allowFuture = false,
   title,
   language = 'es',
   onClose,
@@ -51,7 +55,7 @@ export function DatePickerSheet({
 
   const weeks = monthMatrix(month);
   const headers = weekdayInitials(language);
-  const canGoForward = shiftMonth(month, 1) <= today;
+  const canGoForward = allowFuture || shiftMonth(month, 1) <= today;
 
   return (
     <BottomSheet visible={visible} onClose={onClose} maxHeight="70%">
@@ -103,7 +107,7 @@ export function DatePickerSheet({
                   iso={iso}
                   selected={iso === value}
                   isToday={iso === today}
-                  disabled={iso !== null && isAfter(iso, today)}
+                  disabled={!allowFuture && iso !== null && isAfter(iso, today)}
                   onPress={() => {
                     if (iso) {
                       onSelect(iso);

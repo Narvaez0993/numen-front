@@ -5,10 +5,9 @@ import {
   deleteAccountUseCase,
   updateAccountUseCase,
 } from '@/core/di/container';
+import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 
 import type { Account, AccountPatch, NewAccount } from '../../domain';
-
-import { ACCOUNTS_OVERVIEW_KEY } from './useAccounts';
 
 type UpdateInput = { id: string; patch: AccountPatch };
 
@@ -23,7 +22,7 @@ export function useCreateAccount() {
       return result.value;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ACCOUNTS_OVERVIEW_KEY });
+      invalidateMoneyViews(queryClient);
     },
   });
 }
@@ -39,7 +38,7 @@ export function useUpdateAccount() {
       return result.value;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ACCOUNTS_OVERVIEW_KEY });
+      invalidateMoneyViews(queryClient);
     },
   });
 }
@@ -54,7 +53,7 @@ export function useDeleteAccount() {
       }
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ACCOUNTS_OVERVIEW_KEY });
+      invalidateMoneyViews(queryClient);
     },
   });
 }

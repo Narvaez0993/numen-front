@@ -15,12 +15,27 @@ import { BudgetInputHero } from '../BudgetInputHero';
 
 import { SheetHeader } from './SheetHeader';
 
-import type { CategoryBudget } from '../../../domain/types/Budget';
+import type { AccentColor } from '@/shared/domain';
+
+/**
+ * A category this sheet can put a cap on — either one already watched or a candidate.
+ *
+ * `categoryId` is spelled out because a watched category carries **two** ids: this one and
+ * the cap's own. Presets and the eventual request key off the category, never the cap.
+ */
+export type TopeTarget = {
+  categoryId: string;
+  name: string;
+  icon: string;
+  color: AccentColor;
+  spent: number;
+};
 
 type Props = {
   visible: boolean;
-  category: CategoryBudget | null;
+  category: TopeTarget | null;
   current: number;
+  saving?: boolean;
   onClose: () => void;
   onSave: (amount: number) => void;
   onDelete?: () => void;
@@ -30,6 +45,7 @@ export function EditTopeSheet({
   visible,
   category,
   current,
+  saving = false,
   onClose,
   onSave,
   onDelete,
@@ -44,7 +60,7 @@ export function EditTopeSheet({
 
   if (!category) return null;
 
-  const presets = CATEGORY_TOPE_PRESETS[category.id] ?? GENERIC_TOPE_PRESETS;
+  const presets = CATEGORY_TOPE_PRESETS[category.categoryId] ?? GENERIC_TOPE_PRESETS;
   const isEditing = current > 0;
   const valid = value >= TOPE_MIN;
 
@@ -77,7 +93,7 @@ export function EditTopeSheet({
           }}
         >
           <IconBox
-            name={category.iconName}
+            name={category.icon}
             color={category.color}
             size={34}
             iconSize={16}
@@ -112,7 +128,7 @@ export function EditTopeSheet({
                 ? t('budgets.editTopeSheet.save')
                 : t('budgets.editTopeSheet.activate')
             }
-            disabled={!valid}
+            disabled={!valid || saving}
             onPress={() => valid && onSave(value)}
           />
         </View>

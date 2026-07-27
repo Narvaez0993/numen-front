@@ -1,3 +1,5 @@
+import type { Objective } from '@/shared/domain';
+
 import { Email } from '../value-objects/Email';
 
 export type Tier = 'free' | 'plus';
@@ -10,6 +12,8 @@ export type UserProps = {
   emailVerified?: boolean;
   /** ISO 4217 home currency: the unit every amount stored for this user is in. */
   currency?: string;
+  /** What they said they came for; Home leads with the figure that serves it. */
+  objective?: Objective | null;
 };
 
 export class User {
@@ -19,6 +23,7 @@ export class User {
   readonly tier: Tier;
   readonly emailVerified: boolean;
   readonly currency: string;
+  readonly objective: Objective | null;
 
   constructor(props: UserProps) {
     this.id = props.id;
@@ -27,6 +32,7 @@ export class User {
     this.tier = props.tier ?? 'free';
     this.emailVerified = props.emailVerified ?? false;
     this.currency = props.currency ?? 'USD';
+    this.objective = props.objective ?? null;
   }
 
   equals(other: User): boolean {

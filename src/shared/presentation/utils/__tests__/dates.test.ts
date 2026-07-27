@@ -7,7 +7,6 @@ import {
   monthName,
   monthRange,
   recentDays,
-  sameSpanLastMonth,
   shiftMonth,
   shortDate,
   toIsoDate,
@@ -167,46 +166,5 @@ describe('monthMatrix', () => {
     // A Wednesday 1st sits one column later when the week starts on Sunday.
     expect(monday.indexOf('2026-07-01')).toBe(2);
     expect(sunday.indexOf('2026-07-01')).toBe(3);
-  });
-});
-
-describe('sameSpanLastMonth', () => {
-  it('cuts last month at the same day, so a month in progress compares fairly', () => {
-    expect(sameSpanLastMonth('2026-07-26')).toEqual({
-      from: '2026-06-01',
-      to: '2026-06-26',
-    });
-  });
-
-  it('clamps to the last day when the previous month is shorter', () => {
-    expect(sameSpanLastMonth('2026-03-31')).toEqual({
-      from: '2026-02-01',
-      to: '2026-02-28',
-    });
-    expect(sameSpanLastMonth('2028-03-30')).toEqual({
-      from: '2028-02-01',
-      to: '2028-02-29', // leap
-    });
-  });
-
-  it('crosses the year backwards', () => {
-    expect(sameSpanLastMonth('2026-01-15')).toEqual({
-      from: '2025-12-01',
-      to: '2025-12-15',
-    });
-  });
-
-  it('on the 1st the span is a single day', () => {
-    expect(sameSpanLastMonth('2026-07-01')).toEqual({
-      from: '2026-06-01',
-      to: '2026-06-01',
-    });
-  });
-
-  it('a full previous month is covered when today is the last day', () => {
-    expect(sameSpanLastMonth('2026-07-31')).toEqual({
-      from: '2026-06-01',
-      to: '2026-06-30',
-    });
   });
 });

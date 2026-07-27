@@ -28,9 +28,14 @@ import {
 import { AuthRepository } from '@/modules/auth/domain';
 import { HttpAuthRepository } from '@/modules/auth/infrastructure';
 import { httpClient } from '@/shared/infrastructure/http/client';
-import type { BudgetsRepository } from '@/modules/budgets/application/ports/BudgetsRepository';
-import { GetBudgetsUseCase } from '@/modules/budgets/application/use-cases/GetBudgetsUseCase';
-import { InMemoryBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/InMemoryBudgetsRepository';
+import type { BudgetsRepository } from '@/modules/budgets/application';
+import {
+  CreateBudgetUseCase,
+  DeleteBudgetUseCase,
+  GetBudgetsUseCase,
+  UpdateBudgetUseCase,
+} from '@/modules/budgets/application';
+import { HttpBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/HttpBudgetsRepository';
 import type { DeudasRepository } from '@/modules/deudas/application/ports/DeudasRepository';
 import { GetDeudasUseCase } from '@/modules/deudas/application/use-cases/GetDeudasUseCase';
 import { InMemoryDeudasRepository } from '@/modules/deudas/infrastructure/repositories/InMemoryDeudasRepository';
@@ -51,8 +56,13 @@ import type { PlanRepository } from '@/modules/plan/application/ports/PlanReposi
 import { GetPlanComparisonUseCase } from '@/modules/plan/application/use-cases/GetPlanComparisonUseCase';
 import { InMemoryPlanRepository } from '@/modules/plan/infrastructure/repositories/InMemoryPlanRepository';
 import type { SubscriptionsRepository } from '@/modules/subscriptions/application/ports/SubscriptionsRepository';
+import { CreateSubscriptionUseCase } from '@/modules/subscriptions/application/use-cases/CreateSubscriptionUseCase';
+import { DeleteSubscriptionUseCase } from '@/modules/subscriptions/application/use-cases/DeleteSubscriptionUseCase';
+import { GetChargesUseCase } from '@/modules/subscriptions/application/use-cases/GetChargesUseCase';
 import { GetSubscriptionsUseCase } from '@/modules/subscriptions/application/use-cases/GetSubscriptionsUseCase';
-import { InMemorySubscriptionsRepository } from '@/modules/subscriptions/infrastructure/repositories/InMemorySubscriptionsRepository';
+import { SettleChargeUseCase } from '@/modules/subscriptions/application/use-cases/SettleChargeUseCase';
+import { UpdateSubscriptionUseCase } from '@/modules/subscriptions/application/use-cases/UpdateSubscriptionUseCase';
+import { HttpSubscriptionsRepository } from '@/modules/subscriptions/infrastructure';
 
 // Re-exported so the app layer can register a session-expiry handler without
 // importing shared-infrastructure directly (boundaries: app → core is allowed).
@@ -61,12 +71,13 @@ export { setOnSessionExpired } from '@/shared/infrastructure/http/client';
 const authRepository: AuthRepository = new HttpAuthRepository(httpClient);
 const homeRepository: HomeRepository = new HttpHomeRepository(httpClient);
 const movementsRepository: MovementsRepository = new HttpMovementsRepository(httpClient);
-const budgetsRepository: BudgetsRepository = new InMemoryBudgetsRepository();
+const budgetsRepository: BudgetsRepository = new HttpBudgetsRepository(httpClient);
 const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
 const accountsRepository: AccountsRepository = new HttpAccountsRepository(httpClient);
-const subscriptionsRepository: SubscriptionsRepository =
-  new InMemorySubscriptionsRepository();
+const subscriptionsRepository: SubscriptionsRepository = new HttpSubscriptionsRepository(
+  httpClient,
+);
 const categoriesRepository: CategoriesRepository = new HttpCategoriesRepository(
   httpClient,
 );
@@ -89,6 +100,9 @@ export const summarizeMovementsUseCase = new SummarizeMovementsUseCase(
   movementsRepository,
 );
 export const getBudgetsUseCase = new GetBudgetsUseCase(budgetsRepository);
+export const createBudgetUseCase = new CreateBudgetUseCase(budgetsRepository);
+export const updateBudgetUseCase = new UpdateBudgetUseCase(budgetsRepository);
+export const deleteBudgetUseCase = new DeleteBudgetUseCase(budgetsRepository);
 export const getDeudasUseCase = new GetDeudasUseCase(deudasRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
@@ -103,6 +117,17 @@ export const deleteCreditCardUseCase = new DeleteCreditCardUseCase(accountsRepos
 export const getSubscriptionsUseCase = new GetSubscriptionsUseCase(
   subscriptionsRepository,
 );
+export const createSubscriptionUseCase = new CreateSubscriptionUseCase(
+  subscriptionsRepository,
+);
+export const updateSubscriptionUseCase = new UpdateSubscriptionUseCase(
+  subscriptionsRepository,
+);
+export const deleteSubscriptionUseCase = new DeleteSubscriptionUseCase(
+  subscriptionsRepository,
+);
+export const getChargesUseCase = new GetChargesUseCase(subscriptionsRepository);
+export const settleChargeUseCase = new SettleChargeUseCase(subscriptionsRepository);
 export const getCategoriesUseCase = new GetCategoriesUseCase(categoriesRepository);
 export const createCategoryUseCase = new CreateCategoryUseCase(categoriesRepository);
 export const updateCategoryUseCase = new UpdateCategoryUseCase(categoriesRepository);
@@ -138,6 +163,9 @@ export const container = {
   deleteMovementUseCase,
   summarizeMovementsUseCase,
   getBudgetsUseCase,
+  createBudgetUseCase,
+  updateBudgetUseCase,
+  deleteBudgetUseCase,
   getDeudasUseCase,
   getAssistantUseCase,
   getAccountsOverviewUseCase,
@@ -148,6 +176,11 @@ export const container = {
   updateCreditCardUseCase,
   deleteCreditCardUseCase,
   getSubscriptionsUseCase,
+  createSubscriptionUseCase,
+  updateSubscriptionUseCase,
+  deleteSubscriptionUseCase,
+  getChargesUseCase,
+  settleChargeUseCase,
   getCategoriesUseCase,
   createCategoryUseCase,
   updateCategoryUseCase,

@@ -4,8 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import {
+  useUpdatePreferences,
+  useAuthStore,
+  useUpdateName,
+} from '@/modules/auth/presentation';
 import { useCreateAccount } from '@/modules/accounts/presentation/hooks/useAccountMutations';
-import { useAuthStore, useUpdateName } from '@/modules/auth/presentation';
 import { completeOnboardingUseCase } from '@/core/di/container';
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -32,6 +36,7 @@ export function SetupFlow() {
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
   const updateName = useUpdateName();
   const createAccount = useCreateAccount();
+  const updatePreferences = useUpdatePreferences();
   const finishingRef = useRef(false);
 
   const finish = useCallback(async () => {
@@ -50,25 +55,40 @@ export function SetupFlow() {
 
     // Turn the source the user just described into their first real account, so
     // they land in the app with their own balance instead of an empty screen.
-    // Best-effort like the name: a failure must not trap them in the setup.
+    //
+    // Awaited on purpose: navigating while the POST was still in flight made Home
+    // load before the account existed, so the user who had *just* created one landed
+    // on "create your first account" with a $0 net balance. Still best-effort — a
+    // failure must not trap them in the setup, so it only logs and moves on.
     if (persisted.sourceName) {
       const isCash = persisted.bankId === 'efectivo';
-      createAccount.mutate({
-        kind: isCash ? 'cash' : 'debit',
-        name: persisted.sourceName,
-        sub: '',
-        icon: isCash ? 'cash' : 'building-bank',
-        color: 'mint',
-        balance: persisted.balance,
-      });
+      try {
+        await createAccount.mutateAsync({
+          kind: isCash ? 'cash' : 'debit',
+          name: persisted.sourceName,
+          sub: '',
+          icon: isCash ? 'cash' : 'building-bank',
+          color: 'mint',
+          balance: persisted.balance,
+        });
+      } catch (error) {
+        console.warn('onboarding: first account could not be created', error);
+      }
     }
-    // The objective the user picked stays in the onboarding store as context for
-    // when `goals` is real. It used to create a "Mi primera meta" of $1.000.000
-    // — a target nobody asked for, in a store that empties on restart.
+    // The objective goes to the server, not just to the device: it is what Home uses
+    // to decide which figure to lead with, and what the agent will anchor to. Also
+    // best-effort — a failed preference must not trap anyone in the setup.
+    if (persisted.goal) {
+      try {
+        await updatePreferences.mutateAsync({ objective: persisted.goal });
+      } catch (error) {
+        console.warn('onboarding: objective could not be saved', error);
+      }
+    }
     // Navigate explicitly to the tabs group. Expo Router v4 cross-group
     // imperative navigation works best with an explicit group path.
     router.replace('/(tabs)');
-  }, [flow.ctx, markCompleted, createAccount]);
+  }, [flow.ctx, markCompleted, createAccount, updatePreferences]);
 
   // Safety net: if we ever reach `confirm` without an expense (e.g. via dev
   // tweaks), finish from an effect, not during render.

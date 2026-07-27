@@ -1,3 +1,5 @@
+import type { Objective } from '@/shared/domain';
+
 import type { AuthSession } from '../../domain';
 
 export type AuthSessionDTO = {
@@ -7,6 +9,7 @@ export type AuthSessionDTO = {
   tier: string;
   emailVerified: boolean;
   currency: string;
+  objective: Objective | null;
   accessToken: string;
   refreshToken: string;
 };
@@ -19,6 +22,7 @@ export function toAuthSessionDTO(session: AuthSession): AuthSessionDTO {
     tier: session.user.tier,
     emailVerified: session.user.emailVerified,
     currency: session.user.currency,
+    objective: session.user.objective,
     accessToken: session.accessToken,
     refreshToken: session.refreshToken,
   };
