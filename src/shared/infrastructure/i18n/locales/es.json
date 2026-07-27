@@ -867,7 +867,10 @@
         "subtitle_other": "{{count}} activas · saldo neto {{net}}"
       },
       "subs": {
-        "title": "Suscripciones"
+        "title": "Suscripciones",
+        "subtitle_one": "{{count}} activa · {{monthly}} al mes",
+        "subtitle_other": "{{count}} activas · {{monthly}} al mes",
+        "subtitleEmpty": "Aún no registras ninguna"
       },
       "categories": {
         "title": "Categorías",

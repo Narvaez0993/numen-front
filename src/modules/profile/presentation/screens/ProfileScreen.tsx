@@ -13,6 +13,7 @@ import {
 } from '@/modules/auth/presentation';
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import { useSubscriptions } from '@/modules/subscriptions/presentation/hooks/useSubscriptions';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { CurrencyChangeBlockedError } from '@/modules/auth/domain';
 import type { Objective } from '@/shared/domain';
@@ -26,6 +27,7 @@ import {
   Toast,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { AppearanceRow } from '../components/AppearanceRow';
@@ -56,6 +58,8 @@ export function ProfileScreen() {
   // saldo neto $5.245.000") over data that has been real for a while.
   const accounts = useAccounts();
   const categories = useCategories();
+  // Same query key the subscriptions screen uses, so this row is usually a cache hit.
+  const subscriptions = useSubscriptions(useMemo(() => toIsoDate(new Date()), []));
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const currency = useCurrencyStore((s) => s.currency);
   const [editOpen, setEditOpen] = useState(false);
@@ -115,7 +119,20 @@ export function ProfileScreen() {
             icon="refresh"
             iconColor="amber"
             title={t('profile.rows.subs.title')}
-            value={t('profile.soon')}
+            subtitle={
+              // It said «Pronto» for a whole slice after the module shipped.
+              subscriptions.data
+                ? subscriptions.data.count === 0
+                  ? t('profile.rows.subs.subtitleEmpty')
+                  : t('profile.rows.subs.subtitle', {
+                      count: subscriptions.data.count,
+                      monthly: formatMoney(
+                        subscriptions.data.monthly,
+                        subscriptions.data.currency,
+                      ),
+                    })
+                : undefined
+            }
             onPress={() => router.push('/subscriptions')}
           />
           <SettingsRow

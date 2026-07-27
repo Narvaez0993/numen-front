@@ -867,7 +867,10 @@
         "subtitle_other": "{{count}} active · net balance {{net}}"
       },
       "subs": {
-        "title": "Subscriptions"
+        "title": "Subscriptions",
+        "subtitle_one": "{{count}} active · {{monthly}} a month",
+        "subtitle_other": "{{count}} active · {{monthly}} a month",
+        "subtitleEmpty": "None registered yet"
       },
       "categories": {
         "title": "Categories",
