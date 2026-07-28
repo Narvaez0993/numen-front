@@ -628,7 +628,11 @@
     "debt": {
       "label": "Getting out of debt",
       "caption": "on your cards",
-      "utilization": "{{pct}}% of your {{amount}} limit"
+      "utilization": "{{pct}}% of your {{amount}} limit",
+      "breakdown": "cards {{cards}} · to people {{people}}",
+      "onlyPeople_one": "to {{count}} person, no card debt",
+      "onlyPeople_other": "across {{count}} personal debts",
+      "owedToMe": "and you are owed {{amount}}"
     },
     "saving": {
       "label": "Saving",
@@ -639,8 +643,8 @@
     "invite": {
       "deudas": {
         "title": "Your goal: get out of debt",
-        "body": "No card registered yet. Add one and I will show you what you owe and how it goes down.",
-        "action": "Add a card"
+        "body": "No debt registered yet — no cards, nothing owed to anyone. Add them and I will show you what you owe and how it goes down.",
+        "action": "Add a debt"
       },
       "ahorrar": {
         "title": "Your goal: save",
@@ -714,11 +718,6 @@
       "incoming": "Owed to me",
       "outgoing": "I owe"
     },
-    "inicioCard": {
-      "title": "Debts",
-      "owedToMe": "to collect",
-      "iOwe": "to pay"
-    },
     "status": {
       "pending": "PENDING",
       "partial": "PARTIAL",
@@ -740,7 +739,6 @@
       "sharedWith_one": "Shared with {{count}} person",
       "sharedWith_other": "Shared with {{count}} people",
       "collected": "collected",
-      "owedPart": "paid",
       "pending_one": "{{count}} pending",
       "pending_other": "{{count}} pending",
       "remaining": "{{amount}} to go",
@@ -766,20 +764,20 @@
       "subTheyOweYou": "Owes you",
       "subYouOweThem": "You owe",
       "partOf": "Part of '{{event}}'",
-      "registerAbono": "Record payment"
+      "registerAbono": "Record payment",
+      "delete": "Delete debt",
+      "deleted": "Debt deleted"
     },
     "abono": {
       "title": "Record payment",
       "subIncoming": "{{name}} paid you",
       "subOutgoing": "Payment to {{name}}",
       "balanceLabel": "Current balance",
-      "accountIncoming": "Account it went into",
-      "accountOutgoing": "Account it came from",
       "save": "Save payment",
-      "toast": "Payment recorded · {{amount}}"
+      "toast": "Payment recorded · {{amount}}",
+      "overpaid": "That payment is more than what is left."
     },
     "create": {
-      "back": "Back",
       "step": "Step {{current}} of {{total}}",
       "next": "Continue",
       "saveIndividual": "Save debt",
@@ -801,27 +799,14 @@
         "subShared": "Total amount and category of the expense.",
         "amountLabel": "Amount",
         "amountSharedLabel": "Total amount",
-        "expenseToggleTitle": "This comes from an expense I paid",
-        "expenseToggleSub": "Counts toward your budget only for your share.",
-        "categoryLabel": "Category",
-        "categorySelected": "Selected",
-        "categorySeeAll": "Search among the 12 categories",
-        "accountIncomingPaid": "Account it came from",
-        "accountIncoming": "Account it will go into",
-        "accountOutgoing": "Account it went into",
-        "dateLabel": "Date",
-        "dateSheetTitle": "Date of the loan",
-        "dateSheetSubtitle": "When it happened.",
         "dueLabel": "Due date",
         "dueSheetTitle": "Due date",
-        "dueSheetSubtitle": "Deshka will remind you when it's near.",
         "dueNone": "No due date",
         "optional": "Optional",
         "noteLabel": "Note (optional)",
         "notePlaceholder": "Ex. Thursday lunch, car loan, etc.",
-        "accountSheetTitle": "Pick an account",
-        "categorySheetTitle": "Pick a category",
-        "categorySheetSubtitle": "Search or pick from the 12 standard categories."
+        "noteSharedLabel": "Event name",
+        "noteSharedPlaceholder": "Friday dinner, trip, gift…"
       },
       "step3": {
         "title": "How is it split?",
@@ -851,7 +836,18 @@
     "share": {
       "button": "Share summary",
       "messageIncoming": "Hi {{name}}: friendly reminder — you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
-      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka"
+      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
+      "ofEvent": "for {{event}}",
+      "dueOn": "due {{date}}"
+    },
+    "error": {
+      "title": "We couldn't load your debts.",
+      "retry": "Try again"
+    },
+    "confirmDelete": {
+      "title": "Delete this debt?",
+      "body": "The record and its payments are removed. Your accounts and movements stay put: this debt never moved money.",
+      "cta": "Delete debt"
     }
   },
   "profile": {
@@ -1065,10 +1061,6 @@
     }
   },
   "comingSoon": {
-    "debts": {
-      "title": "Debts",
-      "body": "Not wired yet. Once it is, you will track what you owe and what you are owed, with partial payments and a summary you can share."
-    },
     "goals": {
       "title": "Goals",
       "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."

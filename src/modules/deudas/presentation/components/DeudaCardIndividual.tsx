@@ -5,8 +5,8 @@ import { ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { type Deuda, debtProgress, debtStatus } from '../../domain/types/Deuda';
-import { selectCounterparty, useDeudasStore } from '../stores/useDeudasStore';
+import { type Deuda, debtProgress } from '../../domain';
+import { useDebtsContext } from '../context/DebtsContext';
 import { useDueLabel } from '../utils/useDueLabel';
 
 import { DebtPill } from './DebtPill';
@@ -20,13 +20,12 @@ type Props = {
 export function DeudaCardIndividual({ deuda, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const today = useDeudasStore((s) => s.today);
-  const person = useDeudasStore((s) => selectCounterparty(s, deuda.counterpartyId));
+  const { today, counterpartyById } = useDebtsContext();
+  const person = counterpartyById[deuda.counterpartyId];
   const dueLabel = useDueLabel(deuda, today);
 
   if (!person) return null;
 
-  const status = debtStatus(deuda, today);
   const pct = debtProgress(deuda);
   const sub = `${t('deudas.card.loanShort')} · ${dueLabel}`;
 
@@ -67,7 +66,7 @@ export function DeudaCardIndividual({ deuda, onPress }: Props) {
           </Text>
         </View>
         <Text tabular style={{ fontSize: 15, fontWeight: '500', letterSpacing: -0.15 }}>
-          {formatMoney(deuda.balance)}
+          {formatMoney(deuda.remaining)}
         </Text>
       </View>
 
@@ -84,7 +83,7 @@ export function DeudaCardIndividual({ deuda, onPress }: Props) {
         <Text tabular color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
           {t('deudas.pctPaid', { pct: Math.round(pct * 100) })}
         </Text>
-        <DebtPill status={status} />
+        <DebtPill status={deuda.status} />
       </View>
     </Pressable>
   );

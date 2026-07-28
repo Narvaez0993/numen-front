@@ -21,6 +21,7 @@ export const MONEY_VIEW_KEYS = {
   categories: ['categories', 'overview'],
   subscriptions: ['subscriptions'],
   budgets: ['budgets'],
+  debts: ['deudas'],
 } as const;
 
 /**

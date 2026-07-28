@@ -7,50 +7,43 @@ import { SegmentProgress } from '@/modules/onboarding/presentation/components/Se
 import { Button, Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type {
-  Counterparty,
-  DebtDirection,
-  Deuda,
-  SharedEvent,
-} from '../../../domain/types/Deuda';
-import { useDeudasStore } from '../../stores/useDeudasStore';
+import type { DebtDirection } from '../../../domain';
+import { useDebtsContext } from '../../context/DebtsContext';
+import { useCreateDebt, useCreateSharedEvent } from '../../hooks/useDebtMutations';
 
 import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 import { Step3 } from './Step3';
 import { YoPongoMasSheet } from './YoPongoMasSheet';
+import { pickKey, type PersonPick } from './personPick';
 
 type Props = {
   visible: boolean;
   defaultDirection?: DebtDirection;
   onClose: () => void;
   onCreated: (toast: string) => void;
+  onFailed: (toast: string) => void;
 };
-
-const newId = (prefix: string) =>
-  `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
 export function NuevaDeudaFlow({
   visible,
   defaultDirection = 'incoming',
   onClose,
   onCreated,
+  onFailed,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const today = useDeudasStore((s) => s.today);
-  const addDeuda = useDeudasStore((s) => s.addDeuda);
-  const addSharedEvent = useDeudasStore((s) => s.addSharedEvent);
+  const { today } = useDebtsContext();
+  const createDebt = useCreateDebt(today);
+  const createEvent = useCreateSharedEvent(today);
+  const saving = createDebt.isPending || createEvent.isPending;
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [direction, setDirection] = useState<DebtDirection>(defaultDirection);
-  const [persons, setPersons] = useState<Counterparty[]>([]);
+  const [persons, setPersons] = useState<PersonPick[]>([]);
   const [amount, setAmount] = useState(0);
-  const [isExpense, setIsExpense] = useState(true);
-  const [category, setCategory] = useState<string | null>(null);
-  const [account, setAccount] = useState('BBVA Débito');
-  const [date, setDate] = useState('Hoy · 14 may');
-  const [dueDate, setDueDate] = useState<string | null>(null);
+  const [dueOn, setDueOn] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [splits, setSplits] = useState<Record<string, number>>({});
   const [yoPongoOpen, setYoPongoOpen] = useState(false);
@@ -61,11 +54,7 @@ export function NuevaDeudaFlow({
       setDirection(defaultDirection);
       setPersons([]);
       setAmount(0);
-      setIsExpense(true);
-      setCategory(null);
-      setAccount('BBVA Débito');
-      setDate('Hoy · 14 may');
-      setDueDate(null);
+      setDueOn(null);
       setNote('');
       setSplits({});
       setYoPongoOpen(false);
@@ -76,7 +65,7 @@ export function NuevaDeudaFlow({
   const totalSteps: 2 | 3 = isShared ? 3 : 2;
 
   const splitsSum = useMemo(
-    () => persons.reduce((s, p) => s + (splits[p.id] ?? 0), 0),
+    () => persons.reduce((sum, p) => sum + (splits[pickKey(p)] ?? 0), 0),
     [persons, splits],
   );
   const yoShare = amount - splitsSum;
@@ -88,11 +77,13 @@ export function NuevaDeudaFlow({
     isShared &&
     persons.length > 0 &&
     persons.every(
-      (p) => (splits[p.id] ?? 0) > 0 && Math.abs((splits[p.id] ?? 0) - eachEqual) < 100,
+      (p) =>
+        (splits[pickKey(p)] ?? 0) > 0 &&
+        Math.abs((splits[pickKey(p)] ?? 0) - eachEqual) < 100,
     );
 
   const splitValid =
-    isShared && yoShare >= 0 && persons.every((p) => (splits[p.id] ?? 0) > 0);
+    isShared && yoShare >= 0 && persons.every((p) => (splits[pickKey(p)] ?? 0) > 0);
   const splitOverage = splitsSum > amount;
 
   const canStep1 = persons.length >= 1;
@@ -104,7 +95,7 @@ export function NuevaDeudaFlow({
     const each = Math.floor(amount / (persons.length + 1) / 100) * 100;
     const ns: Record<string, number> = {};
     persons.forEach((p) => {
-      ns[p.id] = each;
+      ns[pickKey(p)] = each;
     });
     setSplits(ns);
   };
@@ -116,7 +107,7 @@ export function NuevaDeudaFlow({
       persons.length > 0 ? Math.floor(remaining / persons.length / 100) * 100 : 0;
     const ns: Record<string, number> = {};
     persons.forEach((p) => {
-      ns[p.id] = each;
+      ns[pickKey(p)] = each;
     });
     setSplits(ns);
   };
@@ -126,55 +117,58 @@ export function NuevaDeudaFlow({
   };
 
   const finalize = () => {
+    if (saving) return;
     if (!isShared) {
       const person = persons[0];
       if (!person) return;
-      const deuda: Deuda = {
-        id: newId('d'),
-        direction,
-        counterpartyId: person.id,
-        amount,
-        balance: amount,
-        createdAt: today,
-        dueDate,
-        note: note || null,
-        payments: [],
-        eventId: null,
-        isExpense: direction === 'incoming' ? isExpense : undefined,
-        category: direction === 'incoming' && isExpense ? (category ?? null) : undefined,
-      };
-      addDeuda(deuda);
-      onCreated(t('deudas.create.toastIndividual', { name: person.name }));
+      createDebt.mutate(
+        {
+          direction,
+          counterpartyId: person.id ?? undefined,
+          counterpartyName: person.id === null ? person.name : undefined,
+          amount,
+          dueOn,
+          note: note.trim() || null,
+        },
+        {
+          onSuccess: () => {
+            onCreated(t('deudas.create.toastIndividual', { name: person.name }));
+            onClose();
+          },
+          onError: (error) => {
+            onFailed(error.message || t('common.error'));
+            onClose();
+          },
+        },
+      );
     } else {
-      const eventId = newId('ev');
+      // The note doubles as the event's name — "Cena del viernes" is the note you
+      // would have written anyway.
       const eventName = note.trim() || t('deudas.create.step2.titleShared');
-      const debts: Deuda[] = persons.map((p) => ({
-        id: newId('d'),
-        direction,
-        counterpartyId: p.id,
-        amount: splits[p.id] ?? 0,
-        balance: splits[p.id] ?? 0,
-        createdAt: today,
-        dueDate,
-        note: null,
-        payments: [],
-        eventId,
-        isExpense: direction === 'incoming' ? isExpense : undefined,
-        category: direction === 'incoming' && isExpense ? (category ?? null) : undefined,
-      }));
-      const event: SharedEvent = {
-        id: eventId,
-        name: eventName,
-        icon: category ? 'tools-kitchen-2' : 'users',
-        iconColor: 'purple',
-        totalAmount: amount,
-        date: today,
-        debtIds: debts.map((d) => d.id),
-      };
-      addSharedEvent(event, debts);
-      onCreated(t('deudas.create.toastShared', { event: eventName }));
+      createEvent.mutate(
+        {
+          direction,
+          name: eventName,
+          total: amount,
+          dueOn,
+          splits: persons.map((p) => ({
+            counterpartyId: p.id ?? undefined,
+            counterpartyName: p.id === null ? p.name : undefined,
+            amount: splits[pickKey(p)] ?? 0,
+          })),
+        },
+        {
+          onSuccess: () => {
+            onCreated(t('deudas.create.toastShared', { event: eventName }));
+            onClose();
+          },
+          onError: (error) => {
+            onFailed(error.message || t('common.error'));
+            onClose();
+          },
+        },
+      );
     }
-    onClose();
   };
 
   const handlePrimary = () => {
@@ -188,7 +182,7 @@ export function NuevaDeudaFlow({
           const each = Math.floor(amount / (persons.length + 1) / 100) * 100;
           const ns: Record<string, number> = {};
           persons.forEach((p) => {
-            ns[p.id] = each;
+            ns[pickKey(p)] = each;
           });
           setSplits(ns);
         }
@@ -300,16 +294,8 @@ export function NuevaDeudaFlow({
               isShared={isShared}
               amount={amount}
               onAmountChange={setAmount}
-              isExpense={isExpense}
-              onExpenseChange={setIsExpense}
-              category={category}
-              onCategoryChange={setCategory}
-              account={account}
-              onAccountChange={setAccount}
-              date={date}
-              onDateChange={setDate}
-              dueDate={dueDate}
-              onDueDateChange={setDueDate}
+              dueOn={dueOn}
+              onDueOnChange={setDueOn}
               note={note}
               onNoteChange={setNote}
             />
@@ -334,7 +320,7 @@ export function NuevaDeudaFlow({
           <Button
             full
             label={primaryLabel}
-            disabled={!primaryEnabled}
+            disabled={!primaryEnabled || saving}
             onPress={handlePrimary}
           />
         </View>

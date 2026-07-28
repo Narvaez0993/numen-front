@@ -13,6 +13,7 @@ import {
 } from '@/modules/auth/presentation';
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
+import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
 import { useSubscriptions } from '@/modules/subscriptions/presentation/hooks/useSubscriptions';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { CurrencyChangeBlockedError } from '@/modules/auth/domain';
@@ -58,8 +59,10 @@ export function ProfileScreen() {
   // saldo neto $5.245.000") over data that has been real for a while.
   const accounts = useAccounts();
   const categories = useCategories();
-  // Same query key the subscriptions screen uses, so this row is usually a cache hit.
-  const subscriptions = useSubscriptions(useMemo(() => toIsoDate(new Date()), []));
+  // Same query keys the subscriptions and deudas screens use — usually cache hits.
+  const today = useMemo(() => toIsoDate(new Date()), []);
+  const subscriptions = useSubscriptions(today);
+  const debts = useDeudas(today);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const currency = useCurrencyStore((s) => s.currency);
   const [editOpen, setEditOpen] = useState(false);
@@ -164,7 +167,16 @@ export function ProfileScreen() {
             icon="users"
             iconColor="pink"
             title={t('profile.rows.deudas.title')}
-            subtitle={t('profile.rows.deudas.subtitleEmpty')}
+            subtitle={
+              debts.data
+                ? (() => {
+                    const open = debts.data.iOwe.count + debts.data.owedToMe.count;
+                    return open === 0
+                      ? t('profile.rows.deudas.subtitleEmpty')
+                      : t('profile.rows.deudas.subtitle', { count: open });
+                  })()
+                : undefined
+            }
             last
             onPress={() => router.push('/deudas')}
           />

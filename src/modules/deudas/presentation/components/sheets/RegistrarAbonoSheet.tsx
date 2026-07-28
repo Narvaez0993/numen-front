@@ -2,18 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, TextInput, View } from 'react-native';
 
-import { BottomSheet, Button, Icon, Text } from '@/shared/presentation/components';
+import { BottomSheet, Button, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { ACCOUNT_OPTIONS, type SelectOption } from '../../constants/options';
-import {
-  selectCounterparty,
-  selectDeuda,
-  useDeudasStore,
-} from '../../stores/useDeudasStore';
-
-import { SelectListSheet } from './SelectListSheet';
+import { OverpaidError } from '../../../domain';
+import { useDebtsContext } from '../../context/DebtsContext';
+import { useAddDebtPayment } from '../../hooks/useDebtMutations';
 
 type Props = {
   visible: boolean;
@@ -25,25 +20,29 @@ type Props = {
 const formatThousands = (n: number) =>
   n > 0 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
 
+/**
+ * A partial repayment. It marks progress on the ledger and moves no balance — which is
+ * why the account picker the prototype had is gone: there is no account to pick.
+ *
+ * The 100% chip settles the debt exactly; anything above what is owed comes back as
+ * `debts.overpaid` from the server, and the input caps at the same bound anyway.
+ */
 export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props) {
   const { theme } = useTheme();
-  const { t, i18n } = useTranslation();
-  const deuda = useDeudasStore((s) => (debtId ? selectDeuda(s, debtId) : undefined));
-  const person = useDeudasStore((s) =>
-    deuda ? selectCounterparty(s, deuda.counterpartyId) : undefined,
-  );
-  const today = useDeudasStore((s) => s.today);
-  const registerPayment = useDeudasStore((s) => s.registerPayment);
+  const { t } = useTranslation();
+  const { today, debtById, counterpartyById } = useDebtsContext();
+  const deuda = debtId ? debtById[debtId] : undefined;
+  const person = deuda ? counterpartyById[deuda.counterpartyId] : undefined;
+  const addPayment = useAddDebtPayment(today);
 
   const [amount, setAmount] = useState(0);
-  const [account, setAccount] = useState('BBVA Débito');
-  const [acctSheetOpen, setAcctSheetOpen] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (visible) {
       setAmount(0);
-      setAccount('BBVA Débito');
+      setFailed(null);
       const tm = setTimeout(() => inputRef.current?.focus(), 320);
       return () => clearTimeout(tm);
     }
@@ -58,24 +57,34 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
   }
 
   const isIncoming = deuda.direction === 'incoming';
-  const balance = deuda.balance;
-  const valid = amount > 0 && amount <= balance;
+  const remaining = deuda.remaining;
+  const valid = amount > 0 && amount <= remaining;
   const display = formatThousands(amount);
 
   const CHIP_PCTS = [0.25, 0.5, 1] as const;
   const chipValues = CHIP_PCTS.map((pct) =>
-    pct === 1 ? balance : Math.round((balance * pct) / 100) * 100,
+    pct === 1 ? remaining : Math.round((remaining * pct) / 100) * 100,
   );
 
   const handleSave = () => {
-    if (!valid) return;
-    registerPayment(deuda.id, {
-      amount,
-      account,
-      date: today,
-    });
-    onSaved(amount);
-    onClose();
+    if (!valid || addPayment.isPending) return;
+    setFailed(null);
+    addPayment.mutate(
+      { id: deuda.id, amount },
+      {
+        onSuccess: () => {
+          onSaved(amount);
+          onClose();
+        },
+        onError: (error) => {
+          setFailed(
+            error instanceof OverpaidError
+              ? t('deudas.abono.overpaid')
+              : t('common.error'),
+          );
+        },
+      },
+    );
   };
 
   return (
@@ -125,7 +134,7 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
             {t('deudas.abono.balanceLabel')}
           </Text>
           <Text tabular style={{ fontSize: 18, fontWeight: '500' }}>
-            {formatMoney(balance)}
+            {formatMoney(remaining)}
           </Text>
         </View>
 
@@ -211,116 +220,25 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
           })}
         </View>
 
-        <View style={{ marginTop: 18 }}>
+        {failed ? (
           <Text
-            variant="micro"
-            uppercase
-            color={theme.colors.textTertiary}
-            style={{ marginBottom: 8, fontFamily: 'Geist_500Medium' }}
+            variant="caption"
+            color={theme.colors.accentCoral}
+            style={{ fontSize: 11.5, marginTop: 12 }}
           >
-            {t(
-              isIncoming
-                ? 'deudas.abono.accountIncoming'
-                : 'deudas.abono.accountOutgoing',
-            )}
+            {failed}
           </Text>
-          <Pressable
-            onPress={() => setAcctSheetOpen(true)}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 10,
-              paddingVertical: 12,
-              paddingHorizontal: 14,
-              backgroundColor: theme.colors.bgFloat,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              borderRadius: 12,
-              opacity: pressed ? 0.85 : 1,
-            })}
-          >
-            <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}
-            >
-              <View
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 8,
-                  backgroundColor: theme.colors.accentMintBg,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Icon name="building-bank" size={14} color={theme.colors.accentMint} />
-              </View>
-              <Text style={{ fontSize: 13.5, fontWeight: '500' }} numberOfLines={1}>
-                {account}
-              </Text>
-            </View>
-            <Icon name="chevron-down" size={14} color={theme.colors.textTertiary} />
-          </Pressable>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            marginTop: 14,
-            paddingVertical: 12,
-            paddingHorizontal: 14,
-            backgroundColor: theme.colors.bgFloat,
-            borderWidth: 1,
-            borderColor: theme.colors.borderSubtle,
-            borderRadius: 12,
-          }}
-        >
-          <View
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 8,
-              backgroundColor: 'rgba(168,178,200,0.12)',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Icon
-              name="calendar-event"
-              size={14}
-              stroke={1.9}
-              color={theme.colors.textSecondary}
-            />
-          </View>
-          <Text style={{ flex: 1, fontSize: 13 }}>
-            {i18n.language.startsWith('en') ? 'Today · 14 May' : 'Hoy · 14 may'}
-          </Text>
-          <Icon name="chevron-down" size={14} color={theme.colors.textTertiary} />
-        </View>
+        ) : null}
 
         <View style={{ marginTop: 22 }}>
           <Button
             full
             label={t('deudas.abono.save')}
-            disabled={!valid}
+            disabled={!valid || addPayment.isPending}
             onPress={handleSave}
           />
         </View>
       </ScrollView>
-
-      <SelectListSheet<string>
-        visible={acctSheetOpen}
-        title={t('deudas.create.step2.accountSheetTitle')}
-        options={ACCOUNT_OPTIONS}
-        value={account}
-        onSelect={(opt: SelectOption<string>) => {
-          setAccount(opt.value);
-          setAcctSheetOpen(false);
-        }}
-        onClose={() => setAcctSheetOpen(false)}
-      />
     </BottomSheet>
   );
 }

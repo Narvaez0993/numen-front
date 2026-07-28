@@ -628,7 +628,11 @@
     "debt": {
       "label": "Salir de deudas",
       "caption": "en tus tarjetas",
-      "utilization": "{{pct}}% de tu cupo de {{amount}}"
+      "utilization": "{{pct}}% de tu cupo de {{amount}}",
+      "breakdown": "tarjetas {{cards}} · a personas {{people}}",
+      "onlyPeople_one": "a {{count}} persona, sin deuda de tarjetas",
+      "onlyPeople_other": "entre {{count}} deudas con personas",
+      "owedToMe": "y a ti te deben {{amount}}"
     },
     "saving": {
       "label": "Ahorrando",
@@ -639,8 +643,8 @@
     "invite": {
       "deudas": {
         "title": "Tu objetivo: salir de deudas",
-        "body": "Aún no registras ninguna tarjeta. Regístrala y te muestro cuánto debes y cómo va bajando.",
-        "action": "Registrar una tarjeta"
+        "body": "Aún no registras ninguna deuda: ni tarjetas ni lo que le debes a alguien. Regístralas y te muestro cuánto debes y cómo va bajando.",
+        "action": "Registrar una deuda"
       },
       "ahorrar": {
         "title": "Tu objetivo: ahorrar",
@@ -714,11 +718,6 @@
       "incoming": "Me deben",
       "outgoing": "Yo debo"
     },
-    "inicioCard": {
-      "title": "Deudas",
-      "owedToMe": "por cobrar",
-      "iOwe": "por pagar"
-    },
     "status": {
       "pending": "PENDIENTE",
       "partial": "PARCIAL",
@@ -740,7 +739,6 @@
       "sharedWith_one": "Compartida con {{count}} persona",
       "sharedWith_other": "Compartida con {{count}} personas",
       "collected": "cobrado",
-      "owedPart": "pagado",
       "pending_one": "{{count}} pendiente",
       "pending_other": "{{count}} pendientes",
       "remaining": "{{amount}} falta",
@@ -766,20 +764,20 @@
       "subTheyOweYou": "Te debe",
       "subYouOweThem": "Le debes",
       "partOf": "Parte de '{{event}}'",
-      "registerAbono": "Registrar abono"
+      "registerAbono": "Registrar abono",
+      "delete": "Eliminar deuda",
+      "deleted": "Deuda eliminada"
     },
     "abono": {
       "title": "Registrar abono",
       "subIncoming": "{{name}} te abonó",
       "subOutgoing": "Abono a {{name}}",
       "balanceLabel": "Balance actual",
-      "accountIncoming": "Cuenta donde entró",
-      "accountOutgoing": "Cuenta de donde salió",
       "save": "Guardar abono",
-      "toast": "Abono registrado · {{amount}}"
+      "toast": "Abono registrado · {{amount}}",
+      "overpaid": "Ese abono es más de lo que queda pendiente."
     },
     "create": {
-      "back": "Volver",
       "step": "Paso {{current}} de {{total}}",
       "next": "Continuar",
       "saveIndividual": "Guardar deuda",
@@ -801,27 +799,14 @@
         "subShared": "Monto total y categoría del gasto.",
         "amountLabel": "Monto",
         "amountSharedLabel": "Total del gasto",
-        "expenseToggleTitle": "Esto viene de un gasto que pagué",
-        "expenseToggleSub": "Cuenta a tu presupuesto solo por tu parte.",
-        "categoryLabel": "Categoría",
-        "categorySelected": "Seleccionada",
-        "categorySeeAll": "Buscar entre las 12 categorías",
-        "accountIncomingPaid": "Cuenta de donde salió",
-        "accountIncoming": "Cuenta donde entrará",
-        "accountOutgoing": "Cuenta donde entró",
-        "dateLabel": "Fecha",
-        "dateSheetTitle": "Fecha del préstamo",
-        "dateSheetSubtitle": "Cuándo ocurrió.",
         "dueLabel": "Fecha límite",
         "dueSheetTitle": "Fecha límite",
-        "dueSheetSubtitle": "Deshka te avisará cuando se acerque.",
         "dueNone": "Sin vencimiento",
         "optional": "Opcional",
         "noteLabel": "Nota (opcional)",
         "notePlaceholder": "Ej. Comida del jueves, préstamo carro, etc.",
-        "accountSheetTitle": "Elegir cuenta",
-        "categorySheetTitle": "Elegir categoría",
-        "categorySheetSubtitle": "Busca o selecciona entre las 12 categorías estándar."
+        "noteSharedLabel": "Nombre del evento",
+        "noteSharedPlaceholder": "Cena del viernes, paseo, regalo…"
       },
       "step3": {
         "title": "¿Cómo se divide?",
@@ -851,7 +836,18 @@
     "share": {
       "button": "Compartir resumen",
       "messageIncoming": "Hola {{name}}: te recuerdo que me debes {{balance}} (de {{total}}, vas {{pct}}% pagado). — enviado desde Deshka",
-      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Deshka"
+      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Deshka",
+      "ofEvent": "de {{event}}",
+      "dueOn": "vence el {{date}}"
+    },
+    "error": {
+      "title": "No pudimos cargar tus deudas.",
+      "retry": "Reintentar"
+    },
+    "confirmDelete": {
+      "title": "¿Eliminar esta deuda?",
+      "body": "Se borra el registro y sus abonos. Tus cuentas y movimientos no se tocan: esta deuda nunca movió plata.",
+      "cta": "Eliminar deuda"
     }
   },
   "profile": {
@@ -1065,10 +1061,6 @@
     }
   },
   "comingSoon": {
-    "debts": {
-      "title": "Deudas",
-      "body": "Aún no está conectado. Cuando lo esté vas a registrar lo que debes y lo que te deben, con abonos parciales y un resumen para compartir."
-    },
     "goals": {
       "title": "Metas",
       "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
