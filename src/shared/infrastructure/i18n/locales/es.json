@@ -1025,7 +1025,6 @@
       "sub": {
         "entry": "Registra un gasto, un ingreso o una transferencia"
       },
-      "voiceSoon": "Registrar hablando llega con el asistente",
       "manual": "Registrar a mano",
       "photoReceipt": "Foto",
       "write": "Escribir",
@@ -1054,7 +1053,29 @@
           "body": "Agrega tu banco, billetera o efectivo en Perfil → Fuentes y cuentas y vuelve a registrar."
         },
         "pickDate": "Otra fecha…"
-      }
+      },
+      "voiceHint": "Toca el mic y cuéntame el gasto",
+      "recordingHint": "Te escucho… toca para terminar",
+      "nothingHeard": "No te escuché — intenta de nuevo o escríbelo",
+      "processing": "Entendiendo…",
+      "writing": {
+        "title": "Escríbelo",
+        "subtitle": "En tus palabras, como se lo contarías a alguien",
+        "placeholder": "pagué 25 mil de almuerzo con Nequi…",
+        "agentAsks": "Tu agente pregunta",
+        "cta": "Registrar"
+      },
+      "confirm": {
+        "title": "Esto entendí",
+        "said": "Dijiste"
+      },
+      "permission": {
+        "title": "El micrófono no tiene permiso",
+        "body": "Para registrar hablando, permite el micrófono y el reconocimiento de voz en Ajustes.",
+        "cta": "Abrir Ajustes"
+      },
+      "quotaExhausted": "Se acabaron tus registros con IA del mes — te dejo el formulario de siempre",
+      "parseFailed": "No pude entenderlo, intenta de nuevo"
     },
     "toast": {
       "saved": {

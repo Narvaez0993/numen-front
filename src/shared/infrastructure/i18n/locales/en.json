@@ -1025,7 +1025,6 @@
       "sub": {
         "entry": "Record an expense, an income or a transfer"
       },
-      "voiceSoon": "Recording by voice arrives with the assistant",
       "manual": "Record by hand",
       "photoReceipt": "Photo",
       "write": "Write",
@@ -1054,7 +1053,29 @@
           "body": "Add your bank, wallet or cash in Profile → Sources and accounts, then come back."
         },
         "pickDate": "Another date…"
-      }
+      },
+      "voiceHint": "Tap the mic and tell me the expense",
+      "recordingHint": "Listening… tap to finish",
+      "nothingHeard": "I didn't catch that — try again or type it",
+      "processing": "Understanding…",
+      "writing": {
+        "title": "Type it",
+        "subtitle": "In your words, like you'd tell a friend",
+        "placeholder": "paid 12.50 for lunch with my debit card…",
+        "agentAsks": "Your agent asks",
+        "cta": "Register"
+      },
+      "confirm": {
+        "title": "Here's what I understood",
+        "said": "You said"
+      },
+      "permission": {
+        "title": "The microphone has no permission",
+        "body": "To register by voice, allow the microphone and speech recognition in Settings.",
+        "cta": "Open Settings"
+      },
+      "quotaExhausted": "Your monthly AI captures ran out — here's the usual form",
+      "parseFailed": "I couldn't understand that, try again"
     },
     "toast": {
       "saved": {

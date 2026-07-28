@@ -21,10 +21,15 @@ type State = {
    * the income form, not on an expense the user has to switch. */
   initialType: MovementType;
   method: SheetMethod;
+  /** What the mic heard — the «Dijiste "…"» echo of the confirm state. */
   transcript: string | null;
-  /** An agent draft being edited: the manual form opens prefilled with it and
-   * saving routes through the draft's confirm instead of a plain create. */
+  /** The staged draft being confirmed or edited: the manual form opens
+   * prefilled with it and saving routes through the draft's confirm. */
   draft: MovementDraft | null;
+  /** The agent's one short question when a capture was ambiguous. */
+  clarification: string | null;
+  /** An honest one-liner for the manual form (e.g. the AI quota ran out). */
+  notice: string | null;
   openSheet: (
     flow?: SheetFlow,
     initialType?: MovementType,
@@ -34,6 +39,9 @@ type State = {
   setFlow: (flow: SheetFlow) => void;
   setMethod: (method: SheetMethod) => void;
   setTranscript: (transcript: string | null) => void;
+  setDraft: (draft: MovementDraft | null) => void;
+  setClarification: (clarification: string | null) => void;
+  setNotice: (notice: string | null) => void;
 };
 
 export const useExpenseSheetStore = create<State>((set) => ({
@@ -43,6 +51,8 @@ export const useExpenseSheetStore = create<State>((set) => ({
   method: 'voice',
   transcript: null,
   draft: null,
+  clarification: null,
+  notice: null,
   openSheet: (flow = 'entry', initialType = 'expense', draft) =>
     set({
       open: true,
@@ -51,6 +61,8 @@ export const useExpenseSheetStore = create<State>((set) => ({
       method: 'voice',
       transcript: null,
       draft: draft ?? null,
+      clarification: null,
+      notice: null,
     }),
   closeSheet: () =>
     set({
@@ -60,8 +72,13 @@ export const useExpenseSheetStore = create<State>((set) => ({
       method: 'voice',
       transcript: null,
       draft: null,
+      clarification: null,
+      notice: null,
     }),
   setFlow: (flow) => set({ flow }),
   setMethod: (method) => set({ method }),
   setTranscript: (transcript) => set({ transcript }),
+  setDraft: (draft) => set({ draft }),
+  setClarification: (clarification) => set({ clarification }),
+  setNotice: (notice) => set({ notice }),
 }));
