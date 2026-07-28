@@ -674,9 +674,8 @@
   "goals": {
     "title": "Goals",
     "of": "of",
-    "projection": "At this pace you'll get there in {{month}}",
+    "projection": "At this pace you get there by {{month}}",
     "projectionEmpty": "Log your first contribution to get started",
-    "projectionSoon": "The agent will project your date with more contributions",
     "add": "New goal",
     "contribute": "Add contribution",
     "edit": "Edit",
@@ -695,17 +694,45 @@
       "delete": "Delete",
       "deleteConfirmTitle": "Delete \"{{name}}\"?",
       "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "targetDate": "Target date (optional)",
+      "noDate": "No date",
+      "archive": "Archive goal",
+      "reopen": "Reopen goal"
     },
     "contribution": {
       "title": "Contribution to {{name}}",
       "remaining": "{{amount}} to go",
       "amount": "Contribution amount",
-      "save": "Save contribution"
+      "save": "Save contribution",
+      "directionIn": "Add",
+      "directionOut": "Withdraw",
+      "fromAccount": "From",
+      "toAccount": "Back to",
+      "holds": "The pocket holds {{amount}}",
+      "saveOut": "Record withdrawal"
     },
     "gate": {
       "title": "Free includes 1 active goal",
       "body": "Plus lets you create unlimited goals, with the agent tracking each one."
+    },
+    "error": {
+      "title": "We couldn't load your goals.",
+      "retry": "Try again"
+    },
+    "archivedSection": "Archived",
+    "achieved": "Goal reached! Withdraw the money and archive it to open the next one.",
+    "needed": "you need {{amount}}/month",
+    "toast": {
+      "contributed": "Contribution of {{amount}} recorded",
+      "withdrawn": "Withdrawal of {{amount}} recorded",
+      "archived": "Goal archived",
+      "reopened": "Goal reopened",
+      "deleted": "Goal deleted"
+    },
+    "errors": {
+      "notEmpty": "Withdraw the money first: the pocket is not empty.",
+      "insufficient": "That withdrawal is more than the pocket holds."
     }
   },
   "deudas": {
@@ -914,6 +941,12 @@
       },
       "objective": {
         "title": "Your goal"
+      },
+      "goals": {
+        "title": "Goals",
+        "subtitleEmpty": "No active goals",
+        "subtitle_one": "{{count}} active goal",
+        "subtitle_other": "{{count}} active goals"
       }
     },
     "appearance": {
@@ -1061,10 +1094,6 @@
     }
   },
   "comingSoon": {
-    "goals": {
-      "title": "Goals",
-      "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."
-    },
     "assistant": {
       "title": "Assistant",
       "body": "Not wired yet. Once it is, it will read your real movements to answer you and flag things worth a look."

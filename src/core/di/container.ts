@@ -37,6 +37,15 @@ import {
 } from '@/modules/budgets/application';
 import { HttpBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/HttpBudgetsRepository';
 import type { DeudasRepository } from '@/modules/deudas/application';
+import type { GoalsRepository } from '@/modules/goals/application';
+import {
+  CreateGoalUseCase,
+  DeleteGoalUseCase,
+  GetGoalsUseCase,
+  MoveGoalFundsUseCase,
+  UpdateGoalUseCase,
+} from '@/modules/goals/application';
+import { HttpGoalsRepository } from '@/modules/goals/infrastructure/repositories/HttpGoalsRepository';
 import {
   AddPaymentUseCase,
   CreateDebtUseCase,
@@ -80,6 +89,7 @@ const homeRepository: HomeRepository = new HttpHomeRepository(httpClient);
 const movementsRepository: MovementsRepository = new HttpMovementsRepository(httpClient);
 const budgetsRepository: BudgetsRepository = new HttpBudgetsRepository(httpClient);
 const deudasRepository: DeudasRepository = new HttpDeudasRepository(httpClient);
+const goalsRepository: GoalsRepository = new HttpGoalsRepository(httpClient);
 const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
 const accountsRepository: AccountsRepository = new HttpAccountsRepository(httpClient);
 const subscriptionsRepository: SubscriptionsRepository = new HttpSubscriptionsRepository(
@@ -116,6 +126,11 @@ export const createSharedEventUseCase = new CreateSharedEventUseCase(deudasRepos
 export const deleteDebtUseCase = new DeleteDebtUseCase(deudasRepository);
 export const addDebtPaymentUseCase = new AddPaymentUseCase(deudasRepository);
 export const removeDebtPaymentUseCase = new RemovePaymentUseCase(deudasRepository);
+export const getGoalsUseCase = new GetGoalsUseCase(goalsRepository);
+export const createGoalUseCase = new CreateGoalUseCase(goalsRepository);
+export const updateGoalUseCase = new UpdateGoalUseCase(goalsRepository);
+export const deleteGoalUseCase = new DeleteGoalUseCase(goalsRepository);
+export const moveGoalFundsUseCase = new MoveGoalFundsUseCase(goalsRepository);
 export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
@@ -184,6 +199,11 @@ export const container = {
   deleteDebtUseCase,
   addDebtPaymentUseCase,
   removeDebtPaymentUseCase,
+  getGoalsUseCase,
+  createGoalUseCase,
+  updateGoalUseCase,
+  deleteGoalUseCase,
+  moveGoalFundsUseCase,
   getAssistantUseCase,
   getAccountsOverviewUseCase,
   createAccountUseCase,

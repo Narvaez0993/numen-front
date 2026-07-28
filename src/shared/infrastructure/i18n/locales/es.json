@@ -676,7 +676,6 @@
     "of": "de",
     "projection": "A este ritmo llegas en {{month}}",
     "projectionEmpty": "Registra tu primer aporte para empezar",
-    "projectionSoon": "El agente proyectará tu fecha con más aportes",
     "add": "Nueva meta",
     "contribute": "Registrar aporte",
     "edit": "Editar",
@@ -695,17 +694,45 @@
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
       "deleteConfirm": "Sí, eliminar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "targetDate": "Fecha objetivo (opcional)",
+      "noDate": "Sin fecha",
+      "archive": "Archivar meta",
+      "reopen": "Reabrir meta"
     },
     "contribution": {
       "title": "Aporte a {{name}}",
       "remaining": "Te faltan {{amount}} para llegar",
       "amount": "Monto del aporte",
-      "save": "Guardar aporte"
+      "save": "Guardar aporte",
+      "directionIn": "Aportar",
+      "directionOut": "Retirar",
+      "fromAccount": "Sale de",
+      "toAccount": "Vuelve a",
+      "holds": "El bolsillo tiene {{amount}}",
+      "saveOut": "Registrar retiro"
     },
     "gate": {
       "title": "Tu plan Free incluye 1 meta activa",
       "body": "Con Plus creas todas las metas que quieras y el agente les hace seguimiento."
+    },
+    "error": {
+      "title": "No pudimos cargar tus metas.",
+      "retry": "Reintentar"
+    },
+    "archivedSection": "Archivadas",
+    "achieved": "¡Meta lograda! Retira la plata y archívala para abrir la siguiente.",
+    "needed": "necesitas {{amount}}/mes",
+    "toast": {
+      "contributed": "Aporte de {{amount}} registrado",
+      "withdrawn": "Retiro de {{amount}} registrado",
+      "archived": "Meta archivada",
+      "reopened": "Meta reabierta",
+      "deleted": "Meta eliminada"
+    },
+    "errors": {
+      "notEmpty": "Primero retira la plata: el bolsillo no está vacío.",
+      "insufficient": "Ese retiro es más de lo que hay en el bolsillo."
     }
   },
   "deudas": {
@@ -914,6 +941,12 @@
       },
       "objective": {
         "title": "Tu objetivo"
+      },
+      "goals": {
+        "title": "Metas",
+        "subtitleEmpty": "Sin metas activas",
+        "subtitle_one": "{{count}} meta activa",
+        "subtitle_other": "{{count}} metas activas"
       }
     },
     "appearance": {
@@ -1061,10 +1094,6 @@
     }
   },
   "comingSoon": {
-    "goals": {
-      "title": "Metas",
-      "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
-    },
     "assistant": {
       "title": "Asistente",
       "body": "Aún no está conectado. Cuando lo esté va a leer tus movimientos reales para responderte y avisarte cosas que valga la pena mirar."

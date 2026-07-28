@@ -2,7 +2,10 @@ import { useMemo } from 'react';
 
 import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
+import { useGoals } from '@/modules/goals/presentation/hooks/useGoals';
 import type { AccentColor } from '@/shared/domain';
+
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 
 import type { SourceRef, SourceType } from '../../domain';
 
@@ -40,6 +43,8 @@ export type MovementCatalogs = {
 export function useMovementCatalogs(): MovementCatalogs {
   const categories = useCategories();
   const accounts = useAccounts();
+  // Pockets are transfer endpoints too: a contribution row reads "→ Viaje a Japón".
+  const goals = useGoals(useMemo(() => toIsoDate(new Date()), []));
 
   return useMemo(() => {
     const categoryById: Record<string, ResolvedCategory> = {};
@@ -71,6 +76,15 @@ export function useMovementCatalogs(): MovementCatalogs {
         color: card.color,
       };
     }
+    for (const goal of goals.data?.goals ?? []) {
+      sourceById[goal.id] = {
+        id: goal.id,
+        type: 'goal',
+        name: goal.name,
+        icon: goal.icon,
+        color: goal.color,
+      };
+    }
 
     return {
       categoryById,
@@ -85,6 +99,7 @@ export function useMovementCatalogs(): MovementCatalogs {
     accounts.data,
     accounts.isLoading,
     accounts.isError,
+    goals.data,
   ]);
 }
 

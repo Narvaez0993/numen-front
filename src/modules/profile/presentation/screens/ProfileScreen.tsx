@@ -14,6 +14,7 @@ import {
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
+import { useGoals } from '@/modules/goals/presentation/hooks/useGoals';
 import { useSubscriptions } from '@/modules/subscriptions/presentation/hooks/useSubscriptions';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { CurrencyChangeBlockedError } from '@/modules/auth/domain';
@@ -63,6 +64,7 @@ export function ProfileScreen() {
   const today = useMemo(() => toIsoDate(new Date()), []);
   const subscriptions = useSubscriptions(today);
   const debts = useDeudas(today);
+  const goals = useGoals(today);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const currency = useCurrencyStore((s) => s.currency);
   const [editOpen, setEditOpen] = useState(false);
@@ -179,6 +181,22 @@ export function ProfileScreen() {
             }
             last
             onPress={() => router.push('/deudas')}
+          />
+          <SettingsRow
+            icon="pig-money"
+            iconColor="mint"
+            title={t('profile.rows.goals.title')}
+            subtitle={
+              goals.data
+                ? (() => {
+                    const active = goals.data.goals.filter((g) => !g.archived).length;
+                    return active === 0
+                      ? t('profile.rows.goals.subtitleEmpty')
+                      : t('profile.rows.goals.subtitle', { count: active });
+                  })()
+                : undefined
+            }
+            onPress={() => router.push('/goals')}
           />
         </SettingsGroup>
 
