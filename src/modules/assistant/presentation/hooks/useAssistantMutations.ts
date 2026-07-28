@@ -3,17 +3,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   confirmDraftUseCase,
   discardDraftUseCase,
+  parseCaptureUseCase,
   sendChatMessageUseCase,
 } from '@/core/di/container';
 import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 
 import { ChatLimitReachedError } from '../../domain';
 import type {
+  CaptureSource,
   ChatHistory,
   ChatTurn,
   ConfirmedDraft,
   DraftOverrides,
   MovementDraft,
+  ParseOutcome,
 } from '../../domain/types/Assistant';
 import {
   appendMessages,
@@ -67,6 +70,27 @@ export function useSendMessage(today: string) {
           removeMessage(old, context.optimisticId),
         );
       }
+    },
+  });
+}
+
+/**
+ * One capture from the sheet (voice or typed). Deliberately silent for the
+ * chat: no message is written and the thread cache is never touched — only
+ * the usage meter learns about the spent registration.
+ */
+export function useParseCapture(today: string) {
+  const queryClient = useQueryClient();
+  return useMutation<ParseOutcome, Error, { text: string; source: CaptureSource }>({
+    mutationFn: async ({ text, source }) => {
+      const result = await parseCaptureUseCase.execute(text, source, today);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return result.value;
+    },
+    onSuccess: (outcome) => {
+      queryClient.setQueryData(ASSISTANT_USAGE_KEY, outcome.usage);
     },
   });
 }

@@ -118,3 +118,14 @@ export type ConfirmedDraft = {
   draft: MovementDraft;
   movementId: string;
 };
+
+/** Where the words of a capture came from — stamped on the draft's provenance. */
+export type CaptureSource = 'voice' | 'text';
+
+/** Exactly one of `draft` / `clarification` is set: the agent either understood
+ * a movement or has one short question. */
+export type ParseOutcome = {
+  draft: MovementDraft | null;
+  clarification: string | null;
+  usage: AssistantUsage;
+};

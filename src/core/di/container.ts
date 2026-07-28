@@ -11,6 +11,7 @@ import type { AssistantRepository } from '@/modules/assistant/application/ports/
 import { ConfirmDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDraftUseCase';
 import { DiscardDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDraftUseCase';
 import { GetAssistantUsageUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUsageUseCase';
+import { ParseCaptureUseCase } from '@/modules/assistant/application/use-cases/ParseCaptureUseCase';
 import { GetChatHistoryUseCase } from '@/modules/assistant/application/use-cases/GetChatHistoryUseCase';
 import { SendChatMessageUseCase } from '@/modules/assistant/application/use-cases/SendChatMessageUseCase';
 import { HttpAssistantRepository } from '@/modules/assistant/infrastructure/repositories/HttpAssistantRepository';
@@ -139,6 +140,7 @@ export const sendChatMessageUseCase = new SendChatMessageUseCase(assistantReposi
 export const getChatHistoryUseCase = new GetChatHistoryUseCase(assistantRepository);
 export const getAssistantUsageUseCase = new GetAssistantUsageUseCase(assistantRepository);
 export const confirmDraftUseCase = new ConfirmDraftUseCase(assistantRepository);
+export const parseCaptureUseCase = new ParseCaptureUseCase(assistantRepository);
 export const discardDraftUseCase = new DiscardDraftUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
@@ -216,6 +218,7 @@ export const container = {
   getChatHistoryUseCase,
   getAssistantUsageUseCase,
   confirmDraftUseCase,
+  parseCaptureUseCase,
   discardDraftUseCase,
   getAccountsOverviewUseCase,
   createAccountUseCase,

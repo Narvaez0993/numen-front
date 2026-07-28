@@ -29,6 +29,15 @@ export class DuplicateMessageError extends DomainError {
   }
 }
 
+/** Capture never hard-blocks the habit: the screen answers this by opening
+ * the manual form, which is always there. */
+export class RegistrationLimitReachedError extends DomainError {
+  readonly code = 'assistant.registration_limit_reached';
+  constructor() {
+    super('Monthly AI-capture limit reached for your plan');
+  }
+}
+
 /** The model provider failed; nothing was charged and the text survives. */
 export class AgentUnavailableError extends DomainError {
   readonly code = 'assistant.upstream_unavailable';

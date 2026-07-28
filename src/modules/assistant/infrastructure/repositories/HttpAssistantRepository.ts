@@ -4,12 +4,14 @@ import type { AssistantRepository } from '../../application/ports/AssistantRepos
 import type {
   AssistantBlock,
   AssistantUsage,
+  CaptureSource,
   ChatHistory,
   ChatMessage,
   ChatTurn,
   ConfirmedDraft,
   DraftOverrides,
   MovementDraft,
+  ParseOutcome,
 } from '../../domain/types/Assistant';
 import { mapApiError } from '../mappers/mapApiError';
 
@@ -77,6 +79,12 @@ type ConfirmResponse = {
   movement_id: string;
 };
 
+type ParseResponse = {
+  draft: DraftResponse | null;
+  clarification: string | null;
+  usage: UsageResponse;
+};
+
 export class HttpAssistantRepository implements AssistantRepository {
   constructor(private readonly http: AxiosInstance) {}
 
@@ -105,6 +113,27 @@ export class HttpAssistantRepository implements AssistantRepository {
       return {
         messages: data.messages.map(toMessage),
         nextBefore: data.next_before,
+      };
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async parseCapture(
+    text: string,
+    source: CaptureSource,
+    today: string,
+  ): Promise<ParseOutcome> {
+    try {
+      const { data } = await this.http.post<ParseResponse>(
+        '/assistant/parse',
+        { text, source },
+        { params: { today }, timeout: CHAT_TIMEOUT_MS },
+      );
+      return {
+        draft: data.draft !== null ? toDraft(data.draft) : null,
+        clarification: data.clarification,
+        usage: toUsage(data.usage),
       };
     } catch (error) {
       throw mapApiError(error);

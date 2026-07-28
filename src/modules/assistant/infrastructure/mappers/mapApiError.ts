@@ -6,10 +6,12 @@ import {
   DraftNotFoundError,
   DraftNotPendingError,
   DuplicateMessageError,
+  RegistrationLimitReachedError,
 } from '../../domain';
 
 const BY_CODE: Record<string, () => Error> = {
   'assistant.chat_limit_reached': () => new ChatLimitReachedError(),
+  'assistant.registration_limit_reached': () => new RegistrationLimitReachedError(),
   'assistant.draft_not_found': () => new DraftNotFoundError(),
   'assistant.draft_not_pending': () => new DraftNotPendingError(),
   'assistant.duplicate_message': () => new DuplicateMessageError(),
