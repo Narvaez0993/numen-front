@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View, type DimensionValue } from 'react-native';
 
+import { useConfirmDraft } from '@/modules/assistant/presentation/hooks/useAssistantMutations';
+import {
+  overridesFromMovement,
+  prefillFromDraft,
+} from '@/modules/assistant/presentation/utils/draftForm';
 import { useCreateMovement } from '@/modules/movements/presentation/hooks/useCreateMovement';
 import { useDeleteMovement } from '@/modules/movements/presentation/hooks/useMovementMutations';
 import type { NewMovement } from '@/modules/movements/domain';
 import { BottomSheet, Icon, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { useExpenseSheetStore, type SheetFlow } from '../stores/useExpenseSheetStore';
 
@@ -31,19 +37,42 @@ export function ExpenseSheet() {
   const closeSheet = useExpenseSheetStore((s) => s.closeSheet);
   const setFlow = useExpenseSheetStore((s) => s.setFlow);
   const initialType = useExpenseSheetStore((s) => s.initialType);
+  const draft = useExpenseSheetStore((s) => s.draft);
 
+  const today = useMemo(() => toIsoDate(new Date()), []);
   const createMovement = useCreateMovement();
+  const confirmDraft = useConfirmDraft(today);
   const deleteMovement = useDeleteMovement();
   const [error, setError] = useState<string | null>(null);
   // The toast remembers what it just created so "undo" has something to remove.
-  const [toast, setToast] = useState<{ message: string; movementId: string } | null>(
-    null,
-  );
+  // A confirmed draft offers no undo: its card in the chat shows what happened.
+  const [toast, setToast] = useState<{
+    message: string;
+    movementId: string | null;
+  } | null>(null);
 
   const isSubScreen = flow === 'manual';
 
   const handleSave = (movement: NewMovement) => {
     setError(null);
+    if (draft !== null) {
+      // Editing an agent draft: the form's picture confirms THROUGH the draft,
+      // so it settles as `confirmed` in the chat instead of leaving a pending twin.
+      confirmDraft.mutate(
+        { draftId: draft.id, overrides: overridesFromMovement(movement) },
+        {
+          onSuccess: () => {
+            setToast({
+              message: t(`expenses.toast.saved.${movement.type}`),
+              movementId: null,
+            });
+            closeSheet();
+          },
+          onError: () => setError(t('expenses.toast.saveFailed')),
+        },
+      );
+      return;
+    }
     createMovement.mutate(
       // A key per attempt: if the request is retried the API returns the original
       // movement instead of charging the user twice.
@@ -63,7 +92,7 @@ export function ExpenseSheet() {
 
   /** Undo is a real delete: the API reverts the deltas, so balances go back too. */
   const handleUndo = () => {
-    if (!toast) return;
+    if (!toast || toast.movementId === null) return;
     const { movementId } = toast;
     setToast(null);
     deleteMovement.mutate(movementId, {
@@ -107,9 +136,11 @@ export function ExpenseSheet() {
         >
           {flow === 'manual' ? (
             <ManualState
+              key={draft?.id ?? 'blank'}
               initialType={initialType}
+              initialValues={draft !== null ? prefillFromDraft(draft) : undefined}
               onSave={handleSave}
-              saving={createMovement.isPending}
+              saving={createMovement.isPending || confirmDraft.isPending}
               errorMessage={error}
             />
           ) : (
@@ -122,8 +153,8 @@ export function ExpenseSheet() {
       <Toast
         visible={toast !== null}
         message={toast?.message ?? ''}
-        undoLabel={t('movements.actions.undo')}
-        onUndo={handleUndo}
+        undoLabel={toast?.movementId != null ? t('movements.actions.undo') : undefined}
+        onUndo={toast?.movementId != null ? handleUndo : undefined}
         onDismiss={() => setToast(null)}
       />
     </>
