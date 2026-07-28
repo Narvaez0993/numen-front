@@ -10,6 +10,7 @@ import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 import type {
   BudgetCap,
   HeroFocus,
+  HeroGoal,
   MonthSummary,
   PersonalDebts,
   SpendingPace,
@@ -25,6 +26,8 @@ type Props = {
   /** The ceiling the user set; `null` when they set none. */
   budget: BudgetCap | null;
   debts: PersonalDebts;
+  /** The active goal closest to done; leads the `saving` face when present. */
+  goal: HeroGoal | null;
   netBalance: number;
   cardDebt: number;
   cardLimit: number;
@@ -38,6 +41,7 @@ type Props = {
   /** What the `invite` face asks for, per objective. */
   onInvite?: () => void;
   onBudgetPress?: () => void;
+  onGoalPress?: () => void;
 };
 
 /** Below this, calling a change "more" or "less" is noise. */
@@ -62,6 +66,7 @@ export function TodayHero({
   pace,
   budget,
   debts,
+  goal,
   netBalance,
   cardDebt,
   cardLimit,
@@ -72,6 +77,7 @@ export function TodayHero({
   start,
   onInvite,
   onBudgetPress,
+  onGoalPress,
 }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -278,7 +284,42 @@ export function TodayHero({
         </>
       ) : null}
 
-      {focus === 'saving' ? (
+      {focus === 'saving' && goal !== null ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onGoalPress}
+          disabled={!onGoalPress}
+          style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+        >
+          <Label>{goal.name}</Label>
+          <Figure
+            amount={goal.saved}
+            suffix={t('home.goal.of', { amount: formatMoney(goal.target) })}
+          />
+          <Text
+            variant="caption"
+            color={theme.colors.textSecondary}
+            style={{ marginBottom: 8 }}
+          >
+            {goal.pct >= 1
+              ? t('home.goal.achieved')
+              : goal.projectedOn === null
+                ? t('home.goal.start')
+                : t('home.goal.projection', {
+                    month: `${monthName(`${goal.projectedOn}-01`, i18n.language)} ${goal.projectedOn.slice(0, 4)}`,
+                  })}
+          </Text>
+          {/* Progress toward the target: more is better, so no warning ramp. */}
+          <ProgressBar pct={goal.pct} height={7} color={theme.colors.accentMint} />
+          {month.saved > 0 ? (
+            <Text variant="caption" muted style={{ fontSize: 11.5, marginTop: 8 }}>
+              {t('home.goal.monthSupport', { amount: formatMoney(month.saved) })}
+            </Text>
+          ) : null}
+        </Pressable>
+      ) : null}
+
+      {focus === 'saving' && goal === null ? (
         <>
           <Label>{t('home.saving.label')}</Label>
           <Figure

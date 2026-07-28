@@ -9,7 +9,8 @@ import type { CurrencyCode, Objective } from '@/shared/domain';
  * - `start` — nothing registered yet: the getting-started checklist.
  * - `pace` — how fast the month is going and where it lands. The honest default.
  * - `debt` — what they owe on their cards, for whoever came to get out of debt.
- * - `saving` — what they put aside this month.
+ * - `saving` — the goal they are saving toward; without one, what they put aside
+ *   this month. An active goal makes this face possible even before any income.
  * - `budget` — the month against the ceiling they set. It replaces the bare `pace`, but
  *   sits below a declared objective: `budget` never hides the debt someone asked to see.
  * - `invite` — they told us their objective and we cannot answer it yet: ask for the
@@ -62,6 +63,20 @@ export type PersonalDebts = {
   /** An asset — shown as its own line, never added to what the user owes. */
   owedToMe: number;
   openCount: number;
+};
+
+/**
+ * The active goal closest to done, `null` without one. The saving face leads with it —
+ * a pocket funded by real transfers — and demotes the month's saved figure to a
+ * supporting line. `projectedOn` is `YYYY-MM`, derived from the contribution pace.
+ */
+export type HeroGoal = {
+  name: string;
+  target: number;
+  saved: number;
+  /** `saved / target`, uncapped. */
+  pct: number;
+  projectedOn: string | null;
 };
 
 /** The same stretch of last month — July 1–26 against June 1–26, never the whole month. */
@@ -136,6 +151,8 @@ export type HomeOverview = {
    */
   budget: BudgetCap | null;
   debts: PersonalDebts;
+  /** The active goal with the highest pct — the one closest to being reached. */
+  goal: HeroGoal | null;
   topCategories: TopCategory[];
   recent: Movement[];
   upcoming: UpcomingCharge[];

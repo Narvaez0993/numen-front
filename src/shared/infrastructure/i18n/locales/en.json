@@ -648,8 +648,8 @@
       },
       "ahorrar": {
         "title": "Your goal: save",
-        "body": "Register this month's income and I will show you what you are really keeping.",
-        "action": "Add income"
+        "body": "Name what you are saving for and truly set the money aside, like a pocket.",
+        "action": "Create my first goal"
       },
       "gastos": {
         "title": "Your goal",
@@ -669,6 +669,13 @@
       "row": "Your cap · {{pct}}% used",
       "perDay": "{{amount}}/day",
       "spent": "nothing left"
+    },
+    "goal": {
+      "of": "of {{amount}}",
+      "projection": "At this pace you get there by {{month}}",
+      "start": "The first contribution sets it in motion",
+      "achieved": "Goal reached! Withdraw the money whenever you like",
+      "monthSupport": "You kept {{amount}} this month"
     }
   },
   "goals": {
