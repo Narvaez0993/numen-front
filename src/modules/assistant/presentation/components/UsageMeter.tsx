@@ -1,28 +1,33 @@
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
-import { usePlanStore, limitsFor } from '@/modules/plan/presentation/stores/usePlanStore';
+import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { Card, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-export function UsageMeter() {
+import type { AssistantUsage } from '../../domain/types/Assistant';
+
+type Props = {
+  /** Server truth; while it loads the meter shows quiet placeholders. */
+  usage: AssistantUsage | undefined;
+};
+
+export function UsageMeter({ usage }: Props) {
   const { t } = useTranslation();
   const tier = usePlanStore((s) => s.tier);
-  const used = usePlanStore((s) => s.used);
-  const limits = limitsFor(tier);
 
   return (
     <Card padding={12}>
       <View style={{ flexDirection: 'row', gap: 14 }}>
         <MeterColumn
           label={t('assistant.usage.registrations')}
-          used={used.registrations}
-          limit={limits.registrations}
+          used={usage?.registrations.used}
+          limit={usage?.registrations.limit}
         />
         <MeterColumn
           label={t('assistant.usage.messages')}
-          used={used.messages}
-          limit={limits.messages}
+          used={usage?.messages.used}
+          limit={usage?.messages.limit}
         />
       </View>
       <Text variant="caption" muted style={{ fontSize: 10.5, marginTop: 8 }}>
@@ -38,11 +43,11 @@ function MeterColumn({
   limit,
 }: {
   label: string;
-  used: number;
-  limit: number;
+  used: number | undefined;
+  limit: number | undefined;
 }) {
   const { theme } = useTheme();
-  const pct = limit > 0 ? used / limit : 0;
+  const pct = used !== undefined && limit !== undefined && limit > 0 ? used / limit : 0;
   return (
     <View style={{ flex: 1, gap: 6 }}>
       <View
@@ -63,7 +68,7 @@ function MeterColumn({
           {label}
         </Text>
         <Text variant="caption" tabular color={theme.colors.textSecondary}>
-          {used}/{limit}
+          {used ?? '–'}/{limit ?? '–'}
         </Text>
       </View>
       <ProgressBar pct={pct} height={4} />

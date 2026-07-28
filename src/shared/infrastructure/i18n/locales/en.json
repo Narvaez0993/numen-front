@@ -419,7 +419,6 @@
     "title": "Assistant",
     "greeting": "How can I help, {{name}}?",
     "thisWeek": "This week",
-    "suggestions": "Suggestions",
     "conversation": "Conversation",
     "inputPlaceholder": "Ask me anything…",
     "summary": {
@@ -442,7 +441,40 @@
       "title": "You're out of messages this month",
       "body": "Free includes 10 agent messages per month. Plus gives you 300, plus the weekly review.",
       "cta": "See Plus"
-    }
+    },
+    "empty": {
+      "title": "Talk to your money",
+      "body": "Tell me an expense (“paid 12.50 for lunch with my debit card”) and I'll stage it for you to confirm, or ask me anything about your finances."
+    },
+    "errors": {
+      "title": "The agent could not answer",
+      "retry": "Retry",
+      "sendFailed": "Could not send. Your message was kept, try again.",
+      "confirmFailed": "Could not save the movement",
+      "discardFailed": "Could not discard the draft"
+    },
+    "draft": {
+      "type": {
+        "expense": "Expense",
+        "income": "Income",
+        "transfer": "Transfer"
+      },
+      "status": {
+        "confirmed": "Saved",
+        "discarded": "Discarded"
+      },
+      "transferFallback": "Transfer",
+      "confirm": "Confirm",
+      "edit": "Edit",
+      "discard": "Discard",
+      "saved": "Movement saved"
+    },
+    "chips": {
+      "month": "How am I doing this month?",
+      "topSpend": "Where is my money going?",
+      "upcoming": "What charges are coming?"
+    },
+    "nudge": "You have {{left}} courtesy messages left this month"
   },
   "onboarding": {
     "skip": "Skip",
@@ -1100,10 +1132,5 @@
       "MXN": "Mexican peso"
     }
   },
-  "comingSoon": {
-    "assistant": {
-      "title": "Assistant",
-      "body": "Not wired yet. Once it is, it will read your real movements to answer you and flag things worth a look."
-    }
-  }
+  "comingSoon": {}
 }

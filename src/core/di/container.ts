@@ -8,8 +8,12 @@ import { UpdateAccountUseCase } from '@/modules/accounts/application/use-cases/U
 import { UpdateCreditCardUseCase } from '@/modules/accounts/application/use-cases/UpdateCreditCardUseCase';
 import { HttpAccountsRepository } from '@/modules/accounts/infrastructure';
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
-import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUseCase';
-import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
+import { ConfirmDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDraftUseCase';
+import { DiscardDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDraftUseCase';
+import { GetAssistantUsageUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUsageUseCase';
+import { GetChatHistoryUseCase } from '@/modules/assistant/application/use-cases/GetChatHistoryUseCase';
+import { SendChatMessageUseCase } from '@/modules/assistant/application/use-cases/SendChatMessageUseCase';
+import { HttpAssistantRepository } from '@/modules/assistant/infrastructure/repositories/HttpAssistantRepository';
 import type { CategoriesRepository } from '@/modules/categories/application/ports/CategoriesRepository';
 import { CreateCategoryUseCase } from '@/modules/categories/application/use-cases/CreateCategoryUseCase';
 import { DeleteCategoryUseCase } from '@/modules/categories/application/use-cases/DeleteCategoryUseCase';
@@ -90,7 +94,7 @@ const movementsRepository: MovementsRepository = new HttpMovementsRepository(htt
 const budgetsRepository: BudgetsRepository = new HttpBudgetsRepository(httpClient);
 const deudasRepository: DeudasRepository = new HttpDeudasRepository(httpClient);
 const goalsRepository: GoalsRepository = new HttpGoalsRepository(httpClient);
-const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
+const assistantRepository: AssistantRepository = new HttpAssistantRepository(httpClient);
 const accountsRepository: AccountsRepository = new HttpAccountsRepository(httpClient);
 const subscriptionsRepository: SubscriptionsRepository = new HttpSubscriptionsRepository(
   httpClient,
@@ -131,7 +135,11 @@ export const createGoalUseCase = new CreateGoalUseCase(goalsRepository);
 export const updateGoalUseCase = new UpdateGoalUseCase(goalsRepository);
 export const deleteGoalUseCase = new DeleteGoalUseCase(goalsRepository);
 export const moveGoalFundsUseCase = new MoveGoalFundsUseCase(goalsRepository);
-export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
+export const sendChatMessageUseCase = new SendChatMessageUseCase(assistantRepository);
+export const getChatHistoryUseCase = new GetChatHistoryUseCase(assistantRepository);
+export const getAssistantUsageUseCase = new GetAssistantUsageUseCase(assistantRepository);
+export const confirmDraftUseCase = new ConfirmDraftUseCase(assistantRepository);
+export const discardDraftUseCase = new DiscardDraftUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
 );
@@ -204,7 +212,11 @@ export const container = {
   updateGoalUseCase,
   deleteGoalUseCase,
   moveGoalFundsUseCase,
-  getAssistantUseCase,
+  sendChatMessageUseCase,
+  getChatHistoryUseCase,
+  getAssistantUsageUseCase,
+  confirmDraftUseCase,
+  discardDraftUseCase,
   getAccountsOverviewUseCase,
   createAccountUseCase,
   updateAccountUseCase,

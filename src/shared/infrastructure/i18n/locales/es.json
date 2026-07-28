@@ -419,7 +419,6 @@
     "title": "Asistente",
     "greeting": "¿En qué te ayudo, {{name}}?",
     "thisWeek": "Esta semana",
-    "suggestions": "Sugerencias",
     "conversation": "Conversación",
     "inputPlaceholder": "Pregúntame lo que sea…",
     "summary": {
@@ -442,7 +441,40 @@
       "title": "Te quedaste sin mensajes este mes",
       "body": "Tu plan Free incluye 10 mensajes con el agente al mes. Con Plus tienes 300, más la revisión semanal.",
       "cta": "Ver Plus"
-    }
+    },
+    "empty": {
+      "title": "Háblale a tu plata",
+      "body": "Cuéntame un gasto («pagué 25 mil de almuerzo con Nequi») y te lo dejo listo para confirmar, o pregúntame lo que sea sobre tus finanzas."
+    },
+    "errors": {
+      "title": "El agente no pudo responder",
+      "retry": "Reintentar",
+      "sendFailed": "No se pudo enviar. Tu mensaje quedó guardado, intenta de nuevo.",
+      "confirmFailed": "No se pudo guardar el movimiento",
+      "discardFailed": "No se pudo descartar el borrador"
+    },
+    "draft": {
+      "type": {
+        "expense": "Gasto",
+        "income": "Ingreso",
+        "transfer": "Transferencia"
+      },
+      "status": {
+        "confirmed": "Guardado",
+        "discarded": "Descartado"
+      },
+      "transferFallback": "Transferencia",
+      "confirm": "Confirmar",
+      "edit": "Editar",
+      "discard": "Descartar",
+      "saved": "Movimiento guardado"
+    },
+    "chips": {
+      "month": "¿Cómo voy este mes?",
+      "topSpend": "¿En qué se me está yendo la plata?",
+      "upcoming": "¿Qué cobros me vienen?"
+    },
+    "nudge": "Te quedan {{left}} mensajes de cortesía este mes"
   },
   "onboarding": {
     "skip": "Saltar",
@@ -1100,10 +1132,5 @@
       "MXN": "Peso mexicano"
     }
   },
-  "comingSoon": {
-    "assistant": {
-      "title": "Asistente",
-      "body": "Aún no está conectado. Cuando lo esté va a leer tus movimientos reales para responderte y avisarte cosas que valga la pena mirar."
-    }
-  }
+  "comingSoon": {}
 }

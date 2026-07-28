@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -10,125 +10,116 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { limitsFor, usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
-import { SectionLabel } from '@/shared/presentation/components';
+import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
+import {
+  Card,
+  RetryState,
+  SectionLabel,
+  Text,
+  Toast,
+} from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 
-import type {
-  ChatMessage,
-  CannedResponseId,
-  Insight,
-  SuggestedChip,
-} from '../../domain/types/Assistant';
+import { ChatLimitReachedError } from '../../domain';
+import type { MovementDraft } from '../../domain/types/Assistant';
 import { AssistantBubble } from '../components/AssistantBubble';
 import { AssistantHeader } from '../components/AssistantHeader';
-import { CannedResponse } from '../components/CannedResponse';
+import { BlockView } from '../components/BlockView';
 import { ChatInput } from '../components/ChatInput';
-import { FormattedText } from '../components/FormattedText';
-import { InsightCard } from '../components/InsightCard';
 import { LimitGateCard } from '../components/LimitGateCard';
-import { MonthlySummaryCard } from '../components/MonthlySummaryCard';
 import { SuggestedChips } from '../components/SuggestedChips';
 import { TypingIndicator } from '../components/TypingIndicator';
 import { UsageMeter } from '../components/UsageMeter';
 import { UserBubble } from '../components/UserBubble';
-import { useAssistant } from '../hooks/useAssistant';
-import { matchCanned } from '../utils/matchCanned';
+import { useAssistantUsage } from '../hooks/useAssistantUsage';
+import {
+  useConfirmDraft,
+  useDiscardDraft,
+  useSendMessage,
+} from '../hooks/useAssistantMutations';
+import { useChatHistory } from '../hooks/useChatHistory';
 
-/** Insights whose CTA takes you to the place where you can act. */
-const INSIGHT_ROUTES: Record<string, string> = {
-  'alerta-cafe': '/budgets',
-  'subs-total': '/subscriptions',
-  'accion-clasificar': '/movements',
-};
-
-/** Insights whose CTA starts a conversation instead. */
-const INSIGHT_TO_QUERY: Record<string, string> = {
-  'patron-viernes': 'Gastos del fin de semana',
-};
+const CHIP_KEYS = ['month', 'topSpend', 'upcoming'] as const;
 
 export function AssistantScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const { data, isLoading } = useAssistant();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const today = useMemo(() => toIsoDate(new Date()), []);
+
+  const history = useChatHistory();
+  const usage = useAssistantUsage(today);
+  const send = useSendMessage(today);
+  const confirm = useConfirmDraft(today);
+  const discard = useDiscardDraft();
+  const openSheet = useExpenseSheetStore((s) => s.openSheet);
+
   const [input, setInput] = useState('');
-  const [typing, setTyping] = useState(false);
-  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [limitHit, setLimitHit] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const tabBarClearance = useFloatingTabBarClearance();
 
-  const tier = usePlanStore((s) => s.tier);
-  const used = usePlanStore((s) => s.used);
-  const consumeMessage = usePlanStore((s) => s.consumeMessage);
-  const limits = limitsFor(tier);
-  const canSend = used.messages < limits.messages;
+  const messages = history.data?.messages ?? [];
+  const typing = send.isPending;
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollToEnd({ animated: true });
     }
-  }, [messages, typing, limitHit]);
-
-  useEffect(() => {
-    if (canSend) setLimitHit(false);
-  }, [canSend]);
+  }, [messages.length, typing, limitHit]);
 
   const sendMessage = useCallback(
-    async (text: string) => {
-      if (!text.trim() || typing) return;
-      if (!canSend) {
-        setLimitHit(true);
-        return;
-      }
+    (text: string) => {
+      const clean = text.trim();
+      if (!clean || send.isPending) return;
       setInput('');
-      consumeMessage();
-      const userMsg: ChatMessage = {
-        id: Date.now(),
-        role: 'user',
-        text,
-      };
-      setMessages((m) => [...m, userMsg]);
-      setTyping(true);
-
-      await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
-
-      const cannedId: CannedResponseId = matchCanned(text) ?? 'honest';
-      const response: ChatMessage = {
-        id: Date.now() + 1,
-        role: 'assistant',
-        cannedId,
-      };
-      setTyping(false);
-      setMessages((m) => [...m, response]);
+      send.mutate(clean, {
+        onError: (error) => {
+          if (error instanceof ChatLimitReachedError) {
+            setLimitHit(true);
+            return;
+          }
+          setToast(t('assistant.errors.sendFailed'));
+        },
+      });
     },
-    [typing, canSend, consumeMessage],
+    [send, t],
   );
 
-  const onInsightCta = useCallback(
-    (insight: Insight) => {
-      const route = INSIGHT_ROUTES[insight.id];
-      if (route) {
-        router.push(route as never);
-        return;
-      }
-      const q = INSIGHT_TO_QUERY[insight.id] ?? insight.cta;
-      setDismissed((d) => new Set([...d, insight.id]));
-      void sendMessage(q);
+  const onConfirmDraft = useCallback(
+    (draft: MovementDraft) => {
+      confirm.mutate(
+        { draftId: draft.id },
+        {
+          onSuccess: () => setToast(t('assistant.draft.saved')),
+          onError: () => setToast(t('assistant.errors.confirmFailed')),
+        },
+      );
     },
-    [sendMessage],
+    [confirm, t],
   );
 
-  const onChipPick = useCallback(
-    (chip: SuggestedChip) => {
-      void sendMessage(chip.label);
+  const onEditDraft = useCallback(
+    (draft: MovementDraft) => {
+      // The full manual form, prefilled: precision is one tap away, and saving
+      // routes back through this draft so it settles as confirmed.
+      openSheet('manual', draft.type, draft);
     },
-    [sendMessage],
+    [openSheet],
   );
 
-  if (isLoading || !data) {
+  const onDiscardDraft = useCallback(
+    (draft: MovementDraft) => {
+      discard.mutate(draft.id, {
+        onError: () => setToast(t('assistant.errors.discardFailed')),
+      });
+    },
+    [discard, t],
+  );
+
+  if (history.isLoading) {
     return (
       <SafeAreaView
         style={{
@@ -143,7 +134,36 @@ export function AssistantScreen() {
     );
   }
 
-  const visibleInsights = data.insights.filter((i) => !dismissed.has(i.id));
+  if (history.isError) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
+        edges={['top']}
+      >
+        <RetryState
+          titleKey="assistant.errors.title"
+          retryKey="assistant.errors.retry"
+          onRetry={() => void history.refetch()}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  const busyDraftId = confirm.isPending
+    ? (confirm.variables?.draftId ?? null)
+    : discard.isPending
+      ? (discard.variables ?? null)
+      : null;
+
+  const messagesUsage = usage.data?.messages;
+  const overLimit =
+    messagesUsage !== undefined &&
+    messagesUsage.used >= messagesUsage.limit + messagesUsage.grace;
+  const inGrace =
+    messagesUsage !== undefined &&
+    !overLimit &&
+    messagesUsage.used >= messagesUsage.limit;
+  const gateVisible = limitHit || overLimit;
 
   return (
     <SafeAreaView
@@ -153,7 +173,6 @@ export function AssistantScreen() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <ScrollView
           ref={scrollRef}
@@ -169,40 +188,59 @@ export function AssistantScreen() {
         >
           <AssistantHeader onAvatarPress={() => router.push('/profile')} />
 
-          <UsageMeter />
+          <UsageMeter usage={usage.data} />
 
-          <MonthlySummaryCard onSeePlus={() => router.push('/plan')} />
-
-          {visibleInsights.length > 0 ? (
-            <View style={{ gap: 10 }}>
-              <SectionLabel>{t('assistant.thisWeek')}</SectionLabel>
-              {visibleInsights.map((ins) => (
-                <InsightCard key={ins.id} insight={ins} onCtaPress={onInsightCta} />
-              ))}
-            </View>
-          ) : null}
-
-          {messages.length > 0 ? (
+          {messages.length === 0 ? (
+            <Card padding={16}>
+              <Text variant="body" style={{ fontWeight: '500', marginBottom: 4 }}>
+                {t('assistant.empty.title')}
+              </Text>
+              <Text variant="caption" muted>
+                {t('assistant.empty.body')}
+              </Text>
+            </Card>
+          ) : (
             <View style={{ gap: 12, paddingTop: 4 }}>
               <SectionLabel>{t('assistant.conversation')}</SectionLabel>
-              {messages.map((m) =>
-                m.role === 'user' ? (
-                  <UserBubble key={m.id} text={m.text} />
-                ) : m.cannedId !== undefined ? (
-                  <AssistantBubble key={m.id}>
-                    <CannedResponse id={m.cannedId} />
-                  </AssistantBubble>
+              {messages.map((message) =>
+                message.role === 'user' ? (
+                  <UserBubble
+                    key={message.id}
+                    text={
+                      message.blocks[0]?.type === 'text' ? message.blocks[0].text : ''
+                    }
+                  />
                 ) : (
-                  <AssistantBubble key={m.id}>
-                    <FormattedText text={m.text} />
+                  <AssistantBubble key={message.id}>
+                    <View style={{ gap: 10 }}>
+                      {message.blocks.map((block, index) => (
+                        <BlockView
+                          key={`${message.id}-${index}`}
+                          block={block}
+                          draftHandlers={{
+                            onConfirm: onConfirmDraft,
+                            onEdit: onEditDraft,
+                            onDiscard: onDiscardDraft,
+                            busyDraftId,
+                          }}
+                        />
+                      ))}
+                    </View>
                   </AssistantBubble>
                 ),
               )}
               {typing ? <TypingIndicator /> : null}
             </View>
-          ) : null}
+          )}
 
-          {limitHit ? <LimitGateCard onSeePlus={() => router.push('/plan')} /> : null}
+          {inGrace && !gateVisible ? (
+            <Text variant="caption" muted style={{ textAlign: 'center' }}>
+              {t('assistant.nudge', {
+                left: messagesUsage.limit + messagesUsage.grace - messagesUsage.used,
+              })}
+            </Text>
+          ) : null}
+          {gateVisible ? <LimitGateCard onSeePlus={() => router.push('/plan')} /> : null}
         </ScrollView>
 
         <View
@@ -216,18 +254,27 @@ export function AssistantScreen() {
           }}
         >
           <SuggestedChips
-            chips={data.suggestedChips}
-            disabled={typing}
-            onPick={onChipPick}
+            chips={CHIP_KEYS.map((key) => ({
+              id: key,
+              label: t(`assistant.chips.${key}`),
+            }))}
+            disabled={typing || gateVisible}
+            onPick={(chip) => sendMessage(chip.label)}
           />
           <ChatInput
             value={input}
             onChangeText={setInput}
-            onSend={() => void sendMessage(input)}
-            disabled={typing}
+            onSend={() => sendMessage(input)}
+            disabled={typing || gateVisible}
           />
         </View>
       </KeyboardAvoidingView>
+
+      <Toast
+        visible={toast !== null}
+        message={toast ?? ''}
+        onDismiss={() => setToast(null)}
+      />
     </SafeAreaView>
   );
 }

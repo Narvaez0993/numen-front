@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import type { MovementDraft } from '@/modules/assistant/domain/types/Assistant';
 import type { MovementType } from '@/modules/movements/domain';
 
 export type SheetFlow =
@@ -21,7 +22,14 @@ type State = {
   initialType: MovementType;
   method: SheetMethod;
   transcript: string | null;
-  openSheet: (flow?: SheetFlow, initialType?: MovementType) => void;
+  /** An agent draft being edited: the manual form opens prefilled with it and
+   * saving routes through the draft's confirm instead of a plain create. */
+  draft: MovementDraft | null;
+  openSheet: (
+    flow?: SheetFlow,
+    initialType?: MovementType,
+    draft?: MovementDraft,
+  ) => void;
   closeSheet: () => void;
   setFlow: (flow: SheetFlow) => void;
   setMethod: (method: SheetMethod) => void;
@@ -34,8 +42,16 @@ export const useExpenseSheetStore = create<State>((set) => ({
   initialType: 'expense',
   method: 'voice',
   transcript: null,
-  openSheet: (flow = 'entry', initialType = 'expense') =>
-    set({ open: true, flow, initialType, method: 'voice', transcript: null }),
+  draft: null,
+  openSheet: (flow = 'entry', initialType = 'expense', draft) =>
+    set({
+      open: true,
+      flow,
+      initialType,
+      method: 'voice',
+      transcript: null,
+      draft: draft ?? null,
+    }),
   closeSheet: () =>
     set({
       open: false,
@@ -43,6 +59,7 @@ export const useExpenseSheetStore = create<State>((set) => ({
       initialType: 'expense',
       method: 'voice',
       transcript: null,
+      draft: null,
     }),
   setFlow: (flow) => set({ flow }),
   setMethod: (method) => set({ method }),
