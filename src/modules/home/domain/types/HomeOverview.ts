@@ -52,6 +52,18 @@ export type BudgetCap = {
   over: number | null;
 };
 
+/**
+ * Money between the user and people, live balances only. Always present: owing nobody
+ * is a measurement, not a missing block.
+ */
+export type PersonalDebts = {
+  /** Joins the card debt in the hero's debt face. */
+  iOwe: number;
+  /** An asset — shown as its own line, never added to what the user owes. */
+  owedToMe: number;
+  openCount: number;
+};
+
 /** The same stretch of last month — July 1–26 against June 1–26, never the whole month. */
 export type PreviousMonth = {
   spent: number;
@@ -123,6 +135,7 @@ export type HomeOverview = {
    * debt or saving the hero leads with that and keeps the cap as a secondary row.
    */
   budget: BudgetCap | null;
+  debts: PersonalDebts;
   topCategories: TopCategory[];
   recent: Movement[];
   upcoming: UpcomingCharge[];

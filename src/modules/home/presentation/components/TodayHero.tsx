@@ -11,6 +11,7 @@ import type {
   BudgetCap,
   HeroFocus,
   MonthSummary,
+  PersonalDebts,
   SpendingPace,
 } from '../../domain/types/HomeOverview';
 
@@ -23,6 +24,7 @@ type Props = {
   pace: SpendingPace | null;
   /** The ceiling the user set; `null` when they set none. */
   budget: BudgetCap | null;
+  debts: PersonalDebts;
   netBalance: number;
   cardDebt: number;
   cardLimit: number;
@@ -59,6 +61,7 @@ export function TodayHero({
   month,
   pace,
   budget,
+  debts,
   netBalance,
   cardDebt,
   cardLimit,
@@ -223,25 +226,54 @@ export function TodayHero({
         <>
           <Label>{t('home.debt.label')}</Label>
           <Figure
-            amount={cardDebt}
+            amount={cardDebt + debts.iOwe}
             suffix={t('home.debt.caption')}
             color={theme.colors.accentCoral}
           />
-          {cardLimit > 0 ? (
-            <>
-              <Text
-                variant="caption"
-                color={theme.colors.textSecondary}
-                style={{ marginBottom: 8 }}
-              >
-                {t('home.debt.utilization', {
-                  pct: Math.round((cardDebt / cardLimit) * 100),
-                  amount: formatMoney(cardLimit),
-                })}
-              </Text>
-              {/* A ratio with a real ceiling, so the warning ramp applies here. */}
-              <ProgressBar pct={cardDebt / cardLimit} height={7} />
-            </>
+          {cardDebt > 0 && debts.iOwe > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.textSecondary}
+              style={{ marginBottom: 8 }}
+            >
+              {t('home.debt.breakdown', {
+                cards: formatMoney(cardDebt),
+                people: formatMoney(debts.iOwe),
+              })}
+            </Text>
+          ) : debts.iOwe > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.textSecondary}
+              style={{ marginBottom: 8 }}
+            >
+              {t('home.debt.onlyPeople', { count: debts.openCount })}
+            </Text>
+          ) : cardLimit > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.textSecondary}
+              style={{ marginBottom: 8 }}
+            >
+              {t('home.debt.utilization', {
+                pct: Math.round((cardDebt / cardLimit) * 100),
+                amount: formatMoney(cardLimit),
+              })}
+            </Text>
+          ) : null}
+          {cardLimit > 0 && debts.iOwe === 0 ? (
+            // A ratio with a real ceiling, so the warning ramp applies here. Mixed
+            // debt has no honest ceiling to draw a bar against.
+            <ProgressBar pct={cardDebt / cardLimit} height={7} />
+          ) : null}
+          {debts.owedToMe > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.accentMint}
+              style={{ fontSize: 11.5, marginTop: 8 }}
+            >
+              {t('home.debt.owedToMe', { amount: formatMoney(debts.owedToMe) })}
+            </Text>
           ) : null}
         </>
       ) : null}
