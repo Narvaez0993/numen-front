@@ -4,15 +4,16 @@ import { Pressable, View } from 'react-native';
 import { Icon, SectionLabel, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type { Counterparty, DebtDirection } from '../../../domain/types/Deuda';
+import type { DebtDirection } from '../../../domain';
 
 import { PersonSelector } from './PersonSelector';
+import type { PersonPick } from './personPick';
 
 type Props = {
   direction: DebtDirection;
   onDirectionChange: (d: DebtDirection) => void;
-  persons: Counterparty[];
-  onPersonsChange: (next: Counterparty[]) => void;
+  persons: PersonPick[];
+  onPersonsChange: (next: PersonPick[]) => void;
 };
 
 const TABS: DebtDirection[] = ['incoming', 'outgoing'];

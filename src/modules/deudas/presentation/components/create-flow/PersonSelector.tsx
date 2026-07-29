@@ -2,64 +2,68 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 
-import { Icon, Text } from '@/shared/presentation/components';
 import type { AccentColor } from '@/shared/domain';
+import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type { Counterparty } from '../../../domain/types/Deuda';
-import { useDeudasStore } from '../../stores/useDeudasStore';
+import { useDebtsContext } from '../../context/DebtsContext';
 import { PersonAvatar } from '../PersonAvatar';
 
+import { pickKey, type PersonPick } from './personPick';
+
 type Props = {
-  selected: Counterparty[];
-  onChange: (next: Counterparty[]) => void;
+  selected: PersonPick[];
+  onChange: (next: PersonPick[]) => void;
 };
 
 const NEW_COLORS: AccentColor[] = ['mint', 'coral', 'purple', 'amber', 'pink'];
 
+const normalize = (name: string) => name.trim().toLowerCase();
+
+/**
+ * Pick who the money is between: people the ledger already knows, or a name typed
+ * fresh. A fresh name is only a pick — the server creates the person inline when the
+ * debt lands (and dedupes by normalized name, so "juan" cannot mint a twin of "Juan").
+ */
 export function PersonSelector({ selected, onChange }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const counterparties = useDeudasStore((s) => s.counterparties);
-  const addCounterparty = useDeudasStore((s) => s.addCounterparty);
+  const { snapshot } = useDebtsContext();
   const [query, setQuery] = useState('');
 
   const trimmed = query.trim();
+  const selectedKeys = new Set(selected.map(pickKey));
 
   const matches = trimmed
-    ? counterparties.filter(
-        (p) =>
-          p.name.toLowerCase().includes(trimmed.toLowerCase()) &&
-          !selected.find((s) => s.id === p.id),
+    ? snapshot.counterparties.filter(
+        (person) =>
+          person.name.toLowerCase().includes(trimmed.toLowerCase()) &&
+          !selectedKeys.has(person.id),
       )
     : [];
 
-  const showCreate =
-    trimmed.length >= 2 &&
-    !counterparties.find((p) => p.name.toLowerCase() === trimmed.toLowerCase());
+  const knownByName = snapshot.counterparties.some(
+    (person) => normalize(person.name) === normalize(trimmed),
+  );
+  const pickedByName = selected.some(
+    (pick) => normalize(pick.name) === normalize(trimmed),
+  );
+  const showCreate = trimmed.length >= 2 && !knownByName && !pickedByName;
 
-  const togglePerson = (p: Counterparty) => {
-    if (selected.find((s) => s.id === p.id)) {
-      onChange(selected.filter((s) => s.id !== p.id));
+  const toggle = (pick: PersonPick) => {
+    const key = pickKey(pick);
+    if (selectedKeys.has(key)) {
+      onChange(selected.filter((other) => pickKey(other) !== key));
     } else {
-      onChange([...selected, p]);
+      onChange([...selected, pick]);
     }
     setQuery('');
   };
 
   const handleCreate = () => {
     if (!trimmed) return;
-    const color = NEW_COLORS[Math.floor(Math.random() * NEW_COLORS.length)] ?? 'mint';
-    const newP: Counterparty = {
-      id: `new-${Date.now().toString(36)}`,
-      name: trimmed,
-      initial: trimmed[0]!.toUpperCase(),
-      color,
-      custom: true,
-    };
-    addCounterparty(newP);
-    onChange([...selected, newP]);
-    setQuery('');
+    const color = NEW_COLORS[selected.length % NEW_COLORS.length] ?? 'mint';
+    toggle({ id: null, name: trimmed, color });
   };
 
   const hasMargin = selected.length > 0 || matches.length > 0 || showCreate;
@@ -107,10 +111,12 @@ export function PersonSelector({ selected, onChange }: Props) {
             marginBottom: selected.length > 0 ? 10 : 0,
           }}
         >
-          {matches.map((p, i) => (
+          {matches.map((person, i) => (
             <Pressable
-              key={p.id}
-              onPress={() => togglePerson(p)}
+              key={person.id}
+              onPress={() =>
+                toggle({ id: person.id, name: person.name, color: person.color })
+              }
               style={({ pressed }) => ({
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -122,8 +128,8 @@ export function PersonSelector({ selected, onChange }: Props) {
                 opacity: pressed ? 0.85 : 1,
               })}
             >
-              <PersonAvatar person={p} size={28} fontSize={12} />
-              <Text style={{ fontSize: 13, fontWeight: '500' }}>{p.name}</Text>
+              <PersonAvatar person={person} size={28} fontSize={12} />
+              <Text style={{ fontSize: 13, fontWeight: '500' }}>{person.name}</Text>
             </Pressable>
           ))}
           {showCreate ? (
@@ -179,9 +185,9 @@ export function PersonSelector({ selected, onChange }: Props) {
             marginTop: 4,
           }}
         >
-          {selected.map((p) => (
+          {selected.map((pick) => (
             <View
-              key={p.id}
+              key={pickKey(pick)}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -195,12 +201,12 @@ export function PersonSelector({ selected, onChange }: Props) {
                 paddingVertical: 4,
               }}
             >
-              <PersonAvatar person={p} size={22} fontSize={10} />
+              <PersonAvatar person={pick} size={22} fontSize={10} />
               <Text variant="label" style={{ fontSize: 12.5, paddingRight: 2 }}>
-                {p.name}
+                {pick.name}
               </Text>
               <Pressable
-                onPress={() => togglePerson(p)}
+                onPress={() => toggle(pick)}
                 hitSlop={6}
                 style={({ pressed }) => ({
                   width: 16,

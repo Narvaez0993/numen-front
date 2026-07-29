@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type { DebtStatus } from '../../domain/types/Deuda';
+import type { DebtStatus } from '../../domain';
 
 type Props = { status: DebtStatus };
 

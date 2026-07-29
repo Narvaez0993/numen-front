@@ -5,8 +5,7 @@ import { BottomSheet, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { debtStatus } from '../../../domain/types/Deuda';
-import { useDeudasStore } from '../../stores/useDeudasStore';
+import { useDebtsContext } from '../../context/DebtsContext';
 import { DebtPill } from '../DebtPill';
 import { PersonAvatar } from '../PersonAvatar';
 
@@ -18,11 +17,9 @@ type Props = {
 export function HistorySheet({ visible, onClose }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const debts = useDeudasStore((s) => s.debts);
-  const counterparties = useDeudasStore((s) => s.counterparties);
-  const today = useDeudasStore((s) => s.today);
+  const { snapshot, counterpartyById } = useDebtsContext();
 
-  const paid = debts.filter((d) => debtStatus(d, today) === 'paid');
+  const paid = snapshot.debts.filter((d) => d.status === 'paid');
 
   return (
     <BottomSheet visible={visible} onClose={onClose} maxHeight="70%">
@@ -56,7 +53,7 @@ export function HistorySheet({ visible, onClose }: Props) {
             }}
           >
             {paid.map((debt, i) => {
-              const person = counterparties.find((c) => c.id === debt.counterpartyId);
+              const person = counterpartyById[debt.counterpartyId];
               return (
                 <View
                   key={debt.id}

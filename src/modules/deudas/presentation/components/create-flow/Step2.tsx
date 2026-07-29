@@ -1,39 +1,27 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TextInput, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 
-import { Pill, SectionLabel, Text } from '@/shared/presentation/components';
-import { useTheme } from '@/shared/presentation/theme';
-
-import type { DebtDirection } from '../../../domain/types/Deuda';
 import {
-  ACCOUNT_OPTIONS,
-  ALL_CATEGORIES,
-  DATE_OPTIONS,
-  DUE_OPTIONS,
-  type SelectOption,
-} from '../../constants/options';
-import { SelectListSheet } from '../sheets/SelectListSheet';
+  DatePickerSheet,
+  Icon,
+  Pill,
+  SectionLabel,
+  Text,
+} from '@/shared/presentation/components';
+import { useTheme } from '@/shared/presentation/theme';
+import { shortDate } from '@/shared/presentation/utils/dates';
 
-import { CategoryPicker } from './CategoryPicker';
-import { ExpenseToggle } from './ExpenseToggle';
-import { FakeSelectRow } from './FakeSelectRow';
+import type { DebtDirection } from '../../../domain';
+import { useDebtsContext } from '../../context/DebtsContext';
 
 type Props = {
   direction: DebtDirection;
   isShared: boolean;
   amount: number;
   onAmountChange: (v: number) => void;
-  isExpense: boolean;
-  onExpenseChange: (v: boolean) => void;
-  category: string | null;
-  onCategoryChange: (v: string | null) => void;
-  account: string;
-  onAccountChange: (v: string) => void;
-  date: string;
-  onDateChange: (v: string) => void;
-  dueDate: string | null;
-  onDueDateChange: (v: string | null) => void;
+  dueOn: string | null;
+  onDueOnChange: (v: string | null) => void;
   note: string;
   onNoteChange: (v: string) => void;
 };
@@ -41,40 +29,30 @@ type Props = {
 const formatThousands = (n: number) =>
   n > 0 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
 
+/**
+ * What is owed, when it is due, and a note. That is the whole step now.
+ *
+ * The prototype also asked for a category, an account and a date — fields of a
+ * movement, not of a debt. A debt is a parallel record that moves no money, so those
+ * pickers (all hardcoded fakes) died with the model that justified them. For a shared
+ * event the note doubles as the event's name ("Cena del viernes").
+ */
 export function Step2({
   direction,
   isShared,
   amount,
   onAmountChange,
-  isExpense,
-  onExpenseChange,
-  category,
-  onCategoryChange,
-  account,
-  onAccountChange,
-  date,
-  onDateChange,
-  dueDate,
-  onDueDateChange,
+  dueOn,
+  onDueOnChange,
   note,
   onNoteChange,
 }: Props) {
   const { theme } = useTheme();
-  const { t } = useTranslation();
-  const [catSheet, setCatSheet] = useState(false);
-  const [acctSheet, setAcctSheet] = useState(false);
-  const [dateSheet, setDateSheet] = useState(false);
+  const { t, i18n } = useTranslation();
+  const { today } = useDebtsContext();
   const [dueSheet, setDueSheet] = useState(false);
 
   const display = formatThousands(amount);
-  const showCategory = isExpense && direction === 'incoming';
-
-  const accountLabel =
-    direction === 'incoming' && isExpense
-      ? t('deudas.create.step2.accountIncomingPaid')
-      : direction === 'incoming'
-        ? t('deudas.create.step2.accountIncoming')
-        : t('deudas.create.step2.accountOutgoing');
 
   return (
     <View style={{ gap: 18 }}>
@@ -150,41 +128,6 @@ export function Step2({
         </View>
       </View>
 
-      {direction === 'incoming' ? (
-        <ExpenseToggle value={isExpense} onChange={onExpenseChange} />
-      ) : null}
-
-      {showCategory ? (
-        <View style={{ gap: 8 }}>
-          <SectionLabel>{t('deudas.create.step2.categoryLabel')}</SectionLabel>
-          <CategoryPicker
-            value={category}
-            onChange={onCategoryChange}
-            onSeeAll={() => setCatSheet(true)}
-          />
-        </View>
-      ) : null}
-
-      <View style={{ gap: 8 }}>
-        <SectionLabel>{accountLabel}</SectionLabel>
-        <FakeSelectRow
-          icon="building-bank"
-          iconColor="mint"
-          value={account}
-          onPress={() => setAcctSheet(true)}
-        />
-      </View>
-
-      <View style={{ gap: 8 }}>
-        <SectionLabel>{t('deudas.create.step2.dateLabel')}</SectionLabel>
-        <FakeSelectRow
-          icon="calendar-event"
-          iconColor="neutral"
-          value={date}
-          onPress={() => setDateSheet(true)}
-        />
-      </View>
-
       <View style={{ gap: 8 }}>
         <View
           style={{
@@ -206,22 +149,63 @@ export function Step2({
             {t('deudas.create.step2.optional')}
           </Pill>
         </View>
-        <FakeSelectRow
-          icon="calendar-event"
-          iconColor="neutral"
-          value={dueDate ?? t('deudas.create.step2.dueNone')}
-          placeholder={!dueDate}
+        <Pressable
           onPress={() => setDueSheet(true)}
-          onClear={dueDate ? () => onDueDateChange(null) : undefined}
-        />
+          style={({ pressed }) => ({
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            paddingVertical: 12,
+            paddingHorizontal: 14,
+            backgroundColor: theme.colors.bgSurface,
+            borderWidth: 1,
+            borderColor: theme.colors.borderSubtle,
+            borderRadius: 12,
+            opacity: pressed ? 0.85 : 1,
+          })}
+        >
+          <Icon
+            name="calendar-event"
+            size={15}
+            stroke={1.9}
+            color={theme.colors.textSecondary}
+          />
+          <Text
+            style={{ flex: 1, fontSize: 13.5 }}
+            color={dueOn ? theme.colors.textPrimary : theme.colors.textTertiary}
+          >
+            {dueOn ? shortDate(dueOn, i18n.language) : t('deudas.create.step2.dueNone')}
+          </Text>
+          {dueOn ? (
+            <Pressable
+              hitSlop={8}
+              onPress={() => onDueOnChange(null)}
+              style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+            >
+              <Icon name="x" size={13} stroke={2.2} color={theme.colors.textTertiary} />
+            </Pressable>
+          ) : (
+            <Icon name="chevron-down" size={14} color={theme.colors.textTertiary} />
+          )}
+        </Pressable>
       </View>
 
       <View style={{ gap: 8 }}>
-        <SectionLabel>{t('deudas.create.step2.noteLabel')}</SectionLabel>
+        <SectionLabel>
+          {t(
+            isShared
+              ? 'deudas.create.step2.noteSharedLabel'
+              : 'deudas.create.step2.noteLabel',
+          )}
+        </SectionLabel>
         <TextInput
           value={note}
           onChangeText={onNoteChange}
-          placeholder={t('deudas.create.step2.notePlaceholder')}
+          placeholder={t(
+            isShared
+              ? 'deudas.create.step2.noteSharedPlaceholder'
+              : 'deudas.create.step2.notePlaceholder',
+          )}
           placeholderTextColor={theme.colors.textTertiary}
           multiline
           numberOfLines={2}
@@ -241,54 +225,19 @@ export function Step2({
         />
       </View>
 
-      <SelectListSheet<string>
-        visible={catSheet}
-        title={t('deudas.create.step2.categorySheetTitle')}
-        subtitle={t('deudas.create.step2.categorySheetSubtitle')}
-        options={ALL_CATEGORIES}
-        value={category ?? ''}
-        searchable
-        searchPlaceholder={t('categories.searchPlaceholder')}
-        onSelect={(o: SelectOption<string>) => {
-          onCategoryChange(o.value);
-          setCatSheet(false);
-        }}
-        onClose={() => setCatSheet(false)}
-      />
-      <SelectListSheet<string>
-        visible={acctSheet}
-        title={t('deudas.create.step2.accountSheetTitle')}
-        options={ACCOUNT_OPTIONS}
-        value={account}
-        onSelect={(o: SelectOption<string>) => {
-          onAccountChange(o.value);
-          setAcctSheet(false);
-        }}
-        onClose={() => setAcctSheet(false)}
-      />
-      <SelectListSheet<string>
-        visible={dateSheet}
-        title={t('deudas.create.step2.dateSheetTitle')}
-        subtitle={t('deudas.create.step2.dateSheetSubtitle')}
-        options={DATE_OPTIONS}
-        value={date}
-        onSelect={(o: SelectOption<string>) => {
-          onDateChange(o.value);
-          setDateSheet(false);
-        }}
-        onClose={() => setDateSheet(false)}
-      />
-      <SelectListSheet<string | null>
+      <DatePickerSheet
         visible={dueSheet}
+        value={dueOn ?? today}
+        today={today}
+        // A due date is usually ahead — that is the point of one.
+        allowFuture
         title={t('deudas.create.step2.dueSheetTitle')}
-        subtitle={t('deudas.create.step2.dueSheetSubtitle')}
-        options={DUE_OPTIONS}
-        value={dueDate}
-        onSelect={(o: SelectOption<string | null>) => {
-          onDueDateChange(o.value);
+        language={i18n.language}
+        onClose={() => setDueSheet(false)}
+        onSelect={(iso) => {
+          onDueOnChange(iso);
           setDueSheet(false);
         }}
-        onClose={() => setDueSheet(false)}
       />
     </View>
   );

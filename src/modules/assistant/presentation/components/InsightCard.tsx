@@ -3,9 +3,23 @@ import { Pressable, View } from 'react-native';
 import { Icon, Pill, Text } from '@/shared/presentation/components';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 
-import type { Insight } from '../../domain/types/Assistant';
+import type { AccentColor } from '@/shared/domain';
 
+import type { ChartPoint } from '../../domain/types/Assistant';
 import { MiniBarChart } from './MiniBarChart';
+
+/** Rule-based insight shape — waiting on disk for the proactive feed slice,
+ * which will hydrate it from `GET /assistant/feed` instead of a mock. */
+export type Insight = {
+  id: string;
+  type: string;
+  color: AccentColor;
+  title: string;
+  body: string;
+  cta: string;
+  chart?: ChartPoint[];
+  chartHighlight?: number;
+};
 
 type Props = {
   insight: Insight;

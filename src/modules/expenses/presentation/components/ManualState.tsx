@@ -18,9 +18,21 @@ import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 import { dayLabel, recentDays, toIsoDate } from '@/shared/presentation/utils/dates';
 import { formatAmountDigits } from '@/shared/presentation/utils/formatMoney';
 
+/** Values the form opens with — how an agent draft (or any future parse)
+ * lands here already filled in, instead of making the user retype it. */
+export type ManualPrefill = {
+  amount?: number;
+  description?: string;
+  categoryId?: string | null;
+  source?: SourceRef;
+  destination?: SourceRef | null;
+  occurredOn?: string;
+};
+
 type Props = {
   /** Which movement type the form opens on (default `expense`). */
   initialType?: MovementType;
+  initialValues?: ManualPrefill;
   onSave: (movement: NewMovement) => void;
   saving?: boolean;
   errorMessage?: string | null;
@@ -42,6 +54,7 @@ const parseRefKey = (key: string): SourceRef => {
 
 export function ManualState({
   initialType = 'expense',
+  initialValues,
   onSave,
   saving = false,
   errorMessage,
@@ -56,12 +69,20 @@ export function ManualState({
 
   const [today] = useState(() => toIsoDate(new Date()));
   const [type, setType] = useState<MovementType>(initialType);
-  const [digits, setDigits] = useState('');
-  const [description, setDescription] = useState('');
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [sourceKey, setSourceKey] = useState<string | null>(null);
-  const [destinationKey, setDestinationKey] = useState<string | null>(null);
-  const [occurredOn, setOccurredOn] = useState(today);
+  const [digits, setDigits] = useState(() =>
+    initialValues?.amount !== undefined ? String(initialValues.amount) : '',
+  );
+  const [description, setDescription] = useState(initialValues?.description ?? '');
+  const [categoryId, setCategoryId] = useState<string | null>(
+    initialValues?.categoryId ?? null,
+  );
+  const [sourceKey, setSourceKey] = useState<string | null>(() =>
+    initialValues?.source ? refKey(initialValues.source) : null,
+  );
+  const [destinationKey, setDestinationKey] = useState<string | null>(() =>
+    initialValues?.destination ? refKey(initialValues.destination) : null,
+  );
+  const [occurredOn, setOccurredOn] = useState(initialValues?.occurredOn ?? today);
   const [expanded, setExpanded] = useState<ExpandedField>(null);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
@@ -135,6 +156,9 @@ export function ManualState({
       return;
     }
     setDestinationKey(null);
+    // While the catalog is still loading, leave the selection alone — otherwise
+    // this pass would wipe a prefilled category before it had a chance to exist.
+    if (categoryOptions.length === 0) return;
     if (!categoryOptions.some((option) => option.id === categoryId)) {
       setCategoryId(categoryOptions[0]?.id ?? null);
     }

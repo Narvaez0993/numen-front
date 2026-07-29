@@ -10,7 +10,9 @@ import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 import type {
   BudgetCap,
   HeroFocus,
+  HeroGoal,
   MonthSummary,
+  PersonalDebts,
   SpendingPace,
 } from '../../domain/types/HomeOverview';
 
@@ -23,6 +25,9 @@ type Props = {
   pace: SpendingPace | null;
   /** The ceiling the user set; `null` when they set none. */
   budget: BudgetCap | null;
+  debts: PersonalDebts;
+  /** The active goal closest to done; leads the `saving` face when present. */
+  goal: HeroGoal | null;
   netBalance: number;
   cardDebt: number;
   cardLimit: number;
@@ -36,6 +41,7 @@ type Props = {
   /** What the `invite` face asks for, per objective. */
   onInvite?: () => void;
   onBudgetPress?: () => void;
+  onGoalPress?: () => void;
 };
 
 /** Below this, calling a change "more" or "less" is noise. */
@@ -59,6 +65,8 @@ export function TodayHero({
   month,
   pace,
   budget,
+  debts,
+  goal,
   netBalance,
   cardDebt,
   cardLimit,
@@ -69,6 +77,7 @@ export function TodayHero({
   start,
   onInvite,
   onBudgetPress,
+  onGoalPress,
 }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -223,30 +232,94 @@ export function TodayHero({
         <>
           <Label>{t('home.debt.label')}</Label>
           <Figure
-            amount={cardDebt}
+            amount={cardDebt + debts.iOwe}
             suffix={t('home.debt.caption')}
             color={theme.colors.accentCoral}
           />
-          {cardLimit > 0 ? (
-            <>
-              <Text
-                variant="caption"
-                color={theme.colors.textSecondary}
-                style={{ marginBottom: 8 }}
-              >
-                {t('home.debt.utilization', {
-                  pct: Math.round((cardDebt / cardLimit) * 100),
-                  amount: formatMoney(cardLimit),
-                })}
-              </Text>
-              {/* A ratio with a real ceiling, so the warning ramp applies here. */}
-              <ProgressBar pct={cardDebt / cardLimit} height={7} />
-            </>
+          {cardDebt > 0 && debts.iOwe > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.textSecondary}
+              style={{ marginBottom: 8 }}
+            >
+              {t('home.debt.breakdown', {
+                cards: formatMoney(cardDebt),
+                people: formatMoney(debts.iOwe),
+              })}
+            </Text>
+          ) : debts.iOwe > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.textSecondary}
+              style={{ marginBottom: 8 }}
+            >
+              {t('home.debt.onlyPeople', { count: debts.openCount })}
+            </Text>
+          ) : cardLimit > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.textSecondary}
+              style={{ marginBottom: 8 }}
+            >
+              {t('home.debt.utilization', {
+                pct: Math.round((cardDebt / cardLimit) * 100),
+                amount: formatMoney(cardLimit),
+              })}
+            </Text>
+          ) : null}
+          {cardLimit > 0 && debts.iOwe === 0 ? (
+            // A ratio with a real ceiling, so the warning ramp applies here. Mixed
+            // debt has no honest ceiling to draw a bar against.
+            <ProgressBar pct={cardDebt / cardLimit} height={7} />
+          ) : null}
+          {debts.owedToMe > 0 ? (
+            <Text
+              variant="caption"
+              color={theme.colors.accentMint}
+              style={{ fontSize: 11.5, marginTop: 8 }}
+            >
+              {t('home.debt.owedToMe', { amount: formatMoney(debts.owedToMe) })}
+            </Text>
           ) : null}
         </>
       ) : null}
 
-      {focus === 'saving' ? (
+      {focus === 'saving' && goal !== null ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onGoalPress}
+          disabled={!onGoalPress}
+          style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+        >
+          <Label>{goal.name}</Label>
+          <Figure
+            amount={goal.saved}
+            suffix={t('home.goal.of', { amount: formatMoney(goal.target) })}
+          />
+          <Text
+            variant="caption"
+            color={theme.colors.textSecondary}
+            style={{ marginBottom: 8 }}
+          >
+            {goal.pct >= 1
+              ? t('home.goal.achieved')
+              : goal.projectedOn === null
+                ? t('home.goal.start')
+                : t('home.goal.projection', {
+                    month: `${monthName(`${goal.projectedOn}-01`, i18n.language)} ${goal.projectedOn.slice(0, 4)}`,
+                  })}
+          </Text>
+          {/* Progress toward the target: more is better, so no warning ramp. */}
+          <ProgressBar pct={goal.pct} height={7} color={theme.colors.accentMint} />
+          {month.saved > 0 ? (
+            <Text variant="caption" muted style={{ fontSize: 11.5, marginTop: 8 }}>
+              {t('home.goal.monthSupport', { amount: formatMoney(month.saved) })}
+            </Text>
+          ) : null}
+        </Pressable>
+      ) : null}
+
+      {focus === 'saving' && goal === null ? (
         <>
           <Label>{t('home.saving.label')}</Label>
           <Figure

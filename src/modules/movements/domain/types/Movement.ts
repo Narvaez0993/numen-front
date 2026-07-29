@@ -1,11 +1,14 @@
 import type { CurrencyCode } from '@/shared/domain';
 
 export type MovementType = 'expense' | 'income' | 'transfer';
-export type SourceType = 'account' | 'credit_card';
+/** `goal` is a pocket: a valid transfer endpoint, never something you spend from.
+ * The capture forms only ever offer accounts and cards — pocket transfers are born
+ * in the Metas screen. */
+export type SourceType = 'account' | 'credit_card' | 'goal';
 /** `recurring` is a charge the subscription engine registered, not a user capture. */
 export type CapturedVia = 'manual' | 'voice' | 'photo' | 'text' | 'recurring';
 
-/** Where the money sits: an account or a credit card, so both parts are needed. */
+/** Where the money sits: an account, a card or a goal's pocket — both parts needed. */
 export type SourceRef = {
   type: SourceType;
   id: string;

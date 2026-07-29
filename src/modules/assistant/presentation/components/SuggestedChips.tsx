@@ -3,7 +3,10 @@ import { Pressable, ScrollView } from 'react-native';
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type { SuggestedChip } from '../../domain/types/Assistant';
+export type SuggestedChip = {
+  id: string;
+  label: string;
+};
 
 type Props = {
   chips: SuggestedChip[];
