@@ -1,85 +1,113 @@
 import type { AccentColor } from '@/shared/domain';
 
+/**
+ * A debt is a **record**, never a transaction: it moves no balance and creates no
+ * movement. The month's spending is what left your pocket, and what a friend still
+ * owes you is not money you have.
+ *
+ * `remaining`, `paidTotal` and `status` come **from the server**, derived for the
+ * snapshot's `today` — the prototype stored a `balance` and displayed dates ("21 may"),
+ * and both went stale. The client no longer computes any of them.
+ */
+
 export type DebtDirection = 'incoming' | 'outgoing';
 
 export type DebtStatus = 'pending' | 'partial' | 'paid' | 'overdue';
 
 export type Payment = {
-  date: string;
+  id: string;
   amount: number;
-  account: string;
-  note?: string;
+  paidOn: string;
+  /** No account: a payment marks progress on the ledger, it never moves a balance. */
+  note: string | null;
 };
 
 export type Counterparty = {
   id: string;
   name: string;
-  initial: string;
   color: AccentColor;
-  custom?: boolean;
 };
 
 export type Deuda = {
   id: string;
+  /** `incoming` = they owe me · `outgoing` = I owe them. */
   direction: DebtDirection;
   counterpartyId: string;
   amount: number;
-  balance: number;
-  createdAt: string;
-  dueDate: string | null;
+  paidTotal: number;
+  remaining: number;
+  status: DebtStatus;
+  /** `YYYY-MM-DD` or nothing — never a display string. */
+  dueOn: string | null;
   note: string | null;
-  payments: Payment[];
   eventId: string | null;
-  isExpense?: boolean;
-  category?: string | null;
+  payments: Payment[];
+  createdAt: string;
 };
 
+/** The split moment that grouped some debts. Display only: the money lives in them. */
 export type SharedEvent = {
   id: string;
   name: string;
-  icon: string;
-  iconColor: AccentColor;
-  totalAmount: number;
-  date: string;
-  debtIds: string[];
+  /** What the whole thing cost, the user's own share included. */
+  total: number;
+  occurredOn: string;
 };
+
+export type DirectionTotal = { total: number; count: number };
 
 export type DebtsSnapshot = {
+  currency: string;
   today: string;
+  iOwe: DirectionTotal;
+  owedToMe: DirectionTotal;
   counterparties: Counterparty[];
-  debts: Deuda[];
   events: SharedEvent[];
+  /** Paid ones included — the history reads them; screens filter by `status`. */
+  debts: Deuda[];
 };
 
-export type DebtTotals = { incoming: number; outgoing: number };
+export type NewDebt = {
+  direction: DebtDirection;
+  /** An existing person, or a name that creates one inline — one of the two. */
+  counterpartyId?: string;
+  counterpartyName?: string;
+  amount: number;
+  dueOn?: string | null;
+  note?: string | null;
+};
+
+export type NewSplit = {
+  counterpartyId?: string;
+  counterpartyName?: string;
+  amount: number;
+};
+
+export type NewSharedEvent = {
+  direction: DebtDirection;
+  name: string;
+  total: number;
+  dueOn?: string | null;
+  /** One per person who owes; the user's own share is the rest and is nobody's debt. */
+  splits: NewSplit[];
+};
+
+/** Share repaid, `0..1`. Derived from server figures — never from a stored balance. */
+export function debtProgress(debt: Deuda): number {
+  if (debt.amount <= 0) return 0;
+  return debt.paidTotal / debt.amount;
+}
+
+/** The letter an avatar wears. Derived — the prototype persisted it. */
+export function initialOf(name: string): string {
+  return name.trim().charAt(0).toUpperCase() || '?';
+}
 
 export const MS_PER_DAY = 86_400_000;
 
+/** Whole days from `todayStr` to `dateStr`; negative once it passed. Display only. */
 export function dayDiff(dateStr: string, todayStr: string): number {
   const today = new Date(todayStr);
   const target = new Date(dateStr);
   return Math.round((target.getTime() - today.getTime()) / MS_PER_DAY);
-}
-
-export function debtStatus(d: Deuda, todayStr: string): DebtStatus {
-  if (d.balance === 0) return 'paid';
-  if (d.dueDate && dayDiff(d.dueDate, todayStr) < 0) return 'overdue';
-  if (d.balance < d.amount) return 'partial';
-  return 'pending';
-}
-
-export function debtProgress(d: Deuda): number {
-  if (d.amount <= 0) return 0;
-  return (d.amount - d.balance) / d.amount;
-}
-
-export function totalsByDirection(debts: Deuda[], todayStr: string): DebtTotals {
-  let incoming = 0;
-  let outgoing = 0;
-  for (const d of debts) {
-    if (debtStatus(d, todayStr) === 'paid') continue;
-    if (d.direction === 'incoming') incoming += d.balance;
-    else outgoing += d.balance;
-  }
-  return { incoming, outgoing };
 }

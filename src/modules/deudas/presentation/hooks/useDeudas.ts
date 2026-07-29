@@ -1,24 +1,20 @@
-import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { container } from '@/core/di/container';
+import { MONEY_VIEW_KEYS } from '@/shared/presentation/query/moneyViews';
 
-import type { DebtsSnapshot } from '../../domain/types/Deuda';
-import { useDeudasStore } from '../stores/useDeudasStore';
+import type { DebtsSnapshot } from '../../domain';
 
-export function useDeudas() {
-  const initialized = useDeudasStore((s) => s.initialized);
-  const init = useDeudasStore((s) => s.init);
+export const DEBTS_KEY = MONEY_VIEW_KEYS.debts;
 
-  const query = useQuery<DebtsSnapshot>({
-    queryKey: ['deudas', 'snapshot'],
-    queryFn: () => container.getDeudasUseCase.execute(),
-    enabled: !initialized,
+/**
+ * `today` is part of the key: `status` — and with it `overdue` — is derived by the
+ * server for that day, so crossing midnight is a different question, not a stale
+ * answer to the same one.
+ */
+export function useDeudas(today: string) {
+  return useQuery<DebtsSnapshot>({
+    queryKey: [...DEBTS_KEY, 'snapshot', today],
+    queryFn: () => container.getDeudasUseCase.execute(today),
   });
-
-  useEffect(() => {
-    if (query.data && !initialized) init(query.data);
-  }, [query.data, initialized, init]);
-
-  return { isLoading: query.isLoading && !initialized };
 }

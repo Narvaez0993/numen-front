@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
@@ -6,8 +5,7 @@ import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { totalsByDirection } from '../../domain/types/Deuda';
-import { useDeudasStore } from '../stores/useDeudasStore';
+import { useDebtsContext } from '../context/DebtsContext';
 
 type Props = {
   onBack?: () => void;
@@ -18,10 +16,9 @@ type Props = {
 export function DeudasHeader({ onBack, onProfile, initials = 'SM' }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const today = useDeudasStore((s) => s.today);
-  const allDebts = useDeudasStore((s) => s.debts);
-
-  const totals = useMemo(() => totalsByDirection(allDebts, today), [allDebts, today]);
+  // Summed by the server with the same derivations that fill each row — the header
+  // and the list cannot disagree.
+  const { snapshot } = useDebtsContext();
 
   return (
     <View
@@ -79,7 +76,7 @@ export function DeudasHeader({ onBack, onProfile, initials = 'SM' }: Props) {
               color={theme.colors.accentMint}
               style={{ fontSize: 12.5, fontFamily: 'Geist_500Medium' }}
             >
-              {formatMoney(totals.incoming)}
+              {formatMoney(snapshot.owedToMe.total)}
             </Text>
             <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
               {' '}
@@ -95,7 +92,7 @@ export function DeudasHeader({ onBack, onProfile, initials = 'SM' }: Props) {
               color={theme.colors.accentAmber}
               style={{ fontSize: 12.5, fontFamily: 'Geist_500Medium' }}
             >
-              {formatMoney(totals.outgoing)}
+              {formatMoney(snapshot.iOwe.total)}
             </Text>
             <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
               {' '}

@@ -419,7 +419,6 @@
     "title": "Asistente",
     "greeting": "¿En qué te ayudo, {{name}}?",
     "thisWeek": "Esta semana",
-    "suggestions": "Sugerencias",
     "conversation": "Conversación",
     "inputPlaceholder": "Pregúntame lo que sea…",
     "summary": {
@@ -442,7 +441,40 @@
       "title": "Te quedaste sin mensajes este mes",
       "body": "Tu plan Free incluye 10 mensajes con el agente al mes. Con Plus tienes 300, más la revisión semanal.",
       "cta": "Ver Plus"
-    }
+    },
+    "empty": {
+      "title": "Háblale a tu plata",
+      "body": "Cuéntame un gasto («pagué 25 mil de almuerzo con Nequi») y te lo dejo listo para confirmar, o pregúntame lo que sea sobre tus finanzas."
+    },
+    "errors": {
+      "title": "El agente no pudo responder",
+      "retry": "Reintentar",
+      "sendFailed": "No se pudo enviar. Tu mensaje quedó guardado, intenta de nuevo.",
+      "confirmFailed": "No se pudo guardar el movimiento",
+      "discardFailed": "No se pudo descartar el borrador"
+    },
+    "draft": {
+      "type": {
+        "expense": "Gasto",
+        "income": "Ingreso",
+        "transfer": "Transferencia"
+      },
+      "status": {
+        "confirmed": "Guardado",
+        "discarded": "Descartado"
+      },
+      "transferFallback": "Transferencia",
+      "confirm": "Confirmar",
+      "edit": "Editar",
+      "discard": "Descartar",
+      "saved": "Movimiento guardado"
+    },
+    "chips": {
+      "month": "¿Cómo voy este mes?",
+      "topSpend": "¿En qué se me está yendo la plata?",
+      "upcoming": "¿Qué cobros me vienen?"
+    },
+    "nudge": "Te quedan {{left}} mensajes de cortesía este mes"
   },
   "onboarding": {
     "skip": "Saltar",
@@ -628,7 +660,11 @@
     "debt": {
       "label": "Salir de deudas",
       "caption": "en tus tarjetas",
-      "utilization": "{{pct}}% de tu cupo de {{amount}}"
+      "utilization": "{{pct}}% de tu cupo de {{amount}}",
+      "breakdown": "tarjetas {{cards}} · a personas {{people}}",
+      "onlyPeople_one": "a {{count}} persona, sin deuda de tarjetas",
+      "onlyPeople_other": "entre {{count}} deudas con personas",
+      "owedToMe": "y a ti te deben {{amount}}"
     },
     "saving": {
       "label": "Ahorrando",
@@ -639,13 +675,13 @@
     "invite": {
       "deudas": {
         "title": "Tu objetivo: salir de deudas",
-        "body": "Aún no registras ninguna tarjeta. Regístrala y te muestro cuánto debes y cómo va bajando.",
-        "action": "Registrar una tarjeta"
+        "body": "Aún no registras ninguna deuda: ni tarjetas ni lo que le debes a alguien. Regístralas y te muestro cuánto debes y cómo va bajando.",
+        "action": "Registrar una deuda"
       },
       "ahorrar": {
         "title": "Tu objetivo: ahorrar",
-        "body": "Registra tu ingreso del mes y te muestro cuánto estás guardando de verdad.",
-        "action": "Registrar ingreso"
+        "body": "Ponle nombre a lo que estás ahorrando y aparta la plata de verdad, como un bolsillo.",
+        "action": "Crear mi primera meta"
       },
       "gastos": {
         "title": "Tu objetivo",
@@ -665,6 +701,13 @@
       "row": "Tu tope · {{pct}}% usado",
       "perDay": "{{amount}}/día",
       "spent": "sin margen"
+    },
+    "goal": {
+      "of": "de {{amount}}",
+      "projection": "A este ritmo llegas en {{month}}",
+      "start": "El primer aporte la pone en marcha",
+      "achieved": "¡Meta lograda! Retira la plata cuando quieras",
+      "monthSupport": "Guardaste {{amount}} este mes"
     }
   },
   "goals": {
@@ -672,7 +715,6 @@
     "of": "de",
     "projection": "A este ritmo llegas en {{month}}",
     "projectionEmpty": "Registra tu primer aporte para empezar",
-    "projectionSoon": "El agente proyectará tu fecha con más aportes",
     "add": "Nueva meta",
     "contribute": "Registrar aporte",
     "edit": "Editar",
@@ -691,17 +733,45 @@
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
       "deleteConfirm": "Sí, eliminar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "targetDate": "Fecha objetivo (opcional)",
+      "noDate": "Sin fecha",
+      "archive": "Archivar meta",
+      "reopen": "Reabrir meta"
     },
     "contribution": {
       "title": "Aporte a {{name}}",
       "remaining": "Te faltan {{amount}} para llegar",
       "amount": "Monto del aporte",
-      "save": "Guardar aporte"
+      "save": "Guardar aporte",
+      "directionIn": "Aportar",
+      "directionOut": "Retirar",
+      "fromAccount": "Sale de",
+      "toAccount": "Vuelve a",
+      "holds": "El bolsillo tiene {{amount}}",
+      "saveOut": "Registrar retiro"
     },
     "gate": {
       "title": "Tu plan Free incluye 1 meta activa",
       "body": "Con Plus creas todas las metas que quieras y el agente les hace seguimiento."
+    },
+    "error": {
+      "title": "No pudimos cargar tus metas.",
+      "retry": "Reintentar"
+    },
+    "archivedSection": "Archivadas",
+    "achieved": "¡Meta lograda! Retira la plata y archívala para abrir la siguiente.",
+    "needed": "necesitas {{amount}}/mes",
+    "toast": {
+      "contributed": "Aporte de {{amount}} registrado",
+      "withdrawn": "Retiro de {{amount}} registrado",
+      "archived": "Meta archivada",
+      "reopened": "Meta reabierta",
+      "deleted": "Meta eliminada"
+    },
+    "errors": {
+      "notEmpty": "Primero retira la plata: el bolsillo no está vacío.",
+      "insufficient": "Ese retiro es más de lo que hay en el bolsillo."
     }
   },
   "deudas": {
@@ -713,11 +783,6 @@
     "tabs": {
       "incoming": "Me deben",
       "outgoing": "Yo debo"
-    },
-    "inicioCard": {
-      "title": "Deudas",
-      "owedToMe": "por cobrar",
-      "iOwe": "por pagar"
     },
     "status": {
       "pending": "PENDIENTE",
@@ -740,7 +805,6 @@
       "sharedWith_one": "Compartida con {{count}} persona",
       "sharedWith_other": "Compartida con {{count}} personas",
       "collected": "cobrado",
-      "owedPart": "pagado",
       "pending_one": "{{count}} pendiente",
       "pending_other": "{{count}} pendientes",
       "remaining": "{{amount}} falta",
@@ -766,20 +830,20 @@
       "subTheyOweYou": "Te debe",
       "subYouOweThem": "Le debes",
       "partOf": "Parte de '{{event}}'",
-      "registerAbono": "Registrar abono"
+      "registerAbono": "Registrar abono",
+      "delete": "Eliminar deuda",
+      "deleted": "Deuda eliminada"
     },
     "abono": {
       "title": "Registrar abono",
       "subIncoming": "{{name}} te abonó",
       "subOutgoing": "Abono a {{name}}",
       "balanceLabel": "Balance actual",
-      "accountIncoming": "Cuenta donde entró",
-      "accountOutgoing": "Cuenta de donde salió",
       "save": "Guardar abono",
-      "toast": "Abono registrado · {{amount}}"
+      "toast": "Abono registrado · {{amount}}",
+      "overpaid": "Ese abono es más de lo que queda pendiente."
     },
     "create": {
-      "back": "Volver",
       "step": "Paso {{current}} de {{total}}",
       "next": "Continuar",
       "saveIndividual": "Guardar deuda",
@@ -801,27 +865,14 @@
         "subShared": "Monto total y categoría del gasto.",
         "amountLabel": "Monto",
         "amountSharedLabel": "Total del gasto",
-        "expenseToggleTitle": "Esto viene de un gasto que pagué",
-        "expenseToggleSub": "Cuenta a tu presupuesto solo por tu parte.",
-        "categoryLabel": "Categoría",
-        "categorySelected": "Seleccionada",
-        "categorySeeAll": "Buscar entre las 12 categorías",
-        "accountIncomingPaid": "Cuenta de donde salió",
-        "accountIncoming": "Cuenta donde entrará",
-        "accountOutgoing": "Cuenta donde entró",
-        "dateLabel": "Fecha",
-        "dateSheetTitle": "Fecha del préstamo",
-        "dateSheetSubtitle": "Cuándo ocurrió.",
         "dueLabel": "Fecha límite",
         "dueSheetTitle": "Fecha límite",
-        "dueSheetSubtitle": "Deshka te avisará cuando se acerque.",
         "dueNone": "Sin vencimiento",
         "optional": "Opcional",
         "noteLabel": "Nota (opcional)",
         "notePlaceholder": "Ej. Comida del jueves, préstamo carro, etc.",
-        "accountSheetTitle": "Elegir cuenta",
-        "categorySheetTitle": "Elegir categoría",
-        "categorySheetSubtitle": "Busca o selecciona entre las 12 categorías estándar."
+        "noteSharedLabel": "Nombre del evento",
+        "noteSharedPlaceholder": "Cena del viernes, paseo, regalo…"
       },
       "step3": {
         "title": "¿Cómo se divide?",
@@ -851,7 +902,18 @@
     "share": {
       "button": "Compartir resumen",
       "messageIncoming": "Hola {{name}}: te recuerdo que me debes {{balance}} (de {{total}}, vas {{pct}}% pagado). — enviado desde Deshka",
-      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Deshka"
+      "messageOutgoing": "Hola {{name}}: no se me olvida — te debo {{balance}} (de {{total}}, voy {{pct}}% pagado). — enviado desde Deshka",
+      "ofEvent": "de {{event}}",
+      "dueOn": "vence el {{date}}"
+    },
+    "error": {
+      "title": "No pudimos cargar tus deudas.",
+      "retry": "Reintentar"
+    },
+    "confirmDelete": {
+      "title": "¿Eliminar esta deuda?",
+      "body": "Se borra el registro y sus abonos. Tus cuentas y movimientos no se tocan: esta deuda nunca movió plata.",
+      "cta": "Eliminar deuda"
     }
   },
   "profile": {
@@ -918,6 +980,12 @@
       },
       "objective": {
         "title": "Tu objetivo"
+      },
+      "goals": {
+        "title": "Metas",
+        "subtitleEmpty": "Sin metas activas",
+        "subtitle_one": "{{count}} meta activa",
+        "subtitle_other": "{{count}} metas activas"
       }
     },
     "appearance": {
@@ -957,7 +1025,6 @@
       "sub": {
         "entry": "Registra un gasto, un ingreso o una transferencia"
       },
-      "voiceSoon": "Registrar hablando llega con el asistente",
       "manual": "Registrar a mano",
       "photoReceipt": "Foto",
       "write": "Escribir",
@@ -986,7 +1053,29 @@
           "body": "Agrega tu banco, billetera o efectivo en Perfil → Fuentes y cuentas y vuelve a registrar."
         },
         "pickDate": "Otra fecha…"
-      }
+      },
+      "voiceHint": "Toca el mic y cuéntame el gasto",
+      "recordingHint": "Te escucho… toca para terminar",
+      "nothingHeard": "No te escuché — intenta de nuevo o escríbelo",
+      "processing": "Entendiendo…",
+      "writing": {
+        "title": "Escríbelo",
+        "subtitle": "En tus palabras, como se lo contarías a alguien",
+        "placeholder": "pagué 25 mil de almuerzo con Nequi…",
+        "agentAsks": "Tu agente pregunta",
+        "cta": "Registrar"
+      },
+      "confirm": {
+        "title": "Esto entendí",
+        "said": "Dijiste"
+      },
+      "permission": {
+        "title": "El micrófono no tiene permiso",
+        "body": "Para registrar hablando, permite el micrófono y el reconocimiento de voz en Ajustes.",
+        "cta": "Abrir Ajustes"
+      },
+      "quotaExhausted": "Se acabaron tus registros con IA del mes — te dejo el formulario de siempre",
+      "parseFailed": "No pude entenderlo, intenta de nuevo"
     },
     "toast": {
       "saved": {
@@ -1064,18 +1153,5 @@
       "MXN": "Peso mexicano"
     }
   },
-  "comingSoon": {
-    "debts": {
-      "title": "Deudas",
-      "body": "Aún no está conectado. Cuando lo esté vas a registrar lo que debes y lo que te deben, con abonos parciales y un resumen para compartir."
-    },
-    "goals": {
-      "title": "Metas",
-      "body": "Aún no está conectado. Cuando lo esté vas a poder ponerte una meta de ahorro, registrar aportes y ver cuánto te falta."
-    },
-    "assistant": {
-      "title": "Asistente",
-      "body": "Aún no está conectado. Cuando lo esté va a leer tus movimientos reales para responderte y avisarte cosas que valga la pena mirar."
-    }
-  }
+  "comingSoon": {}
 }

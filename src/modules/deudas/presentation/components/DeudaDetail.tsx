@@ -5,13 +5,8 @@ import { Button, Card, Icon, ProgressBar, Text } from '@/shared/presentation/com
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { debtProgress, debtStatus } from '../../domain/types/Deuda';
-import {
-  selectCounterparty,
-  selectDeuda,
-  selectEvent,
-  useDeudasStore,
-} from '../stores/useDeudasStore';
+import { debtProgress, type Deuda } from '../../domain';
+import { useDebtsContext } from '../context/DebtsContext';
 import { formatShortDate } from '../utils/formatShortDate';
 import { useDueLabel } from '../utils/useDueLabel';
 
@@ -22,24 +17,21 @@ type Props = {
   debtId: string;
   onBack: () => void;
   onAbono: () => void;
+  onDelete: () => void;
 };
 
-export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
+export function DeudaDetail({ debtId, onBack, onAbono, onDelete }: Props) {
   const { theme, mode } = useTheme();
   const { t, i18n } = useTranslation();
-  const today = useDeudasStore((s) => s.today);
-  const deuda = useDeudasStore((s) => selectDeuda(s, debtId));
-  const person = useDeudasStore((s) =>
-    deuda ? selectCounterparty(s, deuda.counterpartyId) : undefined,
-  );
-  const event = useDeudasStore((s) =>
-    deuda?.eventId ? selectEvent(s, deuda.eventId) : undefined,
-  );
-  const dueLabel = useDueLabel(deuda ?? ({ dueDate: null } as never), today);
+  const { today, debtById, counterpartyById, eventById } = useDebtsContext();
+  const deuda = debtById[debtId];
+  const person = deuda ? counterpartyById[deuda.counterpartyId] : undefined;
+  const event = deuda?.eventId ? eventById[deuda.eventId] : undefined;
+  const dueLabel = useDueLabel(deuda ?? ({ dueOn: null } as Deuda), today);
 
   if (!deuda || !person) return null;
 
-  const status = debtStatus(deuda, today);
+  const status = deuda.status;
   const pct = debtProgress(deuda);
   const isIncoming = deuda.direction === 'incoming';
   const isOverdue = status === 'overdue';
@@ -89,14 +81,23 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
             const key = isIncoming
               ? 'deudas.share.messageIncoming'
               : 'deudas.share.messageOutgoing';
-            void Share.share({
-              message: t(key, {
+            const parts = [
+              t(key, {
                 name: person.name,
-                balance: formatMoney(deuda.balance),
+                balance: formatMoney(deuda.remaining),
                 total: formatMoney(deuda.amount),
                 pct: Math.round(debtProgress(deuda) * 100),
               }),
-            }).catch(() => undefined);
+            ];
+            if (event) parts.push(t('deudas.share.ofEvent', { event: event.name }));
+            if (deuda.dueOn) {
+              parts.push(
+                t('deudas.share.dueOn', {
+                  date: formatShortDate(deuda.dueOn, i18n.language),
+                }),
+              );
+            }
+            void Share.share({ message: parts.join(' · ') }).catch(() => undefined);
           }}
           style={({ pressed }) => ({
             width: 38,
@@ -152,7 +153,7 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
         </View>
 
         {/* Overdue alert */}
-        {isOverdue && deuda.dueDate ? (
+        {isOverdue && deuda.dueOn ? (
           <View
             style={{
               flexDirection: 'row',
@@ -181,7 +182,7 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
               style={{ flex: 1, fontSize: 12, lineHeight: 17.4 }}
             >
               {t('deudas.detail.overdueAlert', {
-                date: formatShortDate(deuda.dueDate, i18n.language),
+                date: formatShortDate(deuda.dueOn, i18n.language),
                 name: person.name,
               })}
             </Text>
@@ -207,7 +208,7 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
               lineHeight: 32,
             }}
           >
-            {formatMoney(deuda.balance)}
+            {formatMoney(deuda.remaining)}
           </Text>
           <Text color={theme.colors.textSecondary} style={{ fontSize: 12, marginTop: 6 }}>
             {t('deudas.detail.ofOriginal', { amount: formatMoney(deuda.amount) })}
@@ -267,9 +268,9 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
             </View>
           ) : (
             <View style={{ gap: 8 }}>
-              {[...deuda.payments].reverse().map((p, i) => (
+              {[...deuda.payments].reverse().map((p) => (
                 <View
-                  key={`${p.date}-${i}`}
+                  key={p.id}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -312,7 +313,7 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
                       numberOfLines={1}
                       style={{ fontSize: 11.5, marginTop: 2 }}
                     >
-                      {formatShortDate(p.date, i18n.language)} · {p.account}
+                      {formatShortDate(p.paidOn, i18n.language)}
                       {p.note ? ` · ${p.note}` : ''}
                     </Text>
                   </View>
@@ -321,6 +322,25 @@ export function DeudaDetail({ debtId, onBack, onAbono }: Props) {
             </View>
           )}
         </View>
+
+        <Pressable
+          onPress={onDelete}
+          style={({ pressed }) => ({
+            width: '100%',
+            paddingVertical: 14,
+            alignItems: 'center',
+            marginTop: 18,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text
+            variant="label"
+            color={theme.colors.accentCoral}
+            style={{ fontSize: 12.5 }}
+          >
+            {t('deudas.detail.delete')}
+          </Text>
+        </Pressable>
       </ScrollView>
     </View>
   );

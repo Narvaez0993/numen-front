@@ -5,8 +5,8 @@ import { Icon, IconBox, ProgressBar, Text } from '@/shared/presentation/componen
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { type Deuda, debtStatus, type SharedEvent } from '../../domain/types/Deuda';
-import { useDeudasStore } from '../stores/useDeudasStore';
+import type { Deuda, SharedEvent } from '../../domain';
+import { useDebtsContext } from '../context/DebtsContext';
 
 import { DebtPill } from './DebtPill';
 import { PersonAvatar } from './PersonAvatar';
@@ -30,13 +30,14 @@ export function DeudaCardShared({
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const today = useDeudasStore((s) => s.today);
-  const counterparties = useDeudasStore((s) => s.counterparties);
+  const { counterpartyById } = useDebtsContext();
 
-  const totalPaid = debts.reduce((s, d) => s + (d.amount - d.balance), 0);
-  const totalRem = debts.reduce((s, d) => s + d.balance, 0);
-  const pendingCount = debts.filter((d) => debtStatus(d, today) !== 'paid').length;
-  const pct = event.totalAmount > 0 ? totalPaid / event.totalAmount : 0;
+  const totalPaid = debts.reduce((sum, d) => sum + d.paidTotal, 0);
+  const totalRem = debts.reduce((sum, d) => sum + d.remaining, 0);
+  const pendingCount = debts.filter((d) => d.status !== 'paid').length;
+  // Progress over what is actually owed: the user's own share needs no collecting.
+  const owedTotal = totalPaid + totalRem;
+  const pct = owedTotal > 0 ? totalPaid / owedTotal : 0;
 
   return (
     <View
@@ -60,13 +61,7 @@ export function DeudaCardShared({
             marginBottom: 10,
           }}
         >
-          <IconBox
-            name={event.icon}
-            color={event.iconColor}
-            size={40}
-            iconSize={19}
-            radius={12}
-          />
+          <IconBox name="users" color="purple" size={40} iconSize={19} radius={12} />
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text
               numberOfLines={1}
@@ -87,7 +82,7 @@ export function DeudaCardShared({
               tabular
               style={{ fontSize: 15, fontWeight: '500', letterSpacing: -0.15 }}
             >
-              {formatMoney(event.totalAmount)}
+              {formatMoney(event.total)}
             </Text>
             <View
               style={{
@@ -146,10 +141,9 @@ export function DeudaCardShared({
             }}
           >
             {debts.map((d) => {
-              const p = counterparties.find((c) => c.id === d.counterpartyId);
+              const p = counterpartyById[d.counterpartyId];
               if (!p) return null;
-              const s = debtStatus(d, today);
-              const isPartial = s === 'partial';
+              const isPartial = d.status === 'partial';
               return (
                 <Pressable
                   key={d.id}
@@ -172,10 +166,10 @@ export function DeudaCardShared({
                     style={{ fontSize: 12 }}
                   >
                     {isPartial
-                      ? `${formatMoney(d.amount - d.balance)} / ${formatMoney(d.amount)}`
+                      ? `${formatMoney(d.paidTotal)} / ${formatMoney(d.amount)}`
                       : formatMoney(d.amount)}
                   </Text>
-                  <DebtPill status={s} />
+                  <DebtPill status={d.status} />
                 </Pressable>
               );
             })}

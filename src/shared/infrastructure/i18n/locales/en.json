@@ -419,7 +419,6 @@
     "title": "Assistant",
     "greeting": "How can I help, {{name}}?",
     "thisWeek": "This week",
-    "suggestions": "Suggestions",
     "conversation": "Conversation",
     "inputPlaceholder": "Ask me anything…",
     "summary": {
@@ -442,7 +441,40 @@
       "title": "You're out of messages this month",
       "body": "Free includes 10 agent messages per month. Plus gives you 300, plus the weekly review.",
       "cta": "See Plus"
-    }
+    },
+    "empty": {
+      "title": "Talk to your money",
+      "body": "Tell me an expense (“paid 12.50 for lunch with my debit card”) and I'll stage it for you to confirm, or ask me anything about your finances."
+    },
+    "errors": {
+      "title": "The agent could not answer",
+      "retry": "Retry",
+      "sendFailed": "Could not send. Your message was kept, try again.",
+      "confirmFailed": "Could not save the movement",
+      "discardFailed": "Could not discard the draft"
+    },
+    "draft": {
+      "type": {
+        "expense": "Expense",
+        "income": "Income",
+        "transfer": "Transfer"
+      },
+      "status": {
+        "confirmed": "Saved",
+        "discarded": "Discarded"
+      },
+      "transferFallback": "Transfer",
+      "confirm": "Confirm",
+      "edit": "Edit",
+      "discard": "Discard",
+      "saved": "Movement saved"
+    },
+    "chips": {
+      "month": "How am I doing this month?",
+      "topSpend": "Where is my money going?",
+      "upcoming": "What charges are coming?"
+    },
+    "nudge": "You have {{left}} courtesy messages left this month"
   },
   "onboarding": {
     "skip": "Skip",
@@ -628,7 +660,11 @@
     "debt": {
       "label": "Getting out of debt",
       "caption": "on your cards",
-      "utilization": "{{pct}}% of your {{amount}} limit"
+      "utilization": "{{pct}}% of your {{amount}} limit",
+      "breakdown": "cards {{cards}} · to people {{people}}",
+      "onlyPeople_one": "to {{count}} person, no card debt",
+      "onlyPeople_other": "across {{count}} personal debts",
+      "owedToMe": "and you are owed {{amount}}"
     },
     "saving": {
       "label": "Saving",
@@ -639,13 +675,13 @@
     "invite": {
       "deudas": {
         "title": "Your goal: get out of debt",
-        "body": "No card registered yet. Add one and I will show you what you owe and how it goes down.",
-        "action": "Add a card"
+        "body": "No debt registered yet — no cards, nothing owed to anyone. Add them and I will show you what you owe and how it goes down.",
+        "action": "Add a debt"
       },
       "ahorrar": {
         "title": "Your goal: save",
-        "body": "Register this month's income and I will show you what you are really keeping.",
-        "action": "Add income"
+        "body": "Name what you are saving for and truly set the money aside, like a pocket.",
+        "action": "Create my first goal"
       },
       "gastos": {
         "title": "Your goal",
@@ -665,14 +701,20 @@
       "row": "Your cap · {{pct}}% used",
       "perDay": "{{amount}}/day",
       "spent": "nothing left"
+    },
+    "goal": {
+      "of": "of {{amount}}",
+      "projection": "At this pace you get there by {{month}}",
+      "start": "The first contribution sets it in motion",
+      "achieved": "Goal reached! Withdraw the money whenever you like",
+      "monthSupport": "You kept {{amount}} this month"
     }
   },
   "goals": {
     "title": "Goals",
     "of": "of",
-    "projection": "At this pace you'll get there in {{month}}",
+    "projection": "At this pace you get there by {{month}}",
     "projectionEmpty": "Log your first contribution to get started",
-    "projectionSoon": "The agent will project your date with more contributions",
     "add": "New goal",
     "contribute": "Add contribution",
     "edit": "Edit",
@@ -691,17 +733,45 @@
       "delete": "Delete",
       "deleteConfirmTitle": "Delete \"{{name}}\"?",
       "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "targetDate": "Target date (optional)",
+      "noDate": "No date",
+      "archive": "Archive goal",
+      "reopen": "Reopen goal"
     },
     "contribution": {
       "title": "Contribution to {{name}}",
       "remaining": "{{amount}} to go",
       "amount": "Contribution amount",
-      "save": "Save contribution"
+      "save": "Save contribution",
+      "directionIn": "Add",
+      "directionOut": "Withdraw",
+      "fromAccount": "From",
+      "toAccount": "Back to",
+      "holds": "The pocket holds {{amount}}",
+      "saveOut": "Record withdrawal"
     },
     "gate": {
       "title": "Free includes 1 active goal",
       "body": "Plus lets you create unlimited goals, with the agent tracking each one."
+    },
+    "error": {
+      "title": "We couldn't load your goals.",
+      "retry": "Try again"
+    },
+    "archivedSection": "Archived",
+    "achieved": "Goal reached! Withdraw the money and archive it to open the next one.",
+    "needed": "you need {{amount}}/month",
+    "toast": {
+      "contributed": "Contribution of {{amount}} recorded",
+      "withdrawn": "Withdrawal of {{amount}} recorded",
+      "archived": "Goal archived",
+      "reopened": "Goal reopened",
+      "deleted": "Goal deleted"
+    },
+    "errors": {
+      "notEmpty": "Withdraw the money first: the pocket is not empty.",
+      "insufficient": "That withdrawal is more than the pocket holds."
     }
   },
   "deudas": {
@@ -713,11 +783,6 @@
     "tabs": {
       "incoming": "Owed to me",
       "outgoing": "I owe"
-    },
-    "inicioCard": {
-      "title": "Debts",
-      "owedToMe": "to collect",
-      "iOwe": "to pay"
     },
     "status": {
       "pending": "PENDING",
@@ -740,7 +805,6 @@
       "sharedWith_one": "Shared with {{count}} person",
       "sharedWith_other": "Shared with {{count}} people",
       "collected": "collected",
-      "owedPart": "paid",
       "pending_one": "{{count}} pending",
       "pending_other": "{{count}} pending",
       "remaining": "{{amount}} to go",
@@ -766,20 +830,20 @@
       "subTheyOweYou": "Owes you",
       "subYouOweThem": "You owe",
       "partOf": "Part of '{{event}}'",
-      "registerAbono": "Record payment"
+      "registerAbono": "Record payment",
+      "delete": "Delete debt",
+      "deleted": "Debt deleted"
     },
     "abono": {
       "title": "Record payment",
       "subIncoming": "{{name}} paid you",
       "subOutgoing": "Payment to {{name}}",
       "balanceLabel": "Current balance",
-      "accountIncoming": "Account it went into",
-      "accountOutgoing": "Account it came from",
       "save": "Save payment",
-      "toast": "Payment recorded · {{amount}}"
+      "toast": "Payment recorded · {{amount}}",
+      "overpaid": "That payment is more than what is left."
     },
     "create": {
-      "back": "Back",
       "step": "Step {{current}} of {{total}}",
       "next": "Continue",
       "saveIndividual": "Save debt",
@@ -801,27 +865,14 @@
         "subShared": "Total amount and category of the expense.",
         "amountLabel": "Amount",
         "amountSharedLabel": "Total amount",
-        "expenseToggleTitle": "This comes from an expense I paid",
-        "expenseToggleSub": "Counts toward your budget only for your share.",
-        "categoryLabel": "Category",
-        "categorySelected": "Selected",
-        "categorySeeAll": "Search among the 12 categories",
-        "accountIncomingPaid": "Account it came from",
-        "accountIncoming": "Account it will go into",
-        "accountOutgoing": "Account it went into",
-        "dateLabel": "Date",
-        "dateSheetTitle": "Date of the loan",
-        "dateSheetSubtitle": "When it happened.",
         "dueLabel": "Due date",
         "dueSheetTitle": "Due date",
-        "dueSheetSubtitle": "Deshka will remind you when it's near.",
         "dueNone": "No due date",
         "optional": "Optional",
         "noteLabel": "Note (optional)",
         "notePlaceholder": "Ex. Thursday lunch, car loan, etc.",
-        "accountSheetTitle": "Pick an account",
-        "categorySheetTitle": "Pick a category",
-        "categorySheetSubtitle": "Search or pick from the 12 standard categories."
+        "noteSharedLabel": "Event name",
+        "noteSharedPlaceholder": "Friday dinner, trip, gift…"
       },
       "step3": {
         "title": "How is it split?",
@@ -851,7 +902,18 @@
     "share": {
       "button": "Share summary",
       "messageIncoming": "Hi {{name}}: friendly reminder — you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
-      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka"
+      "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
+      "ofEvent": "for {{event}}",
+      "dueOn": "due {{date}}"
+    },
+    "error": {
+      "title": "We couldn't load your debts.",
+      "retry": "Try again"
+    },
+    "confirmDelete": {
+      "title": "Delete this debt?",
+      "body": "The record and its payments are removed. Your accounts and movements stay put: this debt never moved money.",
+      "cta": "Delete debt"
     }
   },
   "profile": {
@@ -918,6 +980,12 @@
       },
       "objective": {
         "title": "Your goal"
+      },
+      "goals": {
+        "title": "Goals",
+        "subtitleEmpty": "No active goals",
+        "subtitle_one": "{{count}} active goal",
+        "subtitle_other": "{{count}} active goals"
       }
     },
     "appearance": {
@@ -957,7 +1025,6 @@
       "sub": {
         "entry": "Record an expense, an income or a transfer"
       },
-      "voiceSoon": "Recording by voice arrives with the assistant",
       "manual": "Record by hand",
       "photoReceipt": "Photo",
       "write": "Write",
@@ -986,7 +1053,29 @@
           "body": "Add your bank, wallet or cash in Profile → Sources and accounts, then come back."
         },
         "pickDate": "Another date…"
-      }
+      },
+      "voiceHint": "Tap the mic and tell me the expense",
+      "recordingHint": "Listening… tap to finish",
+      "nothingHeard": "I didn't catch that — try again or type it",
+      "processing": "Understanding…",
+      "writing": {
+        "title": "Type it",
+        "subtitle": "In your words, like you'd tell a friend",
+        "placeholder": "paid 12.50 for lunch with my debit card…",
+        "agentAsks": "Your agent asks",
+        "cta": "Register"
+      },
+      "confirm": {
+        "title": "Here's what I understood",
+        "said": "You said"
+      },
+      "permission": {
+        "title": "The microphone has no permission",
+        "body": "To register by voice, allow the microphone and speech recognition in Settings.",
+        "cta": "Open Settings"
+      },
+      "quotaExhausted": "Your monthly AI captures ran out — here's the usual form",
+      "parseFailed": "I couldn't understand that, try again"
     },
     "toast": {
       "saved": {
@@ -1064,18 +1153,5 @@
       "MXN": "Mexican peso"
     }
   },
-  "comingSoon": {
-    "debts": {
-      "title": "Debts",
-      "body": "Not wired yet. Once it is, you will track what you owe and what you are owed, with partial payments and a summary you can share."
-    },
-    "goals": {
-      "title": "Goals",
-      "body": "Not wired yet. Once it is, you will set a savings goal, log contributions and see how far you have left."
-    },
-    "assistant": {
-      "title": "Assistant",
-      "body": "Not wired yet. Once it is, it will read your real movements to answer you and flag things worth a look."
-    }
-  }
+  "comingSoon": {}
 }

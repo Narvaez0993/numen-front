@@ -3,10 +3,13 @@ import { View } from 'react-native';
 import { Text } from '@/shared/presentation/components';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
 
-import type { Counterparty } from '../../domain/types/Deuda';
+import type { AccentColor } from '@/shared/domain';
+
+import { initialOf } from '../../domain';
 
 type Props = {
-  person?: Counterparty | null;
+  /** Anything person-shaped: a counterparty from the snapshot or a fresh pick. */
+  person?: { name: string; color: AccentColor } | null;
   size?: number;
   fontSize?: number;
 };
@@ -29,7 +32,7 @@ export function PersonAvatar({ person, size = 36, fontSize }: Props) {
       }}
     >
       <Text variant="label" color={fg} style={{ fontSize: fs, letterSpacing: 0.01 * fs }}>
-        {person.initial}
+        {initialOf(person.name)}
       </Text>
     </View>
   );

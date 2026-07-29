@@ -5,14 +5,14 @@ import { Icon, SectionLabel, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { Counterparty } from '../../../domain/types/Deuda';
+import { pickKey, type PersonPick } from './personPick';
 
 import { PersonAvatar } from '../PersonAvatar';
 import { YoAvatar } from '../YoAvatar';
 
 type Props = {
   amount: number;
-  persons: Counterparty[];
+  persons: PersonPick[];
   splits: Record<string, number>;
   yoShare: number;
   splitsSum: number;
@@ -198,12 +198,12 @@ export function Step3({
           </View>
 
           {persons.map((p, i) => {
-            const v = splits[p.id] ?? 0;
+            const v = splits[pickKey(p)] ?? 0;
             const display = formatThousands(v);
             const pctOfTotal = amount > 0 ? Math.round((v / amount) * 100) : 0;
             return (
               <View
-                key={p.id}
+                key={pickKey(p)}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -249,7 +249,7 @@ export function Step3({
                     value={display}
                     onChangeText={(value) => {
                       const raw = value.replace(/\D/g, '').slice(0, 10);
-                      onEditSplit(p.id, raw === '' ? 0 : parseInt(raw, 10));
+                      onEditSplit(pickKey(p), raw === '' ? 0 : parseInt(raw, 10));
                     }}
                     placeholder="0"
                     placeholderTextColor={theme.colors.textTertiary}

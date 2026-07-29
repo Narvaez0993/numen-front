@@ -117,6 +117,8 @@ export function HomeScreen() {
             month={data.month}
             pace={data.pace}
             budget={data.budget}
+            debts={data.debts}
+            goal={data.goal}
             netBalance={data.netBalance}
             cardDebt={data.cardDebt}
             cardLimit={data.cardLimit}
@@ -127,12 +129,16 @@ export function HomeScreen() {
             // The month's spend is the movements that made it, not a budget.
             onMonthPress={goMovements}
             start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
-            // Both invitations point at something that exists today.
+            // Every invitation points at something that exists today: the debts
+            // ledger, the first goal, or the month's income.
             onInvite={
               data.objective === 'deudas'
-                ? () => router.push('/accounts')
-                : () => openSheet('manual', 'income')
+                ? () => router.push('/deudas')
+                : data.objective === 'ahorrar'
+                  ? () => router.push('/goals')
+                  : () => openSheet('manual', 'income')
             }
+            onGoalPress={() => router.push('/goals')}
           />
           <IncomeSummaryRow
             total={data.month.income}

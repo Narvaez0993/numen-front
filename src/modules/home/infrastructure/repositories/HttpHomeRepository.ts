@@ -44,6 +44,14 @@ type HomeOverviewResponse = {
     projected: number | null;
     over: number | null;
   } | null;
+  debts: { i_owe: number; owed_to_me: number; open_count: number };
+  goal: {
+    name: string;
+    target: number;
+    saved: number;
+    pct: number;
+    projected_on: string | null;
+  } | null;
   top_categories: {
     category_id: string | null;
     spent: number;
@@ -92,6 +100,21 @@ export class HttpHomeRepository implements HomeRepository {
           previous: data.month.previous,
           change: data.month.change,
         },
+        debts: {
+          iOwe: data.debts.i_owe,
+          owedToMe: data.debts.owed_to_me,
+          openCount: data.debts.open_count,
+        },
+        goal:
+          data.goal === null
+            ? null
+            : {
+                name: data.goal.name,
+                target: data.goal.target,
+                saved: data.goal.saved,
+                pct: data.goal.pct,
+                projectedOn: data.goal.projected_on,
+              },
         budget:
           data.budget === null
             ? null

@@ -1,25 +1,40 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
-import { Button, Icon, IconName, Pill, Text } from '@/shared/presentation/components';
+import { Button, Icon, IconName, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { useExpenseSheetStore } from '../stores/useExpenseSheetStore';
 
-import { RecordingMic } from './RecordingMic';
+import { PermissionRationale } from './PermissionRationale';
+import { RecordingMic, WaveVisualizer } from './RecordingMic';
+
+type Props = {
+  liveTranscript: string;
+  permissionDenied: boolean;
+  inlineError: string | null;
+  onMicPress: () => void;
+};
 
 /**
- * Entry point of the capture sheet.
- *
- * Voice, photo and text are the product's core gesture, but their parsing lands
- * with the assistant (phase 4) — until then they are shown as what they are,
- * coming soon, instead of a mic that records nothing into a save that saves
- * nothing. Manual entry is real and is the primary action.
+ * Entry point of the capture sheet — and since the voice slice, the real core
+ * gesture: tap the mic, talk, watch your words appear, and the agent stages
+ * the movement. The store's `flow` drives which face renders (entry /
+ * recording / processing); manual and writing stay one tap away.
  */
-export function EntryState() {
+export function EntryState({
+  liveTranscript,
+  permissionDenied,
+  inlineError,
+  onMicPress,
+}: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const flow = useExpenseSheetStore((s) => s.flow);
   const setFlow = useExpenseSheetStore((s) => s.setFlow);
+
+  const micState =
+    flow === 'recording' ? 'recording' : flow === 'processing' ? 'processing' : 'entry';
 
   return (
     <View style={{ paddingTop: 4 }}>
@@ -36,35 +51,74 @@ export function EntryState() {
         </Text>
       </View>
 
-      <View style={{ alignItems: 'center', paddingVertical: 18, opacity: 0.4 }}>
-        <RecordingMic state="entry" onPress={() => {}} />
-        <View style={{ marginTop: 18, alignItems: 'center', gap: 6 }}>
-          <Pill variant="amber">{t('common.soon')}</Pill>
-          <Text variant="caption" muted style={{ textAlign: 'center', maxWidth: 250 }}>
-            {t('expenses.sheet.voiceSoon')}
-          </Text>
+      {permissionDenied ? (
+        <PermissionRationale onWriteInstead={() => setFlow('writing')} />
+      ) : (
+        <View style={{ alignItems: 'center', paddingVertical: 18 }}>
+          <RecordingMic state={micState} onPress={onMicPress} />
+          <View style={{ marginTop: 16, alignItems: 'center', gap: 8, minHeight: 52 }}>
+            {flow === 'recording' ? (
+              <>
+                <WaveVisualizer />
+                <Text
+                  variant="body"
+                  style={{ textAlign: 'center', maxWidth: 280 }}
+                  numberOfLines={2}
+                >
+                  {liveTranscript || t('expenses.sheet.recordingHint')}
+                </Text>
+              </>
+            ) : flow === 'processing' ? (
+              <Text variant="caption" muted style={{ textAlign: 'center' }}>
+                {t('expenses.sheet.processing')}
+              </Text>
+            ) : (
+              <Text
+                variant="caption"
+                muted
+                style={{ textAlign: 'center', maxWidth: 250 }}
+              >
+                {inlineError ?? t('expenses.sheet.voiceHint')}
+              </Text>
+            )}
+          </View>
         </View>
-      </View>
+      )}
 
       <Button label={t('expenses.sheet.manual')} full onPress={() => setFlow('manual')} />
 
-      <View style={{ flexDirection: 'row', gap: 10, marginTop: 10, opacity: 0.4 }}>
-        <SoonBtn icon="camera" label={t('expenses.sheet.photoReceipt')} />
-        <SoonBtn icon="pencil" label={t('expenses.sheet.write')} />
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+        <MethodBtn icon="camera" label={t('expenses.sheet.photoReceipt')} soon />
+        <MethodBtn
+          icon="pencil"
+          label={t('expenses.sheet.write')}
+          onPress={() => setFlow('writing')}
+        />
       </View>
     </View>
   );
 }
 
-function SoonBtn({ icon, label }: { icon: IconName; label: string }) {
+function MethodBtn({
+  icon,
+  label,
+  soon = false,
+  onPress,
+}: {
+  icon: IconName;
+  label: string;
+  soon?: boolean;
+  onPress?: () => void;
+}) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: true }}
-      disabled
-      style={{
+      accessibilityState={{ disabled: soon }}
+      disabled={soon}
+      onPress={onPress}
+      style={({ pressed }) => ({
         flex: 1,
         alignItems: 'center',
         gap: 4,
@@ -74,15 +128,18 @@ function SoonBtn({ icon, label }: { icon: IconName; label: string }) {
         borderColor: theme.colors.borderDefault,
         borderWidth: 1,
         borderRadius: 14,
-      }}
+        opacity: soon ? 0.4 : pressed ? 0.8 : 1,
+      })}
     >
       <Icon name={icon} size={17} color={theme.colors.textSecondary} />
       <Text variant="label" muted style={{ fontSize: 12 }}>
         {label}
       </Text>
-      <Text variant="micro" muted style={{ fontSize: 9.5 }}>
-        {t('common.soon')}
-      </Text>
+      {soon ? (
+        <Text variant="micro" muted style={{ fontSize: 9.5 }}>
+          {t('common.soon')}
+        </Text>
+      ) : null}
     </Pressable>
   );
 }

@@ -8,8 +8,13 @@ import { UpdateAccountUseCase } from '@/modules/accounts/application/use-cases/U
 import { UpdateCreditCardUseCase } from '@/modules/accounts/application/use-cases/UpdateCreditCardUseCase';
 import { HttpAccountsRepository } from '@/modules/accounts/infrastructure';
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
-import { GetAssistantUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUseCase';
-import { InMemoryAssistantRepository } from '@/modules/assistant/infrastructure/repositories/InMemoryAssistantRepository';
+import { ConfirmDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDraftUseCase';
+import { DiscardDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDraftUseCase';
+import { GetAssistantUsageUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUsageUseCase';
+import { ParseCaptureUseCase } from '@/modules/assistant/application/use-cases/ParseCaptureUseCase';
+import { GetChatHistoryUseCase } from '@/modules/assistant/application/use-cases/GetChatHistoryUseCase';
+import { SendChatMessageUseCase } from '@/modules/assistant/application/use-cases/SendChatMessageUseCase';
+import { HttpAssistantRepository } from '@/modules/assistant/infrastructure/repositories/HttpAssistantRepository';
 import type { CategoriesRepository } from '@/modules/categories/application/ports/CategoriesRepository';
 import { CreateCategoryUseCase } from '@/modules/categories/application/use-cases/CreateCategoryUseCase';
 import { DeleteCategoryUseCase } from '@/modules/categories/application/use-cases/DeleteCategoryUseCase';
@@ -36,9 +41,25 @@ import {
   UpdateBudgetUseCase,
 } from '@/modules/budgets/application';
 import { HttpBudgetsRepository } from '@/modules/budgets/infrastructure/repositories/HttpBudgetsRepository';
-import type { DeudasRepository } from '@/modules/deudas/application/ports/DeudasRepository';
-import { GetDeudasUseCase } from '@/modules/deudas/application/use-cases/GetDeudasUseCase';
-import { InMemoryDeudasRepository } from '@/modules/deudas/infrastructure/repositories/InMemoryDeudasRepository';
+import type { DeudasRepository } from '@/modules/deudas/application';
+import type { GoalsRepository } from '@/modules/goals/application';
+import {
+  CreateGoalUseCase,
+  DeleteGoalUseCase,
+  GetGoalsUseCase,
+  MoveGoalFundsUseCase,
+  UpdateGoalUseCase,
+} from '@/modules/goals/application';
+import { HttpGoalsRepository } from '@/modules/goals/infrastructure/repositories/HttpGoalsRepository';
+import {
+  AddPaymentUseCase,
+  CreateDebtUseCase,
+  CreateSharedEventUseCase,
+  DeleteDebtUseCase,
+  GetDeudasUseCase,
+  RemovePaymentUseCase,
+} from '@/modules/deudas/application';
+import { HttpDeudasRepository } from '@/modules/deudas/infrastructure/repositories/HttpDeudasRepository';
 import type { HomeRepository } from '@/modules/home/application/ports/HomeRepository';
 import { GetHomeOverviewUseCase } from '@/modules/home/application/use-cases/GetHomeOverviewUseCase';
 import { HttpHomeRepository } from '@/modules/home/infrastructure';
@@ -72,8 +93,9 @@ const authRepository: AuthRepository = new HttpAuthRepository(httpClient);
 const homeRepository: HomeRepository = new HttpHomeRepository(httpClient);
 const movementsRepository: MovementsRepository = new HttpMovementsRepository(httpClient);
 const budgetsRepository: BudgetsRepository = new HttpBudgetsRepository(httpClient);
-const deudasRepository: DeudasRepository = new InMemoryDeudasRepository();
-const assistantRepository: AssistantRepository = new InMemoryAssistantRepository();
+const deudasRepository: DeudasRepository = new HttpDeudasRepository(httpClient);
+const goalsRepository: GoalsRepository = new HttpGoalsRepository(httpClient);
+const assistantRepository: AssistantRepository = new HttpAssistantRepository(httpClient);
 const accountsRepository: AccountsRepository = new HttpAccountsRepository(httpClient);
 const subscriptionsRepository: SubscriptionsRepository = new HttpSubscriptionsRepository(
   httpClient,
@@ -104,7 +126,22 @@ export const createBudgetUseCase = new CreateBudgetUseCase(budgetsRepository);
 export const updateBudgetUseCase = new UpdateBudgetUseCase(budgetsRepository);
 export const deleteBudgetUseCase = new DeleteBudgetUseCase(budgetsRepository);
 export const getDeudasUseCase = new GetDeudasUseCase(deudasRepository);
-export const getAssistantUseCase = new GetAssistantUseCase(assistantRepository);
+export const createDebtUseCase = new CreateDebtUseCase(deudasRepository);
+export const createSharedEventUseCase = new CreateSharedEventUseCase(deudasRepository);
+export const deleteDebtUseCase = new DeleteDebtUseCase(deudasRepository);
+export const addDebtPaymentUseCase = new AddPaymentUseCase(deudasRepository);
+export const removeDebtPaymentUseCase = new RemovePaymentUseCase(deudasRepository);
+export const getGoalsUseCase = new GetGoalsUseCase(goalsRepository);
+export const createGoalUseCase = new CreateGoalUseCase(goalsRepository);
+export const updateGoalUseCase = new UpdateGoalUseCase(goalsRepository);
+export const deleteGoalUseCase = new DeleteGoalUseCase(goalsRepository);
+export const moveGoalFundsUseCase = new MoveGoalFundsUseCase(goalsRepository);
+export const sendChatMessageUseCase = new SendChatMessageUseCase(assistantRepository);
+export const getChatHistoryUseCase = new GetChatHistoryUseCase(assistantRepository);
+export const getAssistantUsageUseCase = new GetAssistantUsageUseCase(assistantRepository);
+export const confirmDraftUseCase = new ConfirmDraftUseCase(assistantRepository);
+export const parseCaptureUseCase = new ParseCaptureUseCase(assistantRepository);
+export const discardDraftUseCase = new DiscardDraftUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
 );
@@ -167,7 +204,22 @@ export const container = {
   updateBudgetUseCase,
   deleteBudgetUseCase,
   getDeudasUseCase,
-  getAssistantUseCase,
+  createDebtUseCase,
+  createSharedEventUseCase,
+  deleteDebtUseCase,
+  addDebtPaymentUseCase,
+  removeDebtPaymentUseCase,
+  getGoalsUseCase,
+  createGoalUseCase,
+  updateGoalUseCase,
+  deleteGoalUseCase,
+  moveGoalFundsUseCase,
+  sendChatMessageUseCase,
+  getChatHistoryUseCase,
+  getAssistantUsageUseCase,
+  confirmDraftUseCase,
+  parseCaptureUseCase,
+  discardDraftUseCase,
   getAccountsOverviewUseCase,
   createAccountUseCase,
   updateAccountUseCase,
