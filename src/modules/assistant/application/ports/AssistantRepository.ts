@@ -1,4 +1,4 @@
-import type { AgentFeed } from '../../domain/types/AgentFeed';
+import type { AgentFeed, AgentOutput } from '../../domain/types/AgentFeed';
 import type {
   AssistantUsage,
   CaptureSource,
@@ -20,6 +20,15 @@ export interface AssistantRepository {
   getUsage(today: string): Promise<AssistantUsage>;
   getFeed(today: string): Promise<AgentFeed>;
   dismissInsight(key: string): Promise<void>;
+  /** The shelf («Tus Cortes»): newest first, dismissed included — history stays. */
+  listOutputs(
+    kind: 'monthly_summary' | 'weekly_review',
+    limit?: number,
+  ): Promise<AgentOutput[]>;
+  getOutput(outputId: string): Promise<AgentOutput>;
+  /** Idempotent: the server writes `read_at` once and echoes the output. */
+  markOutputRead(outputId: string): Promise<AgentOutput>;
+  dismissOutput(outputId: string): Promise<AgentOutput>;
   confirmDraft(
     draftId: string,
     overrides: DraftOverrides,

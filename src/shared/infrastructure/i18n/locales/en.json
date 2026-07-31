@@ -421,15 +421,41 @@
     "thisWeek": "This week",
     "conversation": "Conversation",
     "inputPlaceholder": "Ask me anything…",
-    "summary": {
-      "pill": "Summary · May",
-      "title": "How May is going",
-      "body": "You've spent $1.919.500, a similar pace to April. Your top category is Groceries, and with this month's salary your savings rate is 54%. Watch Coffee: it's at 96% of its cap.",
-      "spent": "Spent",
-      "savings": "Savings",
-      "projection": "Proj. close",
-      "plusTeaser": "With Plus, your agent reviews your week.",
-      "seePlus": "See Plus"
+    "corte": {
+      "title": "El Corte",
+      "pillNew": "New",
+      "pillSeen": "Seen",
+      "entryTitle": "Your {{month}} in 60 seconds",
+      "entryCta": "See my Corte",
+      "shelfTitle": "Your Cortes",
+      "shelfEmptyTitle": "No Cortes yet",
+      "shelfEmptyBody": "When your first month with movements closes, the agent tells it here.",
+      "flat": {
+        "spent": "You spent",
+        "movements_one": "{{count}} movement",
+        "movements_other": "{{count}} movements",
+        "topCategories": "Where it went",
+        "heaviestDay": "The day that stole the show",
+        "pulse": "Against last month",
+        "spentLess": "{{pct}}% less",
+        "spentMore": "{{pct}}% more",
+        "previousMonth": "last month",
+        "goal": "Your goal",
+        "neededPerMonth": "~{{amount}} a month to land on the date",
+        "firstMonth": "Your first month",
+        "play": "The month's play"
+      },
+      "play": {
+        "pill": "Play",
+        "applied": "Applied",
+        "failed": "Failed",
+        "setCap": "Cap for {{name}}: {{amount}}",
+        "raiseCap": "Raise {{name}}'s cap: {{from}} → {{to}}",
+        "monthCap": "Month ceiling: {{amount}}",
+        "contribute": "Contribution to {{name}}: {{amount}}",
+        "treat": "Treat yourself up to {{amount}}"
+      },
+      "loadFailed": "We could not load your Corte"
     },
     "usage": {
       "registrations": "AI entries",

@@ -1,6 +1,12 @@
 import { AxiosInstance } from 'axios';
 
-import type { AgentFeed, FeedInsight } from '../../domain/types/AgentFeed';
+import type {
+  AgentFeed,
+  AgentOutput,
+  AgentPlay,
+  FeedInsight,
+  Slide,
+} from '../../domain/types/AgentFeed';
 import type { AssistantRepository } from '../../application/ports/AssistantRepository';
 import type {
   AssistantBlock,
@@ -103,8 +109,90 @@ type InsightResponse =
     }
   | { kind: 'uncategorized'; key: string; count: number; spent: number };
 
+type SlideResponse =
+  | { type: 'cover'; id: string; text: string }
+  | { type: 'big_number'; id: string; amount: number; count: number; text: string }
+  | {
+      type: 'category_bars';
+      id: string;
+      bars: { category_id: string; name: string; amount: number; pct: number }[];
+      text: string;
+    }
+  | {
+      type: 'fun_fact';
+      id: string;
+      day: string;
+      amount: number;
+      count: number;
+      text: string;
+    }
+  | {
+      type: 'pulse';
+      id: string;
+      current: number;
+      previous: number;
+      delta_pct: number;
+      text: string;
+    }
+  | {
+      type: 'goal';
+      id: string;
+      goal_id: string;
+      name: string;
+      saved: number;
+      target: number;
+      pct: number;
+      needed_per_month: number | null;
+      text: string;
+    }
+  | { type: 'first_month'; id: string; text: string }
+  | { type: 'play'; id: string; play_id: string; text: string };
+
+type PlayLifecycleResponse = {
+  id: string;
+  text: string;
+  status: 'proposed' | 'applying' | 'applied' | 'failed';
+  result_id: string | null;
+  failure_code: string | null;
+};
+
+type PlayResponse = PlayLifecycleResponse &
+  (
+    | {
+        action: 'set_category_cap';
+        category_id: string;
+        category_name: string;
+        target: number;
+        linked_goal_id: string | null;
+      }
+    | {
+        action: 'raise_category_cap';
+        budget_id: string;
+        category_id: string;
+        category_name: string;
+        current_target: number;
+        target: number;
+      }
+    | { action: 'set_month_cap'; target: number }
+    | { action: 'contribute_goal'; goal_id: string; goal_name: string; amount: number }
+    | { action: 'treat'; amount: number }
+  );
+
+type AgentOutputResponse = {
+  id: string;
+  kind: 'monthly_summary' | 'weekly_review';
+  period: string;
+  payload: { slides?: SlideResponse[] };
+  plays: PlayResponse[];
+  created_at: string;
+  read_at: string | null;
+  dismissed_at: string | null;
+};
+
 type FeedResponse = {
   insights: InsightResponse[];
+  outputs: AgentOutputResponse[];
+  unseen_count: number;
 };
 
 type ParseResponse = {
@@ -173,7 +261,11 @@ export class HttpAssistantRepository implements AssistantRepository {
       const { data } = await this.http.get<FeedResponse>('/assistant/feed', {
         params: { today },
       });
-      return { insights: data.insights.map(toInsight) };
+      return {
+        insights: data.insights.map(toInsight),
+        outputs: data.outputs.map(toOutput),
+        unseenCount: data.unseen_count,
+      };
     } catch (error) {
       throw mapApiError(error);
     }
@@ -182,6 +274,56 @@ export class HttpAssistantRepository implements AssistantRepository {
   async dismissInsight(key: string): Promise<void> {
     try {
       await this.http.post('/assistant/insights/dismiss', { key });
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async listOutputs(
+    kind: 'monthly_summary' | 'weekly_review',
+    limit?: number,
+  ): Promise<AgentOutput[]> {
+    try {
+      const { data } = await this.http.get<{ outputs: AgentOutputResponse[] }>(
+        '/assistant/outputs',
+        { params: { kind, limit } },
+      );
+      return data.outputs.map(toOutput);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async getOutput(outputId: string): Promise<AgentOutput> {
+    try {
+      const { data } = await this.http.get<AgentOutputResponse>(
+        `/assistant/outputs/${outputId}`,
+      );
+      return toOutput(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async markOutputRead(outputId: string): Promise<AgentOutput> {
+    try {
+      const { data } = await this.http.post<AgentOutputResponse>(
+        `/assistant/outputs/${outputId}/read`,
+        {},
+      );
+      return toOutput(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async dismissOutput(outputId: string): Promise<AgentOutput> {
+    try {
+      const { data } = await this.http.post<AgentOutputResponse>(
+        `/assistant/outputs/${outputId}/dismiss`,
+        {},
+      );
+      return toOutput(data);
     } catch (error) {
       throw mapApiError(error);
     }
@@ -316,6 +458,104 @@ function toInsight(insight: InsightResponse): FeedInsight {
         spent: insight.spent,
       };
   }
+}
+
+function toSlide(slide: SlideResponse): Slide {
+  switch (slide.type) {
+    case 'category_bars':
+      return {
+        type: 'category_bars',
+        id: slide.id,
+        bars: slide.bars.map((b) => ({
+          categoryId: b.category_id,
+          name: b.name,
+          amount: b.amount,
+          pct: b.pct,
+        })),
+        text: slide.text,
+      };
+    case 'pulse':
+      return {
+        type: 'pulse',
+        id: slide.id,
+        current: slide.current,
+        previous: slide.previous,
+        deltaPct: slide.delta_pct,
+        text: slide.text,
+      };
+    case 'goal':
+      return {
+        type: 'goal',
+        id: slide.id,
+        goalId: slide.goal_id,
+        name: slide.name,
+        saved: slide.saved,
+        target: slide.target,
+        pct: slide.pct,
+        neededPerMonth: slide.needed_per_month,
+        text: slide.text,
+      };
+    case 'play':
+      return { type: 'play', id: slide.id, playId: slide.play_id, text: slide.text };
+    default:
+      return slide;
+  }
+}
+
+function toPlay(play: PlayResponse): AgentPlay {
+  const base = {
+    id: play.id,
+    text: play.text,
+    status: play.status,
+    resultId: play.result_id,
+    failureCode: play.failure_code,
+  };
+  switch (play.action) {
+    case 'set_category_cap':
+      return {
+        ...base,
+        action: 'set_category_cap',
+        categoryId: play.category_id,
+        categoryName: play.category_name,
+        target: play.target,
+        linkedGoalId: play.linked_goal_id,
+      };
+    case 'raise_category_cap':
+      return {
+        ...base,
+        action: 'raise_category_cap',
+        budgetId: play.budget_id,
+        categoryId: play.category_id,
+        categoryName: play.category_name,
+        currentTarget: play.current_target,
+        target: play.target,
+      };
+    case 'set_month_cap':
+      return { ...base, action: 'set_month_cap', target: play.target };
+    case 'contribute_goal':
+      return {
+        ...base,
+        action: 'contribute_goal',
+        goalId: play.goal_id,
+        goalName: play.goal_name,
+        amount: play.amount,
+      };
+    case 'treat':
+      return { ...base, action: 'treat', amount: play.amount };
+  }
+}
+
+function toOutput(output: AgentOutputResponse): AgentOutput {
+  return {
+    id: output.id,
+    kind: output.kind,
+    period: output.period,
+    slides: (output.payload.slides ?? []).map(toSlide),
+    plays: output.plays.map(toPlay),
+    createdAt: output.created_at,
+    readAt: output.read_at,
+    dismissedAt: output.dismissed_at,
+  };
 }
 
 function toUsage(usage: UsageResponse): AssistantUsage {

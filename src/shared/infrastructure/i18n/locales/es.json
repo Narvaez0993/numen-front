@@ -421,15 +421,41 @@
     "thisWeek": "Esta semana",
     "conversation": "Conversación",
     "inputPlaceholder": "Pregúntame lo que sea…",
-    "summary": {
-      "pill": "Resumen · Mayo",
-      "title": "Así vas en mayo",
-      "body": "Llevas $1.919.500 gastados, un ritmo parecido al de abril. Tu mayor categoría es Mercado, y con el sueldo de este mes tu ahorro va en 54%. Ojo con Café: está al 96% de su tope.",
-      "spent": "Gastado",
-      "savings": "Ahorro",
-      "projection": "Cierre proy.",
-      "plusTeaser": "Con Plus, tu agente te revisa cada semana.",
-      "seePlus": "Ver Plus"
+    "corte": {
+      "title": "El Corte",
+      "pillNew": "Nuevo",
+      "pillSeen": "Visto",
+      "entryTitle": "Tu {{month}} en 60 segundos",
+      "entryCta": "Ver mi Corte",
+      "shelfTitle": "Tus Cortes",
+      "shelfEmptyTitle": "Aún no hay Cortes",
+      "shelfEmptyBody": "Cuando cierre tu primer mes con movimientos, el agente te lo cuenta aquí.",
+      "flat": {
+        "spent": "Gastaste",
+        "movements_one": "{{count}} movimiento",
+        "movements_other": "{{count}} movimientos",
+        "topCategories": "Dónde se fue",
+        "heaviestDay": "El día que se llevó el show",
+        "pulse": "Contra el mes anterior",
+        "spentLess": "{{pct}}% menos",
+        "spentMore": "{{pct}}% más",
+        "previousMonth": "el mes pasado",
+        "goal": "Tu meta",
+        "neededPerMonth": "~{{amount}} al mes para llegar en la fecha",
+        "firstMonth": "Tu primer mes",
+        "play": "La jugada del mes"
+      },
+      "play": {
+        "pill": "Jugada",
+        "applied": "Aplicada",
+        "failed": "No se pudo",
+        "setCap": "Techo para {{name}}: {{amount}}",
+        "raiseCap": "Subir el tope de {{name}}: {{from}} → {{to}}",
+        "monthCap": "Techo del mes: {{amount}}",
+        "contribute": "Aporte a {{name}}: {{amount}}",
+        "treat": "Date un gusto de hasta {{amount}}"
+      },
+      "loadFailed": "No pudimos cargar tu Corte"
     },
     "usage": {
       "registrations": "Registros IA",
