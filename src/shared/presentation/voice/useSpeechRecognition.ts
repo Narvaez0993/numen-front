@@ -29,8 +29,9 @@ export type SpeechStatus = 'idle' | 'listening' | 'stopping';
 export type SpeechPermission = 'unknown' | 'granted' | 'denied';
 
 type Options = {
-  /** Fired on the `end` event with the final transcript ('' when nothing was heard). */
-  onFinal: (transcript: string) => void;
+  /** Fired on the `end` event with the final transcript ('' when nothing was
+   * heard) and the error that ended the session, if any. */
+  onFinal: (transcript: string, errorCode: string | null) => void;
   /** Vocabulary to bias toward — account and category names hear better. */
   contextualStrings?: string[];
 };
@@ -43,6 +44,7 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const transcriptRef = useRef('');
+  const errorRef = useRef<string | null>(null);
   const retriedLocaleRef = useRef(false);
   const restartingRef = useRef(false);
   const onFinalRef = useRef(onFinal);
@@ -51,6 +53,7 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
   const beginSession = useCallback(
     (lang: string) => {
       setErrorCode(null);
+      errorRef.current = null;
       setTranscript('');
       transcriptRef.current = '';
       setStatus('listening');
@@ -74,6 +77,9 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
   });
 
   useSpeechRecognitionEvent('error', (event) => {
+    // Surfacing beats guessing: simulators and odd devices fail in ways only
+    // the code tells apart (docs/09: iOS simulator STT is known-broken).
+    console.warn(`[voice] recognition error: ${event.error} — ${event.message}`);
     // One silent second chance when the first tag is rejected; every other
     // error surfaces and lets the caller offer typing instead.
     if (event.error === 'language-not-supported' && !retriedLocaleRef.current) {
@@ -81,6 +87,7 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
       restartingRef.current = true;
       return;
     }
+    errorRef.current = event.error;
     setErrorCode(event.error);
   });
 
@@ -91,10 +98,17 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
       return;
     }
     setStatus('idle');
-    onFinalRef.current(transcriptRef.current.trim());
+    onFinalRef.current(transcriptRef.current.trim(), errorRef.current);
   });
 
   const start = useCallback(async (): Promise<boolean> => {
+    // Simulators (and rare devices) have no recognizer at all — say so instead
+    // of starting a session that dies instantly and reads as a silent reset.
+    if (!ExpoSpeechRecognitionModule.isRecognitionAvailable()) {
+      console.warn('[voice] speech recognition unavailable on this device/simulator');
+      setErrorCode('recognizer-unavailable');
+      return false;
+    }
     const granted = await ensurePermission(setPermission);
     if (!granted) {
       return false;

@@ -1075,7 +1075,8 @@
         "cta": "Open Settings"
       },
       "quotaExhausted": "Your monthly AI captures ran out — here's the usual form",
-      "parseFailed": "I couldn't understand that, try again"
+      "parseFailed": "I couldn't understand that, try again",
+      "voiceUnavailable": "Dictation isn't available here (simulators don't ship it) — try your iPhone or type it"
     },
     "toast": {
       "saved": {

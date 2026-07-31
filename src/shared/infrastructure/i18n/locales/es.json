@@ -1075,7 +1075,8 @@
         "cta": "Abrir Ajustes"
       },
       "quotaExhausted": "Se acabaron tus registros con IA del mes — te dejo el formulario de siempre",
-      "parseFailed": "No pude entenderlo, intenta de nuevo"
+      "parseFailed": "No pude entenderlo, intenta de nuevo",
+      "voiceUnavailable": "El dictado no está disponible aquí (los simuladores no lo traen) — pruébalo en tu iPhone o escríbelo"
     },
     "toast": {
       "saved": {
