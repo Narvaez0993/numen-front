@@ -24,9 +24,11 @@ export type Insight = {
 type Props = {
   insight: Insight;
   onCtaPress: (insight: Insight) => void;
+  /** "Stop showing me this one" — optimistic, cheap to lose (it resurfaces). */
+  onDismiss?: () => void;
 };
 
-export function InsightCard({ insight, onCtaPress }: Props) {
+export function InsightCard({ insight, onCtaPress, onDismiss }: Props) {
   const { theme } = useTheme();
   const fg = theme.colors[accentColorKey(insight.color, 'fg')];
   const bg = theme.colors[accentColorKey(insight.color, 'bg')];
@@ -42,9 +44,27 @@ export function InsightCard({ insight, onCtaPress }: Props) {
         gap: 10,
       }}
     >
-      <Pill variant={insight.color} uppercase>
-        {insight.type}
-      </Pill>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Pill variant={insight.color} uppercase>
+          {insight.type}
+        </Pill>
+        {onDismiss ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={onDismiss}
+            hitSlop={10}
+            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          >
+            <Icon name="x" size={14} color={theme.colors.textTertiary} />
+          </Pressable>
+        ) : null}
+      </View>
 
       <View>
         <Text

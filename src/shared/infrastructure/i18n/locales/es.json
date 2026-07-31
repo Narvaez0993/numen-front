@@ -474,7 +474,35 @@
       "topSpend": "¿En qué se me está yendo la plata?",
       "upcoming": "¿Qué cobros me vienen?"
     },
-    "nudge": "Te quedan {{left}} mensajes de cortesía este mes"
+    "nudge": "Te quedan {{left}} mensajes de cortesía este mes",
+    "insights": {
+      "pill": {
+        "alert": "Alerta",
+        "subscription": "Suscripción",
+        "action": "Acción"
+      },
+      "cap": {
+        "global": "tu techo del mes",
+        "nearTitle": "{{name}} va al {{pct}}% de su tope",
+        "brokenTitle": "{{name}} ya rompió su tope",
+        "body": "Llevas {{spent}} de {{target}}.",
+        "cta": "Ver presupuestos"
+      },
+      "charge": {
+        "today": "hoy",
+        "tomorrow": "mañana",
+        "inDays": "en {{days}} días",
+        "title": "{{name}} te cobra {{when}}",
+        "body": "Serán {{amount}}. Si ya no la usas, este es el momento.",
+        "cta": "Ver suscripciones"
+      },
+      "uncategorized": {
+        "title_one": "{{count}} gasto sin categoría",
+        "title_other": "{{count}} gastos sin categoría",
+        "body": "{{amount}} que aún no cuentan bien la historia del mes.",
+        "cta": "Clasificarlos"
+      }
+    }
   },
   "onboarding": {
     "skip": "Saltar",

@@ -10,6 +10,8 @@ import { HttpAccountsRepository } from '@/modules/accounts/infrastructure';
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
 import { ConfirmDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDraftUseCase';
 import { DiscardDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDraftUseCase';
+import { DismissInsightUseCase } from '@/modules/assistant/application/use-cases/DismissInsightUseCase';
+import { GetAssistantFeedUseCase } from '@/modules/assistant/application/use-cases/GetAssistantFeedUseCase';
 import { GetAssistantUsageUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUsageUseCase';
 import { ParseCaptureUseCase } from '@/modules/assistant/application/use-cases/ParseCaptureUseCase';
 import { GetChatHistoryUseCase } from '@/modules/assistant/application/use-cases/GetChatHistoryUseCase';
@@ -141,6 +143,8 @@ export const getChatHistoryUseCase = new GetChatHistoryUseCase(assistantReposito
 export const getAssistantUsageUseCase = new GetAssistantUsageUseCase(assistantRepository);
 export const confirmDraftUseCase = new ConfirmDraftUseCase(assistantRepository);
 export const parseCaptureUseCase = new ParseCaptureUseCase(assistantRepository);
+export const getAssistantFeedUseCase = new GetAssistantFeedUseCase(assistantRepository);
+export const dismissInsightUseCase = new DismissInsightUseCase(assistantRepository);
 export const discardDraftUseCase = new DiscardDraftUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
@@ -219,6 +223,8 @@ export const container = {
   getAssistantUsageUseCase,
   confirmDraftUseCase,
   parseCaptureUseCase,
+  getAssistantFeedUseCase,
+  dismissInsightUseCase,
   discardDraftUseCase,
   getAccountsOverviewUseCase,
   createAccountUseCase,

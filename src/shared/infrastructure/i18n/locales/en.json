@@ -474,7 +474,35 @@
       "topSpend": "Where is my money going?",
       "upcoming": "What charges are coming?"
     },
-    "nudge": "You have {{left}} courtesy messages left this month"
+    "nudge": "You have {{left}} courtesy messages left this month",
+    "insights": {
+      "pill": {
+        "alert": "Alert",
+        "subscription": "Subscription",
+        "action": "Action"
+      },
+      "cap": {
+        "global": "your monthly ceiling",
+        "nearTitle": "{{name}} is at {{pct}}% of its cap",
+        "brokenTitle": "{{name}} already broke its cap",
+        "body": "You've spent {{spent}} of {{target}}.",
+        "cta": "See budgets"
+      },
+      "charge": {
+        "today": "today",
+        "tomorrow": "tomorrow",
+        "inDays": "in {{days}} days",
+        "title": "{{name}} charges you {{when}}",
+        "body": "It will be {{amount}}. If you no longer use it, now is the moment.",
+        "cta": "See subscriptions"
+      },
+      "uncategorized": {
+        "title_one": "{{count}} uncategorized expense",
+        "title_other": "{{count}} uncategorized expenses",
+        "body": "{{amount}} not yet telling the month's story properly.",
+        "cta": "Sort them"
+      }
+    }
   },
   "onboarding": {
     "skip": "Skip",

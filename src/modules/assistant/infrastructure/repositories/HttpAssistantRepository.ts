@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios';
 
+import type { AgentFeed, FeedInsight } from '../../domain/types/AgentFeed';
 import type { AssistantRepository } from '../../application/ports/AssistantRepository';
 import type {
   AssistantBlock,
@@ -79,6 +80,33 @@ type ConfirmResponse = {
   movement_id: string;
 };
 
+type InsightResponse =
+  | {
+      kind: 'cap_alert';
+      key: string;
+      scope: 'global' | 'category';
+      category_id: string | null;
+      category_name: string | null;
+      used: number;
+      target: number;
+      spent: number;
+      over: number | null;
+    }
+  | {
+      kind: 'upcoming_charge';
+      key: string;
+      subscription_id: string;
+      name: string;
+      amount: number;
+      due_on: string;
+      charge_id: string | null;
+    }
+  | { kind: 'uncategorized'; key: string; count: number; spent: number };
+
+type FeedResponse = {
+  insights: InsightResponse[];
+};
+
 type ParseResponse = {
   draft: DraftResponse | null;
   clarification: string | null;
@@ -135,6 +163,25 @@ export class HttpAssistantRepository implements AssistantRepository {
         clarification: data.clarification,
         usage: toUsage(data.usage),
       };
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async getFeed(today: string): Promise<AgentFeed> {
+    try {
+      const { data } = await this.http.get<FeedResponse>('/assistant/feed', {
+        params: { today },
+      });
+      return { insights: data.insights.map(toInsight) };
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async dismissInsight(key: string): Promise<void> {
+    try {
+      await this.http.post('/assistant/insights/dismiss', { key });
     } catch (error) {
       throw mapApiError(error);
     }
@@ -235,6 +282,40 @@ function toDraft(draft: DraftResponse): MovementDraft {
     status: draft.status,
     movementId: draft.movement_id,
   };
+}
+
+function toInsight(insight: InsightResponse): FeedInsight {
+  switch (insight.kind) {
+    case 'cap_alert':
+      return {
+        kind: 'cap_alert',
+        key: insight.key,
+        scope: insight.scope,
+        categoryId: insight.category_id,
+        categoryName: insight.category_name,
+        used: insight.used,
+        target: insight.target,
+        spent: insight.spent,
+        over: insight.over,
+      };
+    case 'upcoming_charge':
+      return {
+        kind: 'upcoming_charge',
+        key: insight.key,
+        subscriptionId: insight.subscription_id,
+        name: insight.name,
+        amount: insight.amount,
+        dueOn: insight.due_on,
+        chargeId: insight.charge_id,
+      };
+    case 'uncategorized':
+      return {
+        kind: 'uncategorized',
+        key: insight.key,
+        count: insight.count,
+        spent: insight.spent,
+      };
+  }
 }
 
 function toUsage(usage: UsageResponse): AssistantUsage {

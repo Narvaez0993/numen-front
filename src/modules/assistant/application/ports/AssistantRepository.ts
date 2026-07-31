@@ -1,3 +1,4 @@
+import type { AgentFeed } from '../../domain/types/AgentFeed';
 import type {
   AssistantUsage,
   CaptureSource,
@@ -17,6 +18,8 @@ export interface AssistantRepository {
   /** One capture: text in → a staged draft out, or one short question. */
   parseCapture(text: string, source: CaptureSource, today: string): Promise<ParseOutcome>;
   getUsage(today: string): Promise<AssistantUsage>;
+  getFeed(today: string): Promise<AgentFeed>;
+  dismissInsight(key: string): Promise<void>;
   confirmDraft(
     draftId: string,
     overrides: DraftOverrides,
