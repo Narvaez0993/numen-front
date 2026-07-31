@@ -455,7 +455,8 @@
         "contribute": "Aporte a {{name}}: {{amount}}",
         "treat": "Date un gusto de hasta {{amount}}"
       },
-      "loadFailed": "No pudimos cargar tu Corte"
+      "loadFailed": "No pudimos cargar tu Corte",
+      "playerHint": "Toca para avanzar · mantén para pausar"
     },
     "usage": {
       "registrations": "Registros IA",

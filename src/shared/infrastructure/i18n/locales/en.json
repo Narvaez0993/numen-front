@@ -455,7 +455,8 @@
         "contribute": "Contribution to {{name}}: {{amount}}",
         "treat": "Treat yourself up to {{amount}}"
       },
-      "loadFailed": "We could not load your Corte"
+      "loadFailed": "We could not load your Corte",
+      "playerHint": "Tap to advance · hold to pause"
     },
     "usage": {
       "registrations": "AI entries",
