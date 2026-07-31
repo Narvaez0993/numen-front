@@ -29,6 +29,14 @@ export interface AssistantRepository {
   /** Idempotent: the server writes `read_at` once and echoes the output. */
   markOutputRead(outputId: string): Promise<AgentOutput>;
   dismissOutput(outputId: string): Promise<AgentOutput>;
+  /** Always resolves with the output — a failed play is STATE (`failed` +
+   * code), not an HTTP error. Rejections mean 404/409/422. */
+  applyPlay(
+    outputId: string,
+    playId: string,
+    accountId: string | null,
+    today: string,
+  ): Promise<AgentOutput>;
   confirmDraft(
     draftId: string,
     overrides: DraftOverrides,

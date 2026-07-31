@@ -11,6 +11,7 @@ import type { AssistantRepository } from '@/modules/assistant/application/ports/
 import { ConfirmDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDraftUseCase';
 import { DiscardDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDraftUseCase';
 import { DismissInsightUseCase } from '@/modules/assistant/application/use-cases/DismissInsightUseCase';
+import { ApplyPlayUseCase } from '@/modules/assistant/application/use-cases/ApplyPlayUseCase';
 import { DismissCorteUseCase } from '@/modules/assistant/application/use-cases/DismissCorteUseCase';
 import { GetCorteUseCase } from '@/modules/assistant/application/use-cases/GetCorteUseCase';
 import { ListCortesUseCase } from '@/modules/assistant/application/use-cases/ListCortesUseCase';
@@ -154,6 +155,7 @@ export const listCortesUseCase = new ListCortesUseCase(assistantRepository);
 export const getCorteUseCase = new GetCorteUseCase(assistantRepository);
 export const markCorteReadUseCase = new MarkCorteReadUseCase(assistantRepository);
 export const dismissCorteUseCase = new DismissCorteUseCase(assistantRepository);
+export const applyPlayUseCase = new ApplyPlayUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
 );
@@ -238,6 +240,7 @@ export const container = {
   getCorteUseCase,
   markCorteReadUseCase,
   dismissCorteUseCase,
+  applyPlayUseCase,
   getAccountsOverviewUseCase,
   createAccountUseCase,
   updateAccountUseCase,

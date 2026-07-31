@@ -453,7 +453,15 @@
         "raiseCap": "Raise {{name}}'s cap: {{from}} → {{to}}",
         "monthCap": "Month ceiling: {{amount}}",
         "contribute": "Contribution to {{name}}: {{amount}}",
-        "treat": "Treat yourself up to {{amount}}"
+        "treat": "Treat yourself up to {{amount}}",
+        "apply": "Apply",
+        "confirm": "Confirm contribution",
+        "sheetTitle": "Contribution to {{name}}",
+        "sheetBody": "{{amount}} moves from the account you pick.",
+        "fromAccount": "Which account does it leave from?",
+        "planLimit": "Your Free plan already uses its 2 category caps.",
+        "seePlus": "See Plus",
+        "failedBody": "It could not be applied. The proposal stays here in case the context changes."
       },
       "loadFailed": "We could not load your Corte",
       "playerHint": "Tap to advance · hold to pause"

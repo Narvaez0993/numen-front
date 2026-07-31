@@ -317,6 +317,24 @@ export class HttpAssistantRepository implements AssistantRepository {
     }
   }
 
+  async applyPlay(
+    outputId: string,
+    playId: string,
+    accountId: string | null,
+    today: string,
+  ): Promise<AgentOutput> {
+    try {
+      const { data } = await this.http.post<AgentOutputResponse>(
+        `/assistant/outputs/${outputId}/plays/${playId}/apply`,
+        accountId !== null ? { account_id: accountId } : {},
+        { params: { today } },
+      );
+      return toOutput(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
   async dismissOutput(outputId: string): Promise<AgentOutput> {
     try {
       const { data } = await this.http.post<AgentOutputResponse>(

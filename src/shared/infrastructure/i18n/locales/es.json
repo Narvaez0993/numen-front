@@ -453,7 +453,15 @@
         "raiseCap": "Subir el tope de {{name}}: {{from}} → {{to}}",
         "monthCap": "Techo del mes: {{amount}}",
         "contribute": "Aporte a {{name}}: {{amount}}",
-        "treat": "Date un gusto de hasta {{amount}}"
+        "treat": "Date un gusto de hasta {{amount}}",
+        "apply": "Aplicar",
+        "confirm": "Confirmar aporte",
+        "sheetTitle": "Aporte a {{name}}",
+        "sheetBody": "Se transfieren {{amount}} de la cuenta que elijas.",
+        "fromAccount": "¿De qué cuenta sale?",
+        "planLimit": "Tu plan Free ya usa sus 2 topes por categoría.",
+        "seePlus": "Ver Plus",
+        "failedBody": "No se pudo aplicar. La propuesta sigue aquí por si cambia el contexto."
       },
       "loadFailed": "No pudimos cargar tu Corte",
       "playerHint": "Toca para avanzar · mantén para pausar"

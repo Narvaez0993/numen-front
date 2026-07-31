@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Easing, View } from 'react-native';
@@ -7,19 +8,20 @@ import { useTheme } from '@/shared/presentation/theme';
 import { shortDate, weekdayName } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { AgentOutput, Slide } from '../../../domain/types/AgentFeed';
+import type { AgentOutput, AgentPlay, Slide } from '../../../domain/types/AgentFeed';
 import { PlayRow } from './PlayRow';
 
 type Props = {
   slide: Slide;
   corte: AgentOutput;
+  playAction?: (play: AgentPlay) => ReactNode;
 };
 
 /**
  * One story slide, full screen. Numbers land big (the narration never repeats
  * them); everything enters with the same 320/380 ms ease-out the mock set.
  */
-export function SlideView({ slide, corte }: Props) {
+export function SlideView({ slide, corte, playAction }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const language = i18n.language;
@@ -233,7 +235,7 @@ export function SlideView({ slide, corte }: Props) {
             >
               {slide.text}
             </Text>
-            {play ? <PlayRow play={play} /> : null}
+            {play ? <PlayRow play={play} action={playAction?.(play)} /> : null}
           </View>
         );
       }

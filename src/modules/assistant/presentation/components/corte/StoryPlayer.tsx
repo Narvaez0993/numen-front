@@ -7,7 +7,9 @@ import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { monthName } from '@/shared/presentation/utils/dates';
 
-import type { AgentOutput } from '../../../domain/types/AgentFeed';
+import type { ReactNode } from 'react';
+
+import type { AgentOutput, AgentPlay } from '../../../domain/types/AgentFeed';
 import { createPressController } from '../../utils/pressGesture';
 import { SlideView } from './SlideView';
 import { StoryProgressBar } from './StoryProgressBar';
@@ -18,6 +20,7 @@ type Props = {
   corte: AgentOutput;
   onClose: () => void;
   onOpenFlat: () => void;
+  playAction?: (play: AgentPlay) => ReactNode;
 };
 
 /**
@@ -27,7 +30,7 @@ type Props = {
  * lands is remembered and resolved inside the callback, which is the race the
  * refs below exist for. The last slide fills its bar and waits for the X.
  */
-export function StoryPlayer({ corte, onClose, onOpenFlat }: Props) {
+export function StoryPlayer({ corte, onClose, onOpenFlat, playAction }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const { width } = useWindowDimensions();
@@ -145,7 +148,7 @@ export function StoryPlayer({ corte, onClose, onOpenFlat }: Props) {
           </View>
 
           {slides[index] ? (
-            <SlideView slide={slides[index]} corte={corte} />
+            <SlideView slide={slides[index]} corte={corte} playAction={playAction} />
           ) : (
             <View style={{ flex: 1 }} />
           )}

@@ -1,6 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { dismissCorteUseCase, markCorteReadUseCase } from '@/core/di/container';
+import {
+  applyPlayUseCase,
+  dismissCorteUseCase,
+  markCorteReadUseCase,
+} from '@/core/di/container';
+import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 
 import type { AgentFeed, AgentOutput } from '../../domain/types/AgentFeed';
 import { removeOutput, replaceInList, replaceOutput } from '../utils/feedCache';
@@ -47,6 +52,33 @@ export function useDismissCorte() {
       queryClient.setQueryData<AgentFeed>(AGENT_FEED_KEY, (old) =>
         removeOutput(old, outputId),
       );
+    },
+  });
+}
+
+export type ApplyPlayVariables = {
+  outputId: string;
+  playId: string;
+  accountId: string | null;
+  today: string;
+};
+
+/**
+ * Aplicar una jugada. The 200 may carry an `applied` play or a `failed` one —
+ * both are truth, both land in the caches. Money views refresh either way:
+ * an applied cap or contribution changed screens this module has never met.
+ */
+export function useApplyPlay() {
+  const queryClient = useQueryClient();
+  return useMutation<AgentOutput, Error, ApplyPlayVariables>({
+    mutationFn: async (variables) => {
+      const result = await applyPlayUseCase.execute(variables);
+      if (!result.ok) throw result.error;
+      return result.value;
+    },
+    onSuccess: (output) => {
+      patchEverywhere(queryClient, output);
+      invalidateMoneyViews(queryClient);
     },
   });
 }

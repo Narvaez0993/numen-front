@@ -11,3 +11,4 @@ export * from './use-cases/ListCortesUseCase';
 export * from './use-cases/GetCorteUseCase';
 export * from './use-cases/MarkCorteReadUseCase';
 export * from './use-cases/DismissCorteUseCase';
+export * from './use-cases/ApplyPlayUseCase';

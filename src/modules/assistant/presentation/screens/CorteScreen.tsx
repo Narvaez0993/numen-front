@@ -1,13 +1,15 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RetryState, SubScreenHeader } from '@/shared/presentation/components';
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { corteTitle, CorteFlatView } from '../components/corte/CorteFlatView';
+import { PlayAction } from '../components/corte/PlayAction';
 import { StoryPlayer } from '../components/corte/StoryPlayer';
 import { useCorte } from '../hooks/useCortes';
 import { useMarkCorteRead } from '../hooks/useCorteMutations';
@@ -23,6 +25,8 @@ export function CorteScreen() {
   const corte = useCorte(id);
   const markRead = useMarkCorteRead();
   const [mode, setMode] = useState<'stories' | 'flat'>('stories');
+  // Pinned once per mount: a re-render must not move the day.
+  const today = useMemo(() => toIsoDate(new Date()), []);
 
   const unread = corte.data?.readAt === null;
   useEffect(() => {
@@ -69,6 +73,9 @@ export function CorteScreen() {
           corte={corte.data}
           onClose={() => router.back()}
           onOpenFlat={() => setMode('flat')}
+          playAction={(play) => (
+            <PlayAction corte={corte.data!} play={play} today={today} />
+          )}
         />
       </View>
     );
@@ -85,7 +92,15 @@ export function CorteScreen() {
         onBack={() => setMode('stories')}
       />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
-        <CorteFlatView corte={corte.data} />
+        <CorteFlatView
+          corte={corte.data}
+          playAction={(playId) => {
+            const play = corte.data?.plays.find((p) => p.id === playId);
+            return play ? (
+              <PlayAction corte={corte.data!} play={play} today={today} />
+            ) : null;
+          }}
+        />
       </ScrollView>
     </SafeAreaView>
   );
