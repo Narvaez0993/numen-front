@@ -7,6 +7,7 @@ function corte(overrides: Partial<AgentOutput> = {}): AgentOutput {
     kind: 'monthly_summary',
     period: '2026-06',
     slides: [{ type: 'cover', id: 'cover', text: 'Tu junio.' }],
+    weekly: null,
     plays: [],
     createdAt: '2026-07-01T06:00:00Z',
     readAt: null,

@@ -167,13 +167,38 @@ export type AgentPlay =
 
 export type AgentOutputKind = 'monthly_summary' | 'weekly_review';
 
+/**
+ * What last week's proposals ended up doing. The coach shows this back before
+ * proposing anything new — a plan nobody checks is not a plan.
+ */
+export type PlayFollowUp = {
+  playId: string;
+  action: AgentPlay['action'];
+  text: string;
+  status: PlayStatus;
+};
+
+export type WeeklyReview = {
+  /** The coach's read of the week — narrated, never a number of its own. */
+  diagnosisText: string;
+  weekTotal: number;
+  prevWeekTotal: number | null;
+  /** Signed fraction vs the previous week; null on the first tracked week. */
+  deltaPct: number | null;
+  topCategoryId: string | null;
+  topCategoryName: string | null;
+  accountability: PlayFollowUp[];
+};
+
 export type AgentOutput = {
   id: string;
   kind: AgentOutputKind;
   /** `2026-07` for a Corte, `2026-W31` for a weekly review. */
   period: string;
-  /** Slides for a Corte; the weekly review's payload lands with slice C. */
+  /** Populated for a Corte; empty for a weekly review. */
   slides: Slide[];
+  /** Populated for a weekly review; null for a Corte. */
+  weekly: WeeklyReview | null;
   plays: AgentPlay[];
   createdAt: string;
   readAt: string | null;

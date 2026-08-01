@@ -11,7 +11,8 @@ import { useApplyPlay } from '../../hooks/useCorteMutations';
 import { PlayAccountSheet } from './PlayAccountSheet';
 
 type Props = {
-  corte: AgentOutput;
+  /** The Corte or the weekly review the play belongs to. */
+  output: AgentOutput;
   play: AgentPlay;
   today: string;
 };
@@ -21,7 +22,7 @@ type Props = {
  * a contribution first asks which account the money leaves from. `plan_limit`
  * failures turn into the honest next step: the plan screen.
  */
-export function PlayAction({ corte, play, today }: Props) {
+export function PlayAction({ output, play, today }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const apply = useApplyPlay();
@@ -33,7 +34,7 @@ export function PlayAction({ corte, play, today }: Props) {
 
   const run = (accountId: string | null) => {
     setPickingAccount(false);
-    apply.mutate({ outputId: corte.id, playId: play.id, accountId, today });
+    apply.mutate({ outputId: output.id, playId: play.id, accountId, today });
   };
 
   if (play.status === 'failed') {

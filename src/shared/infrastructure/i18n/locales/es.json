@@ -466,6 +466,17 @@
       "loadFailed": "No pudimos cargar tu Corte",
       "playerHint": "Toca para avanzar · mantén para pausar"
     },
+    "weekly": {
+      "pill": "Revisión semanal",
+      "less": "{{pct}}% menos que la semana pasada",
+      "more": "{{pct}}% más que la semana pasada",
+      "topCategory": "Lo que más pesó: {{name}}",
+      "seePlan": "Ver el plan",
+      "hidePlan": "Ocultar el plan",
+      "lastWeek": "De la semana pasada",
+      "followUpDone": "· la aplicaste",
+      "followUpPending": "· sigue pendiente"
+    },
     "usage": {
       "registrations": "Registros IA",
       "messages": "Mensajes",

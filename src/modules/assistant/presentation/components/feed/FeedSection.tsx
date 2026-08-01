@@ -10,6 +10,7 @@ import { useDismissCorte } from '../../hooks/useCorteMutations';
 import { useDismissInsight } from '../../hooks/useFeedMutations';
 import { presentInsight } from '../../utils/insightPresenter';
 import { CorteEntryCard } from '../corte/CorteEntryCard';
+import { WeeklyReviewCard } from '../corte/WeeklyReviewCard';
 import { InsightCard } from '../InsightCard';
 
 type Props = {
@@ -28,9 +29,11 @@ export function FeedSection({ today }: Props) {
   const dismiss = useDismissInsight();
   const dismissCorte = useDismissCorte();
 
-  const cortes = (feed.data?.outputs ?? []).filter((o) => o.kind === 'monthly_summary');
+  const outputs = feed.data?.outputs ?? [];
+  const cortes = outputs.filter((o) => o.kind === 'monthly_summary');
+  const reviews = outputs.filter((o) => o.kind === 'weekly_review');
   const insights = feed.data?.insights ?? [];
-  if (cortes.length === 0 && insights.length === 0) {
+  if (outputs.length === 0 && insights.length === 0) {
     return null;
   }
 
@@ -66,6 +69,15 @@ export function FeedSection({ today }: Props) {
             <Icon name="chevron-right" size={11} color={theme.colors.textTertiary} />
           </Pressable>
         </View>
+      ))}
+
+      {reviews.map((review) => (
+        <WeeklyReviewCard
+          key={review.id}
+          review={review}
+          today={today}
+          onDismiss={() => dismissCorte.mutate(review.id)}
+        />
       ))}
 
       {insights.map((insight) => {

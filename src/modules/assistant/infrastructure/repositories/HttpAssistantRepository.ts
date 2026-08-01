@@ -6,6 +6,7 @@ import type {
   AgentPlay,
   FeedInsight,
   Slide,
+  WeeklyReview,
 } from '../../domain/types/AgentFeed';
 import type { AssistantRepository } from '../../application/ports/AssistantRepository';
 import type {
@@ -178,11 +179,27 @@ type PlayResponse = PlayLifecycleResponse &
     | { action: 'treat'; amount: number }
   );
 
+type WeeklyPayloadResponse = {
+  diagnosis_text: string;
+  week_total: number;
+  prev_week_total: number | null;
+  delta_pct: number | null;
+  top_category_id: string | null;
+  top_category_name: string | null;
+  accountability: {
+    play_id: string;
+    action: AgentPlay['action'];
+    text: string;
+    status: 'proposed' | 'applying' | 'applied' | 'failed';
+  }[];
+};
+
 type AgentOutputResponse = {
   id: string;
   kind: 'monthly_summary' | 'weekly_review';
   period: string;
-  payload: { slides?: SlideResponse[] };
+  /** One field, two shapes — the kind says which one is filled. */
+  payload: Partial<WeeklyPayloadResponse> & { slides?: SlideResponse[] };
   plays: PlayResponse[];
   created_at: string;
   read_at: string | null;
@@ -563,12 +580,31 @@ function toPlay(play: PlayResponse): AgentPlay {
   }
 }
 
+function toWeekly(payload: AgentOutputResponse['payload']): WeeklyReview | null {
+  if (payload.diagnosis_text === undefined) return null;
+  return {
+    diagnosisText: payload.diagnosis_text,
+    weekTotal: payload.week_total ?? 0,
+    prevWeekTotal: payload.prev_week_total ?? null,
+    deltaPct: payload.delta_pct ?? null,
+    topCategoryId: payload.top_category_id ?? null,
+    topCategoryName: payload.top_category_name ?? null,
+    accountability: (payload.accountability ?? []).map((entry) => ({
+      playId: entry.play_id,
+      action: entry.action,
+      text: entry.text,
+      status: entry.status,
+    })),
+  };
+}
+
 function toOutput(output: AgentOutputResponse): AgentOutput {
   return {
     id: output.id,
     kind: output.kind,
     period: output.period,
     slides: (output.payload.slides ?? []).map(toSlide),
+    weekly: toWeekly(output.payload),
     plays: output.plays.map(toPlay),
     createdAt: output.created_at,
     readAt: output.read_at,

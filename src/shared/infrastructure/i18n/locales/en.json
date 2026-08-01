@@ -466,6 +466,17 @@
       "loadFailed": "We could not load your Corte",
       "playerHint": "Tap to advance · hold to pause"
     },
+    "weekly": {
+      "pill": "Weekly review",
+      "less": "{{pct}}% less than last week",
+      "more": "{{pct}}% more than last week",
+      "topCategory": "Heaviest: {{name}}",
+      "seePlan": "See the plan",
+      "hidePlan": "Hide the plan",
+      "lastWeek": "From last week",
+      "followUpDone": "· you applied it",
+      "followUpPending": "· still pending"
+    },
     "usage": {
       "registrations": "AI entries",
       "messages": "Messages",

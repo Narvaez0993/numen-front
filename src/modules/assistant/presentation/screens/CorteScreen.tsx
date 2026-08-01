@@ -74,7 +74,7 @@ export function CorteScreen() {
           onClose={() => router.back()}
           onOpenFlat={() => setMode('flat')}
           playAction={(play) => (
-            <PlayAction corte={corte.data!} play={play} today={today} />
+            <PlayAction output={corte.data!} play={play} today={today} />
           )}
         />
       </View>
@@ -97,7 +97,7 @@ export function CorteScreen() {
           playAction={(playId) => {
             const play = corte.data?.plays.find((p) => p.id === playId);
             return play ? (
-              <PlayAction corte={corte.data!} play={play} today={today} />
+              <PlayAction output={corte.data!} play={play} today={today} />
             ) : null;
           }}
         />
