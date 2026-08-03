@@ -685,7 +685,8 @@
     "categories": {
       "title": "Your categories",
       "thisMonth": "this month",
-      "unclassified": "Unclassified"
+      "unclassified": "Unclassified",
+      "noCapShare": "no cap · {{pct}}% of spending"
     },
     "recent": {
       "title": "Recent activity",

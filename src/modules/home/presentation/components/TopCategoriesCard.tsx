@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
 import { Card, IconBox, ProgressBar, Text } from '@/shared/presentation/components';
-import { accentColorKey, useTheme } from '@/shared/presentation/theme';
+import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { TopCategory } from '../../domain/types/HomeOverview';
@@ -14,8 +14,17 @@ type Props = { categories: TopCategory[] };
 const FALLBACK_ICON = 'dots';
 
 /**
- * Where the month's money went, by **share of the month's expenses** — a real
- * number, not progress against a budget that does not exist yet.
+ * Where the month's money went — each category against the best yardstick it has.
+ *
+ * A category with a cap gets the same bar the budgets screen draws: `spent / target`
+ * with the warning ramp. One without a cap gets **no bar at all**, only its share of
+ * the month as text.
+ *
+ * That split is the whole point. This card used to draw the share as a bar, and a
+ * category that took every peso of the month therefore showed a *full* bar while its
+ * own cap sat at 40% spent — the same category read as blown here and as fine one
+ * screen over. In this app a filled bar means "you reached a limit you set", and it
+ * cannot mean anything else on any screen.
  *
  * Names and icons come from the catalog the client already caches: the API sends
  * only references, so a rename shows up here without touching the history.
@@ -81,19 +90,30 @@ export function TopCategoriesCard({ categories }: Props) {
                     style={{ fontWeight: '500', fontSize: 12.5 }}
                   >
                     {formatMoney(c.spent)}
-                    <Text variant="caption" muted>
-                      {' '}
-                      · {Math.round(c.share * 100)}%
-                    </Text>
+                    {c.cap ? (
+                      <Text variant="body" muted style={{ fontSize: 12.5 }}>
+                        {' '}
+                        / {formatMoney(c.cap.target)}
+                      </Text>
+                    ) : null}
                   </Text>
                 </View>
-                <ProgressBar
-                  pct={c.share}
-                  height={5}
-                  // Share of the month, not progress against a limit: the bar
-                  // wears the category's own colour instead of a warning ramp.
-                  color={theme.colors[accentColorKey(resolved?.color ?? 'mint', 'fg')]}
-                />
+                {c.cap ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    {/* The default ramp, mint → amber → coral, and the overflow past
+                        the cap: the same bar the budgets screen draws for this cap. */}
+                    <ProgressBar pct={c.cap.used} height={5} style={{ flex: 1 }} />
+                    <Text variant="caption" muted tabular style={{ fontSize: 11 }}>
+                      {Math.round(c.cap.used * 100)}%
+                    </Text>
+                  </View>
+                ) : (
+                  <Text variant="caption" muted tabular style={{ fontSize: 11 }}>
+                    {t('home.categories.noCapShare', {
+                      pct: Math.round(c.share * 100),
+                    })}
+                  </Text>
+                )}
               </View>
             </View>
           );
