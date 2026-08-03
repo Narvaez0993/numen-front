@@ -78,13 +78,18 @@ export function useVoiceCapture() {
   );
 
   const onFinal = useCallback(
-    (transcript: string) => {
+    (transcript: string, errorCode: string | null) => {
       // The sheet may have been closed mid-listen; the store already reset.
       if (!useExpenseSheetStore.getState().open) {
         return;
       }
       if (!transcript) {
-        setInlineError(t('expenses.sheet.nothingHeard'));
+        // A hard recognizer error is not "you were quiet" — say the truth.
+        setInlineError(
+          errorCode !== null && errorCode !== 'no-speech'
+            ? t('expenses.sheet.voiceUnavailable')
+            : t('expenses.sheet.nothingHeard'),
+        );
         setFlow('entry');
         return;
       }
@@ -104,9 +109,15 @@ export function useVoiceCapture() {
     void speech.start().then((started) => {
       if (started) {
         setFlow('recording');
+        return;
+      }
+      // Denied permission renders its own rationale; anything else means the
+      // recognizer itself is missing (simulators, mostly).
+      if (speech.permission !== 'denied') {
+        setInlineError(t('expenses.sheet.voiceUnavailable'));
       }
     });
-  }, [flow, speech, setFlow]);
+  }, [flow, speech, setFlow, t]);
 
   const submitText = useCallback((text: string) => submit(text.trim(), 'text'), [submit]);
 

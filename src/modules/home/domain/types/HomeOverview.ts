@@ -113,13 +113,31 @@ export type UpcomingCharge = {
   chargeId: string | null;
 };
 
-/** A category's weight in the month's expenses. `categoryId: null` = unclassified. */
+/**
+ * The cap on a category, measured by the module that owns it. `used` is `spent / target`
+ * uncapped, so `1.4` is 140% and the bar draws the overflow.
+ */
+export type TopCategoryCap = {
+  target: number;
+  used: number;
+};
+
+/**
+ * A category's weight in the month's expenses. `categoryId: null` = unclassified.
+ *
+ * With a `cap` the row measures against it, exactly as the budgets screen does. Without
+ * one it falls back to `share` — as text, never as a bar: a filled bar in this app means
+ * "you reached a limit you set", and a category that took every peso of the month used to
+ * fill it while its own cap sat at 40% spent.
+ */
 export type TopCategory = {
   categoryId: string | null;
   spent: number;
   count: number;
   /** 0..1 — share of the month's expenses. */
   share: number;
+  /** `null` unless the user put a cap on this category. */
+  cap: TopCategoryCap | null;
 };
 
 /**

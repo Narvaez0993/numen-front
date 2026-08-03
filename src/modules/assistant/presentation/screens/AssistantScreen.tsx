@@ -25,6 +25,7 @@ import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { ChatLimitReachedError } from '../../domain';
 import type { MovementDraft } from '../../domain/types/Assistant';
 import { AssistantBubble } from '../components/AssistantBubble';
+import { FeedSection } from '../components/feed/FeedSection';
 import { AssistantHeader } from '../components/AssistantHeader';
 import { BlockView } from '../components/BlockView';
 import { ChatInput } from '../components/ChatInput';
@@ -119,36 +120,6 @@ export function AssistantScreen() {
     [discard, t],
   );
 
-  if (history.isLoading) {
-    return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: theme.colors.bgBase,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <ActivityIndicator color={theme.colors.accentMint} />
-      </SafeAreaView>
-    );
-  }
-
-  if (history.isError) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-        edges={['top']}
-      >
-        <RetryState
-          titleKey="assistant.errors.title"
-          retryKey="assistant.errors.retry"
-          onRetry={() => void history.refetch()}
-        />
-      </SafeAreaView>
-    );
-  }
-
   const busyDraftId = confirm.isPending
     ? (confirm.variables?.draftId ?? null)
     : discard.isPending
@@ -190,7 +161,19 @@ export function AssistantScreen() {
 
           <UsageMeter usage={usage.data} />
 
-          {messages.length === 0 ? (
+          <FeedSection today={today} />
+
+          {history.isLoading ? (
+            <View style={{ paddingVertical: 28, alignItems: 'center' }}>
+              <ActivityIndicator color={theme.colors.accentMint} />
+            </View>
+          ) : history.isError ? (
+            <RetryState
+              titleKey="assistant.errors.title"
+              retryKey="assistant.errors.retry"
+              onRetry={() => void history.refetch()}
+            />
+          ) : messages.length === 0 ? (
             <Card padding={16}>
               <Text variant="body" style={{ fontWeight: '500', marginBottom: 4 }}>
                 {t('assistant.empty.title')}

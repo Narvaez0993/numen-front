@@ -57,6 +57,7 @@ type HomeOverviewResponse = {
     spent: number;
     count: number;
     share: number;
+    cap: { target: number; used: number } | null;
   }[];
   recent: MovementResponse[];
   upcoming: {
@@ -160,5 +161,6 @@ function toTopCategory(dto: HomeOverviewResponse['top_categories'][number]): Top
     spent: dto.spent,
     count: dto.count,
     share: dto.share,
+    cap: dto.cap === null ? null : { target: dto.cap.target, used: dto.cap.used },
   };
 }
