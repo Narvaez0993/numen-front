@@ -1,3 +1,4 @@
+import type { AgentFeed, AgentOutput } from '../../domain/types/AgentFeed';
 import type {
   AssistantUsage,
   CaptureSource,
@@ -17,6 +18,25 @@ export interface AssistantRepository {
   /** One capture: text in → a staged draft out, or one short question. */
   parseCapture(text: string, source: CaptureSource, today: string): Promise<ParseOutcome>;
   getUsage(today: string): Promise<AssistantUsage>;
+  getFeed(today: string): Promise<AgentFeed>;
+  dismissInsight(key: string): Promise<void>;
+  /** The shelf («Tus Cortes»): newest first, dismissed included — history stays. */
+  listOutputs(
+    kind: 'monthly_summary' | 'weekly_review',
+    limit?: number,
+  ): Promise<AgentOutput[]>;
+  getOutput(outputId: string): Promise<AgentOutput>;
+  /** Idempotent: the server writes `read_at` once and echoes the output. */
+  markOutputRead(outputId: string): Promise<AgentOutput>;
+  dismissOutput(outputId: string): Promise<AgentOutput>;
+  /** Always resolves with the output — a failed play is STATE (`failed` +
+   * code), not an HTTP error. Rejections mean 404/409/422. */
+  applyPlay(
+    outputId: string,
+    playId: string,
+    accountId: string | null,
+    today: string,
+  ): Promise<AgentOutput>;
   confirmDraft(
     draftId: string,
     overrides: DraftOverrides,

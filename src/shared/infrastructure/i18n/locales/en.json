@@ -421,15 +421,61 @@
     "thisWeek": "This week",
     "conversation": "Conversation",
     "inputPlaceholder": "Ask me anything…",
-    "summary": {
-      "pill": "Summary · May",
-      "title": "How May is going",
-      "body": "You've spent $1.919.500, a similar pace to April. Your top category is Groceries, and with this month's salary your savings rate is 54%. Watch Coffee: it's at 96% of its cap.",
-      "spent": "Spent",
-      "savings": "Savings",
-      "projection": "Proj. close",
-      "plusTeaser": "With Plus, your agent reviews your week.",
-      "seePlus": "See Plus"
+    "corte": {
+      "title": "El Corte",
+      "pillNew": "New",
+      "pillSeen": "Seen",
+      "entryTitle": "Your {{month}} in 60 seconds",
+      "entryCta": "See my Corte",
+      "shelfTitle": "Your Cortes",
+      "shelfEmptyTitle": "No Cortes yet",
+      "shelfEmptyBody": "When your first month with movements closes, the agent tells it here.",
+      "flat": {
+        "spent": "You spent",
+        "movements_one": "{{count}} movement",
+        "movements_other": "{{count}} movements",
+        "topCategories": "Where it went",
+        "heaviestDay": "The day that stole the show",
+        "pulse": "Against last month",
+        "spentLess": "{{pct}}% less",
+        "spentMore": "{{pct}}% more",
+        "previousMonth": "last month",
+        "goal": "Your goal",
+        "neededPerMonth": "~{{amount}} a month to land on the date",
+        "firstMonth": "Your first month",
+        "play": "The month's play"
+      },
+      "play": {
+        "pill": "Play",
+        "applied": "Applied",
+        "failed": "Failed",
+        "setCap": "Cap for {{name}}: {{amount}}",
+        "raiseCap": "Raise {{name}}'s cap: {{from}} → {{to}}",
+        "monthCap": "Month ceiling: {{amount}}",
+        "contribute": "Contribution to {{name}}: {{amount}}",
+        "treat": "Treat yourself up to {{amount}}",
+        "apply": "Apply",
+        "confirm": "Confirm contribution",
+        "sheetTitle": "Contribution to {{name}}",
+        "sheetBody": "{{amount}} moves from the account you pick.",
+        "fromAccount": "Which account does it leave from?",
+        "planLimit": "Your Free plan already uses its 2 category caps.",
+        "seePlus": "See Plus",
+        "failedBody": "It could not be applied. The proposal stays here in case the context changes."
+      },
+      "loadFailed": "We could not load your Corte",
+      "playerHint": "Tap to advance · hold to pause"
+    },
+    "weekly": {
+      "pill": "Weekly review",
+      "less": "{{pct}}% less than last week",
+      "more": "{{pct}}% more than last week",
+      "topCategory": "Heaviest: {{name}}",
+      "seePlan": "See the plan",
+      "hidePlan": "Hide the plan",
+      "lastWeek": "From last week",
+      "followUpDone": "· you applied it",
+      "followUpPending": "· still pending"
     },
     "usage": {
       "registrations": "AI entries",
@@ -474,7 +520,35 @@
       "topSpend": "Where is my money going?",
       "upcoming": "What charges are coming?"
     },
-    "nudge": "You have {{left}} courtesy messages left this month"
+    "nudge": "You have {{left}} courtesy messages left this month",
+    "insights": {
+      "pill": {
+        "alert": "Alert",
+        "subscription": "Subscription",
+        "action": "Action"
+      },
+      "cap": {
+        "global": "your monthly ceiling",
+        "nearTitle": "{{name}} is at {{pct}}% of its cap",
+        "brokenTitle": "{{name}} already broke its cap",
+        "body": "You've spent {{spent}} of {{target}}.",
+        "cta": "See budgets"
+      },
+      "charge": {
+        "today": "today",
+        "tomorrow": "tomorrow",
+        "inDays": "in {{days}} days",
+        "title": "{{name}} charges you {{when}}",
+        "body": "It will be {{amount}}. If you no longer use it, now is the moment.",
+        "cta": "See subscriptions"
+      },
+      "uncategorized": {
+        "title_one": "{{count}} uncategorized expense",
+        "title_other": "{{count}} uncategorized expenses",
+        "body": "{{amount}} not yet telling the month's story properly.",
+        "cta": "Sort them"
+      }
+    }
   },
   "onboarding": {
     "skip": "Skip",
@@ -611,7 +685,8 @@
     "categories": {
       "title": "Your categories",
       "thisMonth": "this month",
-      "unclassified": "Unclassified"
+      "unclassified": "Unclassified",
+      "noCapShare": "no cap · {{pct}}% of spending"
     },
     "recent": {
       "title": "Recent activity",

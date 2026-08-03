@@ -146,6 +146,16 @@ export function monthName(iso: string, language = 'es'): string {
   return table(MONTHS_LONG, language)[fromIsoDate(iso).getMonth()]!;
 }
 
+const WEEKDAYS_LONG: Record<string, readonly string[]> = {
+  es: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+  en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+};
+
+/** `sábado` / `Saturday` — the weekday `iso` falls on. */
+export function weekdayName(iso: string, language = 'es'): string {
+  return table(WEEKDAYS_LONG, language)[fromIsoDate(iso).getDay()]!;
+}
+
 /**
  * The label a day group carries: `hoy`, `ayer`, or `sáb 11 jul`. Derived, never
  * stored — a persisted "sáb 11 may" is a lie the day after it is written.

@@ -10,6 +10,13 @@ import { HttpAccountsRepository } from '@/modules/accounts/infrastructure';
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
 import { ConfirmDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDraftUseCase';
 import { DiscardDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDraftUseCase';
+import { DismissInsightUseCase } from '@/modules/assistant/application/use-cases/DismissInsightUseCase';
+import { ApplyPlayUseCase } from '@/modules/assistant/application/use-cases/ApplyPlayUseCase';
+import { DismissCorteUseCase } from '@/modules/assistant/application/use-cases/DismissCorteUseCase';
+import { GetCorteUseCase } from '@/modules/assistant/application/use-cases/GetCorteUseCase';
+import { ListCortesUseCase } from '@/modules/assistant/application/use-cases/ListCortesUseCase';
+import { MarkCorteReadUseCase } from '@/modules/assistant/application/use-cases/MarkCorteReadUseCase';
+import { GetAssistantFeedUseCase } from '@/modules/assistant/application/use-cases/GetAssistantFeedUseCase';
 import { GetAssistantUsageUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUsageUseCase';
 import { ParseCaptureUseCase } from '@/modules/assistant/application/use-cases/ParseCaptureUseCase';
 import { GetChatHistoryUseCase } from '@/modules/assistant/application/use-cases/GetChatHistoryUseCase';
@@ -141,7 +148,14 @@ export const getChatHistoryUseCase = new GetChatHistoryUseCase(assistantReposito
 export const getAssistantUsageUseCase = new GetAssistantUsageUseCase(assistantRepository);
 export const confirmDraftUseCase = new ConfirmDraftUseCase(assistantRepository);
 export const parseCaptureUseCase = new ParseCaptureUseCase(assistantRepository);
+export const getAssistantFeedUseCase = new GetAssistantFeedUseCase(assistantRepository);
+export const dismissInsightUseCase = new DismissInsightUseCase(assistantRepository);
 export const discardDraftUseCase = new DiscardDraftUseCase(assistantRepository);
+export const listCortesUseCase = new ListCortesUseCase(assistantRepository);
+export const getCorteUseCase = new GetCorteUseCase(assistantRepository);
+export const markCorteReadUseCase = new MarkCorteReadUseCase(assistantRepository);
+export const dismissCorteUseCase = new DismissCorteUseCase(assistantRepository);
+export const applyPlayUseCase = new ApplyPlayUseCase(assistantRepository);
 export const getAccountsOverviewUseCase = new GetAccountsOverviewUseCase(
   accountsRepository,
 );
@@ -219,7 +233,14 @@ export const container = {
   getAssistantUsageUseCase,
   confirmDraftUseCase,
   parseCaptureUseCase,
+  getAssistantFeedUseCase,
+  dismissInsightUseCase,
   discardDraftUseCase,
+  listCortesUseCase,
+  getCorteUseCase,
+  markCorteReadUseCase,
+  dismissCorteUseCase,
+  applyPlayUseCase,
   getAccountsOverviewUseCase,
   createAccountUseCase,
   updateAccountUseCase,
