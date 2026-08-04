@@ -426,9 +426,6 @@
       "pillSeen": "Seen",
       "entryTitle": "Your {{month}} in 60 seconds",
       "entryCta": "See my Corte",
-      "shelfTitle": "Your Cortes",
-      "shelfEmptyTitle": "No Cortes yet",
-      "shelfEmptyBody": "When your first month with movements closes, the agent tells it here.",
       "flat": {
         "spent": "You spent",
         "movements_one": "{{count}} movement",
@@ -482,13 +479,25 @@
         "backToAssistant": "Back to the Assistant"
       }
     },
-    "shelf": {
-      "corte": "{{month}} Corte",
-      "weekly": "Weekly review",
-      "weeklyPill": "Weekly",
-      "removeTitle": "Remove from the shelf?",
-      "remove": "Remove",
-      "removeCancel": "Cancel"
+    "summaries": {
+      "title": "Summaries",
+      "rowTitle": "Your summaries",
+      "rowSubtitle": "The month's Corte and your week",
+      "weeklyKind": "Weekly",
+      "unseen_one": "{{count}} new",
+      "unseen_other": "{{count}} new",
+      "emptyTitle": "No summaries yet",
+      "loadFailed": "We could not load your summaries",
+      "tabMonthly": "Monthly",
+      "tabWeekly": "Weekly",
+      "mostRecent": "Latest",
+      "previous": "Earlier",
+      "spent": "spent",
+      "weeklyCta": "See the review",
+      "empty": {
+        "monthly": "When your first month with movements closes, El Corte shows up here.",
+        "weekly": "Every Monday the agent reviews your week and leaves it here."
+      }
     },
     "announce": {
       "weeklyTitle": "Your weekly review is ready",

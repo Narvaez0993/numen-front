@@ -5,21 +5,21 @@ import { container } from '@/core/di/container';
 import type { AgentFeed, AgentOutput } from '../../domain/types/AgentFeed';
 import { AGENT_FEED_KEY } from './useAgentFeed';
 
-export const CORTES_KEY = ['assistant', 'cortes'] as const;
+export const SUMMARIES_KEY = ['assistant', 'summaries'] as const;
 
 export const corteKey = (outputId: string) => ['assistant', 'corte', outputId] as const;
 
-/** «Tus Cortes» — the shelf, newest first. */
-export function useCortes() {
+/** «Resúmenes» — the whole history, Cortes and weekly reviews, newest first. */
+export function useSummaries() {
   return useQuery<AgentOutput[]>({
-    queryKey: CORTES_KEY,
-    queryFn: () => container.listCortesUseCase.execute(),
+    queryKey: SUMMARIES_KEY,
+    queryFn: () => container.listSummariesUseCase.execute(),
   });
 }
 
 /**
- * One Corte. Seeded from whatever cache already holds it (feed or shelf), so
- * opening a story the entry card just showed never flashes a spinner.
+ * One output. Seeded from whatever cache already holds it (the feed or the
+ * history), so opening something a card just showed never flashes a spinner.
  */
 export function useCorte(outputId: string) {
   const queryClient = useQueryClient();
@@ -27,9 +27,9 @@ export function useCorte(outputId: string) {
     queryKey: corteKey(outputId),
     queryFn: () => container.getCorteUseCase.execute(outputId),
     initialData: () => {
-      const shelf = queryClient.getQueryData<AgentOutput[]>(CORTES_KEY);
-      const fromShelf = shelf?.find((o) => o.id === outputId);
-      if (fromShelf) return fromShelf;
+      const history = queryClient.getQueryData<AgentOutput[]>(SUMMARIES_KEY);
+      const fromHistory = history?.find((o) => o.id === outputId);
+      if (fromHistory) return fromHistory;
       const feed = queryClient.getQueryData<AgentFeed>(AGENT_FEED_KEY);
       return feed?.outputs.find((o) => o.id === outputId);
     },

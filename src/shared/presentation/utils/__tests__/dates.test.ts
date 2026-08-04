@@ -2,6 +2,7 @@ import {
   addDays,
   dayLabel,
   isAfter,
+  isoWeekMonday,
   monthKey,
   monthMatrix,
   monthName,
@@ -166,5 +167,27 @@ describe('monthMatrix', () => {
     // A Wednesday 1st sits one column later when the week starts on Sunday.
     expect(monday.indexOf('2026-07-01')).toBe(2);
     expect(sunday.indexOf('2026-07-01')).toBe(3);
+  });
+});
+
+describe('isoWeekMonday', () => {
+  it('finds the Monday of an ISO week', () => {
+    // ISO week 1 of 2026 starts on 29 Dec 2025 (Jan 4th is a Sunday), so W30
+    // lands on 20 Jul 2026 — the week the demo review covers.
+    expect(isoWeekMonday('2026-W30')).toBe('2026-07-20');
+    expect(isoWeekMonday('2026-W01')).toBe('2025-12-29');
+  });
+
+  it('handles a year whose week 1 starts in January', () => {
+    // 2024: Jan 4th is a Thursday, so week 1 starts on Monday 1 Jan.
+    expect(isoWeekMonday('2024-W01')).toBe('2024-01-01');
+    expect(isoWeekMonday('2024-W53')).toBe('2024-12-30');
+  });
+
+  it('returns null for anything that is not a week label', () => {
+    expect(isoWeekMonday('2026-07')).toBeNull();
+    expect(isoWeekMonday('2026-W00')).toBeNull();
+    expect(isoWeekMonday('2026-W54')).toBeNull();
+    expect(isoWeekMonday('')).toBeNull();
   });
 });

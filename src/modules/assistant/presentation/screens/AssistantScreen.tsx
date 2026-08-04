@@ -26,7 +26,6 @@ import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { ChatLimitReachedError } from '../../domain';
 import type { MovementDraft } from '../../domain/types/Assistant';
 import { AssistantBubble } from '../components/AssistantBubble';
-import { AgentShelf } from '../components/feed/AgentShelf';
 import { AssistantHeader } from '../components/AssistantHeader';
 import { BlockView } from '../components/BlockView';
 import { ChatInput } from '../components/ChatInput';
@@ -147,14 +146,12 @@ export function AssistantScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* Fixed dock: the quota and the agent's deliveries stay one tap away
-            no matter how long the conversation grows — the scroll below
-            belongs to the stream alone. Artifacts and chat are different
-            natures; only one of them is infinite.
-            The bottom padding + hairline mirror the input bar's top edge:
-            the stream clips against a deliberate border, not against the
-            cards — a message sliced mid-line right under a chip read as a
-            layout accident. */}
+        {/* The dock holds only what belongs to the conversation: who you are
+            talking to and the quota that governs what you are about to send.
+            The agent's deliveries moved to Home — docked here they cost the
+            chat a third of its screen for artifacts that arrive five times a
+            month. The hairline mirrors the input bar's top edge, so the stream
+            clips against a deliberate border. */}
         <View
           style={{
             paddingTop: 14,
@@ -165,12 +162,8 @@ export function AssistantScreen() {
             borderBottomColor: theme.colors.borderSubtle,
           }}
         >
-          <AssistantHeader
-            onAvatarPress={() => router.push('/profile')}
-            onArchivePress={() => router.push('/cortes')}
-          />
+          <AssistantHeader onAvatarPress={() => router.push('/profile')} />
           <UsageMeterStrip usage={usage.data} onPress={() => setMeterOpen(true)} />
-          <AgentShelf today={today} />
         </View>
 
         <ScrollView

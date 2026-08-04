@@ -5,6 +5,8 @@ import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AgentAnnouncementBanner } from '@/modules/assistant/presentation/components/feed/AgentAnnouncementBanner';
+import { AgentInsights } from '@/modules/assistant/presentation/components/feed/AgentInsights';
+import { AgentSummariesRow } from '@/modules/assistant/presentation/components/feed/AgentSummariesRow';
 import { useAuthStore } from '@/modules/auth/presentation';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
@@ -145,6 +147,12 @@ export function HomeScreen() {
             }
             onGoalPress={() => router.push('/goals')}
           />
+          {/* The agent's block, right under the hero: the permanent door to its
+              deliveries, then what it noticed that you can act on today. Both
+              live here instead of docked over the chat — they are answers to
+              "how am I doing", and the conversation needed its screen back. */}
+          <AgentSummariesRow today={today} />
+          <AgentInsights today={today} />
           <IncomeSummaryRow
             total={data.month.income}
             savingsRate={data.month.savingsRate}

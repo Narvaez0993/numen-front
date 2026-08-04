@@ -10,7 +10,7 @@ import { invalidateMoneyViews } from '@/shared/presentation/query/moneyViews';
 import type { AgentFeed, AgentOutput } from '../../domain/types/AgentFeed';
 import { removeOutput, replaceInList, replaceOutput } from '../utils/feedCache';
 import { AGENT_FEED_KEY } from './useAgentFeed';
-import { CORTES_KEY, corteKey } from './useCortes';
+import { SUMMARIES_KEY, corteKey } from './useCortes';
 
 /** The server's echo is the truth — patch every cache that holds this output. */
 function patchEverywhere(
@@ -20,7 +20,7 @@ function patchEverywhere(
   queryClient.setQueryData<AgentFeed>(AGENT_FEED_KEY, (old) =>
     replaceOutput(old, output),
   );
-  queryClient.setQueryData<AgentOutput[]>(CORTES_KEY, (old) =>
+  queryClient.setQueryData<AgentOutput[]>(SUMMARIES_KEY, (old) =>
     replaceInList(old, output),
   );
   queryClient.setQueryData<AgentOutput>(corteKey(output.id), output);
@@ -39,7 +39,7 @@ export function useMarkCorteRead() {
   });
 }
 
-/** Hides the card from the feed; the shelf keeps the history untouched. */
+/** Hides the card from the feed; «Resúmenes» keeps the history untouched. */
 export function useDismissCorte() {
   const queryClient = useQueryClient();
   return useMutation<AgentOutput, Error, string>({

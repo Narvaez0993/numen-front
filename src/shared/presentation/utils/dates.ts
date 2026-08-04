@@ -194,6 +194,29 @@ export function weekdayInitials(language = 'es', weekStartsOn = 1): string[] {
 }
 
 /**
+ * The Monday of an ISO week label (`2026-W30`), or `null` when the string is not
+ * one. ISO weeks are what the agent's weekly reviews are keyed by, and the
+ * oldest ones do not carry their dates in the payload — this recovers the range
+ * from the key instead of printing `2026-w30` at the user.
+ *
+ * The anchor is January 4th: it is always inside ISO week 1, whatever weekday it
+ * happens to land on.
+ */
+export function isoWeekMonday(period: string): string | null {
+  const match = /^(\d{4})-W(\d{1,2})$/i.exec(period);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const week = Number(match[2]);
+  if (week < 1 || week > 53) return null;
+
+  const jan4 = new Date(year, 0, 4, 12);
+  // 0 = Monday, so subtracting it lands on week 1's Monday.
+  const jan4Weekday = (jan4.getDay() + 6) % 7;
+  const week1Monday = addDays(toIsoDate(jan4), -jan4Weekday);
+  return addDays(week1Monday, (week - 1) * 7);
+}
+
+/**
  * The month `iso` falls in, laid out as calendar weeks. `null` is padding before
  * the 1st or after the last day, so the grid always has 7 columns.
  */

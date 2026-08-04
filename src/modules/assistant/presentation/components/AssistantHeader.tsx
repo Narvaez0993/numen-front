@@ -2,18 +2,15 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
-import { Icon, Text } from '@/shared/presentation/components';
+import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 type Props = {
   initials?: string;
   onAvatarPress?: () => void;
-  /** Opens «Tus Cortes». It lives in the header so the archive stays
-   * reachable even when the shelf has nothing new to show. */
-  onArchivePress?: () => void;
 };
 
-export function AssistantHeader({ initials, onAvatarPress, onArchivePress }: Props) {
+export function AssistantHeader({ initials, onAvatarPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const profileName = useOnboardingStore((s) => s.profile?.name);
@@ -50,26 +47,6 @@ export function AssistantHeader({ initials, onAvatarPress, onArchivePress }: Pro
           {t('assistant.greeting', { name })}
         </Text>
       </View>
-      {onArchivePress ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('assistant.corte.shelfTitle')}
-          onPress={onArchivePress}
-          style={({ pressed }) => ({
-            width: 38,
-            height: 38,
-            borderRadius: 19,
-            backgroundColor: theme.colors.bgSurface,
-            borderColor: theme.colors.borderSubtle,
-            borderWidth: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: pressed ? 0.85 : 1,
-          })}
-        >
-          <Icon name="books" size={17} color={theme.colors.textSecondary} />
-        </Pressable>
-      ) : null}
       <Pressable
         onPress={onAvatarPress}
         style={({ pressed }) => ({

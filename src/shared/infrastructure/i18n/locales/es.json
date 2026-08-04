@@ -426,9 +426,6 @@
       "pillSeen": "Visto",
       "entryTitle": "Tu {{month}} en 60 segundos",
       "entryCta": "Ver mi Corte",
-      "shelfTitle": "Tus Cortes",
-      "shelfEmptyTitle": "Aún no hay Cortes",
-      "shelfEmptyBody": "Cuando cierre tu primer mes con movimientos, el agente te lo cuenta aquí.",
       "flat": {
         "spent": "Gastaste",
         "movements_one": "{{count}} movimiento",
@@ -482,13 +479,25 @@
         "backToAssistant": "Volver al Asistente"
       }
     },
-    "shelf": {
-      "corte": "Corte de {{month}}",
-      "weekly": "Revisión semanal",
-      "weeklyPill": "Semanal",
-      "removeTitle": "¿Quitar del estante?",
-      "remove": "Quitar",
-      "removeCancel": "Cancelar"
+    "summaries": {
+      "title": "Resúmenes",
+      "rowTitle": "Tus resúmenes",
+      "rowSubtitle": "El Corte del mes y tu semana",
+      "weeklyKind": "Semanal",
+      "unseen_one": "{{count}} nuevo",
+      "unseen_other": "{{count}} nuevos",
+      "emptyTitle": "Aún no hay resúmenes",
+      "loadFailed": "No pudimos cargar tus resúmenes",
+      "tabMonthly": "Mensuales",
+      "tabWeekly": "Semanales",
+      "mostRecent": "El más reciente",
+      "previous": "Anteriores",
+      "spent": "gastados",
+      "weeklyCta": "Ver la revisión",
+      "empty": {
+        "monthly": "Cuando cierre tu primer mes con movimientos, El Corte aparece acá.",
+        "weekly": "Cada lunes el agente revisa tu semana y la deja acá."
+      }
     },
     "announce": {
       "weeklyTitle": "Tu revisión semanal está lista",

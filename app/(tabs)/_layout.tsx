@@ -21,8 +21,9 @@ export default function TabsLayout() {
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
   const clearance = useFloatingTabBarClearance();
   const today = useMemo(() => toIsoDate(new Date()), []);
-  // Same query Home's banner and the shelf read — one fetch, three surfaces.
-  // The dot is the whisper, Home's banner is the shout: both die on read.
+  // Same query Home's banner and summaries row read — one fetch, three
+  // surfaces. The dot sits on HOME because that is where the agent delivers;
+  // on the chat it promised something the conversation no longer holds.
   const feed = useAgentFeed(today);
   const unseen = (feed.data?.unseenCount ?? 0) > 0;
 
@@ -45,7 +46,22 @@ export default function TabsLayout() {
           options={{
             title: t('tabs.home'),
             tabBarIcon: ({ color, focused }) => (
-              <Icon name="home" size={22} stroke={focused ? 2.2 : 1.8} color={color} />
+              <View>
+                <Icon name="home" size={22} stroke={focused ? 2.2 : 1.8} color={color} />
+                {unseen ? (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: -1,
+                      right: -5,
+                      width: 7,
+                      height: 7,
+                      borderRadius: 3.5,
+                      backgroundColor: theme.colors.accentMint,
+                    }}
+                  />
+                ) : null}
+              </View>
             ),
           }}
         />
@@ -77,27 +93,12 @@ export default function TabsLayout() {
           options={{
             title: t('tabs.assistant'),
             tabBarIcon: ({ color, focused }) => (
-              <View>
-                <Icon
-                  name="sparkles"
-                  size={22}
-                  stroke={focused ? 2.2 : 1.8}
-                  color={color}
-                />
-                {unseen ? (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      top: -1,
-                      right: -5,
-                      width: 7,
-                      height: 7,
-                      borderRadius: 3.5,
-                      backgroundColor: theme.colors.accentMint,
-                    }}
-                  />
-                ) : null}
-              </View>
+              <Icon
+                name="sparkles"
+                size={22}
+                stroke={focused ? 2.2 : 1.8}
+                color={color}
+              />
             ),
           }}
         />
