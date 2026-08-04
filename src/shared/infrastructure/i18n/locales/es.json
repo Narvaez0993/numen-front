@@ -418,7 +418,6 @@
   "assistant": {
     "title": "Asistente",
     "greeting": "¿En qué te ayudo, {{name}}?",
-    "thisWeek": "Esta semana",
     "conversation": "Conversación",
     "inputPlaceholder": "Pregúntame lo que sea…",
     "corte": {
@@ -464,18 +463,53 @@
         "failedBody": "No se pudo aplicar. La propuesta sigue aquí por si cambia el contexto."
       },
       "loadFailed": "No pudimos cargar tu Corte",
-      "playerHint": "Toca para avanzar · mantén para pausar"
+      "playerHint": "Toca para avanzar · mantén para pausar",
+      "stories": {
+        "coverTitle": "{{month}}, contado.",
+        "kickerSpent": "Gastaste en {{month}}",
+        "kickerWhere": "Dónde se fue",
+        "funFactPill": "El dato que no sabías",
+        "funFactTitle": "Tu día más caro fue un {{day}}.",
+        "kickerPulse": "El pulso",
+        "pulseFair": "Sin trucos: los dos meses completos.",
+        "kickerGoal": "Tu meta",
+        "goalOf": "de {{amount}}",
+        "kickerPlay": "La jugada de {{month}}",
+        "capProposed": "Tope propuesto",
+        "treatLabel": "Date un gusto",
+        "applied": "Jugada aplicada",
+        "notNow": "Ahora no",
+        "backToAssistant": "Volver al Asistente"
+      }
+    },
+    "shelf": {
+      "corte": "Corte de {{month}}",
+      "weekly": "Revisión semanal",
+      "weeklyPill": "Semanal",
+      "removeTitle": "¿Quitar del estante?",
+      "remove": "Quitar",
+      "removeCancel": "Cancelar"
+    },
+    "announce": {
+      "weeklyTitle": "Tu revisión semanal está lista",
+      "weeklyCta": "Verla"
     },
     "weekly": {
       "pill": "Revisión semanal",
       "less": "{{pct}}% menos que la semana pasada",
       "more": "{{pct}}% más que la semana pasada",
       "topCategory": "Lo que más pesó: {{name}}",
-      "seePlan": "Ver el plan",
-      "hidePlan": "Ocultar el plan",
       "lastWeek": "De la semana pasada",
       "followUpDone": "· la aplicaste",
-      "followUpPending": "· sigue pendiente"
+      "followUpPending": "· sigue pendiente",
+      "movements_one": "{{count}} mov",
+      "movements_other": "{{count}} mov",
+      "where": "A dónde se fue",
+      "unclassified": "Sin clasificar",
+      "biggest": "Mayor gasto: {{label}} · {{amount}}",
+      "cap": "Tope del mes",
+      "goal": "Meta · {{name}}",
+      "plan": "El plan de esta semana"
     },
     "usage": {
       "registrations": "Registros IA",

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AgentAnnouncementBanner } from '@/modules/assistant/presentation/components/feed/AgentAnnouncementBanner';
 import { useAuthStore } from '@/modules/auth/presentation';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
@@ -111,6 +112,10 @@ export function HomeScreen() {
             name={displayName?.trim() || onboardingName?.trim() || t('home.greeting.you')}
             onAvatarPress={() => router.push('/profile')}
           />
+          {/* The premiere: an unread Corte or weekly review announces itself
+              above the hero — once a month it outranks the number, and once
+              watched it never comes back. */}
+          <AgentAnnouncementBanner today={today} />
           <TodayHero
             focus={data.focus}
             objective={data.objective}

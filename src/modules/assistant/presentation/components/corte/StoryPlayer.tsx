@@ -14,7 +14,8 @@ import { createPressController } from '../../utils/pressGesture';
 import { SlideView } from './SlideView';
 import { StoryProgressBar } from './StoryProgressBar';
 
-const SLIDE_MS = 6000;
+// The design's clock: 5.2s per story, «tu mes en 7 pantallas · 40 segundos».
+const SLIDE_MS = 5200;
 
 type Props = {
   corte: AgentOutput;
@@ -124,42 +125,73 @@ export function StoryPlayer({ corte, onClose, onOpenFlat, playAction }: Props) {
                 justifyContent: 'space-between',
               }}
             >
+              {/* The design's wordmark: «El Corte.» with the mint period. */}
               <Text
                 variant="label"
                 color={theme.colors.textSecondary}
-                style={{ textTransform: 'capitalize' }}
+                style={{ fontSize: 12.5 }}
               >
-                {monthName(`${corte.period}-01`, i18n.language)}{' '}
-                {corte.period.slice(0, 4)}
+                {t('assistant.corte.title')}
+                <Text
+                  variant="label"
+                  color={theme.colors.accentMint}
+                  style={{ fontSize: 12.5 }}
+                >
+                  .
+                </Text>
+                <Text variant="caption" muted style={{ fontSize: 12.5 }}>
+                  {' '}
+                  {monthName(`${corte.period}-01`, i18n.language)}
+                </Text>
               </Text>
-              <View style={{ flexDirection: 'row', gap: 18 }}>
-                <Pressable accessibilityRole="button" onPress={onOpenFlat} hitSlop={10}>
-                  <Icon
-                    name="list-details"
-                    size={18}
-                    color={theme.colors.textSecondary}
-                  />
-                </Pressable>
-                <Pressable accessibilityRole="button" onPress={onClose} hitSlop={10}>
-                  <Icon name="x" size={18} color={theme.colors.textSecondary} />
-                </Pressable>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <ChromeButton icon="list-details" onPress={onOpenFlat} />
+                <ChromeButton icon="x" onPress={onClose} />
               </View>
             </View>
           </View>
 
           {slides[index] ? (
-            <SlideView slide={slides[index]} corte={corte} playAction={playAction} />
+            <SlideView
+              // Remount per slide: every entrance replays from zero.
+              key={slides[index].id}
+              slide={slides[index]}
+              corte={corte}
+              playAction={playAction}
+              onClose={onClose}
+            />
           ) : (
             <View style={{ flex: 1 }} />
           )}
 
-          <View style={{ paddingBottom: insets.bottom + 14, alignItems: 'center' }}>
-            <Text variant="caption" color={theme.colors.textTertiary}>
-              {t('assistant.corte.playerHint')}
-            </Text>
-          </View>
+          <View style={{ paddingBottom: insets.bottom + 6 }} />
         </View>
       </Pressable>
     </View>
+  );
+}
+
+/** The design's chrome buttons: a 30px float circle with a subtle border. */
+function ChromeButton({ icon, onPress }: { icon: string; onPress: () => void }) {
+  const { theme } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => ({
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: theme.colors.bgFloat,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
+      <Icon name={icon} size={14} color={theme.colors.textSecondary} />
+    </Pressable>
   );
 }

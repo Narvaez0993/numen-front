@@ -113,7 +113,17 @@ function RootNavigator() {
           headerShown: false,
           contentStyle: { backgroundColor: theme.colors.bgBase },
         }}
-      />
+      >
+        {/* Declared HERE, statically: options set inside the screen at render
+            time land after the transition starts, and re-opening the route
+            then animates from the previous dismissal's state — a half-opacity
+            screen that re-attaches. The navigator must know this is a fade
+            modal BEFORE it mounts the route. */}
+        <Stack.Screen
+          name="corte/[id]"
+          options={{ presentation: 'fullScreenModal', animation: 'fade' }}
+        />
+      </Stack>
       <RootGate />
     </NavigationThemeProvider>
   );

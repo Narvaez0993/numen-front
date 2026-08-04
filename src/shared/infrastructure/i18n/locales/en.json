@@ -418,7 +418,6 @@
   "assistant": {
     "title": "Assistant",
     "greeting": "How can I help, {{name}}?",
-    "thisWeek": "This week",
     "conversation": "Conversation",
     "inputPlaceholder": "Ask me anything…",
     "corte": {
@@ -464,18 +463,53 @@
         "failedBody": "It could not be applied. The proposal stays here in case the context changes."
       },
       "loadFailed": "We could not load your Corte",
-      "playerHint": "Tap to advance · hold to pause"
+      "playerHint": "Tap to advance · hold to pause",
+      "stories": {
+        "coverTitle": "{{month}}, counted.",
+        "kickerSpent": "You spent in {{month}}",
+        "kickerWhere": "Where it went",
+        "funFactPill": "The thing you didn't know",
+        "funFactTitle": "Your priciest day was a {{day}}.",
+        "kickerPulse": "The pulse",
+        "pulseFair": "No tricks: both months complete.",
+        "kickerGoal": "Your goal",
+        "goalOf": "of {{amount}}",
+        "kickerPlay": "The {{month}} play",
+        "capProposed": "Proposed cap",
+        "treatLabel": "Treat yourself",
+        "applied": "Play applied",
+        "notNow": "Not now",
+        "backToAssistant": "Back to the Assistant"
+      }
+    },
+    "shelf": {
+      "corte": "{{month}} Corte",
+      "weekly": "Weekly review",
+      "weeklyPill": "Weekly",
+      "removeTitle": "Remove from the shelf?",
+      "remove": "Remove",
+      "removeCancel": "Cancel"
+    },
+    "announce": {
+      "weeklyTitle": "Your weekly review is ready",
+      "weeklyCta": "See it"
     },
     "weekly": {
       "pill": "Weekly review",
       "less": "{{pct}}% less than last week",
       "more": "{{pct}}% more than last week",
       "topCategory": "Heaviest: {{name}}",
-      "seePlan": "See the plan",
-      "hidePlan": "Hide the plan",
       "lastWeek": "From last week",
       "followUpDone": "· you applied it",
-      "followUpPending": "· still pending"
+      "followUpPending": "· still pending",
+      "movements_one": "{{count}} mov",
+      "movements_other": "{{count}} mov",
+      "where": "Where it went",
+      "unclassified": "Unclassified",
+      "biggest": "Biggest expense: {{label}} · {{amount}}",
+      "cap": "Month cap",
+      "goal": "Goal · {{name}}",
+      "plan": "This week's plan"
     },
     "usage": {
       "registrations": "AI entries",

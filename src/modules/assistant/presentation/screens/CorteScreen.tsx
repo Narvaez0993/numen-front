@@ -1,4 +1,4 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
@@ -35,17 +35,15 @@ export function CorteScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unread, id]);
 
-  const screenOptions = (
-    <Stack.Screen options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
-  );
-
+  // The fullScreenModal + fade options live statically in app/_layout.tsx:
+  // set here at render time they landed after the transition started, and the
+  // second opening faded in from the previous dismissal's state.
   if (corte.isLoading || corte.isError || !corte.data) {
     return (
       <SafeAreaView
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
         edges={['top']}
       >
-        {screenOptions}
         <SubScreenHeader
           title={t('assistant.corte.title')}
           onBack={() => router.back()}
@@ -68,7 +66,6 @@ export function CorteScreen() {
   if (mode === 'stories') {
     return (
       <View style={{ flex: 1 }}>
-        {screenOptions}
         <StoryPlayer
           corte={corte.data}
           onClose={() => router.back()}
@@ -86,7 +83,6 @@ export function CorteScreen() {
       style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       edges={['top']}
     >
-      {screenOptions}
       <SubScreenHeader
         title={`${t('assistant.corte.title')} · ${corteTitle(corte.data.period, i18n.language)}`}
         onBack={() => setMode('stories')}
