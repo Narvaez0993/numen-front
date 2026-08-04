@@ -1,6 +1,9 @@
 import { Tabs, usePathname } from 'expo-router';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { View } from 'react-native';
 
+import { useAgentFeed } from '@/modules/assistant/presentation/hooks/useAgentFeed';
 import { ExpenseSheet } from '@/modules/expenses/presentation/components/ExpenseSheet';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { Icon, FAB } from '@/shared/presentation/components';
@@ -9,6 +12,7 @@ import {
   useFloatingTabBarClearance,
 } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 
 export default function TabsLayout() {
   const { theme } = useTheme();
@@ -16,6 +20,12 @@ export default function TabsLayout() {
   const pathname = usePathname();
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
   const clearance = useFloatingTabBarClearance();
+  const today = useMemo(() => toIsoDate(new Date()), []);
+  // Same query Home's banner and summaries row read — one fetch, three
+  // surfaces. The dot sits on HOME because that is where the agent delivers;
+  // on the chat it promised something the conversation no longer holds.
+  const feed = useAgentFeed(today);
+  const unseen = (feed.data?.unseenCount ?? 0) > 0;
 
   // Hide FAB on assistant per the brief
   const hideFab = pathname.endsWith('/assistant');
@@ -36,7 +46,22 @@ export default function TabsLayout() {
           options={{
             title: t('tabs.home'),
             tabBarIcon: ({ color, focused }) => (
-              <Icon name="home" size={22} stroke={focused ? 2.2 : 1.8} color={color} />
+              <View>
+                <Icon name="home" size={22} stroke={focused ? 2.2 : 1.8} color={color} />
+                {unseen ? (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: -1,
+                      right: -5,
+                      width: 7,
+                      height: 7,
+                      borderRadius: 3.5,
+                      backgroundColor: theme.colors.accentMint,
+                    }}
+                  />
+                ) : null}
+              </View>
             ),
           }}
         />

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
 import { Card, ProgressBar, Text } from '@/shared/presentation/components';
@@ -11,6 +11,47 @@ type Props = {
   /** Server truth; while it loads the meter shows quiet placeholders. */
   usage: AssistantUsage | undefined;
 };
+
+/**
+ * The quota, docked: it lives OUTSIDE the conversation's scroll because it is
+ * the one number that governs what the user is about to do — buried in the
+ * stream it was three screens up after a few questions. One slim row; the tap
+ * opens the full card with the renewal caption.
+ */
+export function UsageMeterStrip({ usage, onPress }: Props & { onPress: () => void }) {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('assistant.usage.planFree')}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        gap: 14,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 12,
+        backgroundColor: theme.colors.bgSurface,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
+        opacity: pressed ? 0.85 : 1,
+      })}
+    >
+      <MeterColumn
+        label={t('assistant.usage.registrations')}
+        used={usage?.registrations.used}
+        limit={usage?.registrations.limit}
+      />
+      <MeterColumn
+        label={t('assistant.usage.messages')}
+        used={usage?.messages.used}
+        limit={usage?.messages.limit}
+      />
+    </Pressable>
+  );
+}
 
 export function UsageMeter({ usage }: Props) {
   const { t } = useTranslation();

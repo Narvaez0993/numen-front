@@ -14,7 +14,7 @@ type Props = {
   action?: React.ReactNode;
 };
 
-function playAmountLine(play: AgentPlay, t: TFunction): string {
+export function playAmountLine(play: AgentPlay, t: TFunction): string {
   switch (play.action) {
     case 'set_category_cap':
       return t('assistant.corte.play.setCap', {

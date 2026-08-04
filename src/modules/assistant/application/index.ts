@@ -7,7 +7,7 @@ export * from './use-cases/ParseCaptureUseCase';
 export * from './use-cases/GetAssistantFeedUseCase';
 export * from './use-cases/DismissInsightUseCase';
 export * from './use-cases/DiscardDraftUseCase';
-export * from './use-cases/ListCortesUseCase';
+export * from './use-cases/ListSummariesUseCase';
 export * from './use-cases/GetCorteUseCase';
 export * from './use-cases/MarkCorteReadUseCase';
 export * from './use-cases/DismissCorteUseCase';

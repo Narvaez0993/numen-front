@@ -14,7 +14,7 @@ import { DismissInsightUseCase } from '@/modules/assistant/application/use-cases
 import { ApplyPlayUseCase } from '@/modules/assistant/application/use-cases/ApplyPlayUseCase';
 import { DismissCorteUseCase } from '@/modules/assistant/application/use-cases/DismissCorteUseCase';
 import { GetCorteUseCase } from '@/modules/assistant/application/use-cases/GetCorteUseCase';
-import { ListCortesUseCase } from '@/modules/assistant/application/use-cases/ListCortesUseCase';
+import { ListSummariesUseCase } from '@/modules/assistant/application/use-cases/ListSummariesUseCase';
 import { MarkCorteReadUseCase } from '@/modules/assistant/application/use-cases/MarkCorteReadUseCase';
 import { GetAssistantFeedUseCase } from '@/modules/assistant/application/use-cases/GetAssistantFeedUseCase';
 import { GetAssistantUsageUseCase } from '@/modules/assistant/application/use-cases/GetAssistantUsageUseCase';
@@ -151,7 +151,7 @@ export const parseCaptureUseCase = new ParseCaptureUseCase(assistantRepository);
 export const getAssistantFeedUseCase = new GetAssistantFeedUseCase(assistantRepository);
 export const dismissInsightUseCase = new DismissInsightUseCase(assistantRepository);
 export const discardDraftUseCase = new DiscardDraftUseCase(assistantRepository);
-export const listCortesUseCase = new ListCortesUseCase(assistantRepository);
+export const listSummariesUseCase = new ListSummariesUseCase(assistantRepository);
 export const getCorteUseCase = new GetCorteUseCase(assistantRepository);
 export const markCorteReadUseCase = new MarkCorteReadUseCase(assistantRepository);
 export const dismissCorteUseCase = new DismissCorteUseCase(assistantRepository);
@@ -236,7 +236,7 @@ export const container = {
   getAssistantFeedUseCase,
   dismissInsightUseCase,
   discardDraftUseCase,
-  listCortesUseCase,
+  listSummariesUseCase,
   getCorteUseCase,
   markCorteReadUseCase,
   dismissCorteUseCase,

@@ -418,7 +418,6 @@
   "assistant": {
     "title": "Asistente",
     "greeting": "¿En qué te ayudo, {{name}}?",
-    "thisWeek": "Esta semana",
     "conversation": "Conversación",
     "inputPlaceholder": "Pregúntame lo que sea…",
     "corte": {
@@ -427,9 +426,6 @@
       "pillSeen": "Visto",
       "entryTitle": "Tu {{month}} en 60 segundos",
       "entryCta": "Ver mi Corte",
-      "shelfTitle": "Tus Cortes",
-      "shelfEmptyTitle": "Aún no hay Cortes",
-      "shelfEmptyBody": "Cuando cierre tu primer mes con movimientos, el agente te lo cuenta aquí.",
       "flat": {
         "spent": "Gastaste",
         "movements_one": "{{count}} movimiento",
@@ -464,18 +460,65 @@
         "failedBody": "No se pudo aplicar. La propuesta sigue aquí por si cambia el contexto."
       },
       "loadFailed": "No pudimos cargar tu Corte",
-      "playerHint": "Toca para avanzar · mantén para pausar"
+      "playerHint": "Toca para avanzar · mantén para pausar",
+      "stories": {
+        "coverTitle": "{{month}}, contado.",
+        "kickerSpent": "Gastaste en {{month}}",
+        "kickerWhere": "Dónde se fue",
+        "funFactPill": "El dato que no sabías",
+        "funFactTitle": "Tu día más caro fue un {{day}}.",
+        "kickerPulse": "El pulso",
+        "pulseFair": "Sin trucos: los dos meses completos.",
+        "kickerGoal": "Tu meta",
+        "goalOf": "de {{amount}}",
+        "kickerPlay": "La jugada de {{month}}",
+        "capProposed": "Tope propuesto",
+        "treatLabel": "Date un gusto",
+        "applied": "Jugada aplicada",
+        "notNow": "Ahora no",
+        "backToAssistant": "Volver al Asistente"
+      }
+    },
+    "summaries": {
+      "title": "Resúmenes",
+      "rowTitle": "Tus resúmenes",
+      "rowSubtitle": "El Corte del mes y tu semana",
+      "weeklyKind": "Semanal",
+      "unseen_one": "{{count}} nuevo",
+      "unseen_other": "{{count}} nuevos",
+      "emptyTitle": "Aún no hay resúmenes",
+      "loadFailed": "No pudimos cargar tus resúmenes",
+      "tabMonthly": "Mensuales",
+      "tabWeekly": "Semanales",
+      "mostRecent": "El más reciente",
+      "previous": "Anteriores",
+      "spent": "gastados",
+      "weeklyCta": "Ver la revisión",
+      "empty": {
+        "monthly": "Cuando cierre tu primer mes con movimientos, El Corte aparece acá.",
+        "weekly": "Cada lunes el agente revisa tu semana y la deja acá."
+      }
+    },
+    "announce": {
+      "weeklyTitle": "Tu revisión semanal está lista",
+      "weeklyCta": "Verla"
     },
     "weekly": {
       "pill": "Revisión semanal",
       "less": "{{pct}}% menos que la semana pasada",
       "more": "{{pct}}% más que la semana pasada",
       "topCategory": "Lo que más pesó: {{name}}",
-      "seePlan": "Ver el plan",
-      "hidePlan": "Ocultar el plan",
       "lastWeek": "De la semana pasada",
       "followUpDone": "· la aplicaste",
-      "followUpPending": "· sigue pendiente"
+      "followUpPending": "· sigue pendiente",
+      "movements_one": "{{count}} mov",
+      "movements_other": "{{count}} mov",
+      "where": "A dónde se fue",
+      "unclassified": "Sin clasificar",
+      "biggest": "Mayor gasto: {{label}} · {{amount}}",
+      "cap": "Tope del mes",
+      "goal": "Meta · {{name}}",
+      "plan": "El plan de esta semana"
     },
     "usage": {
       "registrations": "Registros IA",
