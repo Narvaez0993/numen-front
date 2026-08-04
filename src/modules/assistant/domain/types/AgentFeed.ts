@@ -178,6 +178,28 @@ export type PlayFollowUp = {
   status: PlayStatus;
 };
 
+/** One day of the week, sparse — days without spending are absent. */
+export type WeeklyDaySpend = { day: string; spent: number };
+
+/** A week category. `categoryId` and `name` both `null` = the unclassified
+ * bucket; names arrive denormalized because the payload is a frozen snapshot. */
+export type WeeklyCategorySpend = {
+  categoryId: string | null;
+  name: string | null;
+  spent: number;
+};
+
+/** The month's global ceiling at review time. `used` is `spent / target`, uncapped. */
+export type WeeklyCapStatus = { target: number; spent: number; used: number };
+
+/** The goal worth pacing when the review was composed. */
+export type WeeklyGoalStatus = {
+  name: string;
+  saved: number;
+  target: number;
+  pct: number;
+};
+
 export type WeeklyReview = {
   /** The coach's read of the week — narrated, never a number of its own. */
   diagnosisText: string;
@@ -188,6 +210,19 @@ export type WeeklyReview = {
   topCategoryId: string | null;
   topCategoryName: string | null;
   accountability: PlayFollowUp[];
+  /**
+   * The report blocks (ago 2026) — domain-measured, rendered by this client.
+   * Every one tolerates absence: reviews stored before the blocks existed
+   * simply render without them.
+   */
+  dateFrom: string | null;
+  dateTo: string | null;
+  movements: number | null;
+  byDay: WeeklyDaySpend[];
+  topCategories: WeeklyCategorySpend[];
+  biggestMerchant: { label: string; spent: number } | null;
+  cap: WeeklyCapStatus | null;
+  goal: WeeklyGoalStatus | null;
 };
 
 export type AgentOutput = {

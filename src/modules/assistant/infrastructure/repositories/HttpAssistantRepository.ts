@@ -192,6 +192,15 @@ type WeeklyPayloadResponse = {
     text: string;
     status: 'proposed' | 'applying' | 'applied' | 'failed';
   }[];
+  // Report blocks (ago 2026) — optional: stored reviews predate them.
+  date_from?: string | null;
+  date_to?: string | null;
+  movements?: number | null;
+  by_day?: { day: string; spent: number }[];
+  top_categories?: { category_id: string | null; name: string | null; spent: number }[];
+  biggest_merchant?: { label: string; spent: number } | null;
+  cap?: { target: number; spent: number; used: number } | null;
+  goal?: { name: string; saved: number; target: number; pct: number } | null;
 };
 
 type AgentOutputResponse = {
@@ -595,6 +604,18 @@ function toWeekly(payload: AgentOutputResponse['payload']): WeeklyReview | null 
       text: entry.text,
       status: entry.status,
     })),
+    dateFrom: payload.date_from ?? null,
+    dateTo: payload.date_to ?? null,
+    movements: payload.movements ?? null,
+    byDay: (payload.by_day ?? []).map((d) => ({ day: d.day, spent: d.spent })),
+    topCategories: (payload.top_categories ?? []).map((c) => ({
+      categoryId: c.category_id,
+      name: c.name,
+      spent: c.spent,
+    })),
+    biggestMerchant: payload.biggest_merchant ?? null,
+    cap: payload.cap ?? null,
+    goal: payload.goal ?? null,
   };
 }
 

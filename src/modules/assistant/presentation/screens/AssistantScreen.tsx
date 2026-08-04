@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import {
+  BottomSheet,
   Card,
   RetryState,
   SectionLabel,
@@ -25,14 +26,13 @@ import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { ChatLimitReachedError } from '../../domain';
 import type { MovementDraft } from '../../domain/types/Assistant';
 import { AssistantBubble } from '../components/AssistantBubble';
-import { FeedSection } from '../components/feed/FeedSection';
 import { AssistantHeader } from '../components/AssistantHeader';
 import { BlockView } from '../components/BlockView';
 import { ChatInput } from '../components/ChatInput';
 import { LimitGateCard } from '../components/LimitGateCard';
 import { SuggestedChips } from '../components/SuggestedChips';
 import { TypingIndicator } from '../components/TypingIndicator';
-import { UsageMeter } from '../components/UsageMeter';
+import { UsageMeter, UsageMeterStrip } from '../components/UsageMeter';
 import { UserBubble } from '../components/UserBubble';
 import { useAssistantUsage } from '../hooks/useAssistantUsage';
 import {
@@ -58,6 +58,7 @@ export function AssistantScreen() {
 
   const [input, setInput] = useState('');
   const [limitHit, setLimitHit] = useState(false);
+  const [meterOpen, setMeterOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const tabBarClearance = useFloatingTabBarClearance();
@@ -145,11 +146,31 @@ export function AssistantScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+        {/* The dock holds only what belongs to the conversation: who you are
+            talking to and the quota that governs what you are about to send.
+            The agent's deliveries moved to Home — docked here they cost the
+            chat a third of its screen for artifacts that arrive five times a
+            month. The hairline mirrors the input bar's top edge, so the stream
+            clips against a deliberate border. */}
+        <View
+          style={{
+            paddingTop: 14,
+            paddingHorizontal: 16,
+            paddingBottom: 12,
+            gap: 12,
+            borderBottomWidth: 1,
+            borderBottomColor: theme.colors.borderSubtle,
+          }}
+        >
+          <AssistantHeader onAvatarPress={() => router.push('/profile')} />
+          <UsageMeterStrip usage={usage.data} onPress={() => setMeterOpen(true)} />
+        </View>
+
         <ScrollView
           ref={scrollRef}
           style={{ flex: 1 }}
           contentContainerStyle={{
-            paddingTop: 14,
+            paddingTop: 12,
             paddingBottom: 12,
             paddingHorizontal: 16,
             gap: 14,
@@ -157,12 +178,6 @@ export function AssistantScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <AssistantHeader onAvatarPress={() => router.push('/profile')} />
-
-          <UsageMeter usage={usage.data} />
-
-          <FeedSection today={today} />
-
           {history.isLoading ? (
             <View style={{ paddingVertical: 28, alignItems: 'center' }}>
               <ActivityIndicator color={theme.colors.accentMint} />
@@ -252,6 +267,17 @@ export function AssistantScreen() {
           />
         </View>
       </KeyboardAvoidingView>
+
+      {/* The strip's detail: the full meter with the renewal caption. */}
+      <BottomSheet
+        visible={meterOpen}
+        onClose={() => setMeterOpen(false)}
+        maxHeight="40%"
+      >
+        <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 26 }}>
+          <UsageMeter usage={usage.data} />
+        </View>
+      </BottomSheet>
 
       <Toast
         visible={toast !== null}
