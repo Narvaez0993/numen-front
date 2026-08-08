@@ -8,7 +8,9 @@ import { UpdateAccountUseCase } from '@/modules/accounts/application/use-cases/U
 import { UpdateCreditCardUseCase } from '@/modules/accounts/application/use-cases/UpdateCreditCardUseCase';
 import { HttpAccountsRepository } from '@/modules/accounts/infrastructure';
 import type { AssistantRepository } from '@/modules/assistant/application/ports/AssistantRepository';
+import { ConfirmDebtDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDebtDraftUseCase';
 import { ConfirmDraftUseCase } from '@/modules/assistant/application/use-cases/ConfirmDraftUseCase';
+import { DiscardDebtDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDebtDraftUseCase';
 import { DiscardDraftUseCase } from '@/modules/assistant/application/use-cases/DiscardDraftUseCase';
 import { DismissInsightUseCase } from '@/modules/assistant/application/use-cases/DismissInsightUseCase';
 import { ApplyPlayUseCase } from '@/modules/assistant/application/use-cases/ApplyPlayUseCase';
@@ -63,6 +65,8 @@ import {
   CreateDebtUseCase,
   CreateSharedEventUseCase,
   DeleteDebtUseCase,
+  ReopenDebtUseCase,
+  WriteOffDebtUseCase,
   GetDeudasUseCase,
   RemovePaymentUseCase,
 } from '@/modules/deudas/application';
@@ -138,6 +142,8 @@ export const createSharedEventUseCase = new CreateSharedEventUseCase(deudasRepos
 export const deleteDebtUseCase = new DeleteDebtUseCase(deudasRepository);
 export const addDebtPaymentUseCase = new AddPaymentUseCase(deudasRepository);
 export const removeDebtPaymentUseCase = new RemovePaymentUseCase(deudasRepository);
+export const writeOffDebtUseCase = new WriteOffDebtUseCase(deudasRepository);
+export const reopenDebtUseCase = new ReopenDebtUseCase(deudasRepository);
 export const getGoalsUseCase = new GetGoalsUseCase(goalsRepository);
 export const createGoalUseCase = new CreateGoalUseCase(goalsRepository);
 export const updateGoalUseCase = new UpdateGoalUseCase(goalsRepository);
@@ -147,6 +153,8 @@ export const sendChatMessageUseCase = new SendChatMessageUseCase(assistantReposi
 export const getChatHistoryUseCase = new GetChatHistoryUseCase(assistantRepository);
 export const getAssistantUsageUseCase = new GetAssistantUsageUseCase(assistantRepository);
 export const confirmDraftUseCase = new ConfirmDraftUseCase(assistantRepository);
+export const confirmDebtDraftUseCase = new ConfirmDebtDraftUseCase(assistantRepository);
+export const discardDebtDraftUseCase = new DiscardDebtDraftUseCase(assistantRepository);
 export const parseCaptureUseCase = new ParseCaptureUseCase(assistantRepository);
 export const getAssistantFeedUseCase = new GetAssistantFeedUseCase(assistantRepository);
 export const dismissInsightUseCase = new DismissInsightUseCase(assistantRepository);
@@ -223,6 +231,8 @@ export const container = {
   deleteDebtUseCase,
   addDebtPaymentUseCase,
   removeDebtPaymentUseCase,
+  writeOffDebtUseCase,
+  reopenDebtUseCase,
   getGoalsUseCase,
   createGoalUseCase,
   updateGoalUseCase,
@@ -232,6 +242,8 @@ export const container = {
   getChatHistoryUseCase,
   getAssistantUsageUseCase,
   confirmDraftUseCase,
+  confirmDebtDraftUseCase,
+  discardDebtDraftUseCase,
   parseCaptureUseCase,
   getAssistantFeedUseCase,
   dismissInsightUseCase,

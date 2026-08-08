@@ -2,13 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, TextInput, View } from 'react-native';
 
-import { BottomSheet, Button, Text } from '@/shared/presentation/components';
+import {
+  BottomSheet,
+  Button,
+  SectionLabel,
+  Text,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { OverpaidError } from '../../../domain';
 import { useDebtsContext } from '../../context/DebtsContext';
 import { useAddDebtPayment } from '../../hooks/useDebtMutations';
+import { AccountPicker } from '../AccountPicker';
 
 type Props = {
   visible: boolean;
@@ -21,8 +27,10 @@ const formatThousands = (n: number) =>
   n > 0 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
 
 /**
- * A partial repayment. It marks progress on the ledger and moves no balance — which is
- * why the account picker the prototype had is gone: there is no account to pick.
+ * A repayment, and it moves real money — so the account is required, unlike the loan,
+ * which may never have moved any. Money coming back lands in an account; money going
+ * out leaves one. Either way a balance changes, and guessing which would be a silent
+ * lie about where the user's cash is.
  *
  * The 100% chip settles the debt exactly; anything above what is owed comes back as
  * `debts.overpaid` from the server, and the input caps at the same bound anyway.
@@ -36,12 +44,14 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
   const addPayment = useAddDebtPayment(today);
 
   const [amount, setAmount] = useState(0);
+  const [accountId, setAccountId] = useState<string | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (visible) {
       setAmount(0);
+      setAccountId(null);
       setFailed(null);
       const tm = setTimeout(() => inputRef.current?.focus(), 320);
       return () => clearTimeout(tm);
@@ -58,7 +68,7 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
 
   const isIncoming = deuda.direction === 'incoming';
   const remaining = deuda.remaining;
-  const valid = amount > 0 && amount <= remaining;
+  const valid = amount > 0 && amount <= remaining && accountId !== null;
   const display = formatThousands(amount);
 
   const CHIP_PCTS = [0.25, 0.5, 1] as const;
@@ -67,10 +77,10 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
   );
 
   const handleSave = () => {
-    if (!valid || addPayment.isPending) return;
+    if (!valid || accountId === null || addPayment.isPending) return;
     setFailed(null);
     addPayment.mutate(
-      { id: deuda.id, amount },
+      { id: deuda.id, amount, accountId },
       {
         onSuccess: () => {
           onSaved(amount);
@@ -218,6 +228,13 @@ export function RegistrarAbonoSheet({ visible, debtId, onClose, onSaved }: Props
               </Pressable>
             );
           })}
+        </View>
+
+        <View style={{ gap: 8, marginTop: 20 }}>
+          <SectionLabel>
+            {t(isIncoming ? 'deudas.abono.accountIn' : 'deudas.abono.accountOut')}
+          </SectionLabel>
+          <AccountPicker selected={accountId} onSelect={setAccountId} />
         </View>
 
         {failed ? (

@@ -5,7 +5,13 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
-import { FilterChip, RetryState, Text, Toast } from '@/shared/presentation/components';
+import {
+  FilterChip,
+  RetryState,
+  SubScreenHeader,
+  Text,
+  Toast,
+} from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import {
@@ -31,7 +37,20 @@ import { groupByDay } from '../utils/groupByDay';
 /** How many months back the picker offers. */
 const MONTHS_BACK = 6;
 
-export function MovementsScreen() {
+type Props = {
+  /**
+   * Renders the screen as a sub-screen of ONE source instead of the tab.
+   *
+   * This exists because a tab cannot be gone back from: pushing `/movements`
+   * from Accounts does not stack anything — expo-router returns to the tabs
+   * already sitting underneath and swaps the active one, dismissing Accounts
+   * and leaving nothing to pop. A source's movements are a place you arrive
+   * *from* somewhere, so they get their own stack route and a back button.
+   */
+  scopedSourceId?: string;
+};
+
+export function MovementsScreen({ scopedSourceId }: Props = {}) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const tabBarClearance = useFloatingTabBarClearance();
@@ -41,7 +60,9 @@ export function MovementsScreen() {
   // Pinned once per mount: every date label and range is derived from it, so the
   // screen never disagrees with itself mid-render.
   const [today] = useState(() => toIsoDate(new Date()));
-  const [filters, setFilters] = useState<MovementsFilters>(emptyFilters);
+  const [filters, setFilters] = useState<MovementsFilters>(() =>
+    scopedSourceId ? { ...emptyFilters, sourceId: scopedSourceId } : emptyFilters,
+  );
   const [detail, setDetail] = useState<Movement | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -127,7 +148,11 @@ export function MovementsScreen() {
     { value: 'transfer', label: t('movements.types.transfers') },
   ];
 
-  const active = hasActiveFilters(filters);
+  // The scope is not one of the user's filters, so it must not light up
+  // "Limpiar" — a clear button with nothing to clear is a dead affordance.
+  const active = hasActiveFilters(
+    scopedSourceId ? { ...filters, sourceId: null } : filters,
+  );
 
   const handleSave = (patch: MovementPatch) => {
     if (!detail) return;
@@ -156,19 +181,27 @@ export function MovementsScreen() {
       <ScrollView
         contentContainerStyle={{
           paddingTop: 14,
-          paddingBottom: tabBarClearance,
+          // Pushed over the tabs there is no floating bar to clear.
+          paddingBottom: scopedSourceId ? 32 : tabBarClearance,
           paddingHorizontal: 16,
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
         <View style={{ gap: 16 }}>
-          <MovementsHeader
-            monthLabel={monthName(month, language)}
-            monthTotal={monthTotal}
-            currency={currency}
-            onAvatarPress={() => router.push('/profile')}
-          />
+          {scopedSourceId ? (
+            <SubScreenHeader
+              title={catalogs.sourceById[scopedSourceId]?.name ?? t('movements.title')}
+              onBack={() => router.back()}
+            />
+          ) : (
+            <MovementsHeader
+              monthLabel={monthName(month, language)}
+              monthTotal={monthTotal}
+              currency={currency}
+              onAvatarPress={() => router.push('/profile')}
+            />
+          )}
 
           <SearchBar
             value={filters.query}
@@ -184,12 +217,17 @@ export function MovementsScreen() {
               options={monthOptions}
               allLabel={t('movements.filters.monthAll')}
             />
-            <FilterChip
-              label={t('movements.filters.account')}
-              value={filters.sourceId}
-              onChange={(sourceId) => setFilters((f) => ({ ...f, sourceId }))}
-              options={sourceOptions}
-            />
+            {/* Scoped to one source, the source is not a filter — it is the
+                screen. Offering it as a chip would let the user "clear" their
+                way out of the very thing they opened. */}
+            {scopedSourceId ? null : (
+              <FilterChip
+                label={t('movements.filters.account')}
+                value={filters.sourceId}
+                onChange={(sourceId) => setFilters((f) => ({ ...f, sourceId }))}
+                options={sourceOptions}
+              />
+            )}
             <FilterChip
               label={t('movements.filters.category')}
               value={filters.categoryId}
@@ -219,7 +257,15 @@ export function MovementsScreen() {
                 {t(count === 1 ? 'movements.resultsOne' : 'movements.results', { count })}
               </Text>
               <Pressable
-                onPress={() => setFilters((f) => ({ ...emptyFilters, month: f.month }))}
+                onPress={() =>
+                  setFilters((f) => ({
+                    ...emptyFilters,
+                    month: f.month,
+                    // The scope survives "Limpiar" — clearing your way out of
+                    // the screen you just opened is not clearing, it is a bug.
+                    sourceId: scopedSourceId ?? null,
+                  }))
+                }
                 hitSlop={6}
               >
                 <Text

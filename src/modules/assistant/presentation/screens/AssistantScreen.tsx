@@ -24,7 +24,12 @@ import { useTheme } from '@/shared/presentation/theme';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { ChatLimitReachedError } from '../../domain';
-import type { MovementDraft } from '../../domain/types/Assistant';
+import type {
+  DebtDraft,
+  DebtDraftOverrides,
+  DraftOverrides,
+  MovementDraft,
+} from '../../domain/types/Assistant';
 import { AssistantBubble } from '../components/AssistantBubble';
 import { AssistantHeader } from '../components/AssistantHeader';
 import { BlockView } from '../components/BlockView';
@@ -36,7 +41,9 @@ import { UsageMeter, UsageMeterStrip } from '../components/UsageMeter';
 import { UserBubble } from '../components/UserBubble';
 import { useAssistantUsage } from '../hooks/useAssistantUsage';
 import {
+  useConfirmDebtDraft,
   useConfirmDraft,
+  useDiscardDebtDraft,
   useDiscardDraft,
   useSendMessage,
 } from '../hooks/useAssistantMutations';
@@ -54,6 +61,8 @@ export function AssistantScreen() {
   const send = useSendMessage(today);
   const confirm = useConfirmDraft(today);
   const discard = useDiscardDraft();
+  const confirmDebt = useConfirmDebtDraft(today);
+  const discardDebt = useDiscardDebtDraft();
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
 
   const [input, setInput] = useState('');
@@ -91,9 +100,9 @@ export function AssistantScreen() {
   );
 
   const onConfirmDraft = useCallback(
-    (draft: MovementDraft) => {
+    (draft: MovementDraft, overrides?: DraftOverrides) => {
       confirm.mutate(
-        { draftId: draft.id },
+        { draftId: draft.id, overrides },
         {
           onSuccess: () => setToast(t('assistant.draft.saved')),
           onError: () => setToast(t('assistant.errors.confirmFailed')),
@@ -120,6 +129,34 @@ export function AssistantScreen() {
     },
     [discard, t],
   );
+
+  const onConfirmDebtDraft = useCallback(
+    (draft: DebtDraft, overrides?: DebtDraftOverrides) => {
+      confirmDebt.mutate(
+        { draftId: draft.id, overrides },
+        {
+          onSuccess: () => setToast(t('assistant.debtDraft.saved')),
+          onError: () => setToast(t('assistant.debtDraft.confirmFailed')),
+        },
+      );
+    },
+    [confirmDebt, t],
+  );
+
+  const onDiscardDebtDraft = useCallback(
+    (draft: DebtDraft) => {
+      discardDebt.mutate(draft.id, {
+        onError: () => setToast(t('assistant.errors.discardFailed')),
+      });
+    },
+    [discardDebt, t],
+  );
+
+  const busyDebtDraftId = confirmDebt.isPending
+    ? (confirmDebt.variables?.draftId ?? null)
+    : discardDebt.isPending
+      ? (discardDebt.variables ?? null)
+      : null;
 
   const busyDraftId = confirm.isPending
     ? (confirm.variables?.draftId ?? null)
@@ -220,6 +257,12 @@ export function AssistantScreen() {
                             onEdit: onEditDraft,
                             onDiscard: onDiscardDraft,
                             busyDraftId,
+                          }}
+                          debtDraftHandlers={{
+                            today,
+                            onConfirm: onConfirmDebtDraft,
+                            onDiscard: onDiscardDebtDraft,
+                            busyDraftId: busyDebtDraftId,
                           }}
                         />
                       ))}

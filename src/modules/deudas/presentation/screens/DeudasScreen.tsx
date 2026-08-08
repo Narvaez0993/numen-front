@@ -18,10 +18,11 @@ import { DirectionTabs } from '../components/DirectionTabs';
 import { EmptyDeudasState } from '../components/EmptyDeudasState';
 import { NuevaDeudaFlow } from '../components/create-flow/NuevaDeudaFlow';
 import { ConfirmDeleteSheet } from '../components/sheets/ConfirmDeleteSheet';
+import { ConfirmWriteOffSheet } from '../components/sheets/ConfirmWriteOffSheet';
 import { HistorySheet } from '../components/sheets/HistorySheet';
 import { RegistrarAbonoSheet } from '../components/sheets/RegistrarAbonoSheet';
 import { DebtsProvider } from '../context/DebtsContext';
-import { useDeleteDebt } from '../hooks/useDebtMutations';
+import { useDeleteDebt, useReopenDebt, useWriteOffDebt } from '../hooks/useDebtMutations';
 import { useDeudas } from '../hooks/useDeudas';
 import { useDeudasFlowStore } from '../stores/useDeudasFlowStore';
 
@@ -55,16 +56,22 @@ export function DeudasScreen() {
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmWriteOffId, setConfirmWriteOffId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ visible: boolean; message: string }>({
     visible: false,
     message: '',
   });
 
   const deleteDebt = useDeleteDebt();
+  const writeOffDebt = useWriteOffDebt(today);
+  const reopenDebt = useReopenDebt(today);
 
   const activeDebts = useMemo(
     () =>
-      (data?.debts ?? []).filter((d) => d.direction === direction && d.status !== 'paid'),
+      (data?.debts ?? []).filter(
+        (d) =>
+          d.direction === direction && d.status !== 'paid' && d.status !== 'written_off',
+      ),
     [data, direction],
   );
 
@@ -123,6 +130,27 @@ export function DeudasScreen() {
     });
   };
 
+  const handleConfirmWriteOff = () => {
+    const id = confirmWriteOffId;
+    setConfirmWriteOffId(null);
+    if (!id) return;
+    writeOffDebt.mutate(id, {
+      onSuccess: () => showToast(t('deudas.writeOff.toast')),
+      onError: () => showToast(t('common.error')),
+    });
+  };
+
+  const handleReopen = (id: string) => {
+    reopenDebt.mutate(id, {
+      onSuccess: () => showToast(t('deudas.writeOff.reopenToast')),
+      onError: () => showToast(t('common.error')),
+    });
+  };
+
+  const writeOffTarget = confirmWriteOffId
+    ? data.debts.find((d) => d.id === confirmWriteOffId)
+    : undefined;
+
   const sheets = (
     <>
       <RegistrarAbonoSheet
@@ -144,6 +172,19 @@ export function DeudasScreen() {
         visible={confirmDeleteId !== null}
         onConfirm={handleConfirmDelete}
         onClose={() => setConfirmDeleteId(null)}
+      />
+      <ConfirmWriteOffSheet
+        visible={writeOffTarget !== undefined}
+        remaining={writeOffTarget?.remaining ?? 0}
+        name={
+          writeOffTarget
+            ? (data.counterparties.find((c) => c.id === writeOffTarget.counterpartyId)
+                ?.name ?? '')
+            : ''
+        }
+        busy={writeOffDebt.isPending}
+        onConfirm={handleConfirmWriteOff}
+        onClose={() => setConfirmWriteOffId(null)}
       />
       <Toast
         visible={toast.visible}
@@ -171,6 +212,8 @@ export function DeudasScreen() {
             onBack={closeDetail}
             onAbono={() => openAbono(selectedDebtId)}
             onDelete={() => setConfirmDeleteId(selectedDebtId)}
+            onWriteOff={() => setConfirmWriteOffId(selectedDebtId)}
+            onReopen={() => handleReopen(selectedDebtId)}
           />
           <FAB variant="pink" bottomOffset={28} onPress={() => openCreate(direction)} />
           {sheets}

@@ -33,6 +33,7 @@ type DebtResponse = {
   due_on: string | null;
   note: string | null;
   event_id: string | null;
+  written_off_on: string | null;
   payments: PaymentResponse[];
   created_at: string;
 };
@@ -71,6 +72,9 @@ export class HttpDeudasRepository implements DeudasRepository {
           counterparty_id: input.counterpartyId ?? null,
           counterparty_name: input.counterpartyName ?? null,
           amount: input.amount,
+          // Null on purpose when the debt shifted no cash: the server then records
+          // no transfer, and the debt is a plain claim.
+          account_id: input.accountId ?? null,
           due_on: input.dueOn ?? null,
           note: input.note ?? null,
         },
@@ -116,15 +120,42 @@ export class HttpDeudasRepository implements DeudasRepository {
   async addPayment(
     id: string,
     amount: number,
+    accountId: string,
     today: string,
     note?: string,
   ): Promise<Deuda> {
     try {
       const { data } = await this.http.post<DebtResponse>(
         `/debts/${id}/payments`,
-        { amount, note: note ?? null },
+        { amount, account_id: accountId, note: note ?? null },
         { params: { today } },
       );
+      return toDeuda(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async writeOff(id: string, today: string): Promise<Deuda> {
+    try {
+      // No body: the only input is the decision. How much it costs is the ledger's
+      // to work out — it knows what cash actually crossed.
+      const { data } = await this.http.post<DebtResponse>(
+        `/debts/${id}/write-off`,
+        {},
+        { params: { today } },
+      );
+      return toDeuda(data);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async reopen(id: string, today: string): Promise<Deuda> {
+    try {
+      const { data } = await this.http.delete<DebtResponse>(`/debts/${id}/write-off`, {
+        params: { today },
+      });
       return toDeuda(data);
     } catch (error) {
       throw mapApiError(error);
@@ -156,6 +187,7 @@ function toDeuda(response: DebtResponse): Deuda {
     dueOn: response.due_on,
     note: response.note,
     eventId: response.event_id,
+    writtenOffOn: response.written_off_on,
     payments: response.payments.map((payment) => ({
       id: payment.id,
       amount: payment.amount,

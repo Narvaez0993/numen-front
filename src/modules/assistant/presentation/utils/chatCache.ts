@@ -8,6 +8,7 @@ import type {
   AssistantBlock,
   ChatHistory,
   ChatMessage,
+  DebtDraft,
   MovementDraft,
 } from '../../domain/types/Assistant';
 
@@ -37,6 +38,25 @@ export function replaceDraft(
         (block): AssistantBlock =>
           block.type === 'draft' && block.draft.id === draft.id
             ? { ...block, draft }
+            : block,
+      ),
+    })),
+  };
+}
+
+export function replaceDebtDraft(
+  history: ChatHistory | undefined,
+  debtDraft: DebtDraft,
+): ChatHistory {
+  const base = history ?? { messages: [], nextBefore: null };
+  return {
+    ...base,
+    messages: base.messages.map((message) => ({
+      ...message,
+      blocks: message.blocks.map(
+        (block): AssistantBlock =>
+          block.type === 'debt_draft' && block.debtDraft.id === debtDraft.id
+            ? { ...block, debtDraft }
             : block,
       ),
     })),

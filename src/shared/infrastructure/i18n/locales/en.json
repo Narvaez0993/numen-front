@@ -8,7 +8,8 @@
     "continue": "Continue",
     "all": "All",
     "recurring": "recurring",
-    "soon": "Soon"
+    "soon": "Soon",
+    "close": "Close"
   },
   "movements": {
     "title": "Movements",
@@ -413,7 +414,8 @@
     "errors": {
       "saveFailed": "We couldn't save it. Try again.",
       "deleteFailed": "We couldn't delete it. Try again."
-    }
+    },
+    "edit": "Edit {{name}}"
   },
   "assistant": {
     "title": "Assistant",
@@ -556,7 +558,17 @@
       "confirm": "Confirm",
       "edit": "Edit",
       "discard": "Discard",
-      "saved": "Movement saved"
+      "saved": "Movement saved",
+      "sourceMissing": {
+        "expense": "Where did it come from?",
+        "income": "Which account did it land in?",
+        "transfer": "Where did it come from?"
+      },
+      "sourceHint": {
+        "expense": "Say it out loud and skip this step: “a $5 coffee on Chase”.",
+        "income": "Say it out loud and skip this step: “got paid $5 into Chase”.",
+        "transfer": "Say it out loud and skip this step: “moved $50 from Chase to Ally”."
+      }
     },
     "chips": {
       "month": "How am I doing this month?",
@@ -591,6 +603,28 @@
         "body": "{{amount}} not yet telling the month's story properly.",
         "cta": "Sort them"
       }
+    },
+    "debtDraft": {
+      "direction": {
+        "incoming": "They owe you",
+        "outgoing": "You owe them"
+      },
+      "subtitle": "Debt to confirm",
+      "noAccount": "No money moved",
+      "saved": "Debt registered",
+      "personMissing": "“{{name}}” is someone new. Or is it one of these people?",
+      "accountHint": "Lending is not spending: the cash leaves your account and becomes a debt, not an expense for the month.",
+      "confirmFailed": "Could not save the debt",
+      "paymentPill": "Repayment",
+      "paymentSubtitle": "Repayment to confirm",
+      "accountIn": "Which account did the money land in?",
+      "accountOut": "Which account did the money leave?",
+      "paymentHint": "A repayment is not income: the cash returns to your account and the debt drops by the same amount.",
+      "accountRequired": "Pick the account the money landed in: a repayment always moves a balance.",
+      "someone": "Who paid you?",
+      "whichDebt": "Which debt is this repayment for?",
+      "remaining": "{{amount}} left",
+      "overpaying": "That is more than what is left ({{amount}})."
     }
   },
   "onboarding": {
@@ -906,7 +940,8 @@
       "pending": "PENDING",
       "partial": "PARTIAL",
       "paid": "PAID",
-      "overdue": "OVERDUE"
+      "overdue": "OVERDUE",
+      "written_off": "WRITTEN OFF"
     },
     "pctPaid": "{{pct}}% paid",
     "due": {
@@ -937,7 +972,7 @@
     },
     "history": {
       "title": "Debt history",
-      "subtitle": "The ones already settled.",
+      "subtitle": "The ones that closed: collected or written off.",
       "empty": "No paid debts yet.",
       "noNote": "No note"
     },
@@ -959,7 +994,9 @@
       "balanceLabel": "Current balance",
       "save": "Save payment",
       "toast": "Payment recorded · {{amount}}",
-      "overpaid": "That payment is more than what is left."
+      "overpaid": "That payment is more than what is left.",
+      "accountIn": "Which account did it land in?",
+      "accountOut": "Which account did it leave?"
     },
     "create": {
       "step": "Step {{current}} of {{total}}",
@@ -979,7 +1016,7 @@
       "step2": {
         "titleIndividual": "Loan details",
         "titleShared": "Expense details",
-        "subIndividual": "How much and where does the money come from?",
+        "subIndividual": "How much, and which account does it leave?",
         "subShared": "Total amount and category of the expense.",
         "amountLabel": "Amount",
         "amountSharedLabel": "Total amount",
@@ -990,7 +1027,12 @@
         "noteLabel": "Note (optional)",
         "notePlaceholder": "Ex. Thursday lunch, car loan, etc.",
         "noteSharedLabel": "Event name",
-        "noteSharedPlaceholder": "Friday dinner, trip, gift…"
+        "noteSharedPlaceholder": "Friday dinner, trip, gift…",
+        "accountOutLabel": "Which account did it leave?",
+        "accountInLabel": "Which account did it land in?",
+        "accountNone": "No money moved (I logged it separately)",
+        "accountHintOut": "Lending is not spending: the cash leaves your account and becomes a claim, not an expense for the month.",
+        "accountHintIn": "Money you borrowed lands in your account and is booked as a debt, not as income."
       },
       "step3": {
         "title": "How is it split?",
@@ -1030,8 +1072,22 @@
     },
     "confirmDelete": {
       "title": "Delete this debt?",
-      "body": "The record and its payments are removed. Your accounts and movements stay put: this debt never moved money.",
+      "body": "The record, its repayments and the movements that carried the cash are all removed. Your accounts go back to where they were.",
       "cta": "Delete debt"
+    },
+    "account": {
+      "none": "No money moved"
+    },
+    "writeOff": {
+      "action": "Write it off",
+      "title": "Write off what {{name}} owes you?",
+      "body": "It books an expense for the cash that left your accounts and never came back. Until now it was a transfer and had cost you nothing.",
+      "undo": "If they pay later you can reopen it, and the expense is deleted.",
+      "cta": "Yes, write it off",
+      "toast": "Debt written off",
+      "banner": "You wrote this off on {{date}}. The expense was booked that day.",
+      "reopen": "Reopen debt",
+      "reopenToast": "Debt reopened · the expense was deleted"
     }
   },
   "profile": {
@@ -1173,6 +1229,7 @@
         "pickDate": "Another date…"
       },
       "voiceHint": "Tap the mic and tell me the expense",
+      "voiceExample": "e.g. “a $5 coffee on Chase”",
       "recordingHint": "Listening… tap to finish",
       "nothingHeard": "I didn't catch that — try again or type it",
       "processing": "Understanding…",
@@ -1185,6 +1242,7 @@
       },
       "confirm": {
         "title": "Here's what I understood",
+        "titleMany": "Here's what I understood · {{count}} movements",
         "said": "You said"
       },
       "permission": {
@@ -1202,7 +1260,9 @@
         "income": "Income saved",
         "transfer": "Transfer saved"
       },
-      "saveFailed": "We couldn't save it. Try again."
+      "saveFailed": "We couldn't save it. Try again.",
+      "savedOne": "Saved",
+      "savedMany": "{{count}} records saved"
     }
   },
   "notFound": {

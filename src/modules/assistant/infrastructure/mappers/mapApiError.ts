@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   AgentUnavailableError,
   ChatLimitReachedError,
+  DebtPaymentAccountRequiredError,
   DraftNotFoundError,
   DraftNotPendingError,
   DuplicateMessageError,
@@ -13,6 +14,7 @@ const BY_CODE: Record<string, () => Error> = {
   'assistant.chat_limit_reached': () => new ChatLimitReachedError(),
   'assistant.registration_limit_reached': () => new RegistrationLimitReachedError(),
   'assistant.draft_not_found': () => new DraftNotFoundError(),
+  'assistant.debt_payment_account_required': () => new DebtPaymentAccountRequiredError(),
   'assistant.draft_not_pending': () => new DraftNotPendingError(),
   'assistant.duplicate_message': () => new DuplicateMessageError(),
   'assistant.upstream_unavailable': () => new AgentUnavailableError(),

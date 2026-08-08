@@ -8,18 +8,30 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RegistrationLimitReachedError } from '@/modules/assistant/domain';
-import type { CaptureSource } from '@/modules/assistant/domain/types/Assistant';
-import { useParseCapture } from '@/modules/assistant/presentation/hooks/useAssistantMutations';
+import type {
+  CapturedRecord,
+  CaptureSource,
+  DebtDraft,
+  MovementDraft,
+} from '@/modules/assistant/domain/types/Assistant';
+import {
+  useConfirmDebtDraft,
+  useConfirmDraft,
+  useParseCapture,
+} from '@/modules/assistant/presentation/hooks/useAssistantMutations';
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { useSpeechRecognition } from '@/shared/presentation/voice/useSpeechRecognition';
 
 import { useExpenseSheetStore } from '../stores/useExpenseSheetStore';
+import { needsAnswers } from '../utils/captureAnswers';
 
 export function useVoiceCapture() {
   const { t } = useTranslation();
   const today = useMemo(() => toIsoDate(new Date()), []);
   const parse = useParseCapture(today);
+  const confirmDraft = useConfirmDraft(today);
+  const confirmDebtDraft = useConfirmDebtDraft(today);
   const catalogs = useMovementCatalogs();
 
   const open = useExpenseSheetStore((s) => s.open);
@@ -27,7 +39,10 @@ export function useVoiceCapture() {
   const setFlow = useExpenseSheetStore((s) => s.setFlow);
   const setMethod = useExpenseSheetStore((s) => s.setMethod);
   const setTranscript = useExpenseSheetStore((s) => s.setTranscript);
-  const setDraft = useExpenseSheetStore((s) => s.setDraft);
+  const setDrafts = useExpenseSheetStore((s) => s.setDrafts);
+  const setDebtDrafts = useExpenseSheetStore((s) => s.setDebtDrafts);
+  const setSaved = useExpenseSheetStore((s) => s.setSaved);
+  const closeSheet = useExpenseSheetStore((s) => s.closeSheet);
   const setClarification = useExpenseSheetStore((s) => s.setClarification);
   const setNotice = useExpenseSheetStore((s) => s.setNotice);
 
@@ -43,6 +58,66 @@ export function useVoiceCapture() {
     [catalogs],
   );
 
+  /**
+   * Everything the agent already knew, saved without asking.
+   *
+   * It walks the drafts one by one rather than firing them together, because each
+   * confirm moves real money and a half-applied batch is worse than a slow one.
+   * Anything that fails hands the REST back to the confirm screen, where the user
+   * decides — silently dropping them would be the app losing words it heard.
+   */
+  const saveAll = useCallback(
+    async (drafts: MovementDraft[], debtDrafts: DebtDraft[]) => {
+      const records: CapturedRecord[] = [];
+      const leftoverDrafts: MovementDraft[] = [];
+      const leftoverDebts: DebtDraft[] = [];
+
+      for (const draft of drafts) {
+        try {
+          const done = await confirmDraft.mutateAsync({ draftId: draft.id });
+          records.push({ kind: 'movement', movementId: done.movementId });
+        } catch {
+          leftoverDrafts.push(draft);
+        }
+      }
+      for (const draft of debtDrafts) {
+        try {
+          const done = await confirmDebtDraft.mutateAsync({ draftId: draft.id });
+          records.push(
+            done.movementId !== null
+              ? {
+                  kind: 'payment',
+                  debtId: done.debtId,
+                  movementId: done.movementId,
+                }
+              : { kind: 'debt', debtId: done.debtId },
+          );
+        } catch {
+          leftoverDebts.push(draft);
+        }
+      }
+
+      if (leftoverDrafts.length > 0 || leftoverDebts.length > 0) {
+        setDrafts(leftoverDrafts);
+        setDebtDrafts(leftoverDebts);
+        setSaved(records);
+        setFlow('confirm');
+        return;
+      }
+      setSaved(records);
+      closeSheet();
+    },
+    [
+      confirmDebtDraft,
+      confirmDraft,
+      closeSheet,
+      setDebtDrafts,
+      setDrafts,
+      setFlow,
+      setSaved,
+    ],
+  );
+
   const submit = useCallback(
     (text: string, source: CaptureSource) => {
       setInlineError(null);
@@ -53,8 +128,17 @@ export function useVoiceCapture() {
         { text, source },
         {
           onSuccess: (outcome) => {
-            if (outcome.draft !== null) {
-              setDraft(outcome.draft);
+            // One breath can hold both — "un café de 5 mil y le presté 50 a
+            // Andrés" — so whatever came back travels together.
+            if (outcome.drafts.length > 0 || outcome.debtDrafts.length > 0) {
+              // Nothing left to ask: save it and get out of the way. Being asked
+              // is what deserves a screen; being understood does not.
+              if (!needsAnswers(outcome.drafts, outcome.debtDrafts)) {
+                void saveAll(outcome.drafts, outcome.debtDrafts);
+                return;
+              }
+              setDrafts(outcome.drafts);
+              setDebtDrafts(outcome.debtDrafts);
               setFlow('confirm');
               return;
             }
@@ -74,7 +158,18 @@ export function useVoiceCapture() {
         },
       );
     },
-    [parse, setClarification, setDraft, setFlow, setMethod, setNotice, setTranscript, t],
+    [
+      parse,
+      saveAll,
+      setClarification,
+      setDebtDrafts,
+      setDrafts,
+      setFlow,
+      setMethod,
+      setNotice,
+      setTranscript,
+      t,
+    ],
   );
 
   const onFinal = useCallback(

@@ -8,7 +8,8 @@
     "continue": "Continuar",
     "all": "Todas",
     "recurring": "recurrente",
-    "soon": "Pronto"
+    "soon": "Pronto",
+    "close": "Cerrar"
   },
   "movements": {
     "title": "Movimientos",
@@ -413,7 +414,8 @@
     "errors": {
       "saveFailed": "No pudimos guardar. Intenta de nuevo.",
       "deleteFailed": "No pudimos eliminar. Intenta de nuevo."
-    }
+    },
+    "edit": "Editar {{name}}"
   },
   "assistant": {
     "title": "Asistente",
@@ -556,7 +558,17 @@
       "confirm": "Confirmar",
       "edit": "Editar",
       "discard": "Descartar",
-      "saved": "Movimiento guardado"
+      "saved": "Movimiento guardado",
+      "sourceMissing": {
+        "expense": "¿De dónde salió?",
+        "income": "¿A qué cuenta entró?",
+        "transfer": "¿De dónde salió?"
+      },
+      "sourceHint": {
+        "expense": "Dilo al hablar y te lo ahorras: «un café de 5.000 con Nequi».",
+        "income": "Dilo al hablar y te lo ahorras: «me pagaron 5.000 a Nequi».",
+        "transfer": "Dilo al hablar y te lo ahorras: «pasé 50.000 de Nequi a Bancolombia»."
+      }
     },
     "chips": {
       "month": "¿Cómo voy este mes?",
@@ -591,6 +603,28 @@
         "body": "{{amount}} que aún no cuentan bien la historia del mes.",
         "cta": "Clasificarlos"
       }
+    },
+    "debtDraft": {
+      "direction": {
+        "incoming": "Te deben",
+        "outgoing": "Le debes"
+      },
+      "subtitle": "Deuda por confirmar",
+      "noAccount": "No movió plata",
+      "saved": "Deuda registrada",
+      "personMissing": "«{{name}}» es alguien nuevo. ¿O es una de estas personas?",
+      "accountHint": "Prestar no es gastar: la plata sale de tu cuenta y queda como deuda, no como gasto del mes.",
+      "confirmFailed": "No se pudo guardar la deuda",
+      "paymentPill": "Abono",
+      "paymentSubtitle": "Abono por confirmar",
+      "accountIn": "¿A qué cuenta entró esa plata?",
+      "accountOut": "¿De qué cuenta salió esa plata?",
+      "paymentHint": "Un abono no es un ingreso: la plata vuelve a tu cuenta y la deuda baja lo mismo.",
+      "accountRequired": "Elige la cuenta donde entró la plata: un abono siempre mueve saldo.",
+      "someone": "¿Quién te pagó?",
+      "whichDebt": "¿De cuál deuda es este abono?",
+      "remaining": "faltan {{amount}}",
+      "overpaying": "Ese abono es más de lo que queda ({{amount}})."
     }
   },
   "onboarding": {
@@ -906,7 +940,8 @@
       "pending": "PENDIENTE",
       "partial": "PARCIAL",
       "paid": "PAGADO",
-      "overdue": "VENCIDA"
+      "overdue": "VENCIDA",
+      "written_off": "PERDIDA"
     },
     "pctPaid": "{{pct}}% pagado",
     "due": {
@@ -937,7 +972,7 @@
     },
     "history": {
       "title": "Historial de deudas",
-      "subtitle": "Las que ya quedaron en cero.",
+      "subtitle": "Las que ya se cerraron: cobradas o dadas por perdidas.",
       "empty": "Aún no hay deudas pagadas.",
       "noNote": "Sin nota"
     },
@@ -959,7 +994,9 @@
       "balanceLabel": "Balance actual",
       "save": "Guardar abono",
       "toast": "Abono registrado · {{amount}}",
-      "overpaid": "Ese abono es más de lo que queda pendiente."
+      "overpaid": "Ese abono es más de lo que queda pendiente.",
+      "accountIn": "¿A qué cuenta entró?",
+      "accountOut": "¿De qué cuenta salió?"
     },
     "create": {
       "step": "Paso {{current}} de {{total}}",
@@ -979,7 +1016,7 @@
       "step2": {
         "titleIndividual": "Detalles del préstamo",
         "titleShared": "Detalles del gasto",
-        "subIndividual": "¿Cuánto y de dónde sale la plata?",
+        "subIndividual": "¿Cuánto y de qué cuenta sale la plata?",
         "subShared": "Monto total y categoría del gasto.",
         "amountLabel": "Monto",
         "amountSharedLabel": "Total del gasto",
@@ -990,7 +1027,12 @@
         "noteLabel": "Nota (opcional)",
         "notePlaceholder": "Ej. Comida del jueves, préstamo carro, etc.",
         "noteSharedLabel": "Nombre del evento",
-        "noteSharedPlaceholder": "Cena del viernes, paseo, regalo…"
+        "noteSharedPlaceholder": "Cena del viernes, paseo, regalo…",
+        "accountOutLabel": "¿De qué cuenta salió?",
+        "accountInLabel": "¿A qué cuenta entró?",
+        "accountNone": "No movió plata (ya lo registré aparte)",
+        "accountHintOut": "Prestar no es gastar: la plata sale de tu cuenta y queda como deuda a tu favor, no como gasto del mes.",
+        "accountHintIn": "La plata que te prestaron entra a tu cuenta y queda anotada como deuda tuya, no como ingreso."
       },
       "step3": {
         "title": "¿Cómo se divide?",
@@ -1030,8 +1072,22 @@
     },
     "confirmDelete": {
       "title": "¿Eliminar esta deuda?",
-      "body": "Se borra el registro y sus abonos. Tus cuentas y movimientos no se tocan: esta deuda nunca movió plata.",
+      "body": "Se borra el registro, sus abonos y los movimientos que movieron esa plata. Tus cuentas vuelven a como estaban.",
       "cta": "Eliminar deuda"
+    },
+    "account": {
+      "none": "No movió plata"
+    },
+    "writeOff": {
+      "action": "Dar por perdida",
+      "title": "¿Dar por perdida la deuda de {{name}}?",
+      "body": "Se registra un gasto por la plata que salió de tus cuentas y no volvió. Hasta ahora era una transferencia y no te había costado nada.",
+      "undo": "Si después te paga, puedes reabrirla y el gasto se borra.",
+      "cta": "Sí, darla por perdida",
+      "toast": "Deuda dada por perdida",
+      "banner": "La diste por perdida el {{date}}. El gasto quedó registrado ese día.",
+      "reopen": "Reabrir deuda",
+      "reopenToast": "Deuda reabierta · el gasto se borró"
     }
   },
   "profile": {
@@ -1173,6 +1229,7 @@
         "pickDate": "Otra fecha…"
       },
       "voiceHint": "Toca el mic y cuéntame el gasto",
+      "voiceExample": "Ej.: «un café de 5.000 con Nequi»",
       "recordingHint": "Te escucho… toca para terminar",
       "nothingHeard": "No te escuché — intenta de nuevo o escríbelo",
       "processing": "Entendiendo…",
@@ -1185,6 +1242,7 @@
       },
       "confirm": {
         "title": "Esto entendí",
+        "titleMany": "Esto entendí · {{count}} movimientos",
         "said": "Dijiste"
       },
       "permission": {
@@ -1202,7 +1260,9 @@
         "income": "Ingreso guardado",
         "transfer": "Transferencia guardada"
       },
-      "saveFailed": "No pudimos guardar. Intenta de nuevo."
+      "saveFailed": "No pudimos guardar. Intenta de nuevo.",
+      "savedOne": "Guardado",
+      "savedMany": "{{count}} registros guardados"
     }
   },
   "notFound": {
