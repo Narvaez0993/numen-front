@@ -76,6 +76,11 @@ export function AccountsScreen() {
   const tier = useAuthStore((s) => s.session?.tier);
   const isPlus = tier === 'plus';
 
+  /** This source's movements — the question a tap on a source is actually
+   * asking. Its own stack route, not the Movements tab: a tab has nothing to
+   * pop back to, and arriving here should always leave a way home. */
+  const goToMovements = (sourceId: string) => router.push(`/source/${sourceId}`);
+
   if (isError) {
     return (
       <SafeAreaView
@@ -223,7 +228,12 @@ export function AccountsScreen() {
                 subtitle={account.sub || undefined}
                 value={formatMoney(account.balance, currency)}
                 last={i === accounts.length - 1}
-                onPress={() => setAccountSheet({ open: true, account })}
+                // Tapping a source asks "what have I done with this account?",
+                // not "let me rename it" — the balance is already on the row,
+                // its movements are the part you cannot see from here.
+                onPress={() => goToMovements(account.id)}
+                onEdit={() => setAccountSheet({ open: true, account })}
+                editLabel={t('accounts.edit', { name: account.name })}
               />
             ))}
           </SettingsGroup>
@@ -258,7 +268,9 @@ export function AccountsScreen() {
                 <CreditCardItem
                   key={card.id}
                   card={card}
-                  onPress={() => setCardSheet({ open: true, card })}
+                  onPress={() => goToMovements(card.id)}
+                  onEdit={() => setCardSheet({ open: true, card })}
+                  editLabel={t('accounts.edit', { name: card.name })}
                 />
               ))}
             </View>

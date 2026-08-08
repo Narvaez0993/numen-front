@@ -14,12 +14,15 @@ import { shortDate } from '@/shared/presentation/utils/dates';
 
 import type { DebtDirection } from '../../../domain';
 import { useDebtsContext } from '../../context/DebtsContext';
+import { AccountPicker } from '../AccountPicker';
 
 type Props = {
   direction: DebtDirection;
   isShared: boolean;
   amount: number;
   onAmountChange: (v: number) => void;
+  accountId: string | null;
+  onAccountChange: (v: string | null) => void;
   dueOn: string | null;
   onDueOnChange: (v: string | null) => void;
   note: string;
@@ -30,18 +33,23 @@ const formatThousands = (n: number) =>
   n > 0 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
 
 /**
- * What is owed, when it is due, and a note. That is the whole step now.
+ * How much, which account the cash crossed, when it is due, and a note.
  *
- * The prototype also asked for a category, an account and a date — fields of a
- * movement, not of a debt. A debt is a parallel record that moves no money, so those
- * pickers (all hardcoded fakes) died with the model that justified them. For a shared
- * event the note doubles as the event's name ("Cena del viernes").
+ * The account is back — but not as the prototype's hardcoded fake. It is here because
+ * lending really moves money: it leaves your account as a transfer into the debt, so
+ * the balance drops while the month's expenses do not. Saying "no movió plata" is a
+ * real answer, and the honest one for a bill you already registered as an expense.
+ *
+ * A shared event never asks: the dinner left as one expense before anyone split it,
+ * so there is no second movement to record.
  */
 export function Step2({
   direction,
   isShared,
   amount,
   onAmountChange,
+  accountId,
+  onAccountChange,
   dueOn,
   onDueOnChange,
   note,
@@ -127,6 +135,35 @@ export function Step2({
           />
         </View>
       </View>
+
+      {isShared ? null : (
+        <View style={{ gap: 8 }}>
+          <SectionLabel>
+            {t(
+              direction === 'incoming'
+                ? 'deudas.create.step2.accountOutLabel'
+                : 'deudas.create.step2.accountInLabel',
+            )}
+          </SectionLabel>
+          <AccountPicker
+            selected={accountId}
+            onSelect={onAccountChange}
+            allowNone
+            noneLabel={t('deudas.create.step2.accountNone')}
+          />
+          <Text
+            variant="caption"
+            muted
+            style={{ fontSize: 11.5, lineHeight: 16, paddingHorizontal: 4 }}
+          >
+            {t(
+              direction === 'incoming'
+                ? 'deudas.create.step2.accountHintOut'
+                : 'deudas.create.step2.accountHintIn',
+            )}
+          </Text>
+        </View>
+      )}
 
       <View style={{ gap: 8 }}>
         <View

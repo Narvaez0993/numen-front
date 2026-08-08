@@ -16,7 +16,10 @@ import type {
   ChatHistory,
   ChatMessage,
   ChatTurn,
+  ConfirmedDebtDraft,
   ConfirmedDraft,
+  DebtDraft,
+  DebtDraftOverrides,
   DraftOverrides,
   MovementDraft,
   ParseOutcome,
@@ -32,8 +35,8 @@ type DraftResponse = {
   description: string;
   amount: number;
   currency: string;
-  source_type: 'account' | 'credit_card';
-  source_id: string;
+  source_type: 'account' | 'credit_card' | null;
+  source_id: string | null;
   destination_type: 'account' | 'credit_card' | null;
   destination_id: string | null;
   category_id: string | null;
@@ -58,7 +61,24 @@ type BlockResponse =
       points: { label: string; value: number }[];
     }
   | { type: 'navigate'; label: string; route: string }
-  | { type: 'draft'; draft: DraftResponse };
+  | { type: 'draft'; draft: DraftResponse }
+  | { type: 'debt_draft'; debt_draft: DebtDraftResponse };
+
+type DebtDraftResponse = {
+  id: string;
+  kind: DebtDraft['kind'];
+  target_debt_id: string | null;
+  direction: 'incoming' | 'outgoing';
+  counterparty_id: string | null;
+  counterparty_name: string;
+  amount: number;
+  currency: string;
+  account_id: string | null;
+  due_on: string | null;
+  note: string | null;
+  status: MovementDraft['status'];
+  debt_id: string | null;
+};
 
 type ChatMessageResponse = {
   id: string;
@@ -85,6 +105,12 @@ type HistoryResponse = {
 type ConfirmResponse = {
   draft: DraftResponse;
   movement_id: string;
+};
+
+type ConfirmDebtResponse = {
+  draft: DebtDraftResponse;
+  debt_id: string;
+  movement_id: string | null;
 };
 
 type InsightResponse =
@@ -222,7 +248,8 @@ type FeedResponse = {
 };
 
 type ParseResponse = {
-  draft: DraftResponse | null;
+  drafts: DraftResponse[];
+  debt_drafts: DebtDraftResponse[];
   clarification: string | null;
   usage: UsageResponse;
 };
@@ -273,7 +300,8 @@ export class HttpAssistantRepository implements AssistantRepository {
         { params: { today }, timeout: CHAT_TIMEOUT_MS },
       );
       return {
-        draft: data.draft !== null ? toDraft(data.draft) : null,
+        drafts: data.drafts.map(toDraft),
+        debtDrafts: (data.debt_drafts ?? []).map(toDebtDraft),
         clarification: data.clarification,
         usage: toUsage(data.usage),
       };
@@ -425,6 +453,52 @@ export class HttpAssistantRepository implements AssistantRepository {
       throw mapApiError(error);
     }
   }
+
+  async confirmDebtDraft(
+    draftId: string,
+    overrides: DebtDraftOverrides,
+    today: string,
+  ): Promise<ConfirmedDebtDraft> {
+    try {
+      const body: Record<string, unknown> = {};
+      if (overrides.targetDebtId !== undefined)
+        body.target_debt_id = overrides.targetDebtId;
+      if (overrides.direction !== undefined) body.direction = overrides.direction;
+      if (overrides.counterpartyId !== undefined)
+        body.counterparty_id = overrides.counterpartyId;
+      if (overrides.counterpartyName !== undefined)
+        body.counterparty_name = overrides.counterpartyName;
+      if (overrides.amount !== undefined) body.amount = overrides.amount;
+      // `null` says "no money moved" on the server; absent keeps the staged one.
+      if (overrides.accountId !== undefined) body.account_id = overrides.accountId;
+      if (overrides.dueOn !== undefined) body.due_on = overrides.dueOn;
+      if (overrides.note !== undefined) body.note = overrides.note;
+      const { data } = await this.http.post<ConfirmDebtResponse>(
+        `/assistant/debt-drafts/${draftId}/confirm`,
+        body,
+        { params: { today } },
+      );
+      return {
+        draft: toDebtDraft(data.draft),
+        debtId: data.debt_id,
+        movementId: data.movement_id ?? null,
+      };
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
+
+  async discardDebtDraft(draftId: string): Promise<DebtDraft> {
+    try {
+      const { data } = await this.http.post<{ draft: DebtDraftResponse }>(
+        `/assistant/debt-drafts/${draftId}/discard`,
+        {},
+      );
+      return toDebtDraft(data.draft);
+    } catch (error) {
+      throw mapApiError(error);
+    }
+  }
 }
 
 function toMessage(response: ChatMessageResponse): ChatMessage {
@@ -447,9 +521,29 @@ function toBlock(block: BlockResponse): AssistantBlock {
       };
     case 'draft':
       return { type: 'draft', draft: toDraft(block.draft) };
+    case 'debt_draft':
+      return { type: 'debt_draft', debtDraft: toDebtDraft(block.debt_draft) };
     default:
       return block;
   }
+}
+
+function toDebtDraft(draft: DebtDraftResponse): DebtDraft {
+  return {
+    id: draft.id,
+    kind: draft.kind,
+    targetDebtId: draft.target_debt_id,
+    direction: draft.direction,
+    counterpartyId: draft.counterparty_id,
+    counterpartyName: draft.counterparty_name,
+    amount: draft.amount,
+    currency: draft.currency,
+    accountId: draft.account_id,
+    dueOn: draft.due_on,
+    note: draft.note,
+    status: draft.status,
+    debtId: draft.debt_id,
+  };
 }
 
 function toDraft(draft: DraftResponse): MovementDraft {

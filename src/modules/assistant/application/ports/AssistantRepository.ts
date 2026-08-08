@@ -4,7 +4,10 @@ import type {
   CaptureSource,
   ChatHistory,
   ChatTurn,
+  ConfirmedDebtDraft,
   ConfirmedDraft,
+  DebtDraft,
+  DebtDraftOverrides,
   DraftOverrides,
   MovementDraft,
   ParseOutcome,
@@ -43,4 +46,13 @@ export interface AssistantRepository {
     today: string,
   ): Promise<ConfirmedDraft>;
   discardDraft(draftId: string): Promise<MovementDraft>;
+  /** Confirming a debt draft creates the debt AND, when an account is named, the
+   *  transfer that moves its balance. Omit `accountId` to keep what was staged;
+   *  send it as `null` to say no money moved. */
+  confirmDebtDraft(
+    draftId: string,
+    overrides: DebtDraftOverrides,
+    today: string,
+  ): Promise<ConfirmedDebtDraft>;
+  discardDebtDraft(draftId: string): Promise<DebtDraft>;
 }

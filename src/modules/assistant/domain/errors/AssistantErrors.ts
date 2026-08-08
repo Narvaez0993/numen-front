@@ -15,6 +15,15 @@ export class DraftNotFoundError extends DomainError {
   }
 }
 
+/** Being paid back IS money changing hands, so a repayment always names an
+ *  account — unlike a loan, which may honestly never have moved any. */
+export class DebtPaymentAccountRequiredError extends DomainError {
+  readonly code = 'assistant.debt_payment_account_required';
+  constructor() {
+    super('A debt payment has to name the account the money moves on');
+  }
+}
+
 export class DraftNotPendingError extends DomainError {
   readonly code = 'assistant.draft_not_pending';
   constructor() {

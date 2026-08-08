@@ -4,27 +4,42 @@ import { Pressable, View } from 'react-native';
 import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type { AssistantBlock, MovementDraft } from '../../domain/types/Assistant';
+import type {
+  AssistantBlock,
+  DebtDraft,
+  DebtDraftOverrides,
+  DraftOverrides,
+  MovementDraft,
+} from '../../domain/types/Assistant';
 import { isAssistantRoute } from '../../domain/types/Assistant';
+import { DebtDraftCard } from './DebtDraftCard';
 import { DraftCard } from './DraftCard';
 import { FormattedText } from './FormattedText';
 import { MiniBarChart } from './MiniBarChart';
 import { RichStat } from './RichStat';
 
 type DraftHandlers = {
-  onConfirm: (draft: MovementDraft) => void;
+  onConfirm: (draft: MovementDraft, overrides?: DraftOverrides) => void;
   onEdit: (draft: MovementDraft) => void;
   onDiscard: (draft: MovementDraft) => void;
+  busyDraftId: string | null;
+};
+
+type DebtDraftHandlers = {
+  today: string;
+  onConfirm: (draft: DebtDraft, overrides?: DebtDraftOverrides) => void;
+  onDiscard: (draft: DebtDraft) => void;
   busyDraftId: string | null;
 };
 
 type Props = {
   block: AssistantBlock;
   draftHandlers?: DraftHandlers;
+  debtDraftHandlers?: DebtDraftHandlers;
 };
 
 /** One agent block → the component that already knew how to draw it. */
-export function BlockView({ block, draftHandlers }: Props) {
+export function BlockView({ block, draftHandlers, debtDraftHandlers }: Props) {
   const { theme } = useTheme();
 
   switch (block.type) {
@@ -82,12 +97,27 @@ export function BlockView({ block, draftHandlers }: Props) {
           draft={block.draft}
           busy={draftHandlers?.busyDraftId === block.draft.id}
           onConfirm={
-            draftHandlers ? () => draftHandlers.onConfirm(block.draft) : undefined
+            draftHandlers
+              ? (overrides) => draftHandlers.onConfirm(block.draft, overrides)
+              : undefined
           }
           onEdit={draftHandlers ? () => draftHandlers.onEdit(block.draft) : undefined}
           onDiscard={
             draftHandlers ? () => draftHandlers.onDiscard(block.draft) : undefined
           }
+        />
+      );
+    case 'debt_draft':
+      if (!debtDraftHandlers) return null;
+      return (
+        <DebtDraftCard
+          debtDraft={block.debtDraft}
+          today={debtDraftHandlers.today}
+          busy={debtDraftHandlers.busyDraftId === block.debtDraft.id}
+          onConfirm={(overrides) =>
+            debtDraftHandlers.onConfirm(block.debtDraft, overrides)
+          }
+          onDiscard={() => debtDraftHandlers.onDiscard(block.debtDraft)}
         />
       );
     default:

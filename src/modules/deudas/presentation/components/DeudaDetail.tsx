@@ -18,9 +18,18 @@ type Props = {
   onBack: () => void;
   onAbono: () => void;
   onDelete: () => void;
+  onWriteOff: () => void;
+  onReopen: () => void;
 };
 
-export function DeudaDetail({ debtId, onBack, onAbono, onDelete }: Props) {
+export function DeudaDetail({
+  debtId,
+  onBack,
+  onAbono,
+  onDelete,
+  onWriteOff,
+  onReopen,
+}: Props) {
   const { theme, mode } = useTheme();
   const { t, i18n } = useTranslation();
   const { today, debtById, counterpartyById, eventById } = useDebtsContext();
@@ -35,6 +44,7 @@ export function DeudaDetail({ debtId, onBack, onAbono, onDelete }: Props) {
   const pct = debtProgress(deuda);
   const isIncoming = deuda.direction === 'incoming';
   const isOverdue = status === 'overdue';
+  const givenUp = status === 'written_off';
 
   const sub = event
     ? t('deudas.detail.partOf', { event: event.name })
@@ -152,6 +162,30 @@ export function DeudaDetail({ debtId, onBack, onAbono, onDelete }: Props) {
           </View>
         </View>
 
+        {/* Written off: the money is gone and the calendar stopped mattering. */}
+        {givenUp && deuda.writtenOffOn ? (
+          <View
+            style={{
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+              marginBottom: 12,
+            }}
+          >
+            <Text
+              color={theme.colors.textSecondary}
+              style={{ fontSize: 12, lineHeight: 17.4 }}
+            >
+              {t('deudas.writeOff.banner', {
+                date: formatShortDate(deuda.writtenOffOn, i18n.language),
+              })}
+            </Text>
+          </View>
+        ) : null}
+
         {/* Overdue alert */}
         {isOverdue && deuda.dueOn ? (
           <View
@@ -231,9 +265,39 @@ export function DeudaDetail({ debtId, onBack, onAbono, onDelete }: Props) {
           </View>
         </Card>
 
-        {status !== 'paid' ? (
+        {givenUp ? (
           <View style={{ marginTop: 14 }}>
+            <Button
+              full
+              variant="secondary"
+              label={t('deudas.writeOff.reopen')}
+              onPress={onReopen}
+            />
+          </View>
+        ) : status !== 'paid' ? (
+          <View style={{ marginTop: 14, gap: 10 }}>
             <Button full label={t('deudas.detail.registerAbono')} onPress={onAbono} />
+            {/* Only for money owed TO the user: being forgiven what you owe is a
+                windfall, not a loss, and the ledger refuses it outright. */}
+            {isIncoming ? (
+              <Pressable
+                onPress={onWriteOff}
+                style={({ pressed }) => ({
+                  width: '100%',
+                  paddingVertical: 12,
+                  alignItems: 'center',
+                  opacity: pressed ? 0.7 : 1,
+                })}
+              >
+                <Text
+                  variant="label"
+                  color={theme.colors.textSecondary}
+                  style={{ fontSize: 12.5 }}
+                >
+                  {t('deudas.writeOff.action')}
+                </Text>
+              </Pressable>
+            ) : null}
           </View>
         ) : null}
 

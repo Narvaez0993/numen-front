@@ -14,6 +14,12 @@ type Props = {
   chevron?: boolean;
   last?: boolean;
   onPress?: () => void;
+  /** A second, explicit action on the right — for rows whose tap already means
+   * something better than "open settings for this". Renders a pencil. */
+  onEdit?: () => void;
+  /** Read out for the pencil; without it the button is a mystery to a screen
+   * reader, since an icon alone carries no label. */
+  editLabel?: string;
 };
 
 export function SettingsRow({
@@ -25,6 +31,8 @@ export function SettingsRow({
   chevron = true,
   last = false,
   onPress,
+  onEdit,
+  editLabel,
 }: Props) {
   const { theme } = useTheme();
 
@@ -76,6 +84,20 @@ export function SettingsRow({
         <Text variant="label" muted style={{ fontSize: 12 }}>
           {value}
         </Text>
+      ) : null}
+      {onEdit ? (
+        // Nested inside the row's Pressable on purpose: React Native hands the
+        // touch to the innermost responder, so tapping the pencil never also
+        // fires the row underneath it.
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={editLabel}
+          onPress={onEdit}
+          hitSlop={10}
+          style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1, paddingHorizontal: 2 })}
+        >
+          <Icon name="pencil" size={15} color={theme.colors.textTertiary} />
+        </Pressable>
       ) : null}
       {chevron ? (
         <Icon name="chevron-right" size={15} color={theme.colors.textTertiary} />
