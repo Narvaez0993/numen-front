@@ -10,9 +10,13 @@ import type { CreditCard } from '../../domain';
 type Props = {
   card: CreditCard;
   onPress?: () => void;
+  /** Editing the card is a second action: the tap itself goes somewhere more
+   * useful (this card's movements). */
+  onEdit?: () => void;
+  editLabel?: string;
 };
 
-export function CreditCardItem({ card, onPress }: Props) {
+export function CreditCardItem({ card, onPress, onEdit, editLabel }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const usage = card.limit > 0 ? card.debt / card.limit : 0;
@@ -49,6 +53,20 @@ export function CreditCardItem({ card, onPress }: Props) {
             {card.dueDay ? ` · ${t('accounts.tc.due', { day: card.dueDay })}` : ''}
           </Text>
         </View>
+        {onEdit ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={editLabel}
+            onPress={onEdit}
+            hitSlop={10}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.5 : 1,
+              paddingHorizontal: 2,
+            })}
+          >
+            <Icon name="pencil" size={15} color={theme.colors.textTertiary} />
+          </Pressable>
+        ) : null}
         <Icon name="chevron-right" size={15} color={theme.colors.textTertiary} />
       </View>
 

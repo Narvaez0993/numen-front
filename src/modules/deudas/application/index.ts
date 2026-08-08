@@ -5,3 +5,5 @@ export * from './use-cases/CreateSharedEventUseCase';
 export * from './use-cases/DeleteDebtUseCase';
 export * from './use-cases/AddPaymentUseCase';
 export * from './use-cases/RemovePaymentUseCase';
+export * from './use-cases/WriteOffDebtUseCase';
+export * from './use-cases/ReopenDebtUseCase';

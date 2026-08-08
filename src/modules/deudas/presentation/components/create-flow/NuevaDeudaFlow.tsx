@@ -43,6 +43,8 @@ export function NuevaDeudaFlow({
   const [direction, setDirection] = useState<DebtDirection>(defaultDirection);
   const [persons, setPersons] = useState<PersonPick[]>([]);
   const [amount, setAmount] = useState(0);
+  // `null` is a real answer, not "unanswered": a split moved no cash.
+  const [accountId, setAccountId] = useState<string | null>(null);
   const [dueOn, setDueOn] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [splits, setSplits] = useState<Record<string, number>>({});
@@ -54,6 +56,7 @@ export function NuevaDeudaFlow({
       setDirection(defaultDirection);
       setPersons([]);
       setAmount(0);
+      setAccountId(null);
       setDueOn(null);
       setNote('');
       setSplits({});
@@ -127,6 +130,7 @@ export function NuevaDeudaFlow({
           counterpartyId: person.id ?? undefined,
           counterpartyName: person.id === null ? person.name : undefined,
           amount,
+          accountId,
           dueOn,
           note: note.trim() || null,
         },
@@ -294,6 +298,8 @@ export function NuevaDeudaFlow({
               isShared={isShared}
               amount={amount}
               onAmountChange={setAmount}
+              accountId={accountId}
+              onAccountChange={setAccountId}
               dueOn={dueOn}
               onDueOnChange={setDueOn}
               note={note}

@@ -14,7 +14,12 @@ export function prefillFromDraft(draft: MovementDraft): ManualPrefill {
     amount: draft.amount,
     description: draft.description,
     categoryId: draft.categoryId,
-    source: { type: draft.sourceType, id: draft.sourceId },
+    // A draft without a source leaves the field unset rather than inventing one:
+    // the form asks, exactly as the confirm card would have.
+    source:
+      draft.sourceType !== null && draft.sourceId !== null
+        ? { type: draft.sourceType, id: draft.sourceId }
+        : undefined,
     destination:
       draft.destinationType !== null && draft.destinationId !== null
         ? { type: draft.destinationType, id: draft.destinationId }

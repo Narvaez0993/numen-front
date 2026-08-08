@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
+  confirmDebtDraftUseCase,
   confirmDraftUseCase,
+  discardDebtDraftUseCase,
   discardDraftUseCase,
   parseCaptureUseCase,
   sendChatMessageUseCase,
@@ -13,7 +15,10 @@ import type {
   CaptureSource,
   ChatHistory,
   ChatTurn,
+  ConfirmedDebtDraft,
   ConfirmedDraft,
+  DebtDraft,
+  DebtDraftOverrides,
   DraftOverrides,
   MovementDraft,
   ParseOutcome,
@@ -22,6 +27,7 @@ import {
   appendMessages,
   localUserMessage,
   removeMessage,
+  replaceDebtDraft,
   replaceDraft,
 } from '../utils/chatCache';
 import { ASSISTANT_USAGE_KEY } from './useAssistantUsage';
@@ -132,6 +138,56 @@ export function useDiscardDraft() {
     onSuccess: (draft) => {
       queryClient.setQueryData<ChatHistory>(CHAT_HISTORY_KEY, (old) =>
         replaceDraft(old, draft),
+      );
+    },
+  });
+}
+
+/**
+ * Confirming a debt moves real money too — the loan leaves the account as a
+ * transfer, so the balance, the movements list and Home's figures all change.
+ * What does NOT change is the month's expenses: lending is not spending.
+ */
+export function useConfirmDebtDraft(today: string) {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ConfirmedDebtDraft,
+    Error,
+    { draftId: string; overrides?: DebtDraftOverrides }
+  >({
+    mutationFn: async ({ draftId, overrides }) => {
+      const result = await confirmDebtDraftUseCase.execute(
+        draftId,
+        overrides ?? {},
+        today,
+      );
+      if (!result.ok) {
+        throw result.error;
+      }
+      return result.value;
+    },
+    onSuccess: ({ draft }) => {
+      queryClient.setQueryData<ChatHistory>(CHAT_HISTORY_KEY, (old) =>
+        replaceDebtDraft(old, draft),
+      );
+      invalidateMoneyViews(queryClient);
+    },
+  });
+}
+
+export function useDiscardDebtDraft() {
+  const queryClient = useQueryClient();
+  return useMutation<DebtDraft, Error, string>({
+    mutationFn: async (draftId) => {
+      const result = await discardDebtDraftUseCase.execute(draftId);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return result.value;
+    },
+    onSuccess: (draft) => {
+      queryClient.setQueryData<ChatHistory>(CHAT_HISTORY_KEY, (old) =>
+        replaceDebtDraft(old, draft),
       );
     },
   });

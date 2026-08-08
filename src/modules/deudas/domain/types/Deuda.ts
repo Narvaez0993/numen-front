@@ -1,9 +1,16 @@
 import type { AccentColor } from '@/shared/domain';
 
 /**
- * A debt is a **record**, never a transaction: it moves no balance and creates no
- * movement. The month's spending is what left your pocket, and what a friend still
- * owes you is not money you have.
+ * A debt is a **ledger of its own**, and the cash that crosses it is real.
+ *
+ * Lending is not spending: the money leaves your account as a **transfer** into the
+ * debt, so you are no poorer and the month's expenses do not move. A repayment is the
+ * same transfer backwards. The only moment a loan becomes an expense is when it is
+ * written off — the moment the loss actually happens.
+ *
+ * That is why `accountId` travels with a new debt and is required for a repayment: a
+ * balance really moves. A debt with no account moved no cash — a dinner split, where
+ * the bill already left as one expense.
  *
  * `remaining`, `paidTotal` and `status` come **from the server**, derived for the
  * snapshot's `today` — the prototype stored a `balance` and displayed dates ("21 may"),
@@ -12,13 +19,17 @@ import type { AccentColor } from '@/shared/domain';
 
 export type DebtDirection = 'incoming' | 'outgoing';
 
-export type DebtStatus = 'pending' | 'partial' | 'paid' | 'overdue';
+/** `written_off` and `paid` are two words for the same zero: one was collected, the
+ *  other was lost. Calling them both PAGADO would say a friend paid you back when
+ *  nobody did. */
+export type DebtStatus = 'pending' | 'partial' | 'paid' | 'overdue' | 'written_off';
 
 export type Payment = {
+  /** The **movement's** id: a repayment and the transfer that carried it are one
+   *  thing, so deleting it in Movimientos undoes the instalment too. */
   id: string;
   amount: number;
   paidOn: string;
-  /** No account: a payment marks progress on the ledger, it never moves a balance. */
   note: string | null;
 };
 
@@ -41,6 +52,9 @@ export type Deuda = {
   dueOn: string | null;
   note: string | null;
   eventId: string | null;
+  /** The day the user gave up on it. What it cost is not here — it is the expense the
+   *  write-off recorded, and it reads in Movimientos like any other. */
+  writtenOffOn: string | null;
   payments: Payment[];
   createdAt: string;
 };
@@ -73,6 +87,9 @@ export type NewDebt = {
   counterpartyId?: string;
   counterpartyName?: string;
   amount: number;
+  /** The account the cash moved on. Omitted when it moved none — a dinner split,
+   *  where the bill already left as one expense. */
+  accountId?: string | null;
   dueOn?: string | null;
   note?: string | null;
 };

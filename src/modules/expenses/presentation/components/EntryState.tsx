@@ -73,13 +73,26 @@ export function EntryState({
                 {t('expenses.sheet.processing')}
               </Text>
             ) : (
-              <Text
-                variant="caption"
-                muted
-                style={{ textAlign: 'center', maxWidth: 250 }}
-              >
-                {inlineError ?? t('expenses.sheet.voiceHint')}
-              </Text>
+              <>
+                <Text
+                  variant="caption"
+                  muted
+                  style={{ textAlign: 'center', maxWidth: 250 }}
+                >
+                  {inlineError ?? t('expenses.sheet.voiceHint')}
+                </Text>
+                {inlineError === null ? (
+                  // The example names a source on purpose: saying it out loud is
+                  // exactly what saves the extra tap on the confirm card.
+                  <Text
+                    variant="micro"
+                    muted
+                    style={{ textAlign: 'center', maxWidth: 260, fontSize: 11 }}
+                  >
+                    {t('expenses.sheet.voiceExample')}
+                  </Text>
+                ) : null}
+              </>
             )}
           </View>
         </View>

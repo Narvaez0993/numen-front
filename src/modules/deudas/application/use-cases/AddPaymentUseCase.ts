@@ -9,11 +9,14 @@ export class AddPaymentUseCase {
   async execute(
     id: string,
     amount: number,
+    accountId: string,
     today: string,
     note?: string,
   ): Promise<Result<Deuda, Error>> {
     try {
-      return ok(await this.deudasRepository.addPayment(id, amount, today, note));
+      return ok(
+        await this.deudasRepository.addPayment(id, amount, accountId, today, note),
+      );
     } catch (error) {
       return err(error instanceof Error ? error : new Error('Unknown debt error'));
     }

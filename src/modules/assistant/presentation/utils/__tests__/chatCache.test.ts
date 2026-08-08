@@ -1,12 +1,14 @@
 import type {
   ChatHistory,
   ChatMessage,
+  DebtDraft,
   MovementDraft,
 } from '../../../domain/types/Assistant';
 import {
   appendMessages,
   localUserMessage,
   removeMessage,
+  replaceDebtDraft,
   replaceDraft,
 } from '../chatCache';
 
@@ -24,6 +26,23 @@ const draft = (overrides: Partial<MovementDraft> = {}): MovementDraft => ({
   occurredOn: '2026-07-28',
   status: 'pending',
   movementId: null,
+  ...overrides,
+});
+
+const debtDraft = (overrides: Partial<DebtDraft> = {}): DebtDraft => ({
+  id: 'dd-1',
+  kind: 'new',
+  targetDebtId: null,
+  direction: 'incoming',
+  counterpartyId: null,
+  counterpartyName: 'Andrés',
+  amount: 50_000,
+  currency: 'COP',
+  accountId: null,
+  dueOn: null,
+  note: null,
+  status: 'pending',
+  debtId: null,
   ...overrides,
 });
 
@@ -89,6 +108,42 @@ describe('replaceDraft', () => {
 
     const block = result.messages[0]!.blocks[0]!;
     expect(block.type === 'draft' && block.draft.status).toBe('pending');
+  });
+});
+
+describe('replaceDebtDraft', () => {
+  it('settles the debt card without touching the movement card beside it', () => {
+    // The two live in the same thread and share nothing but a lifecycle. Matching
+    // them by id alone would have one silently overwrite the other.
+    const base = history([
+      message({
+        blocks: [
+          { type: 'draft', draft: draft() },
+          { type: 'debt_draft', debtDraft: debtDraft() },
+        ],
+      }),
+    ]);
+
+    const result = replaceDebtDraft(
+      base,
+      debtDraft({ status: 'confirmed', debtId: 'debt-9' }),
+    );
+
+    const movement = result.messages[0]!.blocks[0]!;
+    const debt = result.messages[0]!.blocks[1]!;
+    expect(movement.type === 'draft' && movement.draft.status).toBe('pending');
+    expect(debt.type === 'debt_draft' && debt.debtDraft.status).toBe('confirmed');
+  });
+
+  it('leaves other debt drafts alone', () => {
+    const base = history([
+      message({ blocks: [{ type: 'debt_draft', debtDraft: debtDraft({ id: 'dd-2' }) }] }),
+    ]);
+
+    const result = replaceDebtDraft(base, debtDraft({ status: 'discarded' }));
+
+    const block = result.messages[0]!.blocks[0]!;
+    expect(block.type === 'debt_draft' && block.debtDraft.status).toBe('pending');
   });
 });
 

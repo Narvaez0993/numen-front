@@ -5,9 +5,15 @@
  * Magic Moment will tomorrow — swapping the underlying library means rewriting
  * this file and nothing else.
  *
- * Two facts of the platform drive the shape:
- * - iOS ends recognition on its own after ~3 s of silence, so the `end` event
- *   is the ONLY source of truth for "finished" — tapping stop just asks.
+ * Three facts of the platform drive the shape:
+ * - We listen in CONTINUOUS mode, so a pause mid-sentence no longer ends the
+ *   capture. People list several expenses in one breath ("10 en café, 5 en
+ *   papitas") and the gaps between them are thinking, not finishing. The user
+ *   decides when they are done by tapping; `MAX_SESSION_MS` is only a backstop
+ *   for a mic left open by accident.
+ * - Continuous mode on Android is SEGMENTED: every final result covers new
+ *   words rather than the whole session, so finals must be concatenated. iOS
+ *   sends one cumulative final instead — joining handles both.
  * - Permissions are requested lazily on the first `start()`, never on mount.
  */
 
@@ -24,9 +30,14 @@ import {
   resolveRecognitionLocale,
   RETRY_LOCALE,
 } from './recognitionLocale';
+import { absorb, NO_SEGMENTS, type SegmentState } from './transcriptSegments';
 
 export type SpeechStatus = 'idle' | 'listening' | 'stopping';
 export type SpeechPermission = 'unknown' | 'granted' | 'denied';
+
+/** Nothing anyone dictates to a capture sheet runs a full minute; past this the
+ * mic was left open by accident, and an open mic is a battery bill. */
+const MAX_SESSION_MS = 60_000;
 
 type Options = {
   /** Fired on the `end` event with the final transcript ('' when nothing was
@@ -43,37 +54,54 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
   const [permission, setPermission] = useState<SpeechPermission>('unknown');
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
-  const transcriptRef = useRef('');
+  /** Committed segments plus the live tail — see `transcriptSegments`. */
+  const segmentsRef = useRef<SegmentState>(NO_SEGMENTS);
   const errorRef = useRef<string | null>(null);
   const retriedLocaleRef = useRef(false);
   const restartingRef = useRef(false);
+  const deadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onFinalRef = useRef(onFinal);
   onFinalRef.current = onFinal;
+
+  const clearDeadline = useCallback(() => {
+    if (deadlineRef.current !== null) {
+      clearTimeout(deadlineRef.current);
+      deadlineRef.current = null;
+    }
+  }, []);
 
   const beginSession = useCallback(
     (lang: string) => {
       setErrorCode(null);
       errorRef.current = null;
       setTranscript('');
-      transcriptRef.current = '';
+      segmentsRef.current = NO_SEGMENTS;
       setStatus('listening');
+      clearDeadline();
+      deadlineRef.current = setTimeout(() => {
+        ExpoSpeechRecognitionModule.stop();
+      }, MAX_SESSION_MS);
       ExpoSpeechRecognitionModule.start({
         lang,
         interimResults: true,
-        continuous: false,
+        // Silence is a pause, not a period: the user taps to say they are done.
+        continuous: true,
         requiresOnDeviceRecognition: false,
         addsPunctuation: false,
         iosTaskHint: 'dictation',
         contextualStrings,
       });
     },
-    [contextualStrings],
+    [clearDeadline, contextualStrings],
   );
 
   useSpeechRecognitionEvent('result', (event) => {
-    const text = event.results[0]?.transcript ?? '';
-    transcriptRef.current = text;
-    setTranscript(text);
+    segmentsRef.current = absorb(
+      segmentsRef.current,
+      event.results[0]?.transcript ?? '',
+      event.isFinal,
+    );
+    setTranscript(segmentsRef.current.transcript);
   });
 
   useSpeechRecognitionEvent('error', (event) => {
@@ -97,8 +125,9 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
       beginSession(RETRY_LOCALE[appLanguageKey(i18n.language)]);
       return;
     }
+    clearDeadline();
     setStatus('idle');
-    onFinalRef.current(transcriptRef.current.trim(), errorRef.current);
+    onFinalRef.current(segmentsRef.current.transcript.trim(), errorRef.current);
   });
 
   const start = useCallback(async (): Promise<boolean> => {
@@ -131,11 +160,12 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
 
   const abort = useCallback(() => {
     restartingRef.current = false;
-    transcriptRef.current = '';
+    segmentsRef.current = NO_SEGMENTS;
+    clearDeadline();
     ExpoSpeechRecognitionModule.abort();
     setStatus('idle');
     setTranscript('');
-  }, []);
+  }, [clearDeadline]);
 
   return { status, transcript, permission, errorCode, start, stop, abort };
 }

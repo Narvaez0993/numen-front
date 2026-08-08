@@ -23,14 +23,56 @@ export type MovementDraft = {
   description: string;
   amount: number;
   currency: string;
-  sourceType: 'account' | 'credit_card';
-  sourceId: string;
+  /** `null` when the capture never said where the money came from and the user
+   * owns more than one source. The confirm card asks; the agent does not guess. */
+  sourceType: 'account' | 'credit_card' | null;
+  sourceId: string | null;
   destinationType: 'account' | 'credit_card' | null;
   destinationId: string | null;
   categoryId: string | null;
   occurredOn: string;
   status: MovementDraftStatus;
   movementId: string | null;
+};
+
+/**
+ * A debt the agent understood but nobody confirmed yet.
+ *
+ * Its own type rather than a movement draft with extra fields, because lending is
+ * not spending: the cash becomes a claim and the user is no poorer for it. The card
+ * it renders asks different questions — which person, which account — and `null` on
+ * either is a legitimate state: the agent heard a name it did not recognise, and it
+ * is not allowed to guess which account the money left.
+ */
+/**
+ * `new` opens a debt; `payment` pays one down.
+ *
+ * The distinction shipped late and the gap was visible: "Santiago me pagó $2.000"
+ * had no verb that fit, so the agent opened a SECOND debt for Santiago.
+ */
+export type DebtDraftKind = 'new' | 'payment';
+
+export type DebtDraft = {
+  id: string;
+  kind: DebtDraftKind;
+  /** Which debt is being paid. Set on a `payment`, never on a `new` one. */
+  targetDebtId: string | null;
+  /** `incoming` = they owe me · `outgoing` = I owe them. */
+  direction: 'incoming' | 'outgoing';
+  /** Set when the spoken name matched someone already in the ledger. */
+  counterpartyId: string | null;
+  /** What the user called them. Creates the person on confirm when no id matched. */
+  counterpartyName: string;
+  amount: number;
+  currency: string;
+  /** `null` until the card asks — and still `null` afterwards when the honest
+   *  answer is that no money moved (a split bill already left as one expense).
+   *  A **payment** has no such answer: being paid back IS money changing hands. */
+  accountId: string | null;
+  dueOn: string | null;
+  note: string | null;
+  status: MovementDraftStatus;
+  debtId: string | null;
 };
 
 /** The only places a navigate chip may point at — the server enforces the
@@ -64,7 +106,8 @@ export type AssistantBlock =
     }
   | { type: 'chart'; kind: 'bars' | 'line'; title: string; points: ChartPoint[] }
   | { type: 'navigate'; label: string; route: string }
-  | { type: 'draft'; draft: MovementDraft };
+  | { type: 'draft'; draft: MovementDraft }
+  | { type: 'debt_draft'; debtDraft: DebtDraft };
 
 export type ChatRole = 'user' | 'assistant';
 
@@ -119,13 +162,50 @@ export type ConfirmedDraft = {
   movementId: string;
 };
 
+/** The card's answers. `accountId: null` is a real answer — "no money moved" — and
+ *  the truth for a split bill, so it is a decision rather than an omission. */
+export type DebtDraftOverrides = Partial<{
+  /** Which debt the abono pays down, when the capture named nobody. */
+  targetDebtId: string;
+  direction: 'incoming' | 'outgoing';
+  counterpartyId: string;
+  counterpartyName: string;
+  amount: number;
+  accountId: string | null;
+  dueOn: string | null;
+  note: string | null;
+}>;
+
+export type ConfirmedDebtDraft = {
+  draft: DebtDraft;
+  debtId: string;
+  /** Set on an abono. Its presence is what says which undo applies: delete this
+   *  movement, rather than delete the debt. */
+  movementId: string | null;
+};
+
+/**
+ * What one confirm created, in the shape undo needs.
+ *
+ * Undo is not one operation: a movement is deleted, a new debt is deleted (which
+ * reverts its loan transfer with it), and an abono is undone by deleting the
+ * movement that carried it — the debt has to survive that one.
+ */
+export type CapturedRecord =
+  | { kind: 'movement'; movementId: string }
+  | { kind: 'debt'; debtId: string }
+  | { kind: 'payment'; debtId: string; movementId: string };
+
 /** Where the words of a capture came from — stamped on the draft's provenance. */
 export type CaptureSource = 'voice' | 'text';
 
-/** Exactly one of `draft` / `clarification` is set: the agent either understood
- * a movement or has one short question. */
+/** Either the draft lists carry what was understood or `clarification` carries a
+ * question — never both. Two lists because one breath can hold several things ("10
+ * mil en café, 5 mil en papitas"), and because lending is not spending: "le presté
+ * 50 mil a Andrés" comes back as a debt draft, not an expense. */
 export type ParseOutcome = {
-  draft: MovementDraft | null;
+  drafts: MovementDraft[];
+  debtDrafts: DebtDraft[];
   clarification: string | null;
   usage: AssistantUsage;
 };

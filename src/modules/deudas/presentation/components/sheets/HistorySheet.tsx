@@ -19,7 +19,11 @@ export function HistorySheet({ visible, onClose }: Props) {
   const { t } = useTranslation();
   const { snapshot, counterpartyById } = useDebtsContext();
 
-  const paid = snapshot.debts.filter((d) => d.status === 'paid');
+  // Closed either way: collected or given up. They are the same shelf and the pill
+  // is what tells them apart — one was paid, the other was lost.
+  const paid = snapshot.debts.filter(
+    (d) => d.status === 'paid' || d.status === 'written_off',
+  );
 
   return (
     <BottomSheet visible={visible} onClose={onClose} maxHeight="70%">
@@ -84,7 +88,7 @@ export function HistorySheet({ visible, onClose }: Props) {
                     <Text variant="bodyLarge" tabular style={{ fontSize: 13.5 }}>
                       {formatMoney(debt.amount)}
                     </Text>
-                    <DebtPill status="paid" />
+                    <DebtPill status={debt.status} />
                   </View>
                 </View>
               );

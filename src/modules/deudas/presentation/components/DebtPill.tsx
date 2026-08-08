@@ -14,7 +14,7 @@ export function DebtPill({ status }: Props) {
 
   const cfg: Record<
     DebtStatus,
-    { bg: string; fg: string; icon: 'check' | 'alert-circle' | null }
+    { bg: string; fg: string; icon: 'check' | 'alert-circle' | 'x' | null }
   > = {
     pending: { bg: theme.colors.bgFloat, fg: theme.colors.textSecondary, icon: null },
     partial: {
@@ -31,6 +31,13 @@ export function DebtPill({ status }: Props) {
       bg: theme.colors.accentCoralBg,
       fg: theme.colors.accentCoral,
       icon: 'alert-circle',
+    },
+    // Muted, not red: the loss already happened and the alarm is over. Deliberately
+    // not the mint of `paid` — nobody paid.
+    written_off: {
+      bg: theme.colors.bgFloat,
+      fg: theme.colors.textTertiary,
+      icon: 'x',
     },
   };
 

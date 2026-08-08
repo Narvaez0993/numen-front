@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 
-import type { MovementDraft } from '@/modules/assistant/domain/types/Assistant';
+import type {
+  CapturedRecord,
+  DebtDraft,
+  MovementDraft,
+} from '@/modules/assistant/domain/types/Assistant';
 import type { MovementType } from '@/modules/movements/domain';
 
 export type SheetFlow =
@@ -23,13 +27,23 @@ type State = {
   method: SheetMethod;
   /** What the mic heard — the «Dijiste "…"» echo of the confirm state. */
   transcript: string | null;
-  /** The staged draft being confirmed or edited: the manual form opens
-   * prefilled with it and saving routes through the draft's confirm. */
-  draft: MovementDraft | null;
+  /** Everything one capture staged, waiting for a yes. A list because a single
+   * breath can hold several expenses; each card settles on its own and leaves
+   * the queue, and the sheet closes when the last one does. */
+  drafts: MovementDraft[];
+  /** Debts from the same capture. A separate queue because lending is not
+   * spending: its card asks for a person, not a category. */
+  debtDrafts: DebtDraft[];
+  /** The single draft the manual form is editing — a different job from the
+   * queue above: saving the form confirms THIS draft through its overrides. */
+  editing: MovementDraft | null;
   /** The agent's one short question when a capture was ambiguous. */
   clarification: string | null;
   /** An honest one-liner for the manual form (e.g. the AI quota ran out). */
   notice: string | null;
+  /** What a capture just saved without asking — the toast's undo works off this.
+   *  Survives `closeSheet`, because the toast outlives the sheet by design. */
+  saved: CapturedRecord[] | null;
   openSheet: (
     flow?: SheetFlow,
     initialType?: MovementType,
@@ -39,9 +53,15 @@ type State = {
   setFlow: (flow: SheetFlow) => void;
   setMethod: (method: SheetMethod) => void;
   setTranscript: (transcript: string | null) => void;
-  setDraft: (draft: MovementDraft | null) => void;
+  setDrafts: (drafts: MovementDraft[]) => void;
+  setDebtDrafts: (drafts: DebtDraft[]) => void;
+  /** Drops a settled draft from the queue — confirmed and discarded both leave. */
+  settleDraft: (draftId: string) => void;
+  settleDebtDraft: (draftId: string) => void;
+  setEditing: (draft: MovementDraft | null) => void;
   setClarification: (clarification: string | null) => void;
   setNotice: (notice: string | null) => void;
+  setSaved: (saved: CapturedRecord[] | null) => void;
 };
 
 export const useExpenseSheetStore = create<State>((set) => ({
@@ -50,9 +70,12 @@ export const useExpenseSheetStore = create<State>((set) => ({
   initialType: 'expense',
   method: 'voice',
   transcript: null,
-  draft: null,
+  drafts: [],
+  debtDrafts: [],
+  editing: null,
   clarification: null,
   notice: null,
+  saved: null,
   openSheet: (flow = 'entry', initialType = 'expense', draft) =>
     set({
       open: true,
@@ -60,9 +83,12 @@ export const useExpenseSheetStore = create<State>((set) => ({
       initialType,
       method: 'voice',
       transcript: null,
-      draft: draft ?? null,
+      drafts: [],
+      debtDrafts: [],
+      editing: draft ?? null,
       clarification: null,
       notice: null,
+      saved: null,
     }),
   closeSheet: () =>
     set({
@@ -71,14 +97,25 @@ export const useExpenseSheetStore = create<State>((set) => ({
       initialType: 'expense',
       method: 'voice',
       transcript: null,
-      draft: null,
+      drafts: [],
+      debtDrafts: [],
+      editing: null,
       clarification: null,
       notice: null,
     }),
   setFlow: (flow) => set({ flow }),
   setMethod: (method) => set({ method }),
   setTranscript: (transcript) => set({ transcript }),
-  setDraft: (draft) => set({ draft }),
+  setDrafts: (drafts) => set({ drafts }),
+  setDebtDrafts: (debtDrafts) => set({ debtDrafts }),
+  settleDraft: (draftId) =>
+    set((state) => ({ drafts: state.drafts.filter((entry) => entry.id !== draftId) })),
+  settleDebtDraft: (draftId) =>
+    set((state) => ({
+      debtDrafts: state.debtDrafts.filter((entry) => entry.id !== draftId),
+    })),
+  setEditing: (draft) => set({ editing: draft }),
   setClarification: (clarification) => set({ clarification }),
   setNotice: (notice) => set({ notice }),
+  setSaved: (saved) => set({ saved }),
 }));
