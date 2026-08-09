@@ -145,6 +145,12 @@ export type TopCategory = {
  * `currency`; `recent` carries plain movements, so renaming a category updates Home
  * for free — the client resolves every label from its own catalog.
  */
+export type DaySpend = {
+  /** `YYYY-MM-DD`. */
+  day: string;
+  spent: number;
+};
+
 export type HomeOverview = {
   currency: CurrencyCode;
   /** `2026-07` — the month every figure belongs to. */
@@ -174,4 +180,7 @@ export type HomeOverview = {
   topCategories: TopCategory[];
   recent: Movement[];
   upcoming: UpcomingCharge[];
+  /** The month day by day, first to today — the rhythm strip Home draws as bars.
+   *  Dense: a day that cost nothing is here at zero, because position is the date. */
+  byDay: DaySpend[];
 };

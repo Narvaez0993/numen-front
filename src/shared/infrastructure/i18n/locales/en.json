@@ -860,6 +860,16 @@
       "start": "The first contribution sets it in motion",
       "achieved": "Goal reached! Withdraw the money whenever you like",
       "monthSupport": "You kept {{amount}} this month"
+    },
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left",
+    "profile": "Your account",
+    "privacy": {
+      "toggle": "Hide the amounts"
+    },
+    "rhythm": {
+      "today": "today · {{amount}}",
+      "projected": "projection"
     }
   },
   "goals": {

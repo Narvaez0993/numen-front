@@ -14,14 +14,16 @@ import {
   useConfirmCharge,
   useSkipCharge,
 } from '@/modules/subscriptions/presentation/hooks/useCharges';
-import { RetryState } from '@/shared/presentation/components';
+import { Aurora, RetryState } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
+import { usePrivacy } from '@/shared/presentation/theme/usePrivacy';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
 import { RecentList } from '../components/RecentList';
+import { RhythmStrip } from '../components/RhythmStrip';
 import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
 import { UpcomingCharges } from '../components/UpcomingCharges';
@@ -30,6 +32,8 @@ import { useHomeOverview } from '../hooks/useHomeOverview';
 export function HomeScreen() {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
+  const privacyHidden = usePrivacy((state) => state.hidden);
+  const togglePrivacy = usePrivacy((state) => state.toggle);
   // The device's local day, pinned once per mount: the server answers about the
   // user's calendar, and a re-render must not move the question.
   const today = useMemo(() => toIsoDate(new Date()), []);
@@ -97,80 +101,89 @@ export function HomeScreen() {
   ];
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-      edges={['top']}
-    >
-      <ScrollView
-        contentContainerStyle={{
-          paddingTop: 14,
-          paddingBottom: tabBarClearance,
-          paddingHorizontal: 16,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{ gap: 18 }}>
-          <HomeHeader
-            name={displayName?.trim() || onboardingName?.trim() || t('home.greeting.you')}
-            onAvatarPress={() => router.push('/profile')}
-          />
-          {/* The premiere: an unread Corte or weekly review announces itself
+    <Aurora>
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+        <HomeHeader
+          name={displayName?.trim() || onboardingName?.trim() || t('home.greeting.you')}
+          daysLeft={data.daysLeft}
+          hidden={privacyHidden}
+          onTogglePrivacy={togglePrivacy}
+          onAvatarPress={() => router.push('/profile')}
+        />
+        <ScrollView
+          contentContainerStyle={{
+            paddingTop: 4,
+            paddingBottom: tabBarClearance,
+            paddingHorizontal: 16,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ gap: 18 }}>
+            {/* The premiere: an unread Corte or weekly review announces itself
               above the hero — once a month it outranks the number, and once
               watched it never comes back. */}
-          <AgentAnnouncementBanner today={today} />
-          <TodayHero
-            focus={data.focus}
-            objective={data.objective}
-            month={data.month}
-            pace={data.pace}
-            budget={data.budget}
-            debts={data.debts}
-            goal={data.goal}
-            netBalance={data.netBalance}
-            cardDebt={data.cardDebt}
-            cardLimit={data.cardLimit}
-            period={data.period}
-            daysLeft={data.daysLeft}
-            onSaldoPress={() => router.push('/accounts')}
-            onBudgetPress={() => router.push('/(tabs)/budgets')}
-            // The month's spend is the movements that made it, not a budget.
-            onMonthPress={goMovements}
-            start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
-            // Every invitation points at something that exists today: the debts
-            // ledger, the first goal, or the month's income.
-            onInvite={
-              data.objective === 'deudas'
-                ? () => router.push('/deudas')
-                : data.objective === 'ahorrar'
-                  ? () => router.push('/goals')
-                  : () => openSheet('manual', 'income')
-            }
-            onGoalPress={() => router.push('/goals')}
-          />
-          {/* The agent's block, right under the hero: the permanent door to its
+            {/* The month at a glance, right under the figure it belongs to. */}
+            <RhythmStrip
+              byDay={data.byDay}
+              spentToday={data.month.spentToday}
+              projected={data.pace?.projected ?? null}
+              language={i18n.language}
+            />
+            <AgentAnnouncementBanner today={today} />
+            <TodayHero
+              focus={data.focus}
+              objective={data.objective}
+              month={data.month}
+              pace={data.pace}
+              budget={data.budget}
+              debts={data.debts}
+              goal={data.goal}
+              netBalance={data.netBalance}
+              cardDebt={data.cardDebt}
+              cardLimit={data.cardLimit}
+              period={data.period}
+              daysLeft={data.daysLeft}
+              onSaldoPress={() => router.push('/accounts')}
+              onBudgetPress={() => router.push('/(tabs)/budgets')}
+              // The month's spend is the movements that made it, not a budget.
+              onMonthPress={goMovements}
+              start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
+              // Every invitation points at something that exists today: the debts
+              // ledger, the first goal, or the month's income.
+              onInvite={
+                data.objective === 'deudas'
+                  ? () => router.push('/deudas')
+                  : data.objective === 'ahorrar'
+                    ? () => router.push('/goals')
+                    : () => openSheet('manual', 'income')
+              }
+              onGoalPress={() => router.push('/goals')}
+            />
+            {/* The agent's block, right under the hero: the permanent door to its
               deliveries, then what it noticed that you can act on today. Both
               live here instead of docked over the chat — they are answers to
               "how am I doing", and the conversation needed its screen back. */}
-          <AgentSummariesRow today={today} />
-          <AgentInsights today={today} />
-          <IncomeSummaryRow
-            total={data.month.income}
-            savingsRate={data.month.savingsRate}
-            period={data.period}
-            onPress={goMovements}
-          />
-          <UpcomingCharges
-            items={data.upcoming}
-            today={today}
-            busy={confirmCharge.isPending || skipCharge.isPending}
-            onConfirm={(id) => confirmCharge.mutate({ id })}
-            onSkip={(id) => skipCharge.mutate(id)}
-            onSeeAll={() => router.push('/subscriptions')}
-          />
-          <RecentList items={data.recent} onSeeAll={goMovements} />
-          <TopCategoriesCard categories={data.topCategories} />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <AgentSummariesRow today={today} />
+            <AgentInsights today={today} />
+            <IncomeSummaryRow
+              total={data.month.income}
+              savingsRate={data.month.savingsRate}
+              period={data.period}
+              onPress={goMovements}
+            />
+            <UpcomingCharges
+              items={data.upcoming}
+              today={today}
+              busy={confirmCharge.isPending || skipCharge.isPending}
+              onConfirm={(id) => confirmCharge.mutate({ id })}
+              onSkip={(id) => skipCharge.mutate(id)}
+              onSeeAll={() => router.push('/subscriptions')}
+            />
+            <RecentList items={data.recent} onSeeAll={goMovements} />
+            <TopCategoriesCard categories={data.topCategories} />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </Aurora>
   );
 }

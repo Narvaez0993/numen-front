@@ -1,6 +1,16 @@
 import { Text as RNText, TextProps as RNTextProps, TextStyle } from 'react-native';
 
 import { useTheme } from '../theme';
+import { usePrivacy } from '../theme/usePrivacy';
+
+/** What a hidden figure reads as. `•` is the same width in a tabular font, so the
+ *  layout does not move when the eye is switched. */
+function mask(node: React.ReactNode): React.ReactNode {
+  if (typeof node === 'number') return mask(String(node));
+  if (typeof node === 'string') return node.replace(/\d/g, '•');
+  if (Array.isArray(node)) return node.map(mask);
+  return node;
+}
 
 export type TextVariant =
   | 'display' // 30/500 — hero numbers
@@ -27,9 +37,14 @@ export function Text({
   uppercase = false,
   color,
   style,
+  children,
   ...rest
 }: Props) {
   const { theme } = useTheme();
+  // `tabular` is this app's `.num`: the design blurs exactly those, so hiding
+  // figures needs no call site to opt in. React Native cannot blur text cheaply,
+  // so they are masked instead — same intent, and the layout does not move.
+  const hidden = usePrivacy((s) => s.hidden);
   const variantStyle = variantStyles(variant);
   const resolvedColor =
     color ?? (muted ? theme.colors.textSecondary : theme.colors.textPrimary);
@@ -48,7 +63,9 @@ export function Text({
         uppercase && { textTransform: 'uppercase' as const },
         style,
       ]}
-    />
+    >
+      {tabular && hidden ? mask(children) : children}
+    </RNText>
   );
 }
 

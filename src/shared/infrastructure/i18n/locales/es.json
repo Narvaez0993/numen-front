@@ -860,6 +860,16 @@
       "start": "El primer aporte la pone en marcha",
       "achieved": "¡Meta lograda! Retira la plata cuando quieras",
       "monthSupport": "Guardaste {{amount}} este mes"
+    },
+    "daysLeft_one": "queda {{count}} día",
+    "daysLeft_other": "quedan {{count}} días",
+    "profile": "Tu cuenta",
+    "privacy": {
+      "toggle": "Ocultar los montos"
+    },
+    "rhythm": {
+      "today": "hoy · {{amount}}",
+      "projected": "proyección"
     }
   },
   "goals": {
