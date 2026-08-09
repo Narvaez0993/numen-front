@@ -2,7 +2,8 @@ import * as SystemUI from 'expo-system-ui';
 import { createContext, ReactNode, useEffect, useMemo } from 'react';
 import { Appearance, useColorScheme } from 'react-native';
 
-import { Theme, ThemeMode, themes } from './tokens';
+import { buildTheme, Theme, ThemeMode } from './tokens';
+import { usePalettePreference } from './usePalettePreference';
 import { useThemePreference } from './useThemePreference';
 
 export type ThemeContextValue = {
@@ -17,7 +18,10 @@ type Props = { children: ReactNode };
 export function ThemeProvider({ children }: Props) {
   const systemScheme = useColorScheme();
   const preference = useThemePreference((state) => state.mode);
+  const palette = usePalettePreference((state) => state.palette);
 
+  // Two axes: the mode decides the surfaces, the palette decides the accent.
+  // Both are resolved here so no screen ever has to compose them itself.
   const { theme, mode } = useMemo<ThemeContextValue>(() => {
     let resolved: ThemeMode;
     if (preference === 'dark' || preference === 'light') {
@@ -26,8 +30,8 @@ export function ThemeProvider({ children }: Props) {
       // 'auto' → follow system; dark is the product default when unknown.
       resolved = systemScheme === 'light' ? 'light' : 'dark';
     }
-    return { theme: themes[resolved], mode: resolved };
-  }, [preference, systemScheme]);
+    return { theme: buildTheme(resolved, palette), mode: resolved };
+  }, [preference, systemScheme, palette]);
 
   // Force React Native's appearance to match the user's preference. On
   // Android, also set the native window background — otherwise the OS's
