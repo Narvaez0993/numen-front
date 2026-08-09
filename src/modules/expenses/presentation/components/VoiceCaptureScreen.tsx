@@ -84,13 +84,17 @@ export function VoiceCaptureScreen({
           <Rect x="0" y="0" width="100%" height="100%" fill="url(#voiceTop)" />
         </Svg>
 
-        <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
+        {/* `edges={['bottom']}` and a manual top pad, like every other
+            full-screen modal here: inside a statusBarTranslucent Modal the top
+            inset does not arrive reliably, and trusting it put the controls on
+            top of the clock. 44 is the floor for a device that reports none. */}
+        <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               paddingHorizontal: 22,
-              paddingTop: Math.max(insets.top > 0 ? 0 : 14, 14),
+              paddingTop: Math.max(insets.top, 44) + 8,
             }}
           >
             <Pressable
