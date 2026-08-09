@@ -67,7 +67,8 @@
     },
     "actions": {
       "undo": "Deshacer"
-    }
+    },
+    "net": "Neto"
   },
   "budgets": {
     "title": "Presupuestos",

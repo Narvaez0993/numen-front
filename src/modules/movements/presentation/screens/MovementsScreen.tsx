@@ -26,6 +26,9 @@ import type { Movement, MovementPatch, MovementType } from '../../domain';
 import { DayGroup } from '../components/DayGroup';
 import { EmptyState } from '../components/EmptyState';
 import { MovementDetailSheet } from '../components/MovementDetailSheet';
+import { RhythmStrip } from '@/modules/home/presentation/components/RhythmStrip';
+import { useHomeOverview } from '@/modules/home/presentation/hooks/useHomeOverview';
+
 import { MovementsHeader } from '../components/MovementsHeader';
 import { SearchBar } from '../components/SearchBar';
 import { useMovementCatalogs } from '../hooks/useMovementCatalogs';
@@ -60,6 +63,7 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
   // Pinned once per mount: every date label and range is derived from it, so the
   // screen never disagrees with itself mid-render.
   const [today] = useState(() => toIsoDate(new Date()));
+  const overview = useHomeOverview(today);
   const [filters, setFilters] = useState<MovementsFilters>(() =>
     scopedSourceId ? { ...emptyFilters, sourceId: scopedSourceId } : emptyFilters,
   );
@@ -199,7 +203,19 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
               monthLabel={monthName(month, language)}
               monthTotal={monthTotal}
               currency={currency}
-              onAvatarPress={() => router.push('/profile')}
+            />
+          )}
+
+          {/* The same strip Home draws, from the same read. Computing it here
+              from the filtered list would let the two screens disagree about
+              the same month. */}
+          {scopedSourceId || !overview.data ? null : (
+            <RhythmStrip
+              compact
+              byDay={overview.data.byDay}
+              spentToday={overview.data.month.spentToday}
+              dailyAverage={overview.data.pace?.dailyAverage ?? null}
+              language={language}
             />
           )}
 

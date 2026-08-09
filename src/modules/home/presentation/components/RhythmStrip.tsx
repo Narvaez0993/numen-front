@@ -9,6 +9,8 @@ import { shortDate } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 const STRIP_HEIGHT = 42;
+/** Movimientos draws the same strip shorter: it is context there, not the point. */
+const COMPACT_HEIGHT = 28;
 /** How many real days the strip shows. The bundle draws twelve and labels the
  *  left edge with a date rather than the 1st — this is a rolling window, not the
  *  calendar month, which is what keeps the bars thick enough to read. */
@@ -26,6 +28,9 @@ type Props = {
    *  bars do not appear at all. */
   dailyAverage: number | null;
   language: string;
+  /** Shorter and without its footer — for screens where the strip is context
+   *  rather than the headline. */
+  compact?: boolean;
 };
 
 /**
@@ -39,7 +44,13 @@ type Props = {
  * solid bar is money that moved, and a projection is not. Nothing on this screen
  * should let the two be confused.
  */
-export function RhythmStrip({ byDay, spentToday, dailyAverage, language }: Props) {
+export function RhythmStrip({
+  byDay,
+  spentToday,
+  dailyAverage,
+  language,
+  compact = false,
+}: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -57,7 +68,7 @@ export function RhythmStrip({ byDay, spentToday, dailyAverage, language }: Props
           flexDirection: 'row',
           alignItems: 'flex-end',
           gap: 5,
-          height: STRIP_HEIGHT,
+          height: compact ? COMPACT_HEIGHT : STRIP_HEIGHT,
         }}
       >
         {days.map((day, index) => {
@@ -69,7 +80,7 @@ export function RhythmStrip({ byDay, spentToday, dailyAverage, language }: Props
               style={{
                 flex: 1,
                 height: `${share * 100}%`,
-                borderRadius: theme.radius.barLg,
+                borderRadius: compact ? theme.radius.bar : theme.radius.barLg,
                 backgroundColor: isToday
                   ? theme.palette.acc
                   : withAlpha(
@@ -96,7 +107,7 @@ export function RhythmStrip({ byDay, spentToday, dailyAverage, language }: Props
             style={{
               flex: 1,
               height: `${Math.max((dailyAverage ?? 0) / peak, MIN_BAR) * 100}%`,
-              borderRadius: theme.radius.barLg,
+              borderRadius: compact ? theme.radius.bar : theme.radius.barLg,
               borderWidth: 1,
               borderStyle: 'dashed',
               borderColor: withAlpha(theme.colors.textPrimary, index === 0 ? 0.22 : 0.18),
@@ -105,24 +116,26 @@ export function RhythmStrip({ byDay, spentToday, dailyAverage, language }: Props
         ))}
       </View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          marginTop: 7,
-        }}
-      >
-        <Text color={theme.colors.textTertiary} style={{ fontSize: 10.5 }}>
-          {first ? shortDate(first.day, language) : ''}
-        </Text>
-        <Text tabular color={theme.colors.textSecondary} style={{ fontSize: 10.5 }}>
-          {t('home.rhythm.today', { amount: formatMoney(spentToday) })}
-        </Text>
-        <Text color={theme.colors.textTertiary} style={{ fontSize: 10.5 }}>
-          {ahead > 0 ? t('home.rhythm.projected') : ''}
-        </Text>
-      </View>
+      {compact ? null : (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            marginTop: 7,
+          }}
+        >
+          <Text color={theme.colors.textTertiary} style={{ fontSize: 10.5 }}>
+            {first ? shortDate(first.day, language) : ''}
+          </Text>
+          <Text tabular color={theme.colors.textSecondary} style={{ fontSize: 10.5 }}>
+            {t('home.rhythm.today', { amount: formatMoney(spentToday) })}
+          </Text>
+          <Text color={theme.colors.textTertiary} style={{ fontSize: 10.5 }}>
+            {ahead > 0 ? t('home.rhythm.projected') : ''}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

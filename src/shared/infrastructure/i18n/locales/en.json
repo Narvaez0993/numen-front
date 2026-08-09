@@ -67,7 +67,8 @@
     },
     "actions": {
       "undo": "Undo"
-    }
+    },
+    "net": "Net"
   },
   "budgets": {
     "title": "Budgets",
