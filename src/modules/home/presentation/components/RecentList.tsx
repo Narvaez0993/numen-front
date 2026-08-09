@@ -7,7 +7,7 @@ import {
   displaySource,
   useMovementCatalogs,
 } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
-import { Card, SectionLabel, Text } from '@/shared/presentation/components';
+import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 type Props = {
@@ -36,18 +36,21 @@ export function RecentList({ items, onSeeAll }: Props) {
           marginBottom: 10,
         }}
       >
-        <SectionLabel>{t('home.recent.title')}</SectionLabel>
+        <Text
+          variant="micro"
+          uppercase
+          color={theme.colors.textTertiary}
+          style={{ letterSpacing: 2.2 }}
+        >
+          {t('home.recent.title')}
+        </Text>
         <Pressable hitSlop={6} onPress={onSeeAll} disabled={!onSeeAll}>
-          <Text
-            variant="label"
-            color={theme.colors.accentMint}
-            style={{ fontSize: 11.5 }}
-          >
+          <Text variant="label" color={theme.palette.acc} style={{ fontSize: 11.5 }}>
             {t('home.recent.seeAll')}
           </Text>
         </Pressable>
       </View>
-      <Card padding={4}>
+      <View>
         {items.length === 0 ? (
           <View style={{ paddingHorizontal: 12, paddingVertical: 26 }}>
             <Text variant="body" muted style={{ fontSize: 13, textAlign: 'center' }}>
@@ -70,7 +73,7 @@ export function RecentList({ items, onSeeAll }: Props) {
             />
           ))
         )}
-      </Card>
+      </View>
     </View>
   );
 }

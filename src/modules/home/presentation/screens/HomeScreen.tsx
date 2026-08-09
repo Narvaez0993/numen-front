@@ -14,6 +14,7 @@ import {
   useConfirmCharge,
   useSkipCharge,
 } from '@/modules/subscriptions/presentation/hooks/useCharges';
+import { useSubscriptions } from '@/modules/subscriptions/presentation/hooks/useSubscriptions';
 import { Aurora, RetryState } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
@@ -23,10 +24,13 @@ import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 import { HomeHeader } from '../components/HomeHeader';
 import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
 import { RecentList } from '../components/RecentList';
+import { HomeHero } from '../components/HomeHero';
+import { AccountsRow } from '../components/AccountsRow';
+import { AutoCharges } from '../components/AutoCharges';
+import { BudgetPulse } from '../components/BudgetPulse';
 import { RhythmStrip } from '../components/RhythmStrip';
 import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
-import { UpcomingCharges } from '../components/UpcomingCharges';
 import { useHomeOverview } from '../hooks/useHomeOverview';
 
 export function HomeScreen() {
@@ -37,6 +41,9 @@ export function HomeScreen() {
   // The device's local day, pinned once per mount: the server answers about the
   // user's calendar, and a re-render must not move the question.
   const today = useMemo(() => toIsoDate(new Date()), []);
+  // Home carries the charges; their names and the monthly total live one
+  // endpoint over, and this screen already talked to it for the shelf.
+  const subscriptions = useSubscriptions(today);
   const { data, isLoading, isError, refetch } = useHomeOverview(today);
   const displayName = useAuthStore((s) => s.session?.displayName);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
@@ -129,36 +136,63 @@ export function HomeScreen() {
               projected={data.pace?.projected ?? null}
               language={i18n.language}
             />
-            <AgentAnnouncementBanner today={today} />
-            <TodayHero
-              focus={data.focus}
-              objective={data.objective}
-              month={data.month}
-              pace={data.pace}
-              budget={data.budget}
-              debts={data.debts}
-              goal={data.goal}
+            {data.budget ? (
+              <BudgetPulse
+                budget={data.budget}
+                daysLeft={data.daysLeft}
+                elapsed={data.daysElapsed / (data.daysElapsed + data.daysLeft)}
+                onPress={() => router.push('/(tabs)/budgets')}
+              />
+            ) : null}
+            <AccountsRow
               netBalance={data.netBalance}
-              cardDebt={data.cardDebt}
-              cardLimit={data.cardLimit}
-              period={data.period}
-              daysLeft={data.daysLeft}
-              onSaldoPress={() => router.push('/accounts')}
-              onBudgetPress={() => router.push('/(tabs)/budgets')}
-              // The month's spend is the movements that made it, not a budget.
-              onMonthPress={goMovements}
-              start={{ steps: startSteps, firstTime: data.recent.length === 0 }}
-              // Every invitation points at something that exists today: the debts
-              // ledger, the first goal, or the month's income.
-              onInvite={
-                data.objective === 'deudas'
-                  ? () => router.push('/deudas')
-                  : data.objective === 'ahorrar'
-                    ? () => router.push('/goals')
-                    : () => openSheet('manual', 'income')
-              }
-              onGoalPress={() => router.push('/goals')}
+              accountsCount={data.accountsCount}
+              creditCardsCount={data.creditCardsCount}
+              owedToMe={data.debts.owedToMe}
+              onPress={() => router.push('/accounts')}
             />
+            <AgentAnnouncementBanner today={today} />
+            {/* The bundle draws Home for a user who already has a month. A
+                first-timer still gets the checklist — dropping it would leave
+                them a screen of zeros with nothing to do. */}
+            {data.recent.length === 0 ? (
+              <TodayHero
+                focus={data.focus}
+                objective={data.objective}
+                month={data.month}
+                pace={data.pace}
+                budget={data.budget}
+                debts={data.debts}
+                goal={data.goal}
+                netBalance={data.netBalance}
+                cardDebt={data.cardDebt}
+                cardLimit={data.cardLimit}
+                period={data.period}
+                daysLeft={data.daysLeft}
+                onSaldoPress={() => router.push('/accounts')}
+                onBudgetPress={() => router.push('/(tabs)/budgets')}
+                // The month's spend is the movements that made it, not a budget.
+                onMonthPress={goMovements}
+                start={{ steps: startSteps, firstTime: true }}
+                // Every invitation points at something that exists today: the debts
+                // ledger, the first goal, or the month's income.
+                onInvite={
+                  data.objective === 'deudas'
+                    ? () => router.push('/deudas')
+                    : data.objective === 'ahorrar'
+                      ? () => router.push('/goals')
+                      : () => openSheet('manual', 'income')
+                }
+                onGoalPress={() => router.push('/goals')}
+              />
+            ) : (
+              <HomeHero
+                spent={data.month.spent}
+                change={data.month.change}
+                monthName={monthName(`${data.period}-01`, i18n.language)}
+                onCortePress={() => router.push('/resumenes')}
+              />
+            )}
             {/* The agent's block, right under the hero: the permanent door to its
               deliveries, then what it noticed that you can act on today. Both
               live here instead of docked over the chat — they are answers to
@@ -171,16 +205,25 @@ export function HomeScreen() {
               period={data.period}
               onPress={goMovements}
             />
-            <UpcomingCharges
+            <AutoCharges
               items={data.upcoming}
+              monthlyTotal={subscriptions.data?.monthly ?? null}
+              nameOf={(id) =>
+                subscriptions.data?.subscriptions.find((sub) => sub.id === id)?.name ??
+                '—'
+              }
               today={today}
+              language={i18n.language}
               busy={confirmCharge.isPending || skipCharge.isPending}
               onConfirm={(id) => confirmCharge.mutate({ id })}
               onSkip={(id) => skipCharge.mutate(id)}
               onSeeAll={() => router.push('/subscriptions')}
             />
             <RecentList items={data.recent} onSeeAll={goMovements} />
-            <TopCategoriesCard categories={data.topCategories} />
+            <TopCategoriesCard
+              categories={data.topCategories}
+              onSeeCaps={() => router.push('/(tabs)/budgets')}
+            />
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -763,7 +763,8 @@
       "title": "Tus categorías",
       "thisMonth": "este mes",
       "unclassified": "Sin clasificar",
-      "noCapShare": "sin tope · {{pct}}% del gasto"
+      "noCapShare": "sin tope · {{pct}}% del gasto",
+      "seeCaps": "Ver topes"
     },
     "recent": {
       "title": "Últimos movimientos",
@@ -843,16 +844,11 @@
       "meanwhile": "Mientras tanto vas gastando {{amount}} al día"
     },
     "budget": {
-      "label": "Tu tope de {{month}}",
-      "of": "de {{amount}}",
-      "ceiling_one": "No pases de {{amount}} hoy, el último día del mes",
-      "ceiling_other": "No pases de {{amount}} al día por los {{count}} que quedan",
-      "over": "Te pasaste del tope por {{amount}}",
-      "willFit": "A este ritmo cierras en {{amount}} · te sobran {{gap}}",
-      "willBust": "A este ritmo cierras en {{amount}} · te pasas por {{gap}}",
-      "row": "Tu tope · {{pct}}% usado",
-      "perDay": "{{amount}}/día",
-      "spent": "sin margen"
+      "left": "Te queda",
+      "over": "Te pasaste",
+      "label": "Presupuesto",
+      "perDay_one": "por día · {{count}} día",
+      "perDay_other": "por día · {{count}} días"
     },
     "goal": {
       "of": "de {{amount}}",
@@ -870,6 +866,29 @@
     "rhythm": {
       "today": "hoy · {{amount}}",
       "projected": "proyección"
+    },
+    "hero": {
+      "firstMonth": "Este es tu primer mes.\nVamos viendo cómo va.",
+      "lighter": "Vas <b>{{pct}}% más liviana</b>\nque el mes pasado.",
+      "heavier": "Vas <b>{{pct}}% más pesada</b>\nque el mes pasado.",
+      "spent": "Gastado",
+      "corte": "El Corte de {{month}}"
+    },
+    "accounts": {
+      "label": "En tus cuentas",
+      "spread": "{{accounts}} cuentas · {{cards}} tarjeta",
+      "owedToMe": "{{amount}} a tu favor"
+    },
+    "autoCharges": {
+      "title": "Se cobran solos",
+      "monthly": "{{amount}} al mes",
+      "seeAll": "Ver todas",
+      "due": "hoy",
+      "inDays_one": "en {{count}} d",
+      "inDays_other": "en {{count}} d",
+      "confirm": "Confirmar",
+      "skip": "Cancelar",
+      "tapToConfirm": "Toca para confirmar"
     }
   },
   "goals": {
