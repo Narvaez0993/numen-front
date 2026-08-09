@@ -13,6 +13,7 @@ import {
 import { useTheme } from '../theme';
 
 import { Icon } from './Icon';
+import { Scrim } from './Scrim';
 
 type Props = {
   visible: boolean;
@@ -99,16 +100,17 @@ export function BottomSheet({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: theme.colors.scrim,
             opacity: scrimOpacity,
           }}
         >
-          <Pressable
-            onPress={onClose}
-            style={{ flex: 1 }}
-            accessibilityRole="button"
-            accessibilityLabel="Close"
-          />
+          <Scrim>
+            <Pressable
+              onPress={onClose}
+              style={{ flex: 1 }}
+              accessibilityRole="button"
+              accessibilityLabel="Close"
+            />
+          </Scrim>
         </Animated.View>
         <Animated.View
           style={[

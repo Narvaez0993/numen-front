@@ -1,5 +1,6 @@
 export * from './Aurora';
 export * from './Orb';
+export * from './Scrim';
 export * from './Text';
 export * from './Button';
 export * from './Input';

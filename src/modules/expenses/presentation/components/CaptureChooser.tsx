@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, View } from 'react-native';
 
-import { Icon, Orb, Pill, Text } from '@/shared/presentation/components';
+import { Icon, Orb, Pill, Scrim, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 type Props = {
@@ -29,12 +29,14 @@ export function CaptureChooser({ visible, onClose, onSpeak, onType }: Props) {
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('common.close')}
-        onPress={onClose}
-        style={{ flex: 1, backgroundColor: theme.colors.scrim }}
-      />
+      <Scrim>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('common.close')}
+          onPress={onClose}
+          style={{ flex: 1 }}
+        />
+      </Scrim>
 
       <View
         pointerEvents="box-none"
