@@ -59,31 +59,50 @@ export function TextField({
  * Money input. `digits` are the raw keystrokes, read as the **minor unit** of the
  * currency: in USD typing `45000` shows `$450.00`, in COP `$450.000`.
  */
+/**
+ * An amount, boxed like any other field or leading a screen.
+ *
+ * `hero` drops the box entirely. Where the amount IS the thing being edited —
+ * a movement's detail, the manual form — a border around it says "one field
+ * among several", and the typography has to carry the hierarchy instead.
+ */
 export function AmountField({
   digits,
   onChangeDigits,
   currency,
+  size = 'field',
 }: {
   digits: string;
   onChangeDigits: (digits: string) => void;
   currency?: CurrencyCode;
+  size?: 'field' | 'hero';
 }) {
   const { theme } = useTheme();
+  const hero = size === 'hero';
+
   return (
     <View
       style={{
         flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        backgroundColor: theme.colors.bgFloat,
-        borderWidth: 1,
-        borderColor: theme.colors.borderSubtle,
-        borderRadius: 12,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
+        alignItems: hero ? 'baseline' : 'center',
+        gap: hero ? 4 : 4,
+        ...(hero
+          ? {}
+          : {
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              borderRadius: 12,
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+            }),
       }}
     >
-      <Text variant="bodyLarge" tabular style={{ fontSize: 15 }}>
+      <Text
+        tabular
+        color={hero ? theme.colors.textTertiary : theme.colors.textPrimary}
+        style={{ fontSize: hero ? 21 : 15, fontWeight: hero ? '300' : '500' }}
+      >
         {currencySymbol(currency)}
       </Text>
       <TextInput
@@ -94,7 +113,9 @@ export function AmountField({
         placeholderTextColor={theme.colors.textTertiary}
         style={{
           flex: 1,
-          fontSize: 15,
+          fontSize: hero ? 44 : 15,
+          lineHeight: hero ? 48 : undefined,
+          letterSpacing: hero ? -2.2 : undefined,
           color: theme.colors.textPrimary,
           fontFamily: 'Geist_500Medium',
           fontVariant: ['tabular-nums'],

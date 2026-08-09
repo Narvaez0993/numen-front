@@ -137,7 +137,7 @@ export function MovementDetailSheet({
                 {t('movements.detail.title')}
               </Text>
               {/* Read-only: changing the type would change the whole shape. */}
-              <Pill variant={isTransfer ? 'neutral' : 'mint'}>{typeLabel}</Pill>
+              <Pill variant="neutral">{typeLabel}</Pill>
             </View>
             <Text
               variant="caption"
@@ -148,28 +148,21 @@ export function MovementDetailSheet({
             </Text>
           </View>
 
-          <View>
-            <FieldLabel label={t('movements.detail.amount')} />
-            <AmountField
-              digits={digits}
-              onChangeDigits={setDigits}
-              currency={movement.currency}
-            />
-          </View>
+          {/* The amount IS the movement — it leads at 44px instead of hiding
+              under a label the same size as every other field's. */}
+          <AmountField
+            digits={digits}
+            onChangeDigits={setDigits}
+            currency={movement.currency}
+            size="hero"
+          />
 
           <View>
             <FieldLabel label={t('movements.detail.description')} />
             <TextField value={description} onChangeText={setDescription} />
           </View>
 
-          <View
-            style={{
-              backgroundColor: theme.colors.bgFloat,
-              borderColor: theme.colors.borderSubtle,
-              borderWidth: 1,
-              borderRadius: 12,
-            }}
-          >
+          <View style={{ gap: 10 }}>
             {!isTransfer ? (
               <SelectRow
                 label={t('movements.detail.category')}
