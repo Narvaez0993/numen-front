@@ -1316,6 +1316,19 @@
         "title": "Nota de voz",
         "body": "Grábala ahora y la reviso después"
       }
+    },
+    "voice": {
+      "status": {
+        "ready": "Cuéntame",
+        "listening": "Te escucho",
+        "thinking": "Un segundo"
+      },
+      "prompt": "Habla como le hablarías a alguien.\nYo me encargo del resto.",
+      "permission": "Necesito el micrófono para oírte.\nActívalo en los ajustes del teléfono.",
+      "writeInstead": "Escribirlo",
+      "mic": "Grabar",
+      "tapToTalk": "Toca y habla",
+      "tapToStop": "Toca cuando termines"
     }
   },
   "notFound": {

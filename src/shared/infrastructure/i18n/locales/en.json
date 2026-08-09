@@ -1316,6 +1316,19 @@
         "title": "Voice note",
         "body": "Record it now, I read it after"
       }
+    },
+    "voice": {
+      "status": {
+        "ready": "Tell me",
+        "listening": "I'm listening",
+        "thinking": "One second"
+      },
+      "prompt": "Talk the way you'd talk to a person.\nI'll take care of the rest.",
+      "permission": "I need the microphone to hear you.\nTurn it on in your phone's settings.",
+      "writeInstead": "Type it",
+      "mic": "Record",
+      "tapToTalk": "Tap and talk",
+      "tapToStop": "Tap when you're done"
     }
   },
   "notFound": {

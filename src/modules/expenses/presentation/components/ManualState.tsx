@@ -240,12 +240,10 @@ export function ManualState({
       <View
         style={{
           flexDirection: 'row',
-          backgroundColor: theme.colors.bgFloat,
-          borderColor: theme.colors.borderSubtle,
-          borderWidth: 1,
-          borderRadius: 12,
+          backgroundColor: theme.colors.bgSurface,
+          borderRadius: 14,
           padding: 3,
-          gap: 3,
+          gap: 6,
         }}
       >
         {TYPES.map((option) => {
@@ -262,17 +260,15 @@ export function ManualState({
                 flex: 1,
                 alignItems: 'center',
                 paddingVertical: 8,
-                borderRadius: 9,
+                borderRadius: 11,
                 backgroundColor: active ? theme.colors.bgElevated : 'transparent',
-                borderWidth: active ? 1 : 0,
-                borderColor: theme.colors.borderDefault,
                 opacity: pressed ? 0.8 : 1,
               })}
             >
               <Text
                 variant="label"
                 color={active ? theme.colors.textPrimary : theme.colors.textTertiary}
-                style={{ fontSize: 12 }}
+                style={{ fontSize: 12.5, fontWeight: '500' }}
               >
                 {t(`expenses.sheet.manualEntry.type.${option}`)}
               </Text>
@@ -281,28 +277,30 @@ export function ManualState({
         })}
       </View>
 
-      <View style={{ alignItems: 'center', paddingVertical: 6 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Text variant="display" tabular color={amountColor} style={{ fontSize: 30 }}>
-            {type === 'income' ? '+' : ''}$
-          </Text>
-          <TextInput
-            ref={amountRef}
-            value={formatAmountDigits(digits, currency)}
-            onChangeText={(v) => setDigits(v.replace(/\D/g, ''))}
-            keyboardType="number-pad"
-            placeholder="0"
-            placeholderTextColor={theme.colors.textTertiary}
-            style={{
-              fontSize: 30,
-              color: amountColor,
-              fontFamily: 'Geist_500Medium',
-              fontVariant: ['tabular-nums'],
-              minWidth: 60,
-              padding: 0,
-            }}
-          />
-        </View>
+      <View
+        style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4, paddingTop: 6 }}
+      >
+        <Text tabular color={amountColor} style={{ fontSize: 21, fontWeight: '300' }}>
+          {type === 'income' ? '+' : ''}$
+        </Text>
+        <TextInput
+          ref={amountRef}
+          value={formatAmountDigits(digits, currency)}
+          onChangeText={(v) => setDigits(v.replace(/\D/g, ''))}
+          keyboardType="number-pad"
+          placeholder="0"
+          placeholderTextColor={theme.colors.textTertiary}
+          style={{
+            flex: 1,
+            fontSize: 50,
+            lineHeight: 54,
+            letterSpacing: -2.4,
+            color: amountColor,
+            fontFamily: 'Geist_500Medium',
+            fontVariant: ['tabular-nums'],
+            padding: 0,
+          }}
+        />
       </View>
 
       <TextInput
@@ -315,23 +313,17 @@ export function ManualState({
           backgroundColor: theme.colors.bgFloat,
           borderWidth: 1,
           borderColor: theme.colors.borderSubtle,
-          borderRadius: 12,
-          paddingHorizontal: 14,
-          paddingVertical: 12,
+          borderRadius: 16,
+          paddingHorizontal: 16,
+          paddingVertical: 13,
+          minHeight: 44,
           fontSize: 14,
           color: theme.colors.textPrimary,
           fontFamily: 'Geist_400Regular',
         }}
       />
 
-      <View
-        style={{
-          backgroundColor: theme.colors.bgFloat,
-          borderColor: theme.colors.borderSubtle,
-          borderWidth: 1,
-          borderRadius: 12,
-        }}
-      >
+      <View style={{ gap: 10 }}>
         {type !== 'transfer' ? (
           <SelectRow
             label={t('expenses.sheet.manualEntry.category')}

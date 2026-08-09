@@ -35,6 +35,7 @@ import { useVoiceCapture } from '../hooks/useVoiceCapture';
 import { useExpenseSheetStore, type SheetFlow } from '../stores/useExpenseSheetStore';
 
 import { CaptureConfirmScreen } from './CaptureConfirmScreen';
+import { VoiceCaptureScreen } from './VoiceCaptureScreen';
 import { EntryState } from './EntryState';
 import { ManualState } from './ManualState';
 import { WritingState } from './WritingState';
@@ -99,6 +100,8 @@ export function ExpenseSheet() {
   }, [open, drafts, debtDrafts]);
 
   const isSubScreen = flow === 'manual' || flow === 'writing';
+  // Talking, listening and thinking are one screen, not three faces of a sheet.
+  const isVoice = flow === 'entry' || flow === 'recording' || flow === 'processing';
 
   const handleSave = (movement: NewMovement) => {
     setError(null);
@@ -276,7 +279,7 @@ export function ExpenseSheet() {
       {/* The sheet steps aside for the confirm screen: answering questions earned a
           screen of its own, and two stacked modals is nobody's idea of clarity. */}
       <BottomSheet
-        visible={open && flow !== 'confirm'}
+        visible={open && flow !== 'confirm' && !isVoice}
         onClose={closeSheet}
         maxHeight={MAX_HEIGHT[flow]}
       >
@@ -339,6 +342,18 @@ export function ExpenseSheet() {
           <View style={{ height: 8 }} />
         </ScrollView>
       </BottomSheet>
+
+      <VoiceCaptureScreen
+        visible={open && isVoice}
+        transcript={capture.liveTranscript}
+        recording={flow === 'recording'}
+        busy={flow === 'processing'}
+        permissionDenied={capture.permissionDenied}
+        error={capture.inlineError}
+        onMicPress={capture.onMicPress}
+        onWriteInstead={() => setFlow('manual')}
+        onClose={closeSheet}
+      />
 
       <CaptureConfirmScreen
         visible={open && flow === 'confirm' && drafts.length + debtDrafts.length > 0}
