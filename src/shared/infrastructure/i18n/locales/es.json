@@ -767,9 +767,10 @@
       "seeCaps": "Ver topes"
     },
     "recent": {
-      "title": "Últimos movimientos",
+      "title": "Hoy",
       "seeAll": "Ver todos",
-      "empty": "Aún no registras movimientos"
+      "empty": "Aún no registras movimientos",
+      "emptyToday": "Hoy no has registrado nada."
     },
     "income": {
       "title": "Ingresos de {{month}}",

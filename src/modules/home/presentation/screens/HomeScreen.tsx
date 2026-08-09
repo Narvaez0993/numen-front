@@ -4,9 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AgentAnnouncementBanner } from '@/modules/assistant/presentation/components/feed/AgentAnnouncementBanner';
-import { AgentInsights } from '@/modules/assistant/presentation/components/feed/AgentInsights';
-import { AgentSummariesRow } from '@/modules/assistant/presentation/components/feed/AgentSummariesRow';
 import { useAuthStore } from '@/modules/auth/presentation';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
@@ -22,7 +19,6 @@ import { usePrivacy } from '@/shared/presentation/theme/usePrivacy';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { HomeHeader } from '../components/HomeHeader';
-import { IncomeSummaryRow } from '../components/IncomeSummaryRow';
 import { RecentList } from '../components/RecentList';
 import { HomeHero } from '../components/HomeHero';
 import { AccountsRow } from '../components/AccountsRow';
@@ -126,32 +122,6 @@ export function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={{ gap: 18 }}>
-            {/* The premiere: an unread Corte or weekly review announces itself
-              above the hero — once a month it outranks the number, and once
-              watched it never comes back. */}
-            {/* The month at a glance, right under the figure it belongs to. */}
-            <RhythmStrip
-              byDay={data.byDay}
-              spentToday={data.month.spentToday}
-              projected={data.pace?.projected ?? null}
-              language={i18n.language}
-            />
-            {data.budget ? (
-              <BudgetPulse
-                budget={data.budget}
-                daysLeft={data.daysLeft}
-                elapsed={data.daysElapsed / (data.daysElapsed + data.daysLeft)}
-                onPress={() => router.push('/(tabs)/budgets')}
-              />
-            ) : null}
-            <AccountsRow
-              netBalance={data.netBalance}
-              accountsCount={data.accountsCount}
-              creditCardsCount={data.creditCardsCount}
-              owedToMe={data.debts.owedToMe}
-              onPress={() => router.push('/accounts')}
-            />
-            <AgentAnnouncementBanner today={today} />
             {/* The bundle draws Home for a user who already has a month. A
                 first-timer still gets the checklist — dropping it would leave
                 them a screen of zeros with nothing to do. */}
@@ -193,17 +163,31 @@ export function HomeScreen() {
                 onCortePress={() => router.push('/resumenes')}
               />
             )}
-            {/* The agent's block, right under the hero: the permanent door to its
-              deliveries, then what it noticed that you can act on today. Both
-              live here instead of docked over the chat — they are answers to
-              "how am I doing", and the conversation needed its screen back. */}
-            <AgentSummariesRow today={today} />
-            <AgentInsights today={today} />
-            <IncomeSummaryRow
-              total={data.month.income}
-              savingsRate={data.month.savingsRate}
-              period={data.period}
-              onPress={goMovements}
+            <RhythmStrip
+              byDay={data.byDay}
+              spentToday={data.month.spentToday}
+              dailyAverage={data.pace?.dailyAverage ?? null}
+              language={i18n.language}
+            />
+            {data.budget ? (
+              <BudgetPulse
+                budget={data.budget}
+                daysLeft={data.daysLeft}
+                elapsed={data.daysElapsed / (data.daysElapsed + data.daysLeft)}
+                onPress={() => router.push('/(tabs)/budgets')}
+              />
+            ) : null}
+            <AccountsRow
+              netBalance={data.netBalance}
+              accountsCount={data.accountsCount}
+              creditCardsCount={data.creditCardsCount}
+              owedToMe={data.debts.owedToMe}
+              onPress={() => router.push('/accounts')}
+            />
+            <RecentList items={data.recent} today={today} onSeeAll={goMovements} />
+            <TopCategoriesCard
+              categories={data.topCategories}
+              onSeeCaps={() => router.push('/(tabs)/budgets')}
             />
             <AutoCharges
               items={data.upcoming}
@@ -218,11 +202,6 @@ export function HomeScreen() {
               onConfirm={(id) => confirmCharge.mutate({ id })}
               onSkip={(id) => skipCharge.mutate(id)}
               onSeeAll={() => router.push('/subscriptions')}
-            />
-            <RecentList items={data.recent} onSeeAll={goMovements} />
-            <TopCategoriesCard
-              categories={data.topCategories}
-              onSeeCaps={() => router.push('/(tabs)/budgets')}
             />
           </View>
         </ScrollView>

@@ -767,9 +767,10 @@
       "seeCaps": "See caps"
     },
     "recent": {
-      "title": "Recent activity",
+      "title": "Today",
       "seeAll": "See all",
-      "empty": "Nothing registered yet"
+      "empty": "Nothing registered yet",
+      "emptyToday": "Nothing logged today."
     },
     "income": {
       "title": "{{month}} income",

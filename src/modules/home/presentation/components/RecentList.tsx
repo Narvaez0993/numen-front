@@ -12,6 +12,9 @@ import { useTheme } from '@/shared/presentation/theme';
 
 type Props = {
   items: Movement[];
+  /** `YYYY-MM-DD`. The block is "Hoy", so it shows today and nothing else —
+   *  yesterday's coffee under a heading that says today would be a small lie. */
+  today: string;
   onSeeAll?: () => void;
 };
 
@@ -20,10 +23,11 @@ type Props = {
  * movement looks identical wherever it shows up, and there is one place to change
  * how it looks.
  */
-export function RecentList({ items, onSeeAll }: Props) {
+export function RecentList({ items, today, onSeeAll }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const catalogs = useMovementCatalogs();
+  const todays = items.filter((movement) => movement.occurredOn === today);
 
   return (
     <View>
@@ -51,14 +55,14 @@ export function RecentList({ items, onSeeAll }: Props) {
         </Pressable>
       </View>
       <View>
-        {items.length === 0 ? (
+        {todays.length === 0 ? (
           <View style={{ paddingHorizontal: 12, paddingVertical: 26 }}>
             <Text variant="body" muted style={{ fontSize: 13, textAlign: 'center' }}>
-              {t('home.recent.empty')}
+              {t('home.recent.emptyToday')}
             </Text>
           </View>
         ) : (
-          items.map((movement, i) => (
+          todays.map((movement, i) => (
             <TxRow
               key={movement.id}
               movement={movement}
@@ -68,7 +72,7 @@ export function RecentList({ items, onSeeAll }: Props) {
                   : undefined
               }
               source={displaySource(catalogs, movement.source, movement.destination)}
-              last={i === items.length - 1}
+              last={i === todays.length - 1}
               onPress={onSeeAll}
             />
           ))
