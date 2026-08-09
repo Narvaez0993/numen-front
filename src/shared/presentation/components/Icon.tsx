@@ -5,6 +5,36 @@ import Svg, { Path } from 'react-native-svg';
  * (`icons.jsx`). To add a new icon, paste its Tabler path here.
  */
 const TABLER_PATHS: Record<string, string[]> = {
+  // The five tabs. Paths verbatim from the redesign bundle, which picked a
+  // different metaphor for each: a pulse for the month's pace, two crossing
+  // arrows for money moving, bars for the year, a gauge for the cap.
+  'tab-inicio': ['M3 12h3.5l2.5 7l4 -14l2.5 7h5.5'],
+  'tab-movimientos': [
+    'M8 4v16M8 4l-3.5 3.5M8 4l3.5 3.5',
+    'M16 20V4M16 20l-3.5 -3.5M16 20l3.5 -3.5',
+  ],
+  'tab-historia': [
+    'M4 19V5',
+    'M4 19h16',
+    'M8 16V11',
+    'M12 16V7',
+    'M16 16v-6',
+    'M20 16v-9',
+  ],
+  'tab-presupuesto': [
+    'M12 21a9 9 0 1 1 9 -9',
+    'M12 12l5 -3',
+    'M12 12m-1.5 0a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0',
+  ],
+  'tab-chat': [
+    'M12 3l1.9 4.6l4.6 1.9l-4.6 1.9l-1.9 4.6l-1.9 -4.6l-4.6 -1.9l4.6 -1.9z',
+    'M18 17l.8 2.2l2.2 .8l-2.2 .8l-.8 2.2l-.8 -2.2l-2.2 -.8l2.2 -.8z',
+  ],
+
+  // Capture: typing, and a waveform for a note left to be read later.
+  typography: ['M4 7v-1h16v1', 'M9 18h6', 'M12 6v12'],
+  waveform: ['M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2'],
+
   // Generic / nav
   plus: ['M12 5l0 14M5 12l14 0'],
   x: ['M18 6l-12 12M6 6l12 12'],

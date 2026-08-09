@@ -1263,6 +1263,21 @@
       "saveFailed": "No pudimos guardar. Intenta de nuevo.",
       "savedOne": "Guardado",
       "savedMany": "{{count}} registros guardados"
+    },
+    "chooser": {
+      "title": "Apuntar algo",
+      "speak": {
+        "title": "Hablando",
+        "body": "Una frase, aunque lleve varias cosas"
+      },
+      "type": {
+        "title": "Escribiendo",
+        "body": "Monto y detalle a mano"
+      },
+      "note": {
+        "title": "Nota de voz",
+        "body": "Grábala ahora y la reviso después"
+      }
     }
   },
   "notFound": {

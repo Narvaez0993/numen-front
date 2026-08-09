@@ -1263,6 +1263,21 @@
       "saveFailed": "We couldn't save it. Try again.",
       "savedOne": "Saved",
       "savedMany": "{{count}} records saved"
+    },
+    "chooser": {
+      "title": "Log something",
+      "speak": {
+        "title": "Speaking",
+        "body": "One sentence, even if it holds several things"
+      },
+      "type": {
+        "title": "Typing",
+        "body": "Amount and detail by hand"
+      },
+      "note": {
+        "title": "Voice note",
+        "body": "Record it now, I read it after"
+      }
     }
   },
   "notFound": {
