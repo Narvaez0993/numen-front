@@ -1,6 +1,13 @@
+import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { Pressable, StyleSheet, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { Text } from '@/shared/presentation/components';
 import {
@@ -13,6 +20,7 @@ import {
   type PaletteId,
   type ThemePreference,
 } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 
 const MODES: ThemePreference[] = ['auto', 'dark', 'light'];
 /** How much wider the chosen stripe sits. Straight from the bundle. */
@@ -123,6 +131,12 @@ export function AppearancePalette() {
   );
 }
 
+/** The bundle's own curve and duration: `transition: flex .34s cubic-bezier(.2,.8,.2,1)`. */
+const GROW = {
+  duration: 340,
+  easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+};
+
 function Stripe({
   id,
   mode,
@@ -136,41 +150,54 @@ function Stripe({
 }) {
   const swatch = palettes[mode][id];
 
+  // Flex is animated rather than swapped. Swapping made the stripe jump to its
+  // new width in one frame, which is also what left the fill behind: the colour
+  // had no chance to follow.
+  const weight = useSharedValue(chosen ? CHOSEN_WEIGHT : 1);
+  const nameOpacity = useSharedValue(chosen ? 1 : 0);
+
+  useEffect(() => {
+    weight.value = withTiming(chosen ? CHOSEN_WEIGHT : 1, GROW);
+    // The name fades faster than the stripe grows, so it is legible before the
+    // box stops moving rather than arriving after it.
+    nameOpacity.value = withTiming(chosen ? 1 : 0, { duration: 200 });
+  }, [chosen, weight, nameOpacity]);
+
+  const growStyle = useAnimatedStyle(() => ({ flex: weight.value }));
+  const nameStyle = useAnimatedStyle(() => ({ opacity: nameOpacity.value }));
+
   return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected: chosen }}
-      accessibilityLabel={PALETTE_NAMES[id]}
-      onPress={onPress}
-      style={{
-        flex: chosen ? CHOSEN_WEIGHT : 1,
-        minWidth: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Svg
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        pointerEvents="none"
+    <Animated.View style={[{ minWidth: 0 }, growStyle]}>
+      <Pressable
+        accessibilityRole="radio"
+        accessibilityState={{ selected: chosen }}
+        accessibilityLabel={PALETTE_NAMES[id]}
+        onPress={onPress}
+        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Defs>
-          <LinearGradient id={`sw-${id}`} x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor={swatch.orb2} stopOpacity={chosen ? 1 : 0.4} />
-            <Stop offset="1" stopColor={swatch.orb3} stopOpacity={chosen ? 1 : 0.6} />
-          </LinearGradient>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#sw-${id})`} />
-      </Svg>
-      {chosen ? (
-        <Text
-          numberOfLines={1}
-          color="#FFFFFF"
-          style={{ fontSize: 11.5, fontWeight: '600', letterSpacing: 0.4 }}
-        >
-          {PALETTE_NAMES[id]}
-        </Text>
-      ) : null}
-    </Pressable>
+        {/* Native gradient, not SVG. An SVG keeps the viewport it was measured
+            with, so a stripe that grows ends up painted at its old width — the
+            colour cut off halfway across. This one resizes with its box. */}
+        <LinearGradient
+          colors={[
+            withAlpha(swatch.orb2, chosen ? 1 : 0.4),
+            withAlpha(swatch.orb3, chosen ? 1 : 0.6),
+          ]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        <Animated.View style={nameStyle} pointerEvents="none">
+          <Text
+            numberOfLines={1}
+            color="#FFFFFF"
+            style={{ fontSize: 11.5, fontWeight: '600', letterSpacing: 0.4 }}
+          >
+            {PALETTE_NAMES[id]}
+          </Text>
+        </Animated.View>
+      </Pressable>
+    </Animated.View>
   );
 }
 
