@@ -4,14 +4,33 @@ import { PALETTE_IDS, palettes } from '../palettes';
 import { buildTheme, withAlpha } from '../tokens';
 
 describe('mixColors', () => {
-  it('matches color-mix at the design’s aurora strength', () => {
-    // 16% of #7C5CFF into #0C0B10 — the night violet aurora, verbatim.
-    expect(mixColors('#7C5CFF', '#0C0B10', 0.16)).toBe('#1e1836');
+  it('matches color-mix on the screen’s own base', () => {
+    // The orb's lit edge is the only mix left; the aurora paints its blooms as
+    // translucent stops now, not as a colour pre-mixed into the page.
+    expect(mixColors('#EDE4FF', '#B79BFF', 0.62)).toBe('#d8c8ff');
   });
 
   it('returns the base at 0 and the tint at 1', () => {
     expect(mixColors('#FFFFFF', '#000000', 0)).toBe('#000000');
     expect(mixColors('#FFFFFF', '#000000', 1)).toBe('#ffffff');
+  });
+});
+
+describe('the screen’s own colours', () => {
+  it('uses the phone’s base, not the page the mockup sits on', () => {
+    // The bundle paints two backgrounds: the app screen, and the page around
+    // its phone mockup. Reading the second is what made day look washed out.
+    expect(modeColors.dark.bgBase).toBe('#08080C');
+    expect(modeColors.light.bgBase).toBe('#F4F2F7');
+  });
+
+  it('carries three blooms per mode, strongest first', () => {
+    for (const mode of ['dark', 'light'] as const) {
+      const { one, two, three } = modeColors[mode].aurora;
+      expect(one).toBeGreaterThan(0);
+      expect(two).toBeGreaterThan(0);
+      expect(three).toBeGreaterThan(0);
+    }
   });
 });
 

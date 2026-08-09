@@ -3,8 +3,16 @@
  *
  * `dark` is night, `light` is day — the names stay as they were so every existing
  * `mode === 'dark'` check keeps working. What changed is every value: the old
- * palette was blue-black and cold (`#0A0E1A`), the design's is near-neutral and
- * warm-violet (`#0A0A0D`), and paper is `#E9E6F0` rather than `#F4F5F9`.
+ * palette was blue-black and cold (`#0A0E1A`), the design's is near-neutral
+ * (`#08080C`), and paper is `#F4F2F7` rather than `#F4F5F9`.
+ *
+ * These are the colours of the SCREEN. The bundle also paints the page around its
+ * phone mockup, in a different and darker pair — reading those by mistake is what
+ * made the first attempt look washed out.
+ *
+ * The base is flat: the light comes from the three blooms `Aurora` paints on top
+ * of it, not from a gradient baked into the colour. That is why there is no
+ * "far" stop any more — a bloom fades to nothing, not to another shade.
  *
  * Surfaces are **translucent on purpose**. In the design a card is white at 5% over
  * night and at 78% over paper, so the aurora behind the page shows through it. Solid
@@ -13,10 +21,8 @@
 export type ThemeMode = 'light' | 'dark';
 
 export type ModeColors = {
-  /** The page under everything. The aurora is painted over this. */
+  /** The page under everything. The aurora's blooms are painted over this. */
   bgBase: string;
-  /** Where the aurora fades to at the bottom of the page. */
-  bgBaseFar: string;
   /** A card. Translucent — the aurora reads through. */
   bgSurface: string;
   /** One step up: icon wells, chips, the sheet over a screen. */
@@ -40,14 +46,13 @@ export type ModeColors = {
   incomeSoft: string;
 
   scrim: string;
-  /** How strongly the aurora bleeds into the page, 0..1. */
-  auroraStrength: number;
+  /** How strongly each of the aurora's three blooms reads, 0..1. */
+  aurora: { one: number; two: number; three: number };
 };
 
 export const modeColors: Record<ThemeMode, ModeColors> = {
   dark: {
-    bgBase: '#0C0B10',
-    bgBaseFar: '#0A0A0D',
+    bgBase: '#08080C',
     bgSurface: 'rgba(255,255,255,0.05)',
     bgFloat: 'rgba(255,255,255,0.07)',
     bgElevated: 'rgba(255,255,255,0.10)',
@@ -66,11 +71,10 @@ export const modeColors: Record<ThemeMode, ModeColors> = {
     incomeSoft: '#F7F5FF',
 
     scrim: 'rgba(0,0,0,0.62)',
-    auroraStrength: 0.16,
+    aurora: { one: 0.3, two: 0.18, three: 0.16 },
   },
   light: {
-    bgBase: '#F2EFF7',
-    bgBaseFar: '#DFDCE6',
+    bgBase: '#F4F2F7',
     bgSurface: 'rgba(255,255,255,0.78)',
     bgFloat: 'rgba(255,255,255,0.92)',
     bgElevated: 'rgba(255,255,255,1)',
@@ -89,6 +93,6 @@ export const modeColors: Record<ThemeMode, ModeColors> = {
     incomeSoft: '#F4F2F7',
 
     scrim: 'rgba(26,22,38,0.38)',
-    auroraStrength: 0.14,
+    aurora: { one: 0.26, two: 0.22, three: 0.2 },
   },
 };
