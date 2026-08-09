@@ -1,7 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -20,7 +20,6 @@ import {
   type PaletteId,
   type ThemePreference,
 } from '@/shared/presentation/theme';
-import { withAlpha } from '@/shared/presentation/theme/tokens';
 
 const MODES: ThemePreference[] = ['auto', 'dark', 'light'];
 /** How much wider the chosen stripe sits. Straight from the bundle. */
@@ -175,18 +174,24 @@ function Stripe({
         onPress={onPress}
         style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
       >
-        {/* Native gradient, not SVG. An SVG keeps the viewport it was measured
-            with, so a stripe that grows ends up painted at its old width — the
-            colour cut off halfway across. This one resizes with its box. */}
-        <LinearGradient
-          colors={[
-            withAlpha(swatch.orb2, chosen ? 1 : 0.4),
-            withAlpha(swatch.orb3, chosen ? 1 : 0.6),
-          ]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        {/* `width`/`height` as PROPS, not style. Given only a style, the SVG
+            keeps the viewport it was first measured with, so a stripe that grows
+            stays painted at its old width — the colour cut off halfway across.
+            As percentage props it tracks the box it is filling. */}
+        <Svg
+          width="100%"
+          height="100%"
           style={StyleSheet.absoluteFill}
-        />
+          pointerEvents="none"
+        >
+          <Defs>
+            <LinearGradient id={`sw-${id}`} x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0" stopColor={swatch.orb2} stopOpacity={chosen ? 1 : 0.4} />
+              <Stop offset="1" stopColor={swatch.orb3} stopOpacity={chosen ? 1 : 0.6} />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill={`url(#sw-${id})`} />
+        </Svg>
         <Animated.View style={nameStyle} pointerEvents="none">
           <Text
             numberOfLines={1}
