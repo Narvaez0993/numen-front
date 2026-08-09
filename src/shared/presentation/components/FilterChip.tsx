@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Pressable, ScrollView, View } from 'react-native';
 
 import { useTheme } from '../theme';
+import { withAlpha } from '../theme/tokens';
 
+import { BottomSheet } from './BottomSheet';
 import { Icon } from './Icon';
 import { Text } from './Text';
 
@@ -20,6 +22,18 @@ type Props = {
   allLabel?: string;
 };
 
+/**
+ * A filter, and the list it opens.
+ *
+ * The chip is a pill that says either what it filters or what it is filtering
+ * BY — a chip reading "Mercado" is worth more than one reading "Categoría" with
+ * a tick somewhere, because the row of chips then reads as a sentence about what
+ * is on screen.
+ *
+ * The list rises from the bottom rather than appearing in the middle. A centred
+ * dialog puts the options as far from the thumb as the screen allows, and these
+ * are lists people scroll.
+ */
 export function FilterChip({ label, value, options, onChange, allLabel }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -32,93 +46,96 @@ export function FilterChip({ label, value, options, onChange, allLabel }: Props)
   const resolvedAllLabel = allLabel ?? t('common.all', { defaultValue: 'Todas' });
 
   return (
-    <View style={{ flex: 1, minWidth: 0 }}>
+    <>
       <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ selected: active }}
         onPress={() => setOpen(true)}
         style={({ pressed }) => ({
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 4,
-          paddingHorizontal: 10,
-          paddingVertical: 8,
-          borderRadius: 12,
-          backgroundColor: active ? theme.colors.accentMintBg : theme.colors.bgSurface,
-          borderColor: active ? 'transparent' : theme.colors.borderSubtle,
+          gap: 6,
+          minHeight: 36,
+          paddingHorizontal: 13,
+          borderRadius: 999,
+          backgroundColor: active
+            ? withAlpha(theme.palette.acc, 0.15)
+            : theme.colors.bgSurface,
+          borderColor: active
+            ? withAlpha(theme.palette.acc, 0.3)
+            : theme.colors.borderSubtle,
           borderWidth: 1,
           opacity: pressed ? 0.85 : 1,
         })}
       >
         <Text
-          variant="label"
-          color={active ? theme.colors.accentMint : theme.colors.textSecondary}
           numberOfLines={1}
-          style={{ fontSize: 12, flex: 1 }}
+          color={active ? theme.palette.acc2 : theme.colors.textSecondary}
+          style={{ fontSize: 12 }}
         >
           {displayLabel}
         </Text>
         <Icon
           name="chevron-down"
           size={11}
-          color={active ? theme.colors.accentMint : theme.colors.textSecondary}
+          color={active ? theme.palette.acc2 : theme.colors.textTertiary}
         />
       </Pressable>
 
-      <Modal
+      <BottomSheet
         visible={open}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={() => setOpen(false)}
+        onClose={() => setOpen(false)}
+        maxHeight="74%"
+        showClose={false}
       >
-        <Pressable
-          onPress={() => setOpen(false)}
+        <View
           style={{
-            flex: 1,
-            backgroundColor: theme.colors.scrim,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 32,
+            flexDirection: 'row',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            paddingHorizontal: 24,
+            paddingTop: 16,
+            paddingBottom: 4,
           }}
         >
+          <Text style={{ fontSize: 15, fontWeight: '500' }}>{label}</Text>
           <Pressable
-            onPress={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: 320,
-              backgroundColor: theme.colors.bgFloat,
-              borderColor: theme.colors.borderDefault,
-              borderWidth: 1,
-              borderRadius: 16,
-              padding: 8,
-              maxHeight: 360,
-            }}
+            accessibilityRole="button"
+            onPress={() => setOpen(false)}
+            style={{ minHeight: 44, justifyContent: 'center' }}
           >
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Option
-                label={resolvedAllLabel}
-                selected={!active}
-                onPress={() => {
-                  onChange(null);
-                  setOpen(false);
-                }}
-              />
-              {options.map((o) => (
-                <Option
-                  key={o.value}
-                  label={o.label}
-                  selected={o.value === value}
-                  onPress={() => {
-                    onChange(o.value);
-                    setOpen(false);
-                  }}
-                />
-              ))}
-            </ScrollView>
+            <Text color={theme.colors.textTertiary} style={{ fontSize: 12.5 }}>
+              {t('common.close')}
+            </Text>
           </Pressable>
-        </Pressable>
-      </Modal>
-    </View>
+        </View>
+
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 26, paddingBottom: 30 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <Option
+            label={resolvedAllLabel}
+            selected={!active}
+            onPress={() => {
+              onChange(null);
+              setOpen(false);
+            }}
+          />
+          {options.map((option) => (
+            <Option
+              key={option.value}
+              label={option.label}
+              selected={option.value === value}
+              onPress={() => {
+                onChange(option.value);
+                setOpen(false);
+              }}
+            />
+          ))}
+        </ScrollView>
+      </BottomSheet>
+    </>
   );
 }
 
@@ -132,29 +149,48 @@ function Option({
   onPress: () => void;
 }) {
   const { theme } = useTheme();
+
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
       onPress={onPress}
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        borderRadius: 10,
-        backgroundColor: selected ? theme.colors.accentMintBg : 'transparent',
-        opacity: pressed && !selected ? 0.6 : 1,
+        gap: 12,
+        paddingVertical: 13,
+        minHeight: 44,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.borderSubtle,
+        opacity: pressed ? 0.85 : 1,
       })}
     >
-      <Text
-        variant="label"
-        color={selected ? theme.colors.accentMint : theme.colors.textPrimary}
-        style={{ fontSize: 12.5 }}
+      <View
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 11,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: selected
+            ? withAlpha(theme.palette.acc, 0.18)
+            : theme.colors.bgFloat,
+        }}
       >
+        <Text
+          color={selected ? theme.palette.acc2 : theme.colors.textSecondary}
+          style={{ fontSize: 12, fontWeight: '600' }}
+        >
+          {label.trim().charAt(0).toUpperCase() || '?'}
+        </Text>
+      </View>
+      <Text numberOfLines={1} style={{ flex: 1, fontSize: 14.5 }}>
         {label}
       </Text>
-      {selected ? <Icon name="check" size={13} color={theme.colors.accentMint} /> : null}
+      {selected ? (
+        <Icon name="check" size={17} stroke={2.2} color={theme.palette.acc} />
+      ) : null}
     </Pressable>
   );
 }
