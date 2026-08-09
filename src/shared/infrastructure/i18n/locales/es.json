@@ -1193,9 +1193,14 @@
       }
     },
     "appearance": {
-      "dark": "Dark",
-      "light": "Light",
-      "auto": "Auto"
+      "title": "Apariencia",
+      "colour": "Color",
+      "mode": {
+        "auto": "Automático",
+        "dark": "Noche",
+        "light": "Día"
+      },
+      "hint": "Toca una franja. El morado es el de casa; los demás usan el mismo sistema de luz."
     },
     "soon": "Próximamente",
     "editName": {

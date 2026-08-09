@@ -32,7 +32,7 @@ import { useTheme } from '@/shared/presentation/theme';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import { AppearanceRow } from '../components/AppearanceRow';
+import { AppearanceModes, AppearancePalette } from '../components/AppearanceSection';
 import { ObjectivePickerSheet } from '../components/ObjectivePickerSheet';
 import { EditNameSheet } from '../components/EditNameSheet';
 import type { UserProfile } from '../../domain/types/UserProfile';
@@ -104,6 +104,8 @@ export function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ProfileBlock profile={profile} onEdit={() => setEditOpen(true)} />
+
+        <AppearanceModes />
 
         <SettingsGroup label={t('profile.groups.myData')}>
           <SettingsRow
@@ -200,6 +202,8 @@ export function ProfileScreen() {
           />
         </SettingsGroup>
 
+        <AppearancePalette />
+
         <SettingsGroup label={t('profile.groups.app')}>
           <SettingsRow
             icon="bell"
@@ -207,7 +211,6 @@ export function ProfileScreen() {
             value={t('profile.soon')}
             chevron={false}
           />
-          <AppearanceRow />
           <SettingsRow
             icon="notebook"
             iconColor="purple"
