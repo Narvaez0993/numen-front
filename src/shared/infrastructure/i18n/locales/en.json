@@ -9,7 +9,9 @@
     "all": "All",
     "recurring": "recurring",
     "soon": "Soon",
-    "close": "Close"
+    "close": "Close",
+    "search": "Search",
+    "noMatches": "Nothing matches that."
   },
   "movements": {
     "title": "Movements",

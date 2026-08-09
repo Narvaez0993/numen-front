@@ -9,7 +9,9 @@
     "all": "Todas",
     "recurring": "recurrente",
     "soon": "Pronto",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "search": "Buscar",
+    "noMatches": "Nada coincide con eso."
   },
   "movements": {
     "title": "Movimientos",

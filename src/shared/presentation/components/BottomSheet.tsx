@@ -4,7 +4,9 @@ import {
   type DimensionValue,
   Dimensions,
   Easing,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   View,
   type ViewStyle,
@@ -92,7 +94,14 @@ export function BottomSheet({
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+      {/* Every sheet, not just the ones with a field today: a sheet is where
+          this app asks for typing, and each one solving the keyboard its own way
+          is how one of them ends up not solving it at all. On Android the window
+          already resizes, so adding padding on top of that double-counts. */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1, justifyContent: 'flex-end' }}
+      >
         <Animated.View
           style={{
             position: 'absolute',
@@ -171,7 +180,7 @@ export function BottomSheet({
 
           {children}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
