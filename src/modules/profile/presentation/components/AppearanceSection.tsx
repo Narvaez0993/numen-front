@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import Animated, {
   Easing,
@@ -22,6 +22,8 @@ import {
 } from '@/shared/presentation/theme';
 
 const MODES: ThemePreference[] = ['auto', 'dark', 'light'];
+const STRIPE_HEIGHT = 60;
+const GAP = 3;
 /** How much wider the chosen stripe sits. Straight from the bundle. */
 const CHOSEN_WEIGHT = 2.6;
 
@@ -95,14 +97,21 @@ export function AppearancePalette() {
   const palette = usePalettePreference((s) => s.palette);
   const setPalette = usePalettePreference((s) => s.setPalette);
 
+  // Measured once, on mount. Every stripe paints a fill this wide and lets the
+  // box clip it, which is what makes the fill independent of the animation.
+  const [rowWidth, setRowWidth] = useState(0);
+  const usable = Math.max(rowWidth - GAP * (PALETTE_IDS.length - 1), 0);
+  const widest = (usable * CHOSEN_WEIGHT) / (CHOSEN_WEIGHT + PALETTE_IDS.length - 1);
+
   return (
     <View>
       <Label style={{ marginBottom: 12 }}>{t('profile.appearance.colour')}</Label>
       <View
+        onLayout={(e) => setRowWidth(e.nativeEvent.layout.width)}
         style={{
           flexDirection: 'row',
-          gap: 3,
-          height: 60,
+          gap: GAP,
+          height: STRIPE_HEIGHT,
           borderRadius: 20,
           overflow: 'hidden',
           marginBottom: 12,
@@ -116,6 +125,7 @@ export function AppearancePalette() {
             // the same palette is a different colour on paper than on black.
             mode={mode}
             chosen={palette === id}
+            widest={widest}
             onPress={() => setPalette(id)}
           />
         ))}
@@ -140,18 +150,19 @@ function Stripe({
   id,
   mode,
   chosen,
+  widest,
   onPress,
 }: {
   id: PaletteId;
   mode: 'light' | 'dark';
   chosen: boolean;
+  /** The widest this stripe can ever be. The fill is painted at that size and
+   *  clipped by the box, which is the whole trick. */
+  widest: number;
   onPress: () => void;
 }) {
   const swatch = palettes[mode][id];
 
-  // Flex is animated rather than swapped. Swapping made the stripe jump to its
-  // new width in one frame, which is also what left the fill behind: the colour
-  // had no chance to follow.
   const weight = useSharedValue(chosen ? CHOSEN_WEIGHT : 1);
   const nameOpacity = useSharedValue(chosen ? 1 : 0);
 
@@ -166,7 +177,7 @@ function Stripe({
   const nameStyle = useAnimatedStyle(() => ({ opacity: nameOpacity.value }));
 
   return (
-    <Animated.View style={[{ minWidth: 0 }, growStyle]}>
+    <Animated.View style={[{ minWidth: 0, overflow: 'hidden' }, growStyle]}>
       <Pressable
         accessibilityRole="radio"
         accessibilityState={{ selected: chosen }}
@@ -174,14 +185,17 @@ function Stripe({
         onPress={onPress}
         style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
       >
-        {/* `width`/`height` as PROPS, not style. Given only a style, the SVG
-            keeps the viewport it was first measured with, so a stripe that grows
-            stays painted at its old width — the colour cut off halfway across.
-            As percentage props it tracks the box it is filling. */}
+        {/* Fixed size, not a percentage and not measured.
+         *
+         * Reanimated drives `flex` on the UI thread, so React never re-renders
+         * and an SVG never learns it got wider — it stayed painted at its old
+         * width with bare background beside it. Painting at the widest the
+         * stripe can ever be and letting the box clip it sidesteps the question:
+         * there is nothing to re-measure, and the fill can never fall short. */}
         <Svg
-          width="100%"
-          height="100%"
-          style={StyleSheet.absoluteFill}
+          width={widest}
+          height={STRIPE_HEIGHT}
+          style={{ position: 'absolute', left: 0, top: 0 }}
           pointerEvents="none"
         >
           <Defs>
