@@ -3,7 +3,7 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
-import { Icon, Orb, Text } from '@/shared/presentation/components';
+import { Icon, ListeningOrb, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 type Props = {
@@ -11,6 +11,12 @@ type Props = {
   /** What the recognizer has heard so far, growing as the user speaks. */
   transcript: string;
   recording: boolean;
+  /** The recognizer has really opened the mic. `recording && !listening` is the
+   *  warm-up, and it needs its own words — that is the gap where people spoke
+   *  and lost the start of what they said. */
+  listening: boolean;
+  /** 0..1 input volume, straight from the recognizer. */
+  level: number;
   busy: boolean;
   permissionDenied: boolean;
   error: string | null;
@@ -35,6 +41,8 @@ export function VoiceCaptureScreen({
   visible,
   transcript,
   recording,
+  listening,
+  level,
   busy,
   permissionDenied,
   error,
@@ -49,14 +57,19 @@ export function VoiceCaptureScreen({
   const status = busy
     ? t('expenses.voice.status.thinking')
     : recording
-      ? t('expenses.voice.status.listening')
+      ? listening
+        ? t('expenses.voice.status.listening')
+        : t('expenses.voice.status.opening')
       : t('expenses.voice.status.ready');
 
+  // Before the tap it explains HOW to talk; once the mic is open it says the app
+  // is ready, which is the answer to "when do I start?".
+  const idlePrompt = listening
+    ? t('expenses.voice.listeningPrompt')
+    : t('expenses.voice.prompt');
   const body =
     error ??
-    (permissionDenied
-      ? t('expenses.voice.permission')
-      : transcript || t('expenses.voice.prompt'));
+    (permissionDenied ? t('expenses.voice.permission') : transcript || idlePrompt);
 
   return (
     <Modal
@@ -166,26 +179,30 @@ export function VoiceCaptureScreen({
               accessibilityState={{ busy: recording }}
               accessibilityLabel={t('expenses.voice.mic')}
               onPress={onMicPress}
-              disabled={busy}
+              disabled={busy || (recording && !listening)}
               style={({ pressed }) => ({
                 transform: [{ scale: pressed ? 0.94 : 1 }],
                 opacity: busy ? 0.6 : 1,
               })}
             >
-              <Orb size={96}>
+              <ListeningOrb size={96} level={level} listening={listening}>
                 <Icon
                   name={recording ? 'check' : 'microphone'}
                   size={34}
                   stroke={1.8}
                   color="#FFFFFF"
                 />
-              </Orb>
+              </ListeningOrb>
             </Pressable>
             <Text
               color={theme.colors.textTertiary}
               style={{ fontSize: 12, marginTop: 14 }}
             >
-              {recording ? t('expenses.voice.tapToStop') : t('expenses.voice.tapToTalk')}
+              {!recording
+                ? t('expenses.voice.tapToTalk')
+                : listening
+                  ? t('expenses.voice.tapToStop')
+                  : t('expenses.voice.opening')}
             </Text>
           </View>
         </SafeAreaView>

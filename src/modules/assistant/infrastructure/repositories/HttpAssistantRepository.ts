@@ -251,6 +251,7 @@ type ParseResponse = {
   drafts: DraftResponse[];
   debt_drafts: DebtDraftResponse[];
   clarification: string | null;
+  notice: string | null;
   usage: UsageResponse;
 };
 
@@ -303,6 +304,7 @@ export class HttpAssistantRepository implements AssistantRepository {
         drafts: data.drafts.map(toDraft),
         debtDrafts: (data.debt_drafts ?? []).map(toDebtDraft),
         clarification: data.clarification,
+        notice: data.notice ?? null,
         usage: toUsage(data.usage),
       };
     } catch (error) {

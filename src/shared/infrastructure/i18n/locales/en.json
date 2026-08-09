@@ -1281,7 +1281,9 @@
       "confirm": {
         "title": "Here's what I understood",
         "titleMany": "Here's what I understood · {{count}} movements",
-        "said": "You said"
+        "said": "You said",
+        "notice": "Heads up",
+        "eyebrow": "Confirm"
       },
       "permission": {
         "title": "The microphone has no permission",
@@ -1321,14 +1323,17 @@
       "status": {
         "ready": "Tell me",
         "listening": "I'm listening",
-        "thinking": "One second"
+        "thinking": "One second",
+        "opening": "Opening the microphone"
       },
       "prompt": "Talk the way you'd talk to a person.\nI'll take care of the rest.",
       "permission": "I need the microphone to hear you.\nTurn it on in your phone's settings.",
       "writeInstead": "Type it",
       "mic": "Record",
       "tapToTalk": "Tap and talk",
-      "tapToStop": "Tap when you're done"
+      "tapToStop": "Tap when you're done",
+      "opening": "One moment…",
+      "listeningPrompt": "I am listening.\nTell me what you spent."
     }
   },
   "notFound": {

@@ -128,12 +128,20 @@ export function useVoiceCapture() {
         { text, source },
         {
           onSuccess: (outcome) => {
+            setNotice(outcome.notice);
             // One breath can hold both — "un café de 5 mil y le presté 50 a
             // Andrés" — so whatever came back travels together.
             if (outcome.drafts.length > 0 || outcome.debtDrafts.length > 0) {
               // Nothing left to ask: save it and get out of the way. Being asked
               // is what deserves a screen; being understood does not.
-              if (!needsAnswers(outcome.drafts, outcome.debtDrafts)) {
+              //
+              // Losing part of what was said does, though. Saving two of three and
+              // closing would show a toast for the two and never mention the third
+              // — silence that reads as "it all went in".
+              if (
+                outcome.notice === null &&
+                !needsAnswers(outcome.drafts, outcome.debtDrafts)
+              ) {
                 void saveAll(outcome.drafts, outcome.debtDrafts);
                 return;
               }
@@ -197,6 +205,11 @@ export function useVoiceCapture() {
 
   const onMicPress = useCallback(() => {
     if (flow === 'recording') {
+      // Warming up is not listening: stopping there would end a session that
+      // never opened, and the tap would read as the app ignoring you.
+      if (speech.status === 'starting') {
+        return;
+      }
       speech.stop();
       return;
     }
@@ -225,6 +238,10 @@ export function useVoiceCapture() {
 
   return {
     liveTranscript: speech.transcript,
+    /** True only once the recognizer has really opened the mic. */
+    listening: speech.status === 'listening',
+    /** 0..1 input volume — the orb follows it. */
+    level: speech.level,
     permissionDenied: speech.permission === 'denied',
     speechError: speech.errorCode,
     inlineError,

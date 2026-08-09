@@ -1281,7 +1281,9 @@
       "confirm": {
         "title": "Esto entendí",
         "titleMany": "Esto entendí · {{count}} movimientos",
-        "said": "Dijiste"
+        "said": "Dijiste",
+        "notice": "Aviso",
+        "eyebrow": "Confirma"
       },
       "permission": {
         "title": "El micrófono no tiene permiso",
@@ -1321,14 +1323,17 @@
       "status": {
         "ready": "Cuéntame",
         "listening": "Te escucho",
-        "thinking": "Un segundo"
+        "thinking": "Un segundo",
+        "opening": "Abriendo el micrófono"
       },
       "prompt": "Habla como le hablarías a alguien.\nYo me encargo del resto.",
       "permission": "Necesito el micrófono para oírte.\nActívalo en los ajustes del teléfono.",
       "writeInstead": "Escribirlo",
       "mic": "Grabar",
       "tapToTalk": "Toca y habla",
-      "tapToStop": "Toca cuando termines"
+      "tapToStop": "Toca cuando termines",
+      "opening": "Un momento…",
+      "listeningPrompt": "Ya te escucho.\nDime en qué gastaste."
     }
   },
   "notFound": {

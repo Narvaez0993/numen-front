@@ -1,4 +1,5 @@
 export * from './Aurora';
+export * from './ListeningOrb';
 export * from './Orb';
 export * from './Scrim';
 export * from './Text';

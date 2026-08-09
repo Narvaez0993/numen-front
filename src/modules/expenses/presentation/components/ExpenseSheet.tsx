@@ -347,6 +347,8 @@ export function ExpenseSheet() {
         visible={open && isVoice}
         transcript={capture.liveTranscript}
         recording={flow === 'recording'}
+        listening={capture.listening}
+        level={capture.level}
         busy={flow === 'processing'}
         permissionDenied={capture.permissionDenied}
         error={capture.inlineError}
@@ -363,6 +365,7 @@ export function ExpenseSheet() {
         transcript={transcript}
         busyDraftId={busyDraftId}
         error={error}
+        notice={notice}
         onClose={closeSheet}
         onConfirm={handleConfirmDraft}
         onEdit={(draft) => {

@@ -12,6 +12,7 @@ import { DebtDraftCard } from '@/modules/assistant/presentation/components/DebtD
 import { DraftCard } from '@/modules/assistant/presentation/components/DraftCard';
 import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 
 type Props = {
   visible: boolean;
@@ -22,6 +23,10 @@ type Props = {
   transcript: string | null;
   busyDraftId: string | null;
   error: string | null;
+  /** What the capture heard but could not record. Distinct from `error`: this is
+   *  not a failure to save, it is a part of the sentence that never became a
+   *  card, and without it the screen looks like it understood everything. */
+  notice: string | null;
   onClose: () => void;
   onConfirm: (draft: MovementDraft, overrides?: DraftOverrides) => void;
   onEdit: (draft: MovementDraft) => void;
@@ -52,6 +57,7 @@ export function CaptureConfirmScreen({
   transcript,
   busyDraftId,
   error,
+  notice,
   onClose,
   onConfirm,
   onEdit,
@@ -80,10 +86,9 @@ export function CaptureConfirmScreen({
           style={{
             paddingTop: Math.max(insets.top, 44) + 8,
             paddingBottom: 10,
-            paddingHorizontal: 14,
+            paddingHorizontal: 20,
             flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
+            justifyContent: 'flex-end',
           }}
         >
           <Pressable
@@ -92,10 +97,10 @@ export function CaptureConfirmScreen({
             onPress={onClose}
             hitSlop={14}
             style={({ pressed }) => ({
-              width: 42,
-              height: 42,
-              borderRadius: 13,
-              backgroundColor: theme.colors.bgSurface,
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              backgroundColor: theme.colors.bgFloat,
               borderWidth: 1,
               borderColor: theme.colors.borderSubtle,
               alignItems: 'center',
@@ -103,9 +108,8 @@ export function CaptureConfirmScreen({
               opacity: pressed ? 0.85 : 1,
             })}
           >
-            <Icon name="x" size={16} stroke={1.9} color={theme.colors.textSecondary} />
+            <Icon name="x" size={15} stroke={2} color={theme.colors.textSecondary} />
           </Pressable>
-          <View style={{ width: 42 }} />
         </View>
 
         <ScrollView
@@ -119,22 +123,67 @@ export function CaptureConfirmScreen({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 24, fontWeight: '500', letterSpacing: -0.6 }}>
+          <View style={{ gap: 10 }}>
+            <Text
+              variant="micro"
+              uppercase
+              color={theme.colors.textTertiary}
+              style={{ letterSpacing: 2.4 }}
+            >
+              {t('expenses.sheet.confirm.eyebrow')}
+            </Text>
+            <Text style={{ fontSize: 29, fontWeight: '300', letterSpacing: -0.9 }}>
               {total > 1
                 ? t('expenses.sheet.confirm.titleMany', { count: total })
                 : t('expenses.sheet.confirm.title')}
             </Text>
             {transcript !== null ? (
-              <Text
-                color={theme.colors.textSecondary}
-                style={{ fontSize: 13, lineHeight: 18.85 }}
+              // What was heard, quoted back. The transcript is the one thing that
+              // explains a card the user disagrees with — without it, a wrong
+              // amount looks like the app inventing numbers rather than mishearing.
+              <View
+                style={{
+                  borderLeftWidth: 2,
+                  borderLeftColor: withAlpha(theme.palette.acc, 0.4),
+                  paddingLeft: 12,
+                }}
               >
-                {t('expenses.sheet.confirm.said')}{' '}
-                <Text style={{ fontSize: 13 }}>“{transcript}”</Text>
-              </Text>
+                <Text
+                  color={theme.colors.textSecondary}
+                  style={{ fontSize: 13.5, lineHeight: 19.5 }}
+                >
+                  {transcript}
+                </Text>
+              </View>
             ) : null}
           </View>
+
+          {notice !== null ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 10,
+                padding: 14,
+                borderRadius: 16,
+                backgroundColor: withAlpha(theme.colors.accentAmber, 0.12),
+                borderWidth: 1,
+                borderColor: withAlpha(theme.colors.accentAmber, 0.28),
+              }}
+            >
+              <Icon
+                name="alert-circle"
+                size={16}
+                stroke={1.9}
+                color={theme.colors.accentAmber}
+              />
+              <Text
+                color={theme.colors.textSecondary}
+                style={{ flex: 1, fontSize: 12.5, lineHeight: 18 }}
+              >
+                {notice}
+              </Text>
+            </View>
+          ) : null}
 
           <View style={{ gap: 14 }}>
             {drafts.map((draft) => (

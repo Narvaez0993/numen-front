@@ -207,5 +207,9 @@ export type ParseOutcome = {
   drafts: MovementDraft[];
   debtDrafts: DebtDraft[];
   clarification: string | null;
+  /** What the capture heard but could NOT record — the monthly quota running out
+   *  mid-sentence, mostly. Understanding three things and saving one used to look
+   *  exactly like understanding one. */
+  notice: string | null;
   usage: AssistantUsage;
 };

@@ -15,6 +15,13 @@
  *   words rather than the whole session, so finals must be concatenated. iOS
  *   sends one cumulative final instead — joining handles both.
  * - Permissions are requested lazily on the first `start()`, never on mount.
+ * - `start()` resolving is NOT the mic being open. The engine warms up after
+ *   it, and on Android the gap is long enough that people talk into a mic that
+ *   is not listening yet and lose their first words. The native `start` event is
+ *   the real go signal, which is why `status` has a `starting` step of its own.
+ * - The recognizer reports input volume, and the UI uses it to show that the app
+ *   is hearing THEM rather than merely being on. It is off by default; asking for
+ *   it every 100ms is what makes an orb react to a voice.
  */
 
 import {
@@ -32,12 +39,26 @@ import {
 } from './recognitionLocale';
 import { absorb, NO_SEGMENTS, type SegmentState } from './transcriptSegments';
 
-export type SpeechStatus = 'idle' | 'listening' | 'stopping';
+export type SpeechStatus = 'idle' | 'starting' | 'listening' | 'stopping';
 export type SpeechPermission = 'unknown' | 'granted' | 'denied';
 
 /** Nothing anyone dictates to a capture sheet runs a full minute; past this the
  * mic was left open by accident, and an open mic is a battery bill. */
 const MAX_SESSION_MS = 60_000;
+
+/** How often the recognizer reports input volume. 100ms is its own default on
+ *  iOS and reads as continuous to the eye; faster only costs battery. */
+const VOLUME_INTERVAL_MS = 100;
+
+/** `volumechange` reports −2 (silence) to 10 (shouting). Normal speech sits low
+ *  in that range, so the ceiling is well under 10 — dividing by the full range
+ *  would make an ordinary voice look like a whisper. */
+const VOLUME_CEILING = 5;
+
+function toLevel(value: number): number {
+  if (value <= 0) return 0;
+  return Math.min(value / VOLUME_CEILING, 1);
+}
 
 type Options = {
   /** Fired on the `end` event with the final transcript ('' when nothing was
@@ -50,6 +71,8 @@ type Options = {
 export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
   const { i18n } = useTranslation();
   const [status, setStatus] = useState<SpeechStatus>('idle');
+  /** 0..1, how loud the mic is hearing right now. Drives the listening orb. */
+  const [level, setLevel] = useState(0);
   const [transcript, setTranscript] = useState('');
   const [permission, setPermission] = useState<SpeechPermission>('unknown');
   const [errorCode, setErrorCode] = useState<string | null>(null);
@@ -76,7 +99,8 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
       errorRef.current = null;
       setTranscript('');
       segmentsRef.current = NO_SEGMENTS;
-      setStatus('listening');
+      setLevel(0);
+      setStatus('starting');
       clearDeadline();
       deadlineRef.current = setTimeout(() => {
         ExpoSpeechRecognitionModule.stop();
@@ -90,10 +114,24 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
         addsPunctuation: false,
         iosTaskHint: 'dictation',
         contextualStrings,
+        volumeChangeEventOptions: {
+          enabled: true,
+          intervalMillis: VOLUME_INTERVAL_MS,
+        },
       });
     },
     [clearDeadline, contextualStrings],
   );
+
+  // The mic is open for real. Until this lands the user must not be told to
+  // speak — that is the gap where first words go missing.
+  useSpeechRecognitionEvent('start', () => {
+    setStatus((current) => (current === 'starting' ? 'listening' : current));
+  });
+
+  useSpeechRecognitionEvent('volumechange', (event) => {
+    setLevel(toLevel(event.value));
+  });
 
   useSpeechRecognitionEvent('result', (event) => {
     segmentsRef.current = absorb(
@@ -127,6 +165,7 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
     }
     clearDeadline();
     setStatus('idle');
+    setLevel(0);
     onFinalRef.current(segmentsRef.current.transcript.trim(), errorRef.current);
   });
 
@@ -164,10 +203,11 @@ export function useSpeechRecognition({ onFinal, contextualStrings }: Options) {
     clearDeadline();
     ExpoSpeechRecognitionModule.abort();
     setStatus('idle');
+    setLevel(0);
     setTranscript('');
   }, [clearDeadline]);
 
-  return { status, transcript, permission, errorCode, start, stop, abort };
+  return { status, level, transcript, permission, errorCode, start, stop, abort };
 }
 
 async function ensurePermission(
