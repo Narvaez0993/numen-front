@@ -2,6 +2,7 @@ export * from './AmountKeypad';
 export * from './Aurora';
 export * from './KeypadAmount';
 export * from './Orb';
+export * from './RiseIn';
 export * from './Scrim';
 export * from './Text';
 export * from './Button';

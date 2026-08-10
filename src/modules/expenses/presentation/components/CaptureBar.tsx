@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
+import { useEffect } from 'react';
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
+  withRepeat,
+  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -13,6 +17,10 @@ import { withAlpha } from '@/shared/presentation/theme/tokens';
 /** The bundle draws nine bars. Their resting heights are its own, kept verbatim
  *  so an idle mic looks like the design rather than a flat line. */
 const BAR_RESTS = [0.36, 0.72, 1, 0.54, 0.88, 0.4, 0.66, 0.3, 0.58];
+
+/** The bundle's `orbBreath`: scale 1 → 1.045 → 1. Its one idle motion, reused
+ *  here for the one moment the app is working and cannot say how long for. */
+const BREATH_MS = 1400;
 
 type Props = {
   /** What has been typed so far. Empty means the round button is a microphone. */
@@ -166,32 +174,75 @@ export function CaptureBar({
         }}
       />
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={typed ? t('expenses.capture.send') : t('expenses.voice.mic')}
-        onPress={typed ? onSend : onStartRecording}
-        disabled={busy}
-        style={({ pressed }) => ({
-          width: 42,
-          height: 42,
-          borderRadius: 21,
-          alignItems: 'center',
-          justifyContent: 'center',
-          // Filled once there is something to send: the accent marks the action
-          // that commits, and an empty field has nothing to commit.
-          backgroundColor: typed ? theme.palette.acc : withAlpha(theme.palette.acc, 0.18),
-          opacity: busy ? 0.5 : pressed ? 0.85 : 1,
-        })}
-      >
-        <Icon
-          name={typed ? 'arrow-up' : 'microphone'}
-          size={19}
-          stroke={1.9}
-          color={typed ? '#FFFFFF' : theme.palette.acc2}
-        />
-      </Pressable>
+      {busy ? (
+        // The button does not grey out and wait — it breathes. Something the
+        // eye can see moving is the difference between "working" and "stuck",
+        // and this is the app's own idle motion rather than a borrowed spinner.
+        <Breathing>
+          <View
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 21,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.palette.acc,
+            }}
+          >
+            <Icon name="sparkles" size={19} stroke={1.9} color="#FFFFFF" />
+          </View>
+        </Breathing>
+      ) : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            typed ? t('expenses.capture.send') : t('expenses.voice.mic')
+          }
+          onPress={typed ? onSend : onStartRecording}
+          style={({ pressed }) => ({
+            width: 42,
+            height: 42,
+            borderRadius: 21,
+            alignItems: 'center',
+            justifyContent: 'center',
+            // Filled once there is something to send: the accent marks the action
+            // that commits, and an empty field has nothing to commit.
+            backgroundColor: typed
+              ? theme.palette.acc
+              : withAlpha(theme.palette.acc, 0.18),
+            opacity: pressed ? 0.85 : 1,
+          })}
+        >
+          <Icon
+            name={typed ? 'arrow-up' : 'microphone'}
+            size={19}
+            stroke={1.9}
+            color={typed ? '#FFFFFF' : theme.palette.acc2}
+          />
+        </Pressable>
+      )}
     </View>
   );
+}
+
+/** `orbBreath`, as a wrapper. */
+function Breathing({ children }: { children: React.ReactNode }) {
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1.045, { duration: BREATH_MS / 2, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: BREATH_MS / 2, easing: Easing.inOut(Easing.quad) }),
+      ),
+      -1,
+      false,
+    );
+  }, [scale]);
+
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  return <Animated.View style={style}>{children}</Animated.View>;
 }
 
 /** One bar of the wave. Its resting height is the design's; the voice pushes it

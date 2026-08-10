@@ -1364,7 +1364,8 @@
         "recording": "Tap the arrow when you are done",
         "thinking": "One second…",
         "more": "Forgot something? Say it or type it"
-      }
+      },
+      "thinking": "Thinking"
     },
     "correct": {
       "title": "Correct",

@@ -38,6 +38,9 @@ export function useVoiceCapture() {
    *  example chip can fill it and a failed parse can leave it alone to be fixed. */
   const [text, setText] = useState('');
   const [elapsed, setElapsed] = useState(0);
+  /** The sentence in flight, spoken or typed. It stays on screen while the agent
+   *  reads it — sending should not blank the words you just said. */
+  const [pending, setPending] = useState<string | null>(null);
 
   // Account and category names bias the recognizer toward the words that
   // actually matter in this app ("Nequi" beats "net key").
@@ -59,23 +62,28 @@ export function useVoiceCapture() {
   const submit = useCallback(
     (text: string, source: CaptureSource) => {
       setInlineError(null);
+      setPending(text);
+      // The bar empties the moment it is sent: while it is being read the
+      // sentence is already on screen at 27px, and printing it twice makes the
+      // capture look like it did not take.
+      setText('');
       setMethod(source === 'voice' ? 'voice' : 'text');
       // Adding to a capture already on screen extends the quote rather than
       // replacing it: "un café… ah, y un tinto" is one dictation to the person
       // saying it, and swapping the sentence would orphan the earlier cards.
+      // Typed captures are quoted back too. They used to be left out because the
+      // words were still in the bar — but the bar empties on send now, so
+      // skipping the quote would lose them the moment they were understood.
       const previousPhrase = useExpenseSheetStore.getState().transcript;
       setTranscript(
-        source === 'voice'
-          ? previousPhrase !== null && hasCards()
-            ? `${previousPhrase} ${text}`
-            : text
-          : previousPhrase,
+        previousPhrase !== null && hasCards() ? `${previousPhrase} ${text}` : text,
       );
       setFlow('processing');
       parse.mutate(
         { text, source },
         {
           onSuccess: (outcome) => {
+            setPending(null);
             setNotice(outcome.notice);
             // One breath can hold both — "un café de 5 mil y le presté 50 a
             // Andrés" — so whatever came back travels together.
@@ -86,7 +94,6 @@ export function useVoiceCapture() {
             // first would make every correction an edit of money that already
             // moved.
             if (outcome.drafts.length > 0 || outcome.debtDrafts.length > 0) {
-              setText('');
               // APPEND. Remembering something a beat later is the normal way
               // people list what they spent, and making them close the capture
               // and start over for it is the app being worse than a napkin.
@@ -110,9 +117,18 @@ export function useVoiceCapture() {
             // retype from scratch.
             setInlineError(outcome.clarification);
             setClarification(outcome.clarification);
+            if (source === 'text') {
+              setText(text);
+            }
             setFlow('entry');
           },
           onError: (error) => {
+            setPending(null);
+            // Nothing understood means the words are all the user has left —
+            // hand them back rather than making them type it again.
+            if (source === 'text') {
+              setText(text);
+            }
             if (error instanceof RegistrationLimitReachedError) {
               // The habit never hard-blocks: the manual form is always there.
               setNotice(t('expenses.sheet.quotaExhausted'));
@@ -234,6 +250,7 @@ export function useVoiceCapture() {
   return {
     text,
     setText,
+    pending,
     elapsed,
     submitTyped,
     onCancelRecording,

@@ -3,12 +3,13 @@ import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
-import { Icon, Text } from '@/shared/presentation/components';
+import { Icon, RiseIn, Text } from '@/shared/presentation/components';
 import { useKeyboardInset } from '@/shared/presentation/hooks/useKeyboardInset';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { CaptureBar } from './CaptureBar';
 import { DetectedCard, type DetectedChip } from './DetectedCard';
+import { SkeletonCard } from './SkeletonCard';
 
 export type CaptureState = 'empty' | 'recording' | 'understood';
 
@@ -34,6 +35,9 @@ type Props = {
   transcript: string;
   /** What was said, quoted back over the cards. */
   phrase: string | null;
+  /** The sentence that was just sent and is still being read. Echoed at the size
+   *  the dictation used, so sending does not blank the words you just spoke. */
+  pending: string | null;
   cards: DetectedCardModel[];
   level: number;
   elapsed: number;
@@ -81,6 +85,7 @@ export function CaptureScreen({
   onChangeText,
   transcript,
   phrase,
+  pending,
   cards,
   level,
   elapsed,
@@ -212,6 +217,8 @@ export function CaptureScreen({
               />
             ) : state === 'recording' ? (
               <Listening transcript={transcript} />
+            ) : busy ? (
+              <Thinking pending={pending} />
             ) : (
               <Invitation error={error} onExample={(example) => onChangeText(example)} />
             )}
@@ -358,6 +365,50 @@ function Listening({ transcript }: { transcript: string }) {
   );
 }
 
+/**
+ * The sentence is sent and the agent is reading it.
+ *
+ * The words stay on screen at the size they were dictated at, because they are
+ * the only thing that explains the wait — and under them, the outline of the
+ * card they are about to become. A line of copy saying "one second" asks for
+ * patience; showing the shape of the answer explains what the patience buys.
+ */
+function Thinking({ pending }: { pending: string | null }) {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <View style={{ paddingHorizontal: 22, paddingTop: 30 }}>
+      <View style={{ paddingHorizontal: 8 }}>
+        <Text
+          variant="micro"
+          uppercase
+          color={theme.colors.textTertiary}
+          style={{ letterSpacing: 2.4, marginBottom: 16 }}
+        >
+          {t('expenses.capture.thinking')}
+        </Text>
+        {pending !== null ? (
+          <Text
+            color={theme.colors.textSecondary}
+            style={{
+              fontSize: 27,
+              lineHeight: 35,
+              fontWeight: '300',
+              letterSpacing: -0.8,
+            }}
+          >
+            {pending}
+          </Text>
+        ) : null}
+      </View>
+      <RiseIn duration={220} style={{ marginTop: 22 }}>
+        <SkeletonCard />
+      </RiseIn>
+    </View>
+  );
+}
+
 /** What the agent made of it, still editable. */
 function Understood({
   phrase,
@@ -435,9 +486,24 @@ function Understood({
       ) : null}
 
       <View style={{ gap: 10, marginTop: 16 }}>
-        {cards.map((card) => (
-          <DetectedCard key={card.id} {...card} />
-        ))}
+        {cards.map((card) =>
+          // A card added to a list already on screen lands rather than blinks —
+          // the bundle gives `capExtra` its own entry for exactly this.
+          card.fresh ? (
+            <RiseIn key={card.id} duration={220}>
+              <DetectedCard {...card} />
+            </RiseIn>
+          ) : (
+            <DetectedCard key={card.id} {...card} />
+          ),
+        )}
+        {/* Appended, so the outline sits where the new card will land and
+            nothing below it jumps when it arrives. */}
+        {busy ? (
+          <RiseIn duration={220}>
+            <SkeletonCard />
+          </RiseIn>
+        ) : null}
       </View>
 
       {error !== null ? (

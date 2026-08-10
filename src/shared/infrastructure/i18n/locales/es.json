@@ -1364,7 +1364,8 @@
         "recording": "Toca la flecha cuando termines",
         "thinking": "Un segundo…",
         "more": "¿Se te olvidó algo? Dilo o escríbelo"
-      }
+      },
+      "thinking": "Pensando"
     },
     "correct": {
       "title": "Corregir",

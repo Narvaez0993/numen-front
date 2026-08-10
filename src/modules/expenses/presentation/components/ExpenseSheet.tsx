@@ -405,6 +405,7 @@ export function ExpenseSheet() {
         onChangeText={capture.setText}
         transcript={capture.liveTranscript}
         phrase={transcript}
+        pending={capture.pending}
         cards={cards}
         level={capture.level}
         elapsed={capture.elapsed}
