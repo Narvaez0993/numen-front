@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
@@ -101,7 +100,7 @@ export function CaptureScreen({
   const { theme } = useTheme();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const keyboardInset = useKeyboardInset();
+  const keyboard = useKeyboardInset();
 
   const registerLabel =
     cards.length > 1
@@ -133,7 +132,10 @@ export function CaptureScreen({
             inside a statusBarTranslucent Modal the top inset does not arrive at
             all, and the bottom one has to add up with the keyboard's height
             rather than stack on top of it. */}
-        <Animated.View style={[{ flex: 1 }, keyboardInset]}>
+        <View
+          style={{ flex: 1, paddingBottom: keyboard.paddingBottom }}
+          onLayout={keyboard.onLayout}
+        >
           <View
             style={{
               flexDirection: 'row',
@@ -249,7 +251,7 @@ export function CaptureScreen({
                     : t('expenses.capture.foot.idle')}
             </Text>
           </View>
-        </Animated.View>
+        </View>
       </View>
     </Modal>
   );
