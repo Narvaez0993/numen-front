@@ -8,30 +8,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RegistrationLimitReachedError } from '@/modules/assistant/domain';
-import type {
-  CapturedRecord,
-  CaptureSource,
-  DebtDraft,
-  MovementDraft,
-} from '@/modules/assistant/domain/types/Assistant';
-import {
-  useConfirmDebtDraft,
-  useConfirmDraft,
-  useParseCapture,
-} from '@/modules/assistant/presentation/hooks/useAssistantMutations';
+import type { CaptureSource } from '@/modules/assistant/domain/types/Assistant';
+import { useParseCapture } from '@/modules/assistant/presentation/hooks/useAssistantMutations';
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { useSpeechRecognition } from '@/shared/presentation/voice/useSpeechRecognition';
 
 import { useExpenseSheetStore } from '../stores/useExpenseSheetStore';
-import { needsAnswers } from '../utils/captureAnswers';
 
 export function useVoiceCapture() {
   const { t } = useTranslation();
   const today = useMemo(() => toIsoDate(new Date()), []);
   const parse = useParseCapture(today);
-  const confirmDraft = useConfirmDraft(today);
-  const confirmDebtDraft = useConfirmDebtDraft(today);
   const catalogs = useMovementCatalogs();
 
   const open = useExpenseSheetStore((s) => s.open);
@@ -41,12 +29,14 @@ export function useVoiceCapture() {
   const setTranscript = useExpenseSheetStore((s) => s.setTranscript);
   const setDrafts = useExpenseSheetStore((s) => s.setDrafts);
   const setDebtDrafts = useExpenseSheetStore((s) => s.setDebtDrafts);
-  const setSaved = useExpenseSheetStore((s) => s.setSaved);
-  const closeSheet = useExpenseSheetStore((s) => s.closeSheet);
   const setClarification = useExpenseSheetStore((s) => s.setClarification);
   const setNotice = useExpenseSheetStore((s) => s.setNotice);
 
   const [inlineError, setInlineError] = useState<string | null>(null);
+  /** What is in the capture bar. It lives here rather than in the bar so an
+   *  example chip can fill it and a failed parse can leave it alone to be fixed. */
+  const [text, setText] = useState('');
+  const [elapsed, setElapsed] = useState(0);
 
   // Account and category names bias the recognizer toward the words that
   // actually matter in this app ("Nequi" beats "net key").
@@ -56,66 +46,6 @@ export function useVoiceCapture() {
       ...Object.values(catalogs.categoryById).map((category) => category.name),
     ],
     [catalogs],
-  );
-
-  /**
-   * Everything the agent already knew, saved without asking.
-   *
-   * It walks the drafts one by one rather than firing them together, because each
-   * confirm moves real money and a half-applied batch is worse than a slow one.
-   * Anything that fails hands the REST back to the confirm screen, where the user
-   * decides — silently dropping them would be the app losing words it heard.
-   */
-  const saveAll = useCallback(
-    async (drafts: MovementDraft[], debtDrafts: DebtDraft[]) => {
-      const records: CapturedRecord[] = [];
-      const leftoverDrafts: MovementDraft[] = [];
-      const leftoverDebts: DebtDraft[] = [];
-
-      for (const draft of drafts) {
-        try {
-          const done = await confirmDraft.mutateAsync({ draftId: draft.id });
-          records.push({ kind: 'movement', movementId: done.movementId });
-        } catch {
-          leftoverDrafts.push(draft);
-        }
-      }
-      for (const draft of debtDrafts) {
-        try {
-          const done = await confirmDebtDraft.mutateAsync({ draftId: draft.id });
-          records.push(
-            done.movementId !== null
-              ? {
-                  kind: 'payment',
-                  debtId: done.debtId,
-                  movementId: done.movementId,
-                }
-              : { kind: 'debt', debtId: done.debtId },
-          );
-        } catch {
-          leftoverDebts.push(draft);
-        }
-      }
-
-      if (leftoverDrafts.length > 0 || leftoverDebts.length > 0) {
-        setDrafts(leftoverDrafts);
-        setDebtDrafts(leftoverDebts);
-        setSaved(records);
-        setFlow('confirm');
-        return;
-      }
-      setSaved(records);
-      closeSheet();
-    },
-    [
-      confirmDebtDraft,
-      confirmDraft,
-      closeSheet,
-      setDebtDrafts,
-      setDrafts,
-      setFlow,
-      setSaved,
-    ],
   );
 
   const submit = useCallback(
@@ -131,27 +61,25 @@ export function useVoiceCapture() {
             setNotice(outcome.notice);
             // One breath can hold both — "un café de 5 mil y le presté 50 a
             // Andrés" — so whatever came back travels together.
+            //
+            // Nothing saves itself any more. The design reads back what it
+            // understood and waits for one Registrar, because the screen that
+            // shows the cards is the same one that lets you fix them: saving
+            // first would make every correction an edit of money that already
+            // moved.
             if (outcome.drafts.length > 0 || outcome.debtDrafts.length > 0) {
-              // Nothing left to ask: save it and get out of the way. Being asked
-              // is what deserves a screen; being understood does not.
-              //
-              // Losing part of what was said does, though. Saving two of three and
-              // closing would show a toast for the two and never mention the third
-              // — silence that reads as "it all went in".
-              if (
-                outcome.notice === null &&
-                !needsAnswers(outcome.drafts, outcome.debtDrafts)
-              ) {
-                void saveAll(outcome.drafts, outcome.debtDrafts);
-                return;
-              }
+              setText('');
               setDrafts(outcome.drafts);
               setDebtDrafts(outcome.debtDrafts);
               setFlow('confirm');
               return;
             }
+            // Understood nothing: the question surfaces where the words are, and
+            // the words stay put so there is something to correct rather than
+            // retype from scratch.
+            setInlineError(outcome.clarification);
             setClarification(outcome.clarification);
-            setFlow('writing');
+            setFlow('entry');
           },
           onError: (error) => {
             if (error instanceof RegistrationLimitReachedError) {
@@ -161,14 +89,13 @@ export function useVoiceCapture() {
               return;
             }
             setInlineError(t('expenses.sheet.parseFailed'));
-            setFlow(source === 'voice' ? 'entry' : 'writing');
+            setFlow('entry');
           },
         },
       );
     },
     [
       parse,
-      saveAll,
       setClarification,
       setDebtDrafts,
       setDrafts,
@@ -227,7 +154,40 @@ export function useVoiceCapture() {
     });
   }, [flow, speech, setFlow, t]);
 
-  const submitText = useCallback((text: string) => submit(text.trim(), 'text'), [submit]);
+  const submitTyped = useCallback(() => {
+    const trimmed = text.trim();
+    if (trimmed.length === 0) return;
+    submit(trimmed, 'text');
+  }, [submit, text]);
+
+  /** Backing out of a recording: no words, no parse, nothing charged. */
+  const onCancelRecording = useCallback(() => {
+    speech.abort();
+    setInlineError(null);
+    setFlow('entry');
+  }, [speech, setFlow]);
+
+  /** "Mejor lo digo otra vez" — the cards go, the bar comes back empty. */
+  const onRetry = useCallback(() => {
+    setDrafts([]);
+    setDebtDrafts([]);
+    setNotice(null);
+    setInlineError(null);
+    setText('');
+    setFlow('entry');
+  }, [setDebtDrafts, setDrafts, setFlow, setNotice]);
+
+  // The clock next to the wave. It runs off the flow rather than the recognizer
+  // so it starts the moment the bar changes, not when the engine warms up.
+  useEffect(() => {
+    if (flow !== 'recording') {
+      setElapsed(0);
+      return;
+    }
+    const started = Date.now();
+    const id = setInterval(() => setElapsed((Date.now() - started) / 1000), 250);
+    return () => clearInterval(id);
+  }, [flow]);
 
   const abort = speech.abort;
   useEffect(() => {
@@ -237,6 +197,12 @@ export function useVoiceCapture() {
   }, [open, abort]);
 
   return {
+    text,
+    setText,
+    elapsed,
+    submitTyped,
+    onCancelRecording,
+    onRetry,
     liveTranscript: speech.transcript,
     /** True only once the recognizer has really opened the mic. */
     listening: speech.status === 'listening',
@@ -246,7 +212,6 @@ export function useVoiceCapture() {
     speechError: speech.errorCode,
     inlineError,
     onMicPress,
-    submitText,
     parsePending: parse.isPending,
   };
 }

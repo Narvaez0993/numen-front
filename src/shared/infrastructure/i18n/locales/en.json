@@ -11,7 +11,8 @@
     "soon": "Soon",
     "close": "Close",
     "search": "Search",
-    "noMatches": "Nothing matches that."
+    "noMatches": "Nothing matches that.",
+    "done": "Done"
   },
   "movements": {
     "title": "Movements",
@@ -1264,7 +1265,10 @@
           "title": "You need a source first",
           "body": "Add your bank, wallet or cash in Profile → Sources and accounts, then come back."
         },
-        "pickDate": "Another date…"
+        "pickDate": "Another date…",
+        "description": "Description",
+        "source": "Source",
+        "destination": "Destination"
       },
       "voiceHint": "Tap the mic and tell me the expense",
       "voiceExample": "e.g. “a $5 coffee on Chase”",
@@ -1334,6 +1338,37 @@
       "tapToStop": "Tap when you're done",
       "opening": "One moment…",
       "listeningPrompt": "I am listening.\nTell me what you spent."
+    },
+    "capture": {
+      "title": "What happened?",
+      "subtitle": "Write it or say it the way you would tell someone. It can be more than one thing in the same sentence.",
+      "placeholder": "Tell me…",
+      "byHand": "Fill it in by hand",
+      "send": "Send",
+      "understood": "Here is what I understood",
+      "tapToFix": "Tap anything to correct it.",
+      "registerOne": "Record it",
+      "registerMany": "Record {{count}} things",
+      "retry": "Let me say it again",
+      "examples": {
+        "one": "a coffee for 5",
+        "two": "I got paid",
+        "three": "I lent Andrés 50"
+      },
+      "chip": {
+        "category": "Category",
+        "source": "Source"
+      },
+      "foot": {
+        "idle": "Type, or tap the microphone",
+        "recording": "Tap the arrow when you are done",
+        "thinking": "One second…"
+      }
+    },
+    "correct": {
+      "title": "Correct",
+      "remove": "Remove",
+      "what": "What it was"
     }
   },
   "notFound": {

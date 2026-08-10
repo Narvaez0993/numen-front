@@ -4,7 +4,7 @@
  * the draft's confirm — one door into the ledger, whoever knocks.
  */
 
-import type { ManualPrefill } from '@/modules/expenses/presentation/components/ManualState';
+import type { ManualPrefill } from '@/modules/expenses/presentation/components/ManualSheet';
 import type { NewMovement } from '@/modules/movements/domain';
 
 import type { DraftOverrides, MovementDraft } from '../../domain/types/Assistant';

@@ -45,6 +45,13 @@ const TABLER_PATHS: Record<string, string[]> = {
   // Capture: typing, and a waveform for a note left to be read later.
   typography: ['M4 7v-1h16v1', 'M9 18h6', 'M12 6v12'],
   waveform: ['M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2'],
+  backspace: [
+    'M20 6a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-9.5l-5.5 -6l5.5 -6z',
+    'M12 10l4 4m0 -4l-4 4',
+  ],
+  // The sheet's own note field, and the arrow that sends what was typed.
+  'note-lines': ['M4 5h16v14H4z', 'M8 9h8', 'M8 13h5'],
+  'arrow-up': ['M12 19V5', 'M6 11l6 -6l6 6'],
 
   // Generic / nav
   plus: ['M12 5l0 14M5 12l14 0'],

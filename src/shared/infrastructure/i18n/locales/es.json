@@ -11,7 +11,8 @@
     "soon": "Pronto",
     "close": "Cerrar",
     "search": "Buscar",
-    "noMatches": "Nada coincide con eso."
+    "noMatches": "Nada coincide con eso.",
+    "done": "Listo"
   },
   "movements": {
     "title": "Movimientos",
@@ -1264,7 +1265,10 @@
           "title": "Primero necesitas una fuente",
           "body": "Agrega tu banco, billetera o efectivo en Perfil → Fuentes y cuentas y vuelve a registrar."
         },
-        "pickDate": "Otra fecha…"
+        "pickDate": "Otra fecha…",
+        "description": "Descripción",
+        "source": "Fuente",
+        "destination": "Destino"
       },
       "voiceHint": "Toca el mic y cuéntame el gasto",
       "voiceExample": "Ej.: «un café de 5.000 con Nequi»",
@@ -1334,6 +1338,37 @@
       "tapToStop": "Toca cuando termines",
       "opening": "Un momento…",
       "listeningPrompt": "Ya te escucho.\nDime en qué gastaste."
+    },
+    "capture": {
+      "title": "¿Qué pasó?",
+      "subtitle": "Escríbelo o dilo como se lo contarías a alguien. Puede ser más de una cosa en la misma frase.",
+      "placeholder": "Cuéntame…",
+      "byHand": "Llenarlo a mano",
+      "send": "Enviar",
+      "understood": "Entendí esto",
+      "tapToFix": "Toca cualquier dato para corregirlo.",
+      "registerOne": "Registrar",
+      "registerMany": "Registrar {{count}} cosas",
+      "retry": "Mejor lo digo otra vez",
+      "examples": {
+        "one": "un café de 5 mil",
+        "two": "me pagaron la nómina",
+        "three": "le presté 50 a Andrés"
+      },
+      "chip": {
+        "category": "Categoría",
+        "source": "Fuente"
+      },
+      "foot": {
+        "idle": "Escribe o toca el micrófono",
+        "recording": "Toca la flecha cuando termines",
+        "thinking": "Un segundo…"
+      }
+    },
+    "correct": {
+      "title": "Corregir",
+      "remove": "Quitar",
+      "what": "Qué fue"
     }
   },
   "notFound": {
