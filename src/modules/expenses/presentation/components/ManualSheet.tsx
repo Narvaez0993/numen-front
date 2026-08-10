@@ -12,6 +12,7 @@ import {
   DatePickerSheet,
   Icon,
   KeypadAmount,
+  Scrim,
   Text,
   pressAmountKey,
 } from '@/shared/presentation/components';
@@ -217,12 +218,14 @@ export function ManualSheet({
       onRequestClose={onClose}
     >
       <View style={{ flex: 1 }}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('common.close')}
-          onPress={onClose}
-          style={{ flex: 1, backgroundColor: theme.colors.scrim }}
-        />
+        <Scrim>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.close')}
+            onPress={onClose}
+            style={{ flex: 1 }}
+          />
+        </Scrim>
 
         <View
           style={{
@@ -233,7 +236,7 @@ export function ManualSheet({
             top: 150,
             borderTopLeftRadius: 34,
             borderTopRightRadius: 34,
-            backgroundColor: theme.colors.bgElevated,
+            backgroundColor: theme.colors.bgSheet,
             borderTopWidth: 1,
             borderTopColor: theme.colors.borderDefault,
           }}

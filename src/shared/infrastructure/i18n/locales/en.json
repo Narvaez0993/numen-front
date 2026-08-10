@@ -1362,7 +1362,8 @@
       "foot": {
         "idle": "Type, or tap the microphone",
         "recording": "Tap the arrow when you are done",
-        "thinking": "One second…"
+        "thinking": "One second…",
+        "more": "Forgot something? Say it or type it"
       }
     },
     "correct": {

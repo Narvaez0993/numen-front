@@ -41,6 +41,7 @@ export type ColorScheme = {
   bgBase: string;
   bgSurface: string;
   bgFloat: string;
+  bgSheet: string;
   bgElevated: string;
 
   borderSubtle: string;
@@ -112,6 +113,7 @@ function colorsFor(mode: ThemeMode, palette: PaletteColors): ColorScheme {
     bgBase: m.bgBase,
     bgSurface: m.bgSurface,
     bgFloat: m.bgFloat,
+    bgSheet: m.bgSheet,
     bgElevated: m.bgElevated,
 
     borderSubtle: m.borderSubtle,

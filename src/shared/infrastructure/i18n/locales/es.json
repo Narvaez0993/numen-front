@@ -1362,7 +1362,8 @@
       "foot": {
         "idle": "Escribe o toca el micrófono",
         "recording": "Toca la flecha cuando termines",
-        "thinking": "Un segundo…"
+        "thinking": "Un segundo…",
+        "more": "¿Se te olvidó algo? Dilo o escríbelo"
       }
     },
     "correct": {

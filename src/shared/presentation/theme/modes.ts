@@ -29,6 +29,11 @@ export type ModeColors = {
   bgFloat: string;
   /** Pressed and selected states. */
   bgElevated: string;
+  /** A sheet that COVERS rather than floats. The other surfaces are deliberately
+   *  translucent so the aurora reads through them, which is right for a card
+   *  sitting on a page and wrong for a panel with its own content: at 5–10% white
+   *  the screen underneath shows through the text and neither is readable. */
+  bgSheet: string;
 
   borderSubtle: string;
   borderDefault: string;
@@ -56,6 +61,7 @@ export const modeColors: Record<ThemeMode, ModeColors> = {
     bgSurface: 'rgba(255,255,255,0.05)',
     bgFloat: 'rgba(255,255,255,0.07)',
     bgElevated: 'rgba(255,255,255,0.10)',
+    bgSheet: 'rgba(20,17,32,0.97)',
 
     borderSubtle: 'rgba(255,255,255,0.08)',
     borderDefault: 'rgba(255,255,255,0.14)',
@@ -78,6 +84,7 @@ export const modeColors: Record<ThemeMode, ModeColors> = {
     bgSurface: 'rgba(255,255,255,0.78)',
     bgFloat: 'rgba(255,255,255,0.92)',
     bgElevated: 'rgba(255,255,255,1)',
+    bgSheet: 'rgba(250,249,252,0.98)',
 
     borderSubtle: 'rgba(26,22,38,0.08)',
     borderDefault: 'rgba(26,22,38,0.14)',

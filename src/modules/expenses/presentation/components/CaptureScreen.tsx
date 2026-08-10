@@ -17,7 +17,7 @@ import { useTheme } from '@/shared/presentation/theme';
 import { CaptureBar } from './CaptureBar';
 import { DetectedCard, type DetectedChip } from './DetectedCard';
 
-export type CaptureState = 'empty' | 'recording' | 'processing' | 'understood';
+export type CaptureState = 'empty' | 'recording' | 'understood';
 
 export type DetectedCardModel = {
   id: string;
@@ -47,6 +47,8 @@ type Props = {
   /** A whole capture that only half made it — shown above the cards. */
   notice: string | null;
   error: string | null;
+  /** A parse is in flight. The bar locks; the cards already on screen stay. */
+  busy: boolean;
   saving: boolean;
   onSend: () => void;
   onStartRecording: () => void;
@@ -91,6 +93,7 @@ export function CaptureScreen({
   elapsed,
   notice,
   error,
+  busy,
   saving,
   onSend,
   onStartRecording,
@@ -207,6 +210,7 @@ export function CaptureScreen({
                   cards={cards}
                   notice={notice}
                   error={error}
+                  busy={busy}
                   saving={saving}
                   registerLabel={registerLabel}
                   onRegister={onRegister}
@@ -222,30 +226,33 @@ export function CaptureScreen({
               )}
             </ScrollView>
 
+            {/* The bar never leaves. Reading back three things is exactly when
+                a fourth is remembered, and a screen that had to be closed and
+                reopened to take it would make the app worse than a napkin. */}
             <View style={{ paddingHorizontal: 18, paddingBottom: 34 }}>
-              {state === 'understood' ? null : (
-                <CaptureBar
-                  text={text}
-                  onChangeText={onChangeText}
-                  recording={state === 'recording'}
-                  level={level}
-                  elapsed={elapsed}
-                  busy={state === 'processing'}
-                  onSend={onSend}
-                  onStartRecording={onStartRecording}
-                  onStopRecording={onStopRecording}
-                  onCancelRecording={onCancelRecording}
-                />
-              )}
+              <CaptureBar
+                text={text}
+                onChangeText={onChangeText}
+                recording={state === 'recording'}
+                level={level}
+                elapsed={elapsed}
+                busy={busy}
+                onSend={onSend}
+                onStartRecording={onStartRecording}
+                onStopRecording={onStopRecording}
+                onCancelRecording={onCancelRecording}
+              />
               <Text
                 color={theme.colors.textTertiary}
                 style={{ fontSize: 11, textAlign: 'center', marginTop: 11 }}
               >
-                {state === 'processing'
+                {busy
                   ? t('expenses.capture.foot.thinking')
                   : state === 'recording'
                     ? t('expenses.capture.foot.recording')
-                    : t('expenses.capture.foot.idle')}
+                    : state === 'understood'
+                      ? t('expenses.capture.foot.more')
+                      : t('expenses.capture.foot.idle')}
               </Text>
             </View>
           </KeyboardAvoidingView>
@@ -362,6 +369,7 @@ function Understood({
   cards,
   notice,
   error,
+  busy,
   saving,
   registerLabel,
   onRegister,
@@ -371,6 +379,8 @@ function Understood({
   cards: DetectedCardModel[];
   notice: string | null;
   error: string | null;
+  /** A parse is in flight. The bar locks; the cards already on screen stay. */
+  busy: boolean;
   saving: boolean;
   registerLabel: string;
   onRegister: () => void;
@@ -447,7 +457,7 @@ function Understood({
       <Pressable
         accessibilityRole="button"
         onPress={onRegister}
-        disabled={saving || cards.length === 0}
+        disabled={saving || busy || cards.length === 0}
         style={({ pressed }) => ({
           minHeight: 54,
           alignItems: 'center',
@@ -455,9 +465,11 @@ function Understood({
           borderRadius: 18,
           marginTop: 14,
           // The one solid, un-tinted surface in the whole flow. It is the last
-          // thing you touch and the only one that moves money.
+          // thing you touch and the only one that moves money. Locked while a
+          // sentence is still being parsed, or the thing being added right now
+          // would be left behind by the button that was meant to save it.
           backgroundColor: theme.colors.textPrimary,
-          opacity: saving || cards.length === 0 ? 0.5 : pressed ? 0.9 : 1,
+          opacity: saving || busy || cards.length === 0 ? 0.5 : pressed ? 0.9 : 1,
         })}
       >
         <Text color={theme.colors.bgBase} style={{ fontSize: 14.5, fontWeight: '600' }}>

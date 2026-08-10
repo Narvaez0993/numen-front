@@ -31,6 +31,7 @@ export function useVoiceCapture() {
   const setDebtDrafts = useExpenseSheetStore((s) => s.setDebtDrafts);
   const setClarification = useExpenseSheetStore((s) => s.setClarification);
   const setNotice = useExpenseSheetStore((s) => s.setNotice);
+  const setFreshIds = useExpenseSheetStore((s) => s.setFreshIds);
 
   const [inlineError, setInlineError] = useState<string | null>(null);
   /** What is in the capture bar. It lives here rather than in the bar so an
@@ -48,11 +49,28 @@ export function useVoiceCapture() {
     [catalogs],
   );
 
+  /** Whether anything is already on the confirm list — read live, because the
+   *  parse's callback fires long after this render's props were captured. */
+  const hasCards = useCallback(() => {
+    const state = useExpenseSheetStore.getState();
+    return state.drafts.length + state.debtDrafts.length > 0;
+  }, []);
+
   const submit = useCallback(
     (text: string, source: CaptureSource) => {
       setInlineError(null);
       setMethod(source === 'voice' ? 'voice' : 'text');
-      setTranscript(source === 'voice' ? text : null);
+      // Adding to a capture already on screen extends the quote rather than
+      // replacing it: "un café… ah, y un tinto" is one dictation to the person
+      // saying it, and swapping the sentence would orphan the earlier cards.
+      const previousPhrase = useExpenseSheetStore.getState().transcript;
+      setTranscript(
+        source === 'voice'
+          ? previousPhrase !== null && hasCards()
+            ? `${previousPhrase} ${text}`
+            : text
+          : previousPhrase,
+      );
       setFlow('processing');
       parse.mutate(
         { text, source },
@@ -69,8 +87,21 @@ export function useVoiceCapture() {
             // moved.
             if (outcome.drafts.length > 0 || outcome.debtDrafts.length > 0) {
               setText('');
-              setDrafts(outcome.drafts);
-              setDebtDrafts(outcome.debtDrafts);
+              // APPEND. Remembering something a beat later is the normal way
+              // people list what they spent, and making them close the capture
+              // and start over for it is the app being worse than a napkin.
+              const current = useExpenseSheetStore.getState();
+              const adding = current.drafts.length + current.debtDrafts.length > 0;
+              setDrafts([...current.drafts, ...outcome.drafts]);
+              setDebtDrafts([...current.debtDrafts, ...outcome.debtDrafts]);
+              setFreshIds(
+                adding
+                  ? [
+                      ...outcome.drafts.map((draft) => draft.id),
+                      ...outcome.debtDrafts.map((draft) => draft.id),
+                    ]
+                  : [],
+              );
               setFlow('confirm');
               return;
             }
@@ -95,8 +126,10 @@ export function useVoiceCapture() {
       );
     },
     [
+      hasCards,
       parse,
       setClarification,
+      setFreshIds,
       setDebtDrafts,
       setDrafts,
       setFlow,
@@ -171,11 +204,13 @@ export function useVoiceCapture() {
   const onRetry = useCallback(() => {
     setDrafts([]);
     setDebtDrafts([]);
+    setFreshIds([]);
+    setTranscript(null);
     setNotice(null);
     setInlineError(null);
     setText('');
     setFlow('entry');
-  }, [setDebtDrafts, setDrafts, setFlow, setNotice]);
+  }, [setDebtDrafts, setDrafts, setFlow, setFreshIds, setNotice, setTranscript]);
 
   // The clock next to the wave. It runs off the flow rather than the recognizer
   // so it starts the moment the bar changes, not when the engine warms up.

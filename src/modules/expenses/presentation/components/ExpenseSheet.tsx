@@ -69,6 +69,7 @@ export function ExpenseSheet() {
   const editing = useExpenseSheetStore((s) => s.editing);
   const transcript = useExpenseSheetStore((s) => s.transcript);
   const notice = useExpenseSheetStore((s) => s.notice);
+  const freshIds = useExpenseSheetStore((s) => s.freshIds);
   const setDrafts = useExpenseSheetStore((s) => s.setDrafts);
   const setDebtDrafts = useExpenseSheetStore((s) => s.setDebtDrafts);
   const saved = useExpenseSheetStore((s) => s.saved);
@@ -128,13 +129,11 @@ export function ExpenseSheet() {
     setEdits((current) => ({ ...current, [id]: { ...current[id], ...next } }));
 
   const understood = drafts.length + debtDrafts.length > 0;
-  const state = understood
-    ? 'understood'
-    : flow === 'recording'
-      ? 'recording'
-      : flow === 'processing'
-        ? 'processing'
-        : 'empty';
+  // Recording wins over the card list, or adding a fourth thing to three would
+  // show the cards while the mic was open and never draw the words landing.
+  // Thinking does NOT win: the cards stay put while the new one is parsed, since
+  // blanking a list the user is reading to show a spinner loses their place.
+  const state = flow === 'recording' ? 'recording' : understood ? 'understood' : 'empty';
 
   /** A movement draft, dressed as a card with its chips. */
   const movementCards: DetectedCardModel[] = drafts.map((draft) => {
@@ -154,6 +153,7 @@ export function ExpenseSheet() {
       amount: formatAmountDigits(digits, currency),
       sign: draft.type === 'income' ? '+$' : draft.type === 'transfer' ? '$' : '−$',
       income: draft.type === 'income',
+      fresh: freshIds.includes(draft.id),
       onEdit: () => setCorrecting(draft.id),
       onRemove: () => handleRemoveDraft(draft.id),
       chips: [
@@ -203,6 +203,7 @@ export function ExpenseSheet() {
       amount: formatAmountDigits(digits, currency),
       sign: draft.direction === 'incoming' ? '+$' : '−$',
       income: draft.direction === 'incoming',
+      fresh: freshIds.includes(draft.id),
       onEdit: () => setCorrecting(draft.id),
       onRemove: () => handleRemoveDebtDraft(draft.id),
       chips: [
@@ -409,6 +410,7 @@ export function ExpenseSheet() {
         elapsed={capture.elapsed}
         notice={notice}
         error={error ?? capture.inlineError}
+        busy={flow === 'processing'}
         saving={saving}
         onSend={capture.submitTyped}
         onStartRecording={capture.onMicPress}
