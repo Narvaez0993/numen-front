@@ -1,17 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { Icon, Text } from '@/shared/presentation/components';
+import { useKeyboardInset } from '@/shared/presentation/hooks/useKeyboardInset';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { CaptureBar } from './CaptureBar';
@@ -107,6 +101,7 @@ export function CaptureScreen({
   const { theme } = useTheme();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const keyboardInset = useKeyboardInset();
 
   const registerLabel =
     cards.length > 1
@@ -134,129 +129,127 @@ export function CaptureScreen({
           <Rect x="0" y="0" width="100%" height="100%" fill="url(#captureGlow)" />
         </Svg>
 
-        {/* `edges={['bottom']}` with a manual top pad: inside a statusBarTranslucent
-            Modal the top inset does not arrive, and trusting it puts the controls
-            on the clock. */}
-        <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        {/* Both insets are applied by hand, and neither comes from a SafeAreaView:
+            inside a statusBarTranslucent Modal the top inset does not arrive at
+            all, and the bottom one has to add up with the keyboard's height
+            rather than stack on top of it. */}
+        <Animated.View style={[{ flex: 1 }, keyboardInset]}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingHorizontal: 20,
+              paddingTop: Math.max(insets.top, 44) + 8,
+            }}
           >
-            <View
-              style={{
+            <Pressable
+              accessibilityRole="button"
+              onPress={onFillByHand}
+              style={({ pressed }) => ({
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 20,
-                paddingTop: Math.max(insets.top, 44) + 8,
-              }}
+                gap: 7,
+                minHeight: 44,
+                paddingHorizontal: 15,
+                borderRadius: 22,
+                backgroundColor: theme.colors.bgFloat,
+                borderWidth: 1,
+                borderColor: theme.colors.borderSubtle,
+                opacity: pressed ? 0.85 : 1,
+              })}
             >
-              <Pressable
-                accessibilityRole="button"
-                onPress={onFillByHand}
-                style={({ pressed }) => ({
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 7,
-                  minHeight: 44,
-                  paddingHorizontal: 15,
-                  borderRadius: 22,
-                  backgroundColor: theme.colors.bgFloat,
-                  borderWidth: 1,
-                  borderColor: theme.colors.borderSubtle,
-                  opacity: pressed ? 0.85 : 1,
-                })}
-              >
-                <Icon
-                  name="note-lines"
-                  size={14}
-                  stroke={1.8}
-                  color={theme.colors.textSecondary}
-                />
-                <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
-                  {t('expenses.capture.byHand')}
-                </Text>
-              </Pressable>
+              <Icon
+                name="note-lines"
+                size={14}
+                stroke={1.8}
+                color={theme.colors.textSecondary}
+              />
+              <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
+                {t('expenses.capture.byHand')}
+              </Text>
+            </Pressable>
 
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t('common.close')}
-                onPress={onClose}
-                style={({ pressed }) => ({
-                  width: 44,
-                  height: 44,
-                  borderRadius: 22,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: theme.colors.bgFloat,
-                  borderWidth: 1,
-                  borderColor: theme.colors.borderSubtle,
-                  opacity: pressed ? 0.85 : 1,
-                })}
-              >
-                <Icon name="x" size={15} stroke={2} color={theme.colors.textTertiary} />
-              </Pressable>
-            </View>
-
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ paddingBottom: 16 }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+              onPress={onClose}
+              style={({ pressed }) => ({
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: theme.colors.bgFloat,
+                borderWidth: 1,
+                borderColor: theme.colors.borderSubtle,
+                opacity: pressed ? 0.85 : 1,
+              })}
             >
-              {state === 'understood' ? (
-                <Understood
-                  phrase={phrase}
-                  cards={cards}
-                  notice={notice}
-                  error={error}
-                  busy={busy}
-                  saving={saving}
-                  registerLabel={registerLabel}
-                  onRegister={onRegister}
-                  onRetry={onRetry}
-                />
-              ) : state === 'recording' ? (
-                <Listening transcript={transcript} />
-              ) : (
-                <Invitation
-                  error={error}
-                  onExample={(example) => onChangeText(example)}
-                />
-              )}
-            </ScrollView>
+              <Icon name="x" size={15} stroke={2} color={theme.colors.textTertiary} />
+            </Pressable>
+          </View>
 
-            {/* The bar never leaves. Reading back three things is exactly when
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 16 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {state === 'understood' ? (
+              <Understood
+                phrase={phrase}
+                cards={cards}
+                notice={notice}
+                error={error}
+                busy={busy}
+                saving={saving}
+                registerLabel={registerLabel}
+                onRegister={onRegister}
+                onRetry={onRetry}
+              />
+            ) : state === 'recording' ? (
+              <Listening transcript={transcript} />
+            ) : (
+              <Invitation error={error} onExample={(example) => onChangeText(example)} />
+            )}
+          </ScrollView>
+
+          {/* The bar never leaves. Reading back three things is exactly when
                 a fourth is remembered, and a screen that had to be closed and
                 reopened to take it would make the app worse than a napkin. */}
-            <View style={{ paddingHorizontal: 18, paddingBottom: 34 }}>
-              <CaptureBar
-                text={text}
-                onChangeText={onChangeText}
-                recording={state === 'recording'}
-                level={level}
-                elapsed={elapsed}
-                busy={busy}
-                onSend={onSend}
-                onStartRecording={onStartRecording}
-                onStopRecording={onStopRecording}
-                onCancelRecording={onCancelRecording}
-              />
-              <Text
-                color={theme.colors.textTertiary}
-                style={{ fontSize: 11, textAlign: 'center', marginTop: 11 }}
-              >
-                {busy
-                  ? t('expenses.capture.foot.thinking')
-                  : state === 'recording'
-                    ? t('expenses.capture.foot.recording')
-                    : state === 'understood'
-                      ? t('expenses.capture.foot.more')
-                      : t('expenses.capture.foot.idle')}
-              </Text>
-            </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
+          <View
+            style={{
+              paddingHorizontal: 18,
+              paddingBottom: Math.max(insets.bottom, 20),
+            }}
+          >
+            <CaptureBar
+              text={text}
+              onChangeText={onChangeText}
+              recording={state === 'recording'}
+              level={level}
+              elapsed={elapsed}
+              busy={busy}
+              onSend={onSend}
+              onStartRecording={onStartRecording}
+              onStopRecording={onStopRecording}
+              onCancelRecording={onCancelRecording}
+            />
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 11, textAlign: 'center', marginTop: 11 }}
+            >
+              {busy
+                ? t('expenses.capture.foot.thinking')
+                : state === 'recording'
+                  ? t('expenses.capture.foot.recording')
+                  : state === 'understood'
+                    ? t('expenses.capture.foot.more')
+                    : t('expenses.capture.foot.idle')}
+            </Text>
+          </View>
+        </Animated.View>
       </View>
     </Modal>
   );
