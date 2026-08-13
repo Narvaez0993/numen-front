@@ -31,32 +31,44 @@ export type TopeTarget = {
   spent: number;
 };
 
-type Props = {
-  visible: boolean;
+type BodyProps = {
   category: TopeTarget | null;
   current: number;
   saving?: boolean;
-  onClose: () => void;
   onSave: (amount: number) => void;
   onDelete?: () => void;
+  /** Re-seeds the amount whenever the sheet is (re)opened for a category. */
+  resetKey?: unknown;
 };
 
-export function EditTopeSheet({
-  visible,
+type Props = BodyProps & {
+  visible: boolean;
+  onClose: () => void;
+};
+
+/**
+ * The cap form, without a sheet around it.
+ *
+ * It is separated so the "watch a new category" flow can show it INSIDE the
+ * picker's own sheet instead of opening a second one. Two `Modal`s handing over
+ * on a timer is what broke the flow: the picker was still animating out when the
+ * cap sheet tried to mount, and picking a category did nothing at all.
+ */
+export function EditTopeBody({
   category,
   current,
   saving = false,
-  onClose,
   onSave,
   onDelete,
-}: Props) {
+  resetKey,
+}: BodyProps) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [value, setValue] = useState(current);
 
   useEffect(() => {
-    if (visible) setValue(current);
-  }, [visible, current]);
+    setValue(current);
+  }, [current, resetKey]);
 
   if (!category) return null;
 
@@ -65,95 +77,98 @@ export function EditTopeSheet({
   const valid = value >= TOPE_MIN;
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} maxHeight="82%">
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 22,
-          paddingTop: 8,
-          paddingBottom: 26,
+    <ScrollView
+      contentContainerStyle={{
+        paddingHorizontal: 22,
+        paddingTop: 8,
+        paddingBottom: 26,
+      }}
+    >
+      <SheetHeader
+        title={t('budgets.editTopeSheet.title', { name: category.name })}
+        subtitle={t('budgets.editTopeSheet.subtitle')}
+      />
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          paddingVertical: 12,
+          paddingHorizontal: 14,
+          backgroundColor: theme.colors.bgFloat,
+          borderWidth: 1,
+          borderColor: theme.colors.borderSubtle,
+          borderRadius: 12,
+          marginBottom: 18,
         }}
       >
-        <SheetHeader
-          title={t('budgets.editTopeSheet.title', { name: category.name })}
-          subtitle={t('budgets.editTopeSheet.subtitle')}
+        <IconBox
+          name={category.icon}
+          color={category.color}
+          size={34}
+          iconSize={16}
+          radius={10}
         />
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            paddingVertical: 12,
-            paddingHorizontal: 14,
-            backgroundColor: theme.colors.bgFloat,
-            borderWidth: 1,
-            borderColor: theme.colors.borderSubtle,
-            borderRadius: 12,
-            marginBottom: 18,
-          }}
-        >
-          <IconBox
-            name={category.icon}
-            color={category.color}
-            size={34}
-            iconSize={16}
-            radius={10}
-          />
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text variant="bodyLarge" style={{ fontSize: 13.5 }}>
-              {category.name}
-            </Text>
-            <Text
-              variant="caption"
-              color={theme.colors.textTertiary}
-              style={{ fontSize: 11.5, marginTop: 2 }}
-            >
-              {t('budgets.editTopeSheet.carry', { amount: formatMoney(category.spent) })}
-            </Text>
-          </View>
-        </View>
-
-        <BudgetInputHero
-          value={value}
-          onChange={setValue}
-          presets={presets}
-          size="small"
-        />
-
-        <View style={{ marginTop: 22 }}>
-          <Button
-            full
-            label={
-              isEditing
-                ? t('budgets.editTopeSheet.save')
-                : t('budgets.editTopeSheet.activate')
-            }
-            disabled={!valid || saving}
-            onPress={() => valid && onSave(value)}
-          />
-        </View>
-
-        {isEditing && onDelete ? (
-          <Pressable
-            onPress={onDelete}
-            style={({ pressed }) => ({
-              width: '100%',
-              paddingVertical: 12,
-              alignItems: 'center',
-              marginTop: 6,
-              opacity: pressed ? 0.7 : 1,
-            })}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text variant="bodyLarge" style={{ fontSize: 13.5 }}>
+            {category.name}
+          </Text>
+          <Text
+            variant="caption"
+            color={theme.colors.textTertiary}
+            style={{ fontSize: 11.5, marginTop: 2 }}
           >
-            <Text
-              variant="label"
-              color={theme.colors.accentCoral}
-              style={{ fontSize: 12.5 }}
-            >
-              {t('budgets.editTopeSheet.delete')}
-            </Text>
-          </Pressable>
-        ) : null}
-      </ScrollView>
+            {t('budgets.editTopeSheet.carry', { amount: formatMoney(category.spent) })}
+          </Text>
+        </View>
+      </View>
+
+      <BudgetInputHero value={value} onChange={setValue} presets={presets} size="small" />
+
+      <View style={{ marginTop: 22 }}>
+        <Button
+          full
+          label={
+            isEditing
+              ? t('budgets.editTopeSheet.save')
+              : t('budgets.editTopeSheet.activate')
+          }
+          disabled={!valid || saving}
+          onPress={() => valid && onSave(value)}
+        />
+      </View>
+
+      {isEditing && onDelete ? (
+        <Pressable
+          onPress={onDelete}
+          style={({ pressed }) => ({
+            width: '100%',
+            paddingVertical: 12,
+            alignItems: 'center',
+            marginTop: 6,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text
+            variant="label"
+            color={theme.colors.accentCoral}
+            style={{ fontSize: 12.5 }}
+          >
+            {t('budgets.editTopeSheet.delete')}
+          </Text>
+        </Pressable>
+      ) : null}
+    </ScrollView>
+  );
+}
+
+/** The same form on its own sheet — how an existing cap is edited, where there
+ *  is no picker to hand over from. */
+export function EditTopeSheet({ visible, onClose, ...body }: Props) {
+  return (
+    <BottomSheet visible={visible} onClose={onClose} maxHeight="82%">
+      <EditTopeBody {...body} resetKey={visible} />
     </BottomSheet>
   );
 }

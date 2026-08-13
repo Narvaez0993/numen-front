@@ -19,7 +19,7 @@ import { GoalsLink } from '../components/GoalsLink';
 import { ProjectionCallout } from '../components/ProjectionCallout';
 import { WatchedRow } from '../components/WatchedRow';
 import { BudgetCreateFlow } from '../components/create-flow/BudgetCreateFlow';
-import { AddVigilanceSheet } from '../components/sheets/AddVigilanceSheet';
+import { WatchCategoryFlow } from '../components/sheets/WatchCategoryFlow';
 import { ConfirmSheet } from '../components/sheets/ConfirmSheet';
 import { EditTechoSheet } from '../components/sheets/EditTechoSheet';
 import { EditTopeSheet } from '../components/sheets/EditTopeSheet';
@@ -30,15 +30,9 @@ import {
 } from '../hooks/useBudgetMutations';
 import { useBudgets } from '../hooks/useBudgets';
 import {
-  type CandidateCategory,
   type WatchedCategory,
   useWatchedCategories,
 } from '../hooks/useWatchedCategories';
-
-/** What the tope sheet is open for: a cap being edited, or a category being picked up. */
-type TopeEdit =
-  | { kind: 'edit'; category: WatchedCategory }
-  | { kind: 'new'; category: CandidateCategory };
 
 type Confirm = { kind: 'techo' } | { kind: 'tope'; budgetId: string; name: string };
 
@@ -48,9 +42,12 @@ const COPY_BY_CODE: Record<string, string> = {
 };
 
 // Time to wait for one BottomSheet to fully close before opening another.
-// React Native only supports a single visible Modal at a time on iOS — opening
-// one while another is still dismissing silently no-ops. Matches BottomSheet's
-// 240ms close animation + a small buffer.
+// React Native only shows a single Modal at a time on iOS, so deleting from
+// inside a sheet has to let that sheet leave before the confirmation arrives.
+// Matches BottomSheet's 240ms close animation plus a small buffer.
+//
+// It is used for confirmations only. Chaining two sheets of a FLOW this way was
+// a race that lost — see `WatchCategoryFlow`.
 const SHEET_CLOSE_MS = 280;
 
 /**
@@ -108,7 +105,7 @@ export function BudgetsScreen() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTechoOpen, setEditTechoOpen] = useState(false);
-  const [topeEdit, setTopeEdit] = useState<TopeEdit | null>(null);
+  const [topeEdit, setTopeEdit] = useState<WatchedCategory | null>(null);
   const [addVigOpen, setAddVigOpen] = useState(false);
   const [confirm, setConfirm] = useState<Confirm | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
@@ -193,28 +190,30 @@ export function BudgetsScreen() {
 
   const handleSaveTope = async (amount: number) => {
     if (!topeEdit) return;
-    const edit = topeEdit;
+    // The cap's own id, not the category's: this is an edit of the row.
+    const capId = topeEdit.id;
     setFailed(null);
     setTopeEdit(null);
     try {
-      if (edit.kind === 'edit') {
-        // The cap's own id, not the category's: this is an edit of the row.
-        await updateBudget.mutateAsync({ id: edit.category.id, target: amount });
-      } else {
-        await createBudget.mutateAsync({
-          scope: 'category',
-          categoryId: edit.category.id,
-          target: amount,
-        });
-      }
+      await updateBudget.mutateAsync({ id: capId, target: amount });
+    } catch (error) {
+      report(error);
+    }
+  };
+
+  const handleWatchCategory = async (categoryId: string, amount: number) => {
+    setFailed(null);
+    setAddVigOpen(false);
+    try {
+      await createBudget.mutateAsync({ scope: 'category', categoryId, target: amount });
     } catch (error) {
       report(error);
     }
   };
 
   const requestDeleteTope = () => {
-    if (topeEdit?.kind !== 'edit') return;
-    const { id, name: categoryName } = topeEdit.category;
+    if (!topeEdit) return;
+    const { id, name: categoryName } = topeEdit;
     setTopeEdit(null);
     setTimeout(
       () => setConfirm({ kind: 'tope', budgetId: id, name: categoryName }),
@@ -238,11 +237,6 @@ export function BudgetsScreen() {
     } catch (error) {
       report(error);
     }
-  };
-
-  const handlePickVigilance = (category: CandidateCategory) => {
-    setAddVigOpen(false);
-    setTimeout(() => setTopeEdit({ kind: 'new', category }), SHEET_CLOSE_MS);
   };
 
   const confirmCopy = {
@@ -346,7 +340,7 @@ export function BudgetsScreen() {
                   used={category.used}
                   currency={currency}
                   last={index === watched.length - 1}
-                  onPress={() => setTopeEdit({ kind: 'edit', category })}
+                  onPress={() => setTopeEdit(category)}
                 />
               ))}
             </View>
@@ -392,29 +386,27 @@ export function BudgetsScreen() {
         category={
           topeEdit
             ? {
-                categoryId:
-                  topeEdit.kind === 'edit'
-                    ? topeEdit.category.categoryId
-                    : topeEdit.category.id,
-                name: topeEdit.category.name,
-                icon: topeEdit.category.icon,
-                color: topeEdit.category.color,
-                spent: topeEdit.category.spent,
+                categoryId: topeEdit.categoryId,
+                name: topeEdit.name,
+                icon: topeEdit.icon,
+                color: topeEdit.color,
+                spent: topeEdit.spent,
               }
             : null
         }
-        current={topeEdit?.kind === 'edit' ? topeEdit.category.target : 0}
-        saving={createBudget.isPending || updateBudget.isPending}
+        current={topeEdit?.target ?? 0}
+        saving={updateBudget.isPending}
         onClose={() => setTopeEdit(null)}
         onSave={handleSaveTope}
-        onDelete={topeEdit?.kind === 'edit' ? requestDeleteTope : undefined}
+        onDelete={requestDeleteTope}
       />
 
-      <AddVigilanceSheet
+      <WatchCategoryFlow
         visible={addVigOpen}
         candidates={candidates}
+        saving={createBudget.isPending}
         onClose={() => setAddVigOpen(false)}
-        onPick={handlePickVigilance}
+        onSave={handleWatchCategory}
       />
 
       <ConfirmSheet
