@@ -36,16 +36,7 @@ const SHEET_TOP = 150;
  * settles into a place it was nearly at already, which is what makes it read as
  * arriving rather than as being thrown. */
 const RISE_PX = 40;
-
-/**
- * Both ways, the same curve and the same time.
- *
- * Leaving used to be shorter (180ms against 260) and read as SLOWER, which is
- * the useful part: it eased IN, so at half the animation the sheet had moved
- * about 12% of the way. It looked frozen and then vanished. The clock was never
- * the problem — a curve that starts still is.
- */
-const DURATION_MS = 260;
+const DURATION_MS = 240;
 
 type Props = {
   visible: boolean;
@@ -154,13 +145,13 @@ export function AmountSheet({
       setMounted(true);
       progress.value = withTiming(1, {
         duration: DURATION_MS,
-        easing: Easing.out(Easing.cubic),
+        easing: Easing.inOut(Easing.quad),
       });
       return;
     }
     progress.value = withTiming(
       0,
-      { duration: DURATION_MS, easing: Easing.out(Easing.cubic) },
+      { duration: DURATION_MS, easing: Easing.inOut(Easing.quad) },
       (finished) => {
         if (finished) runOnJS(setMounted)(false);
       },
@@ -168,8 +159,12 @@ export function AmountSheet({
   }, [visible, progress]);
 
   const scrimStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
+  // The bundle's keyframe starts the panel at .6 opacity, which is right for an
+  // entrance and wrong reused as an exit: the sheet ended 40px lower and still
+  // 60% visible, and then the Modal unmounted. That hard cut at the end is what
+  // read as sticking. It fades the whole way now.
   const panelStyle = useAnimatedStyle(() => ({
-    opacity: 0.6 + progress.value * 0.4,
+    opacity: progress.value,
     transform: [{ translateY: (1 - progress.value) * RISE_PX }],
   }));
 
