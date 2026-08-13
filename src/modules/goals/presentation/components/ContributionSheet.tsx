@@ -171,6 +171,21 @@ export function ContributionSheet({ visible, goal, today, onClose, onSaved }: Pr
             )}
           </>
         }
+        overlays={
+          <>
+            <ChooseSheet
+              visible={picking}
+              title={t(withdrawing ? 'goals.contribution.to' : 'goals.contribution.from')}
+              options={options.map((account) => ({
+                value: account.id,
+                label: account.name,
+              }))}
+              value={chosen}
+              onChange={setAccountId}
+              onClose={() => setPicking(false)}
+            />
+          </>
+        }
       >
         <SheetFieldRow
           label={t(withdrawing ? 'goals.contribution.to' : 'goals.contribution.from')}
@@ -179,18 +194,6 @@ export function ContributionSheet({ visible, goal, today, onClose, onSaved }: Pr
           onPress={() => setPicking(true)}
         />
       </AmountSheet>
-
-      <ChooseSheet
-        visible={picking}
-        title={t(withdrawing ? 'goals.contribution.to' : 'goals.contribution.from')}
-        options={options.map((account) => ({
-          value: account.id,
-          label: account.name,
-        }))}
-        value={chosen}
-        onChange={setAccountId}
-        onClose={() => setPicking(false)}
-      />
     </>
   );
 }

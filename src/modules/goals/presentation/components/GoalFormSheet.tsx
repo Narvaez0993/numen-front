@@ -107,6 +107,20 @@ export function GoalFormSheet({
             ) : null}
           </>
         }
+        overlays={
+          <>
+            <DatePickerSheet
+              visible={dateOpen}
+              value={targetDate ?? today}
+              today={today}
+              allowFuture
+              title={t('goals.form.targetDate')}
+              language={i18n.language}
+              onSelect={setTargetDate}
+              onClose={() => setDateOpen(false)}
+            />
+          </>
+        }
       >
         <SheetFieldRow label={t('goals.form.name')} onPress={() => undefined}>
           <TextInput
@@ -155,17 +169,6 @@ export function GoalFormSheet({
           </Pressable>
         ) : null}
       </AmountSheet>
-
-      <DatePickerSheet
-        visible={dateOpen}
-        value={targetDate ?? today}
-        today={today}
-        allowFuture
-        title={t('goals.form.targetDate')}
-        language={i18n.language}
-        onSelect={setTargetDate}
-        onClose={() => setDateOpen(false)}
-      />
     </>
   );
 }

@@ -305,6 +305,47 @@ export function ManualSheet({
             </View>
           </>
         }
+        overlays={
+          <>
+            <ChooseSheet
+              visible={picker === 'category'}
+              title={t('expenses.sheet.manualEntry.category')}
+              options={categoryOptions}
+              value={categoryId}
+              onChange={setCategoryId}
+              onClose={() => setPicker(null)}
+            />
+            <ChooseSheet
+              visible={picker === 'source'}
+              title={t(
+                type === 'income'
+                  ? 'expenses.sheet.manualEntry.destination'
+                  : 'expenses.sheet.manualEntry.source',
+              )}
+              options={sourceOptions}
+              value={sourceKey}
+              onChange={setSourceKey}
+              onClose={() => setPicker(null)}
+            />
+            <ChooseSheet
+              visible={picker === 'destination'}
+              title={t('expenses.sheet.manualEntry.destination')}
+              options={destinationOptions}
+              value={destinationKey}
+              onChange={setDestinationKey}
+              onClose={() => setPicker(null)}
+            />
+            <DatePickerSheet
+              visible={datePickerOpen}
+              value={occurredOn}
+              today={today}
+              title={t('expenses.sheet.manualEntry.date')}
+              language={language}
+              onSelect={setOccurredOn}
+              onClose={() => setDatePickerOpen(false)}
+            />
+          </>
+        }
       >
         <SheetFieldRow
           label={t('expenses.sheet.manualEntry.description')}
@@ -377,44 +418,6 @@ export function ManualSheet({
           </Text>
         ) : null}
       </AmountSheet>
-
-      <ChooseSheet
-        visible={picker === 'category'}
-        title={t('expenses.sheet.manualEntry.category')}
-        options={categoryOptions}
-        value={categoryId}
-        onChange={setCategoryId}
-        onClose={() => setPicker(null)}
-      />
-      <ChooseSheet
-        visible={picker === 'source'}
-        title={t(
-          type === 'income'
-            ? 'expenses.sheet.manualEntry.destination'
-            : 'expenses.sheet.manualEntry.source',
-        )}
-        options={sourceOptions}
-        value={sourceKey}
-        onChange={setSourceKey}
-        onClose={() => setPicker(null)}
-      />
-      <ChooseSheet
-        visible={picker === 'destination'}
-        title={t('expenses.sheet.manualEntry.destination')}
-        options={destinationOptions}
-        value={destinationKey}
-        onChange={setDestinationKey}
-        onClose={() => setPicker(null)}
-      />
-      <DatePickerSheet
-        visible={datePickerOpen}
-        value={occurredOn}
-        today={today}
-        title={t('expenses.sheet.manualEntry.date')}
-        language={language}
-        onSelect={setOccurredOn}
-        onClose={() => setDatePickerOpen(false)}
-      />
     </>
   );
 }

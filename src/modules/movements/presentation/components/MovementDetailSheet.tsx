@@ -262,17 +262,19 @@ export function MovementDetailSheet({
             onConfirm={onDelete}
           />
         </View>
-      </BottomSheet>
 
-      <DatePickerSheet
-        visible={datePickerOpen}
-        value={occurredOn}
-        today={today}
-        title={t('movements.detail.datePickerTitle')}
-        language={language}
-        onClose={() => setDatePickerOpen(false)}
-        onSelect={setOccurredOn}
-      />
+        {/* Inside the sheet, not beside it: iOS presents a modal from whichever
+            one is already on screen, so a sibling is silently dropped. */}
+        <DatePickerSheet
+          visible={datePickerOpen}
+          value={occurredOn}
+          today={today}
+          title={t('movements.detail.datePickerTitle')}
+          language={language}
+          onClose={() => setDatePickerOpen(false)}
+          onSelect={setOccurredOn}
+        />
+      </BottomSheet>
     </>
   );
 }

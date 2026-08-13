@@ -421,6 +421,93 @@ export function ExpenseSheet() {
         onRetry={capture.onRetry}
         onFillByHand={() => setFlow('manual')}
         onClose={closeSheet}
+        overlays={
+          <>
+            <CorrectSheet
+              visible={correcting !== null}
+              digits={
+                correctingEdit.digits ??
+                String(correctingDraft?.amount ?? correctingDebt?.amount ?? 0)
+              }
+              description={
+                correctingEdit.description ??
+                correctingDraft?.description ??
+                correctingDebt?.counterpartyName ??
+                ''
+              }
+              currency={currency}
+              sign={
+                correctingDraft?.type === 'income' ||
+                correctingDebt?.direction === 'incoming'
+                  ? '+'
+                  : '−'
+              }
+              income={
+                correctingDraft?.type === 'income' ||
+                correctingDebt?.direction === 'incoming'
+              }
+              onClose={() => setCorrecting(null)}
+              onRemove={() => {
+                if (correctingDraft !== null) handleRemoveDraft(correctingDraft.id);
+                else if (correctingDebt !== null)
+                  handleRemoveDebtDraft(correctingDebt.id);
+              }}
+              onDone={(next) => {
+                if (correcting !== null) patch(correcting, next);
+                setCorrecting(null);
+              }}
+            />
+
+            <ChooseSheet
+              visible={picker?.field === 'category'}
+              title={t('expenses.sheet.manualEntry.category')}
+              options={(categories.data ?? []).map((category) => ({
+                value: category.id,
+                label: category.name,
+              }))}
+              value={
+                picker !== null
+                  ? (editOf(picker.card).categoryId ??
+                    drafts.find((d) => d.id === picker.card)?.categoryId ??
+                    null)
+                  : null
+              }
+              onChange={(value: string) =>
+                picker !== null && patch(picker.card, { categoryId: value })
+              }
+              onClose={() => setPicker(null)}
+            />
+
+            <ChooseSheet
+              visible={picker?.field === 'source'}
+              title={t('expenses.sheet.manualEntry.source')}
+              options={sourceOptions}
+              value={picker !== null ? (editOf(picker.card).sourceKey ?? null) : null}
+              onChange={(value: string) =>
+                picker !== null && patch(picker.card, { sourceKey: value })
+              }
+              onClose={() => setPicker(null)}
+            />
+
+            <DatePickerSheet
+              visible={datePickerFor !== null}
+              value={
+                datePickerFor !== null
+                  ? (editOf(datePickerFor).occurredOn ?? today)
+                  : today
+              }
+              today={today}
+              title={t('expenses.sheet.manualEntry.date')}
+              language={language}
+              onSelect={(value: string) =>
+                datePickerFor !== null
+                  ? patch(datePickerFor, { occurredOn: value })
+                  : undefined
+              }
+              onClose={() => setDatePickerFor(null)}
+            />
+          </>
+        }
       />
 
       <ManualSheet
@@ -432,83 +519,6 @@ export function ExpenseSheet() {
         onClose={closeSheet}
         saving={createMovement.isPending || confirmDraft.isPending}
         errorMessage={error}
-      />
-
-      <CorrectSheet
-        visible={correcting !== null}
-        digits={
-          correctingEdit.digits ??
-          String(correctingDraft?.amount ?? correctingDebt?.amount ?? 0)
-        }
-        description={
-          correctingEdit.description ??
-          correctingDraft?.description ??
-          correctingDebt?.counterpartyName ??
-          ''
-        }
-        currency={currency}
-        sign={
-          correctingDraft?.type === 'income' || correctingDebt?.direction === 'incoming'
-            ? '+'
-            : '−'
-        }
-        income={
-          correctingDraft?.type === 'income' || correctingDebt?.direction === 'incoming'
-        }
-        onClose={() => setCorrecting(null)}
-        onRemove={() => {
-          if (correctingDraft !== null) handleRemoveDraft(correctingDraft.id);
-          else if (correctingDebt !== null) handleRemoveDebtDraft(correctingDebt.id);
-        }}
-        onDone={(next) => {
-          if (correcting !== null) patch(correcting, next);
-          setCorrecting(null);
-        }}
-      />
-
-      <ChooseSheet
-        visible={picker?.field === 'category'}
-        title={t('expenses.sheet.manualEntry.category')}
-        options={(categories.data ?? []).map((category) => ({
-          value: category.id,
-          label: category.name,
-        }))}
-        value={
-          picker !== null
-            ? (editOf(picker.card).categoryId ??
-              drafts.find((d) => d.id === picker.card)?.categoryId ??
-              null)
-            : null
-        }
-        onChange={(value: string) =>
-          picker !== null && patch(picker.card, { categoryId: value })
-        }
-        onClose={() => setPicker(null)}
-      />
-
-      <ChooseSheet
-        visible={picker?.field === 'source'}
-        title={t('expenses.sheet.manualEntry.source')}
-        options={sourceOptions}
-        value={picker !== null ? (editOf(picker.card).sourceKey ?? null) : null}
-        onChange={(value: string) =>
-          picker !== null && patch(picker.card, { sourceKey: value })
-        }
-        onClose={() => setPicker(null)}
-      />
-
-      <DatePickerSheet
-        visible={datePickerFor !== null}
-        value={
-          datePickerFor !== null ? (editOf(datePickerFor).occurredOn ?? today) : today
-        }
-        today={today}
-        title={t('expenses.sheet.manualEntry.date')}
-        language={language}
-        onSelect={(value: string) =>
-          datePickerFor !== null ? patch(datePickerFor, { occurredOn: value }) : undefined
-        }
-        onClose={() => setDatePickerFor(null)}
       />
 
       <Toast

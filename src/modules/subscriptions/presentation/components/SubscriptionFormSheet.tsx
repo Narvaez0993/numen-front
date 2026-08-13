@@ -228,6 +228,36 @@ export function SubscriptionFormSheet({
             ) : null}
           </>
         }
+        overlays={
+          <>
+            <ChooseSheet
+              visible={picker === 'source'}
+              title={t('subscriptions.form.source')}
+              options={sourceOptions}
+              value={sourceKey}
+              onChange={setSourceKey}
+              onClose={() => setPicker(null)}
+            />
+            <ChooseSheet
+              visible={picker === 'category'}
+              title={t('subscriptions.form.category')}
+              options={categoryOptions}
+              value={categoryId}
+              onChange={setCategoryId}
+              onClose={() => setPicker(null)}
+            />
+            <DatePickerSheet
+              visible={datePickerOpen}
+              value={firstChargeOn}
+              today={today}
+              allowFuture
+              title={t('subscriptions.form.firstCharge')}
+              language={i18n.language}
+              onSelect={setFirstChargeOn}
+              onClose={() => setDatePickerOpen(false)}
+            />
+          </>
+        }
       >
         <SheetFieldRow label={t('subscriptions.form.name')} onPress={() => undefined}>
           <TextInput
@@ -284,33 +314,6 @@ export function SubscriptionFormSheet({
           </Pressable>
         ) : null}
       </AmountSheet>
-
-      <ChooseSheet
-        visible={picker === 'source'}
-        title={t('subscriptions.form.source')}
-        options={sourceOptions}
-        value={sourceKey}
-        onChange={setSourceKey}
-        onClose={() => setPicker(null)}
-      />
-      <ChooseSheet
-        visible={picker === 'category'}
-        title={t('subscriptions.form.category')}
-        options={categoryOptions}
-        value={categoryId}
-        onChange={setCategoryId}
-        onClose={() => setPicker(null)}
-      />
-      <DatePickerSheet
-        visible={datePickerOpen}
-        value={firstChargeOn}
-        today={today}
-        allowFuture
-        title={t('subscriptions.form.firstCharge')}
-        language={i18n.language}
-        onSelect={setFirstChargeOn}
-        onClose={() => setDatePickerOpen(false)}
-      />
     </>
   );
 }

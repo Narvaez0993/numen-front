@@ -104,6 +104,15 @@ type Props = {
    * rides above the system keyboard instead of being covered by it.
    */
   keyboard?: 'pad' | 'system';
+  /**
+   * Pickers this sheet opens — `ChooseSheet`, `DatePickerSheet`.
+   *
+   * They have to be rendered HERE, inside this `Modal`, and not beside it. iOS
+   * presents a modal from whichever view controller is already on screen, so a
+   * sibling `Modal` asks the root — which is busy presenting this one — and is
+   * silently dropped. Tapping a row did nothing at all, with no error.
+   */
+  overlays?: React.ReactNode;
 };
 
 /**
@@ -144,6 +153,7 @@ export function AmountSheet({
   onMic,
   replaceBody,
   keyboard = 'pad',
+  overlays,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -368,6 +378,8 @@ export function AmountSheet({
             )}
           </SafeAreaView>
         </Animated.View>
+
+        {overlays}
       </View>
     </Modal>
   );

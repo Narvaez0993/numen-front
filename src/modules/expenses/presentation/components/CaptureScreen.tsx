@@ -55,6 +55,9 @@ type Props = {
   onRetry: () => void;
   onFillByHand: () => void;
   onClose: () => void;
+  /** Pickers opened from the cards. Rendered inside this Modal, because a
+   *  sibling one never presents on iOS — see AmountSheet. */
+  overlays?: React.ReactNode;
 };
 
 /** The three the bundle offers, as keys into the locale file. */
@@ -101,6 +104,7 @@ export function CaptureScreen({
   onRetry,
   onFillByHand,
   onClose,
+  overlays,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -259,6 +263,8 @@ export function CaptureScreen({
             </Text>
           </View>
         </View>
+
+        {overlays}
       </View>
     </Modal>
   );
