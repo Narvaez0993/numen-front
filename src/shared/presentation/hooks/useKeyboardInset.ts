@@ -72,8 +72,13 @@ export function useKeyboardInset() {
     setResized(restHeight.current > 0 && height < restHeight.current - RESIZE_EPSILON);
   }, []);
 
+  const raised = keyboardHeight > 0 && !resized;
+
   return {
     onLayout,
+    /** A keyboard is up AND this window did not resize itself for it — so the
+     *  caller is the one holding the content clear of it. */
+    raised,
     /** Spread onto the container's style. */
     paddingBottom:
       keyboardHeight === 0 || resized

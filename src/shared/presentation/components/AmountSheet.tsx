@@ -225,11 +225,14 @@ export function AmountSheet({
                     </View>
                   ) : null}
                 </ScrollView>
+                {/* A little air over the keyboard. Flush against it, the save
+                    button reads as part of the keyboard's own top row. */}
                 <Footer
                   primaryLabel={primaryLabel}
                   onPrimary={onPrimary}
                   primaryDisabled={primaryDisabled}
                   onMic={onMic}
+                  extraBottom={lift.raised ? 18 : 0}
                 />
               </>
             ) : (
@@ -297,11 +300,13 @@ function Footer({
   onPrimary,
   primaryDisabled,
   onMic,
+  extraBottom = 0,
 }: {
   primaryLabel: string;
   onPrimary: () => void;
   primaryDisabled: boolean;
   onMic?: () => void;
+  extraBottom?: number;
 }) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -314,7 +319,7 @@ function Footer({
         gap: 10,
         paddingHorizontal: 20,
         paddingTop: 16,
-        paddingBottom: 32,
+        paddingBottom: 32 + extraBottom,
       }}
     >
       <Pressable
