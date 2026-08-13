@@ -258,9 +258,10 @@
       "custom": "Custom"
     },
     "row": {
-      "noMovements": "No movements this month",
-      "movements_one": "{{count}} expense · this month",
-      "movements_other": "{{count}} expenses · this month"
+      "over": "Past its cap",
+      "cap": "Cap {{amount}}",
+      "noCap": "No cap",
+      "unused": "No movements"
     },
     "limitReached": {
       "title": "You've reached the custom limit",
@@ -300,7 +301,17 @@
         "deleteFailed": "Couldn't delete. Try again."
       }
     },
-    "footer": "Tap a custom category to edit it."
+    "footer": "Tap a custom category to edit it.",
+    "list": {
+      "label": "The ones you use",
+      "period": "this month"
+    },
+    "capacity": {
+      "free_one": "{{count}} of your own, of {{limit}} on the free plan",
+      "free_other": "{{count}} of your own, of {{limit}} on the free plan",
+      "plus_one": "{{count}} of your own · no limit with Plus",
+      "plus_other": "{{count}} of your own · no limit with Plus"
+    }
   },
   "subscriptions": {
     "title": "Subscriptions",

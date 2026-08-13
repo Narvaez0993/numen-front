@@ -53,6 +53,10 @@ export type ColorScheme = {
 
   accentMint: string;
   accentCoral: string;
+  /** Spending, said gently. The design uses it for a note ABOUT an overspend —
+   *  "pasada del tope" beside a number — where full coral would read as the
+   *  number itself being the alarm. */
+  accentCoralSoft: string;
   accentPurple: string;
   accentAmber: string;
   accentPink: string;
@@ -95,6 +99,7 @@ function namedAccents(mode: ThemeMode, palette: PaletteColors) {
   return {
     accentMint: m.income,
     accentCoral: m.spend,
+    accentCoralSoft: m.spendSoft,
     accentPurple: palette.acc,
     accentAmber: warm,
     accentPink: rose,

@@ -258,9 +258,10 @@
       "custom": "Personalizadas"
     },
     "row": {
-      "noMovements": "Sin movimientos este mes",
-      "movements_one": "{{count}} gasto · este mes",
-      "movements_other": "{{count}} gastos · este mes"
+      "over": "Pasada del tope",
+      "cap": "Tope {{amount}}",
+      "noCap": "Sin tope",
+      "unused": "Sin movimientos"
     },
     "limitReached": {
       "title": "Llegaste al límite de personalizadas",
@@ -300,7 +301,17 @@
         "deleteFailed": "No se pudo borrar. Intenta de nuevo."
       }
     },
-    "footer": "Toca una categoría personalizada para editarla."
+    "footer": "Toca una categoría personalizada para editarla.",
+    "list": {
+      "label": "Las que usas",
+      "period": "este mes"
+    },
+    "capacity": {
+      "free_one": "Llevas {{count}} propia de {{limit}} en el plan gratis",
+      "free_other": "Llevas {{count}} propias de {{limit}} en el plan gratis",
+      "plus_one": "{{count}} categoría propia · sin límite con Plus",
+      "plus_other": "{{count}} categorías propias · sin límite con Plus"
+    }
   },
   "subscriptions": {
     "title": "Suscripciones",
