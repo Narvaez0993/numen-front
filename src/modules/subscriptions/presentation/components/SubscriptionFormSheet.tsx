@@ -213,7 +213,7 @@ export function SubscriptionFormSheet({
                       }
                       style={{ fontSize: 12.5, fontWeight: '500' }}
                     >
-                      {t(`subscriptions.form.frequency.${option}`)}
+                      {t(`subscriptions.form.cadences.${option}`)}
                     </Text>
                   </Pressable>
                 );

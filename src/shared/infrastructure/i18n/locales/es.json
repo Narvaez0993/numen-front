@@ -926,7 +926,14 @@
       "over": "Te pasaste",
       "label": "Presupuesto",
       "perDay_one": "por día · {{count}} día",
-      "perDay_other": "por día · {{count}} días"
+      "perDay_other": "por día · {{count}} días",
+      "row": "{{pct}}% del presupuesto",
+      "spent": "Sin margen",
+      "of": "de {{amount}}",
+      "ceiling_one": "{{amount}} por día · queda {{count}} día",
+      "ceiling_other": "{{amount}} por día · quedan {{count}} días",
+      "willFit": "Cierras en {{amount}}. Cabes por {{gap}}.",
+      "willBust": "Cierras en {{amount}}. Te pasas por {{gap}}."
     },
     "goal": {
       "of": "de {{amount}}",

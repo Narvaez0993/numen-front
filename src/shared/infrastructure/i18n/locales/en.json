@@ -926,7 +926,14 @@
       "over": "You went over",
       "label": "Budget",
       "perDay_one": "per day · {{count}} day",
-      "perDay_other": "per day · {{count}} days"
+      "perDay_other": "per day · {{count}} days",
+      "row": "{{pct}}% of the budget",
+      "spent": "Nothing left",
+      "of": "of {{amount}}",
+      "ceiling_one": "{{amount}} a day · {{count}} day left",
+      "ceiling_other": "{{amount}} a day · {{count}} days left",
+      "willFit": "You close at {{amount}}. That fits, by {{gap}}.",
+      "willBust": "You close at {{amount}}. That is {{gap}} over."
     },
     "goal": {
       "of": "of {{amount}}",
