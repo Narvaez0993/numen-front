@@ -948,13 +948,10 @@
     "of": "de",
     "projection": "A este ritmo llegas en {{month}}",
     "projectionEmpty": "Registra tu primer aporte para empezar",
-    "add": "Nueva meta",
+    "add": "Ponerme otra meta",
     "contribute": "Registrar aporte",
     "edit": "Editar",
-    "empty": {
-      "title": "Aún no tienes metas",
-      "body": "Crea una meta de ahorro y el agente te ayudará a llegar."
-    },
+    "empty": "Aún no tienes metas. Ponte una y Deshka te va mostrando cuánto llevas.",
     "form": {
       "newGoal": "Nueva meta",
       "editGoal": "Editar meta",
@@ -965,12 +962,13 @@
       "save": "Guardar",
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
-      "deleteConfirm": "Sí, eliminar",
+      "deleteConfirm": "¿Seguro?",
       "cancel": "Cancelar",
       "targetDate": "Fecha objetivo (opcional)",
       "noDate": "Sin fecha",
-      "archive": "Archivar meta",
-      "reopen": "Reabrir meta"
+      "archive": "Cerrar esta meta",
+      "reopen": "Volver a abrirla",
+      "help": "Ponle fecha y Deshka te dice cuánto necesitas cada mes."
     },
     "contribution": {
       "title": "Aporte a {{name}}",
@@ -982,7 +980,16 @@
       "fromAccount": "Sale de",
       "toAccount": "Vuelve a",
       "holds": "El bolsillo tiene {{amount}}",
-      "saveOut": "Registrar retiro"
+      "saveOut": "Sacar",
+      "put": "Cuánto aportas",
+      "take": "Cuánto sacas",
+      "from": "Sale de",
+      "to": "Vuelve a",
+      "saveIn": "Aportar",
+      "direction": {
+        "in": "Aportar",
+        "out": "Sacar"
+      }
     },
     "gate": {
       "title": "Tu plan Free incluye 1 meta activa",
@@ -1005,6 +1012,24 @@
     "errors": {
       "notEmpty": "Primero retira la plata: el bolsillo no está vacío.",
       "insufficient": "Ese retiro es más de lo que hay en el bolsillo."
+    },
+    "hero": {
+      "label": "Llevas guardado",
+      "of_one": "De {{amount}} en una meta",
+      "of_other": "De {{amount}} entre {{count}} metas"
+    },
+    "card": {
+      "contribute": "Aportar",
+      "contributeAmount": "Aportar {{amount}}",
+      "missing": "faltan {{amount}}",
+      "done": "Lograda",
+      "noPace": "Sin ritmo aún"
+    },
+    "capacity": {
+      "free_one": "Llevas {{count}} meta de {{limit}} en el plan gratis",
+      "free_other": "Llevas {{count}} metas de {{limit}} en el plan gratis",
+      "plus_one": "{{count}} meta activa · sin límite con Plus",
+      "plus_other": "{{count}} metas activas · sin límite con Plus"
     }
   },
   "deudas": {

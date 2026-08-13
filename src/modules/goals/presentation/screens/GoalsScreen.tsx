@@ -2,19 +2,16 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
 import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
-import { GoalLimitReachedError, GoalNotEmptyError } from '../../domain';
+import type { CurrencyCode } from '@/shared/domain';
 import {
-  Card,
+  Aurora,
+  DashedButton,
   Icon,
-  IconBox,
-  ProgressBar,
   RetryState,
-  SectionLabel,
-  SubScreenHeader,
   Text,
   Toast,
 } from '@/shared/presentation/components';
@@ -22,20 +19,31 @@ import { useTheme } from '@/shared/presentation/theme';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { Goal } from '../../domain';
+import { GoalLimitReachedError, GoalNotEmptyError, type Goal } from '../../domain';
 import { ContributionSheet } from '../components/ContributionSheet';
+import { GoalCard } from '../components/GoalCard';
 import { GoalFormSheet, type GoalFormInput } from '../components/GoalFormSheet';
 import { useGoals } from '../hooks/useGoals';
 import { useCreateGoal, useDeleteGoal, useUpdateGoal } from '../hooks/useGoalMutations';
 
+/** What a free account gets. The server's 403 is the one that rules. */
+const FREE_GOALS = 1;
+
 /**
- * Metas, running on the API. Pockets hold real money: a contribution is a genuine
- * transfer, so this screen shares every figure with Cuentas and Movimientos instead
- * of keeping its own (the prototype's zustand died with its persisted `saved`).
+ * Metas, running on the API.
+ *
+ * Pockets hold real money: a contribution is a genuine transfer, so every figure
+ * here is shared with Cuentas and Movimientos rather than kept on its own.
+ *
+ * The redesign leads with the total across all of them, because that is the
+ * number that answers "am I saving?" — a question no individual goal can. Each
+ * goal below is then a card that asks only its own question, and carries the one
+ * action that changes it.
  */
 export function GoalsScreen() {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   // Pinned once per mount: the pace projection is derived for this day.
   const today = useMemo(() => toIsoDate(new Date()), []);
@@ -63,7 +71,6 @@ export function GoalsScreen() {
         edges={['top']}
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       >
-        <SubScreenHeader title={t('goals.title')} onBack={() => router.back()} />
         <RetryState
           titleKey="goals.error.title"
           retryKey="goals.error.retry"
@@ -83,13 +90,19 @@ export function GoalsScreen() {
           justifyContent: 'center',
         }}
       >
-        <ActivityIndicator color={theme.colors.accentMint} />
+        <ActivityIndicator color={theme.palette.acc} />
       </SafeAreaView>
     );
   }
 
+  const currency = data.currency as CurrencyCode;
   const active = data.goals.filter((goal) => !goal.archived);
   const archived = data.goals.filter((goal) => goal.archived);
+  const savedTotal = active.reduce((sum, goal) => sum + goal.saved, 0);
+  const targetTotal = active.reduce((sum, goal) => sum + goal.target, 0);
+
+  const isPlus = tier === 'plus';
+  const atLimit = !isPlus && active.length >= FREE_GOALS;
 
   const closeForm = () => setFormSheet({ open: false, goal: null });
   const showToast = (message: string) => setToast({ visible: true, message });
@@ -106,7 +119,7 @@ export function GoalsScreen() {
 
   const handleAddPress = () => {
     // Courtesy pre-gate; the server's 403 is the one that rules.
-    if (tier === 'free' && active.length >= 1) {
+    if (atLimit) {
       setGateOpen(true);
       return;
     }
@@ -117,9 +130,9 @@ export function GoalsScreen() {
     closeForm();
     if (formSheet.goal) {
       updateGoal.mutate({ id: formSheet.goal.id, patch: input }, { onError: report });
-    } else {
-      createGoal.mutate(input, { onError: report });
+      return;
     }
+    createGoal.mutate(input, { onError: report });
   };
 
   const handleArchive = () => {
@@ -148,149 +161,152 @@ export function GoalsScreen() {
     });
   };
 
-  const projectionLine = (goal: Goal): string => {
-    if (goal.achieved) return t('goals.achieved');
-    if (goal.projectedOn === null) return t('goals.projectionEmpty');
+  /** The card's top-right note: when it lands, or that it already has. */
+  const deadlineOf = (goal: Goal): string => {
+    if (goal.achieved) return t('goals.card.done');
+    if (goal.projectedOn === null) return t('goals.card.noPace');
     const month = monthName(`${goal.projectedOn}-01`, i18n.language);
-    const year = goal.projectedOn.slice(0, 4);
-    const when = `${month} ${year}`;
-    if (goal.neededPerMonth !== null) {
-      return `${t('goals.projection', { month: when })} · ${t('goals.needed', {
-        amount: formatMoney(goal.neededPerMonth),
-      })}`;
-    }
-    return t('goals.projection', { month: when });
+    return `${month} ${goal.projectedOn.slice(0, 4)}`;
   };
 
-  const goalCard = (goal: Goal) => (
-    <Card key={goal.id} padding={16}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 12,
-          marginBottom: 12,
-        }}
-      >
-        <IconBox name={goal.icon} color={goal.color} size={36} iconSize={17} />
-        <Text variant="bodyLarge" numberOfLines={1} style={{ flex: 1 }}>
-          {goal.name}
-        </Text>
-        <Text
-          variant="caption"
-          color={goal.achieved ? theme.colors.accentMint : theme.colors.textSecondary}
-          tabular
-          style={{ fontFamily: 'Geist_500Medium' }}
-        >
-          {Math.round(goal.pct * 100)}%
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'baseline',
-          gap: 6,
-          marginBottom: 10,
-        }}
-      >
-        <Text variant="h2" tabular>
-          {formatMoney(goal.saved)}
-        </Text>
-        <Text variant="caption" muted>
-          {t('goals.of')} {formatMoney(goal.target)}
-        </Text>
-      </View>
-      {/* Progress toward the target: more is better, so no warning ramp. */}
-      <ProgressBar pct={goal.pct} height={6} color={theme.colors.accentMint} />
-      <Text
-        variant="caption"
-        color={goal.achieved ? theme.colors.accentMint : theme.colors.textTertiary}
-        style={{ marginTop: 10, marginBottom: goal.archived ? 0 : 12 }}
-      >
-        {projectionLine(goal)}
-      </Text>
-      {!goal.archived ? (
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <ActionButton
-            label={t('goals.contribute')}
-            accent
-            onPress={() => setContributionGoal(goal)}
-          />
-          <ActionButton
-            label={t('goals.edit')}
-            onPress={() => setFormSheet({ open: true, goal })}
-          />
-        </View>
-      ) : null}
-    </Card>
-  );
-
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-      edges={['top']}
-    >
-      <SubScreenHeader title={t('goals.title')} onBack={() => router.back()} />
+    <Aurora>
       <ScrollView
         contentContainerStyle={{
-          paddingTop: 8,
-          paddingBottom: 32,
-          paddingHorizontal: 16,
-          gap: 12,
+          paddingTop: insets.top + 16,
+          paddingBottom: insets.bottom + 26,
         }}
         showsVerticalScrollIndicator={false}
       >
-        {active.length === 0 ? (
-          <Card padding={22}>
-            <View style={{ alignItems: 'center', gap: 8 }}>
-              <IconBox name="target" color="mint" size={40} iconSize={19} />
-              <Text variant="bodyLarge">{t('goals.empty.title')}</Text>
-              <Text
-                variant="caption"
-                color={theme.colors.textSecondary}
-                style={{ textAlign: 'center' }}
-              >
-                {t('goals.empty.body')}
-              </Text>
-            </View>
-          </Card>
-        ) : (
-          active.map(goalCard)
-        )}
-
-        <Pressable
-          accessibilityRole="button"
-          onPress={handleAddPress}
-          style={({ pressed }) => ({
+        <View
+          style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            borderColor: theme.colors.borderDefault,
-            borderWidth: 1,
-            borderStyle: 'dashed',
-            borderRadius: 14,
-            paddingVertical: 13,
-            opacity: pressed ? 0.8 : 1,
-          })}
+            gap: 12,
+            paddingHorizontal: 22,
+          }}
         >
-          <Icon name="plus" size={14} color={theme.colors.textSecondary} />
-          <Text variant="label" color={theme.colors.textSecondary}>
-            {t('goals.add')}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back')}
+            onPress={() => router.back()}
+            style={({ pressed }) => ({
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Icon
+              name="arrow-left"
+              size={16}
+              stroke={2}
+              color={theme.colors.textSecondary}
+            />
+          </Pressable>
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>{t('goals.title')}</Text>
+        </View>
+
+        <View style={{ paddingHorizontal: 26, paddingTop: 24 }}>
+          <Text
+            variant="micro"
+            uppercase
+            color={theme.colors.textTertiary}
+            style={{ letterSpacing: 2.2, marginBottom: 8 }}
+          >
+            {t('goals.hero.label')}
           </Text>
-        </Pressable>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}>
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 19, fontWeight: '300' }}
+            >
+              $
+            </Text>
+            <Text
+              tabular
+              style={{
+                fontSize: 41,
+                lineHeight: 41,
+                fontWeight: '500',
+                letterSpacing: -2,
+              }}
+            >
+              {formatMoney(savedTotal, currency).replace(/^[^\d-]*/, '')}
+            </Text>
+          </View>
+          {active.length > 0 ? (
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 12.5, marginTop: 9 }}
+            >
+              {t('goals.hero.of', {
+                amount: formatMoney(targetTotal, currency),
+                count: active.length,
+              })}
+            </Text>
+          ) : null}
+        </View>
+
+        <View style={{ paddingHorizontal: 26, paddingTop: 26, gap: 12 }}>
+          {active.length === 0 ? (
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 13, lineHeight: 19, paddingVertical: 10 }}
+            >
+              {t('goals.empty')}
+            </Text>
+          ) : (
+            active.map((goal) => (
+              <GoalCard
+                key={goal.id}
+                goal={goal}
+                currency={currency}
+                deadline={deadlineOf(goal)}
+                onContribute={() => setContributionGoal(goal)}
+                onEdit={() => setFormSheet({ open: true, goal })}
+              />
+            ))
+          )}
+        </View>
+
+        <View style={{ paddingHorizontal: 24, paddingTop: 18 }}>
+          <DashedButton label={t('goals.add')} onPress={handleAddPress} />
+          {/* Said before the button, not fired as an error after it. */}
+          <Text
+            color={atLimit ? theme.colors.accentCoralSoft : theme.colors.textTertiary}
+            style={{ fontSize: 11, textAlign: 'center', marginTop: 10 }}
+          >
+            {isPlus
+              ? t('goals.capacity.plus', { count: active.length })
+              : t('goals.capacity.free', { count: active.length, limit: FREE_GOALS })}
+          </Text>
+        </View>
 
         {archived.length > 0 ? (
-          <View style={{ gap: 12, marginTop: 8 }}>
-            <SectionLabel>{t('goals.archivedSection')}</SectionLabel>
+          <View style={{ paddingHorizontal: 26, paddingTop: 28, gap: 12 }}>
+            <Text
+              variant="micro"
+              uppercase
+              color={theme.colors.textTertiary}
+              style={{ letterSpacing: 2.2 }}
+            >
+              {t('goals.archivedSection')}
+            </Text>
             {archived.map((goal) => (
-              <Pressable
+              <GoalCard
                 key={goal.id}
-                onPress={() => setFormSheet({ open: true, goal })}
-                style={({ pressed }) => ({ opacity: pressed ? 0.85 : 0.72 })}
-              >
-                {goalCard(goal)}
-              </Pressable>
+                goal={goal}
+                currency={currency}
+                deadline={deadlineOf(goal)}
+                onContribute={() => setContributionGoal(goal)}
+                onEdit={() => setFormSheet({ open: true, goal })}
+              />
             ))}
           </View>
         ) : null}
@@ -327,42 +343,6 @@ export function GoalsScreen() {
         message={toast.message}
         onDismiss={() => setToast({ visible: false, message: '' })}
       />
-    </SafeAreaView>
-  );
-}
-
-function ActionButton({
-  label,
-  accent = false,
-  onPress,
-}: {
-  label: string;
-  accent?: boolean;
-  onPress: () => void;
-}) {
-  const { theme } = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flex: 1,
-        alignItems: 'center',
-        paddingVertical: 10,
-        borderRadius: 11,
-        backgroundColor: accent ? theme.colors.accentMintBg : theme.colors.bgFloat,
-        borderWidth: 1,
-        borderColor: accent ? 'transparent' : theme.colors.borderSubtle,
-        opacity: pressed ? 0.85 : 1,
-      })}
-    >
-      <Text
-        variant="label"
-        color={accent ? theme.colors.accentMint : theme.colors.textSecondary}
-        style={{ fontSize: 12.5 }}
-      >
-        {label}
-      </Text>
-    </Pressable>
+    </Aurora>
   );
 }

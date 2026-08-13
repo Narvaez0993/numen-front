@@ -948,13 +948,10 @@
     "of": "of",
     "projection": "At this pace you get there by {{month}}",
     "projectionEmpty": "Log your first contribution to get started",
-    "add": "New goal",
+    "add": "Set another goal",
     "contribute": "Add contribution",
     "edit": "Edit",
-    "empty": {
-      "title": "No goals yet",
-      "body": "Create a savings goal and the agent will help you get there."
-    },
+    "empty": "No goals yet. Set one and Deshka will show you how far along you are.",
     "form": {
       "newGoal": "New goal",
       "editGoal": "Edit goal",
@@ -965,12 +962,13 @@
       "save": "Save",
       "delete": "Delete",
       "deleteConfirmTitle": "Delete \"{{name}}\"?",
-      "deleteConfirm": "Yes, delete",
+      "deleteConfirm": "Sure?",
       "cancel": "Cancel",
       "targetDate": "Target date (optional)",
       "noDate": "No date",
-      "archive": "Archive goal",
-      "reopen": "Reopen goal"
+      "archive": "Close this goal",
+      "reopen": "Open it again",
+      "help": "Give it a date and Deshka works out what each month needs."
     },
     "contribution": {
       "title": "Contribution to {{name}}",
@@ -982,7 +980,16 @@
       "fromAccount": "From",
       "toAccount": "Back to",
       "holds": "The pocket holds {{amount}}",
-      "saveOut": "Record withdrawal"
+      "saveOut": "Take out",
+      "put": "How much you put in",
+      "take": "How much you take out",
+      "from": "Comes from",
+      "to": "Goes back to",
+      "saveIn": "Put in",
+      "direction": {
+        "in": "Put in",
+        "out": "Take out"
+      }
     },
     "gate": {
       "title": "Free includes 1 active goal",
@@ -1005,6 +1012,24 @@
     "errors": {
       "notEmpty": "Withdraw the money first: the pocket is not empty.",
       "insufficient": "That withdrawal is more than the pocket holds."
+    },
+    "hero": {
+      "label": "You have saved",
+      "of_one": "Of {{amount}} in one goal",
+      "of_other": "Of {{amount}} across {{count}} goals"
+    },
+    "card": {
+      "contribute": "Put in",
+      "contributeAmount": "Put in {{amount}}",
+      "missing": "{{amount}} to go",
+      "done": "Reached",
+      "noPace": "No pace yet"
+    },
+    "capacity": {
+      "free_one": "{{count}} goal of {{limit}} on the free plan",
+      "free_other": "{{count}} goals of {{limit}} on the free plan",
+      "plus_one": "{{count}} active goal · no limit with Plus",
+      "plus_other": "{{count}} active goals · no limit with Plus"
     }
   },
   "deudas": {
