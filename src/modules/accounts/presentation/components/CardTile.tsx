@@ -61,12 +61,15 @@ export function CardTile({ card, onPress, onEdit, editLabel }: Props) {
         <Text numberOfLines={1} style={{ flex: 1, fontSize: 14 }}>
           {card.name}
         </Text>
+        {/* A card you owe nothing on is not a warning. The minus and the coral
+            both mean "this is a debt", and at zero neither is true. */}
         <Text
           tabular
-          color={theme.colors.accentCoral}
+          color={card.debt > 0 ? theme.colors.accentCoral : theme.colors.textSecondary}
           style={{ fontSize: 14.5, fontWeight: '500' }}
         >
-          −{formatMoney(card.debt, card.currency)}
+          {card.debt > 0 ? '−' : ''}
+          {formatMoney(card.debt, card.currency)}
         </Text>
         <Pressable
           accessibilityRole="button"

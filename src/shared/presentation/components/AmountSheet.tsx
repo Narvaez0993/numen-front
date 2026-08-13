@@ -1,6 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, View } from 'react-native';
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { CurrencyCode } from '@/shared/domain';
@@ -19,6 +26,20 @@ import { Text } from './Text';
  *  to its content: the keypad has to land in the same place every time, whatever
  *  is being typed into it. */
 const SHEET_TOP = 150;
+
+/** The bundle's own keyframe:
+ *
+ *    @keyframes sheetUp { from { transform:translateY(40px); opacity:.6 }
+ *                         to   { transform:translateY(0);    opacity:1  } }
+ *
+ * at `.26s ease`. A short rise rather than a slide from off-screen: the sheet
+ * settles into a place it was nearly at already, which is what makes it read as
+ * arriving rather than as being thrown. */
+const RISE_PX = 40;
+const IN_MS = 260;
+/** Leaving is quicker than arriving. Waiting to get out of the way is the one
+ *  thing an animation should never make you do. */
+const OUT_MS = 180;
 
 type Props = {
   visible: boolean;
@@ -117,45 +138,83 @@ export function AmountSheet({
   const lift = useKeyboardInset();
   const system = keyboard === 'system';
 
+  // The Modal outlives `visible` by exactly one animation, so the sheet can be
+  // seen leaving instead of blinking out.
+  const [mounted, setMounted] = useState(visible);
+  const progress = useSharedValue(visible ? 1 : 0);
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      progress.value = withTiming(1, {
+        duration: IN_MS,
+        easing: Easing.out(Easing.cubic),
+      });
+      return;
+    }
+    progress.value = withTiming(
+      0,
+      { duration: OUT_MS, easing: Easing.in(Easing.cubic) },
+      (finished) => {
+        if (finished) runOnJS(setMounted)(false);
+      },
+    );
+  }, [visible, progress]);
+
+  const scrimStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
+  const panelStyle = useAnimatedStyle(() => ({
+    opacity: 0.6 + progress.value * 0.4,
+    transform: [{ translateY: (1 - progress.value) * RISE_PX }],
+  }));
+
+  if (!mounted) return null;
+
   return (
     <Modal
-      visible={visible}
+      visible
       transparent
-      animationType="fade"
+      // Driven here instead: the platform's fade cannot rise, and running both
+      // would be two animations disagreeing about when the sheet has arrived.
+      animationType="none"
       statusBarTranslucent
       onRequestClose={onClose}
     >
       <View style={{ flex: 1 }}>
-        <Scrim>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close')}
-            onPress={onClose}
-            style={{ flex: 1 }}
-          />
-        </Scrim>
+        <Animated.View style={[{ flex: 1 }, scrimStyle]}>
+          <Scrim>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+              onPress={onClose}
+              style={{ flex: 1 }}
+            />
+          </Scrim>
+        </Animated.View>
 
-        <View
+        <Animated.View
           onLayout={lift.onLayout}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            // The pad's height is known, so its sheet is pinned and never moves.
-            // A system keyboard is a different height on every device, so that
-            // sheet sizes to its content and is lifted clear of it instead.
-            ...(system
-              ? { maxHeight: '94%', paddingBottom: lift.paddingBottom }
-              : { top: SHEET_TOP }),
-            borderTopLeftRadius: 34,
-            borderTopRightRadius: 34,
-            // Opaque, unlike the app's cards: a panel with its own content has to
-            // cover what is behind it or neither is readable.
-            backgroundColor: theme.colors.bgSheet,
-            borderTopWidth: 1,
-            borderTopColor: theme.colors.borderDefault,
-          }}
+          style={[
+            {
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              // The pad's height is known, so its sheet is pinned and never moves.
+              // A system keyboard is a different height on every device, so that
+              // sheet sizes to its content and is lifted clear of it instead.
+              ...(system
+                ? { maxHeight: '94%', paddingBottom: lift.paddingBottom }
+                : { top: SHEET_TOP }),
+              borderTopLeftRadius: 34,
+              borderTopRightRadius: 34,
+              // Opaque, unlike the app's cards: a panel with its own content has to
+              // cover what is behind it or neither is readable.
+              backgroundColor: theme.colors.bgSheet,
+              borderTopWidth: 1,
+              borderTopColor: theme.colors.borderDefault,
+            },
+            panelStyle,
+          ]}
         >
           <SafeAreaView style={system ? undefined : { flex: 1 }} edges={['bottom']}>
             <View
@@ -288,7 +347,7 @@ export function AmountSheet({
               </>
             )}
           </SafeAreaView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
