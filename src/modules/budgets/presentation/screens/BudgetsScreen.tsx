@@ -19,10 +19,9 @@ import { GoalsLink } from '../components/GoalsLink';
 import { ProjectionCallout } from '../components/ProjectionCallout';
 import { WatchedRow } from '../components/WatchedRow';
 import { BudgetCreateFlow } from '../components/create-flow/BudgetCreateFlow';
-import { WatchCategoryFlow } from '../components/sheets/WatchCategoryFlow';
+import { CapSheet } from '../components/sheets/CapSheet';
+import { CeilingSheet } from '../components/sheets/CeilingSheet';
 import { ConfirmSheet } from '../components/sheets/ConfirmSheet';
-import { EditTechoSheet } from '../components/sheets/EditTechoSheet';
-import { EditTopeSheet } from '../components/sheets/EditTopeSheet';
 import {
   useCreateBudget,
   useDeleteBudget,
@@ -371,42 +370,48 @@ export function BudgetsScreen() {
         onSave={handleCreate}
       />
 
-      <EditTechoSheet
+      <CeilingSheet
         visible={editTechoOpen}
         current={data.month?.target ?? null}
         monthName={name}
-        saving={updateBudget.isPending}
+        currency={currency}
+        saving={updateBudget.isPending || createBudget.isPending}
         onClose={() => setEditTechoOpen(false)}
         onSave={handleSaveTecho}
-        onDelete={requestDeleteTecho}
+        onDelete={data.month ? requestDeleteTecho : undefined}
       />
 
-      <EditTopeSheet
+      {/* One component for both: capping a category is the same act whether the
+          cap exists yet, and only the header and the category row differ. */}
+      <CapSheet
         visible={topeEdit != null}
-        category={
+        target={
           topeEdit
             ? {
                 categoryId: topeEdit.categoryId,
                 name: topeEdit.name,
-                icon: topeEdit.icon,
-                color: topeEdit.color,
                 spent: topeEdit.spent,
               }
             : null
         }
+        candidates={candidates}
         current={topeEdit?.target ?? 0}
+        currency={currency}
         saving={updateBudget.isPending}
         onClose={() => setTopeEdit(null)}
-        onSave={handleSaveTope}
+        onSave={(_, amount) => void handleSaveTope(amount)}
         onDelete={requestDeleteTope}
       />
 
-      <WatchCategoryFlow
+      <CapSheet
         visible={addVigOpen}
+        target={null}
         candidates={candidates}
+        current={0}
+        currency={currency}
         saving={createBudget.isPending}
         onClose={() => setAddVigOpen(false)}
-        onSave={handleWatchCategory}
+        onSave={(categoryId, amount) => void handleWatchCategory(categoryId, amount)}
       />
 
       <ConfirmSheet

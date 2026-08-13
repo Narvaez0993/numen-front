@@ -213,6 +213,10 @@
       "label": "Your goals",
       "summary_one": "{{count}} active · {{amount}} saved",
       "summary_other": "{{count}} active · {{amount}} saved"
+    },
+    "capSheet": {
+      "label": "Monthly cap",
+      "category": "Category"
     }
   },
   "plan": {

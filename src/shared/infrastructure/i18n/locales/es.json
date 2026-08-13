@@ -213,6 +213,10 @@
       "label": "Tus metas",
       "summary_one": "{{count}} activa · {{amount}} guardados",
       "summary_other": "{{count}} activas · {{amount}} guardados"
+    },
+    "capSheet": {
+      "label": "Tope del mes",
+      "category": "Categoría"
     }
   },
   "plan": {

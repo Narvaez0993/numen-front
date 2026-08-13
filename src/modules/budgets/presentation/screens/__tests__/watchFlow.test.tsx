@@ -136,7 +136,8 @@ describe('watching a new category', () => {
 
     // The cap form's own copy, with no clock advanced: nothing had to close
     // first, so there is no window in which this could fail to appear.
-    expect(screen.queryByText(/Deshka will warn you/)).not.toBeNull();
+    expect(screen.queryByText('Cap for Transporte')).not.toBeNull();
+    expect(screen.queryByText('Monthly cap')).not.toBeNull();
     expect(screen.queryByText('Activate cap')).not.toBeNull();
     // And the picker is gone rather than layered behind it.
     expect(screen.queryByText('Watch a category')).toBeNull();

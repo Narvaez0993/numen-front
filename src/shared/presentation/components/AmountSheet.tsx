@@ -42,6 +42,16 @@ type Props = {
   /** Shows the mic beside the save button. Absent on sheets where speaking makes
    *  no sense — you cannot dictate a ceiling. */
   onMic?: () => void;
+  /**
+   * Takes over everything below the header — the amount, the fields, the pad and
+   * the footer all go.
+   *
+   * It is how a sheet asks a question before it can show the form: picking WHICH
+   * category to cap happens in the same sheet as the amount, instead of a second
+   * `Modal` opening on a timer while the first animates away. That handover is a
+   * race whichever delay you pick, and it lost.
+   */
+  replaceBody?: React.ReactNode;
 };
 
 /**
@@ -78,6 +88,7 @@ export function AmountSheet({
   onPrimary,
   primaryDisabled = false,
   onMic,
+  replaceBody,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -140,107 +151,113 @@ export function AmountSheet({
               {header}
             </View>
 
-            <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
-              {label !== undefined ? (
-                <Text
-                  variant="micro"
-                  uppercase
-                  color={theme.colors.textTertiary}
-                  style={{ letterSpacing: 2.2, marginBottom: 9 }}
-                >
-                  {label}
-                </Text>
-              ) : null}
-              <KeypadAmount
-                digits={digits}
-                currency={currency}
-                sign={sign}
-                size={size}
-                color={amountColor}
-              />
-              {help !== undefined ? (
-                <Text
-                  color={theme.colors.textTertiary}
-                  style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
-                >
-                  {help}
-                </Text>
-              ) : null}
-            </View>
-
-            {children !== undefined ? (
-              <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
-                {children}
-              </View>
-            ) : null}
-
-            <View style={{ flex: 1 }} />
-
-            <View style={{ paddingHorizontal: 20 }}>
-              <AmountKeypad onKey={(key) => onDigits(pressAmountKey(digits, key))} />
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 10,
-                paddingHorizontal: 20,
-                paddingTop: 16,
-                paddingBottom: 32,
-              }}
-            >
-              <Pressable
-                accessibilityRole="button"
-                accessibilityState={{ disabled: primaryDisabled }}
-                onPress={onPrimary}
-                disabled={primaryDisabled}
-                style={({ pressed }) => ({
-                  flex: 1,
-                  minHeight: 52,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 18,
-                  // The one solid, un-tinted surface: the last thing you touch
-                  // and the only one that changes anything.
-                  backgroundColor: theme.colors.textPrimary,
-                  opacity: primaryDisabled ? 0.4 : pressed ? 0.9 : 1,
-                })}
-              >
-                <Text
-                  color={theme.colors.bgBase}
-                  style={{ fontSize: 14, fontWeight: '600' }}
-                >
-                  {primaryLabel}
-                </Text>
-              </Pressable>
-
-              {onMic !== undefined ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t('expenses.voice.mic')}
-                  onPress={onMic}
-                  style={({ pressed }) => ({
-                    width: 54,
-                    height: 54,
-                    borderRadius: 27,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: withAlpha(theme.palette.acc, 0.16),
-                    borderWidth: 1,
-                    borderColor: withAlpha(theme.palette.acc, 0.22),
-                    opacity: pressed ? 0.8 : 1,
-                  })}
-                >
-                  <Icon
-                    name="microphone"
-                    size={22}
-                    stroke={1.8}
-                    color={theme.palette.acc}
+            {replaceBody !== undefined ? (
+              <View style={{ flex: 1 }}>{replaceBody}</View>
+            ) : (
+              <>
+                <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
+                  {label !== undefined ? (
+                    <Text
+                      variant="micro"
+                      uppercase
+                      color={theme.colors.textTertiary}
+                      style={{ letterSpacing: 2.2, marginBottom: 9 }}
+                    >
+                      {label}
+                    </Text>
+                  ) : null}
+                  <KeypadAmount
+                    digits={digits}
+                    currency={currency}
+                    sign={sign}
+                    size={size}
+                    color={amountColor}
                   />
-                </Pressable>
-              ) : null}
-            </View>
+                  {help !== undefined ? (
+                    <Text
+                      color={theme.colors.textTertiary}
+                      style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
+                    >
+                      {help}
+                    </Text>
+                  ) : null}
+                </View>
+
+                {children !== undefined ? (
+                  <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
+                    {children}
+                  </View>
+                ) : null}
+
+                <View style={{ flex: 1 }} />
+
+                <View style={{ paddingHorizontal: 20 }}>
+                  <AmountKeypad onKey={(key) => onDigits(pressAmountKey(digits, key))} />
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 10,
+                    paddingHorizontal: 20,
+                    paddingTop: 16,
+                    paddingBottom: 32,
+                  }}
+                >
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: primaryDisabled }}
+                    onPress={onPrimary}
+                    disabled={primaryDisabled}
+                    style={({ pressed }) => ({
+                      flex: 1,
+                      minHeight: 52,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 18,
+                      // The one solid, un-tinted surface: the last thing you touch
+                      // and the only one that changes anything.
+                      backgroundColor: theme.colors.textPrimary,
+                      opacity: primaryDisabled ? 0.4 : pressed ? 0.9 : 1,
+                    })}
+                  >
+                    <Text
+                      color={theme.colors.bgBase}
+                      style={{ fontSize: 14, fontWeight: '600' }}
+                    >
+                      {primaryLabel}
+                    </Text>
+                  </Pressable>
+
+                  {onMic !== undefined ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={t('expenses.voice.mic')}
+                      onPress={onMic}
+                      style={({ pressed }) => ({
+                        width: 54,
+                        height: 54,
+                        borderRadius: 27,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: withAlpha(theme.palette.acc, 0.16),
+                        borderWidth: 1,
+                        borderColor: withAlpha(theme.palette.acc, 0.22),
+                        opacity: pressed ? 0.8 : 1,
+                      })}
+                    >
+                      <Icon
+                        name="microphone"
+                        size={22}
+                        stroke={1.8}
+                        color={theme.palette.acc}
+                      />
+                    </Pressable>
+                  ) : null}
+                </View>
+              </>
+            )}
           </SafeAreaView>
         </View>
       </View>
