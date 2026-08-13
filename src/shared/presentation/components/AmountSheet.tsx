@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
+import { Dimensions, Modal, Pressable, ScrollView, View } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -35,8 +35,23 @@ const SHEET_TOP = 150;
  * at `.26s ease`. A short rise rather than a slide from off-screen: the sheet
  * settles into a place it was nearly at already, which is what makes it read as
  * arriving rather than as being thrown. */
-const RISE_PX = 40;
-const DURATION_MS = 240;
+/**
+ * The sheet's motion, matched to `BottomSheet`'s — which is the one in this app
+ * that feels right, and the reason is worth writing down.
+ *
+ * **The panel slides the whole way off the screen.** It does not fade. An
+ * earlier version rose 40px and dropped to 60% opacity, taken from the bundle's
+ * `sheetUp` keyframe — right for an entrance, and as an exit it meant the sheet
+ * finished still visible and was then removed. That cut is what read as sticking.
+ * With a full slide there is nothing left on screen to cut.
+ *
+ * The scrim also runs faster than the panel, both ways. The light comes back
+ * before the sheet has finished leaving, which is what makes the screen behind
+ * feel like it was there all along.
+ */
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const IN = { scrim: 220, panel: 320 };
+const OUT = { scrim: 180, panel: 240 };
 
 type Props = {
   visible: boolean;
@@ -138,34 +153,38 @@ export function AmountSheet({
   // The Modal outlives `visible` by exactly one animation, so the sheet can be
   // seen leaving instead of blinking out.
   const [mounted, setMounted] = useState(visible);
-  const progress = useSharedValue(visible ? 1 : 0);
+  const scrim = useSharedValue(0);
+  const slide = useSharedValue(SCREEN_HEIGHT);
 
   useEffect(() => {
     if (visible) {
       setMounted(true);
-      progress.value = withTiming(1, {
-        duration: DURATION_MS,
-        easing: Easing.inOut(Easing.quad),
+      scrim.value = withTiming(1, {
+        duration: IN.scrim,
+        easing: Easing.out(Easing.quad),
+      });
+      slide.value = withTiming(0, {
+        duration: IN.panel,
+        easing: Easing.out(Easing.cubic),
       });
       return;
     }
-    progress.value = withTiming(
-      0,
-      { duration: DURATION_MS, easing: Easing.inOut(Easing.quad) },
+    scrim.value = withTiming(0, {
+      duration: OUT.scrim,
+      easing: Easing.in(Easing.quad),
+    });
+    slide.value = withTiming(
+      SCREEN_HEIGHT,
+      { duration: OUT.panel, easing: Easing.in(Easing.cubic) },
       (finished) => {
         if (finished) runOnJS(setMounted)(false);
       },
     );
-  }, [visible, progress]);
+  }, [visible, scrim, slide]);
 
-  const scrimStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
-  // The bundle's keyframe starts the panel at .6 opacity, which is right for an
-  // entrance and wrong reused as an exit: the sheet ended 40px lower and still
-  // 60% visible, and then the Modal unmounted. That hard cut at the end is what
-  // read as sticking. It fades the whole way now.
+  const scrimStyle = useAnimatedStyle(() => ({ opacity: scrim.value }));
   const panelStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ translateY: (1 - progress.value) * RISE_PX }],
+    transform: [{ translateY: slide.value }],
   }));
 
   if (!mounted) return null;
