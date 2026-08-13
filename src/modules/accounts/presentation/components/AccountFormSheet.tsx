@@ -6,7 +6,6 @@ import type { CurrencyCode } from '@/shared/domain';
 import {
   AmountSheet,
   SheetDangerAction,
-  SheetFieldRow,
   SheetHeaderButton,
   Text,
 } from '@/shared/presentation/components';
@@ -34,9 +33,6 @@ type Props = {
 };
 
 const KINDS: AccountKind[] = ['debit', 'cash'];
-
-/** Which row has the system keyboard. */
-type Field = 'name' | 'sub' | null;
 
 /**
  * An account — `CREAR`, the sheet the design draws once for subscription,
@@ -73,7 +69,6 @@ export function AccountFormSheet({
   const [name, setName] = useState('');
   const [sub, setSub] = useState('');
   const [digits, setDigits] = useState('');
-  const [typing, setTyping] = useState<Field>(null);
 
   useEffect(() => {
     if (!visible) return;
@@ -81,7 +76,6 @@ export function AccountFormSheet({
     setName(account?.name ?? '');
     setSub(account?.sub ?? '');
     setDigits(account ? String(Math.max(0, account.balance)) : '');
-    setTyping(null);
   }, [visible, account]);
 
   const valid = name.trim().length >= 2;
@@ -93,6 +87,7 @@ export function AccountFormSheet({
       digits={digits}
       onDigits={setDigits}
       currency={currency}
+      keyboard="system"
       label={t('accounts.form.balance')}
       help={t('accounts.form.balanceHelp')}
       primaryLabel={t('accounts.form.save')}
@@ -166,57 +161,62 @@ export function AccountFormSheet({
         </>
       }
     >
-      <SheetFieldRow label={t('accounts.form.name')} onPress={() => setTyping('name')}>
-        <RowInput
-          editing={typing === 'name'}
-          value={name}
-          placeholder={t('accounts.form.namePlaceholder')}
-          onChangeText={setName}
-          onBlur={() => setTyping(null)}
-        />
-      </SheetFieldRow>
-
-      <SheetFieldRow label={t('accounts.form.sub')} onPress={() => setTyping('sub')}>
-        <RowInput
-          editing={typing === 'sub'}
-          value={sub}
-          placeholder={t('accounts.form.subPlaceholder')}
-          onChangeText={setSub}
-          onBlur={() => setTyping(null)}
-        />
-      </SheetFieldRow>
+      <TextRow
+        label={t('accounts.form.name')}
+        value={name}
+        placeholder={t('accounts.form.namePlaceholder')}
+        onChangeText={setName}
+      />
+      <TextRow
+        label={t('accounts.form.sub')}
+        value={sub}
+        placeholder={t('accounts.form.subPlaceholder')}
+        onChangeText={setSub}
+      />
     </AmountSheet>
   );
 }
 
-/** A row that types. The system keyboard is fine here — these are words, not
- *  money, and the row sits near the top of the sheet so it stays visible above
- *  whatever the keyboard covers. */
-function RowInput({
-  editing,
+/** A row that types. Always a live field — with the system keyboard there is no
+ *  reason to make someone tap twice to start writing a name. */
+function TextRow({
+  label,
   value,
   placeholder,
   onChangeText,
-  onBlur,
 }: {
-  editing: boolean;
+  label: string;
   value: string;
   placeholder: string;
   onChangeText: (next: string) => void;
-  onBlur: () => void;
 }) {
   const { theme } = useTheme();
 
-  if (editing) {
-    return (
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        minHeight: 44,
+        paddingHorizontal: 16,
+        paddingVertical: 13,
+        borderRadius: 16,
+        backgroundColor: theme.colors.bgSurface,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
+      }}
+    >
+      <Text color={theme.colors.textTertiary} style={{ fontSize: 13.5 }}>
+        {label}
+      </Text>
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.textTertiary}
-        autoFocus
         maxLength={40}
-        onBlur={onBlur}
+        selectionColor={theme.palette.acc}
         style={{
           flex: 1,
           textAlign: 'right',
@@ -226,16 +226,6 @@ function RowInput({
           padding: 0,
         }}
       />
-    );
-  }
-
-  return (
-    <Text
-      numberOfLines={1}
-      color={value ? theme.colors.textPrimary : theme.colors.textTertiary}
-      style={{ flex: 1, textAlign: 'right', fontSize: 13.5 }}
-    >
-      {value || placeholder}
-    </Text>
+    </View>
   );
 }

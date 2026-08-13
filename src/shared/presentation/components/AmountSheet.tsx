@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, View } from 'react-native';
+import { Modal, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { CurrencyCode } from '@/shared/domain';
 
+import { useKeyboardInset } from '../hooks/useKeyboardInset';
 import { useTheme } from '../theme';
 import { withAlpha } from '../theme/tokens';
 
@@ -57,6 +58,19 @@ type Props = {
    * race whichever delay you pick, and it lost.
    */
   replaceBody?: React.ReactNode;
+  /**
+   * Which keyboard the sheet is built around.
+   *
+   * `pad` is the design's: the app's own number pad, pinned to the bottom, which
+   * is what lets the layout be a fixed height. It only holds while EVERYTHING in
+   * the sheet is a number.
+   *
+   * `system` is for sheets that also take words. A pad cannot type a name, and
+   * one sitting where the name field should be is worse than no pad — so the
+   * sheet sizes to its content, every field is a real input, and the whole thing
+   * rides above the system keyboard instead of being covered by it.
+   */
+  keyboard?: 'pad' | 'system';
 };
 
 /**
@@ -96,9 +110,12 @@ export function AmountSheet({
   primaryDisabled = false,
   onMic,
   replaceBody,
+  keyboard = 'pad',
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const lift = useKeyboardInset();
+  const system = keyboard === 'system';
 
   return (
     <Modal
@@ -119,12 +136,18 @@ export function AmountSheet({
         </Scrim>
 
         <View
+          onLayout={lift.onLayout}
           style={{
             position: 'absolute',
             left: 0,
             right: 0,
             bottom: 0,
-            top: SHEET_TOP,
+            // The pad's height is known, so its sheet is pinned and never moves.
+            // A system keyboard is a different height on every device, so that
+            // sheet sizes to its content and is lifted clear of it instead.
+            ...(system
+              ? { maxHeight: '94%', paddingBottom: lift.paddingBottom }
+              : { top: SHEET_TOP }),
             borderTopLeftRadius: 34,
             borderTopRightRadius: 34,
             // Opaque, unlike the app's cards: a panel with its own content has to
@@ -134,7 +157,7 @@ export function AmountSheet({
             borderTopColor: theme.colors.borderDefault,
           }}
         >
-          <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+          <SafeAreaView style={system ? undefined : { flex: 1 }} edges={['bottom']}>
             <View
               style={{
                 width: 38,
@@ -160,6 +183,55 @@ export function AmountSheet({
 
             {replaceBody !== undefined ? (
               <View style={{ flex: 1 }}>{replaceBody}</View>
+            ) : system ? (
+              <>
+                <ScrollView
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ paddingBottom: 4 }}
+                >
+                  <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
+                    {label !== undefined ? (
+                      <Text
+                        variant="micro"
+                        uppercase
+                        color={theme.colors.textTertiary}
+                        style={{ letterSpacing: 2.2, marginBottom: 9 }}
+                      >
+                        {label}
+                      </Text>
+                    ) : null}
+                    <KeypadAmount
+                      digits={digits}
+                      currency={currency}
+                      sign={sign}
+                      size={size}
+                      color={amountColor}
+                      symbol={symbol}
+                      onChangeDigits={onDigits}
+                    />
+                    {help !== undefined ? (
+                      <Text
+                        color={theme.colors.textTertiary}
+                        style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
+                      >
+                        {help}
+                      </Text>
+                    ) : null}
+                  </View>
+                  {children !== undefined ? (
+                    <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
+                      {children}
+                    </View>
+                  ) : null}
+                </ScrollView>
+                <Footer
+                  primaryLabel={primaryLabel}
+                  onPrimary={onPrimary}
+                  primaryDisabled={primaryDisabled}
+                  onMic={onMic}
+                />
+              </>
             ) : (
               <>
                 <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
@@ -204,73 +276,90 @@ export function AmountSheet({
                   />
                 </View>
 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 10,
-                    paddingHorizontal: 20,
-                    paddingTop: 16,
-                    paddingBottom: 32,
-                  }}
-                >
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityState={{ disabled: primaryDisabled }}
-                    onPress={onPrimary}
-                    disabled={primaryDisabled}
-                    style={({ pressed }) => ({
-                      flex: 1,
-                      minHeight: 52,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 18,
-                      // The one solid, un-tinted surface: the last thing you touch
-                      // and the only one that changes anything.
-                      backgroundColor: theme.colors.textPrimary,
-                      opacity: primaryDisabled ? 0.4 : pressed ? 0.9 : 1,
-                    })}
-                  >
-                    <Text
-                      color={theme.colors.bgBase}
-                      style={{ fontSize: 14, fontWeight: '600' }}
-                    >
-                      {primaryLabel}
-                    </Text>
-                  </Pressable>
-
-                  {onMic !== undefined ? (
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={t('expenses.voice.mic')}
-                      onPress={onMic}
-                      style={({ pressed }) => ({
-                        width: 54,
-                        height: 54,
-                        borderRadius: 27,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: withAlpha(theme.palette.acc, 0.16),
-                        borderWidth: 1,
-                        borderColor: withAlpha(theme.palette.acc, 0.22),
-                        opacity: pressed ? 0.8 : 1,
-                      })}
-                    >
-                      <Icon
-                        name="microphone"
-                        size={22}
-                        stroke={1.8}
-                        color={theme.palette.acc}
-                      />
-                    </Pressable>
-                  ) : null}
-                </View>
+                <Footer
+                  primaryLabel={primaryLabel}
+                  onPrimary={onPrimary}
+                  primaryDisabled={primaryDisabled}
+                  onMic={onMic}
+                />
               </>
             )}
           </SafeAreaView>
         </View>
       </View>
     </Modal>
+  );
+}
+
+/** Save, and — only where speaking makes sense — the microphone beside it. */
+function Footer({
+  primaryLabel,
+  onPrimary,
+  primaryDisabled,
+  onMic,
+}: {
+  primaryLabel: string;
+  onPrimary: () => void;
+  primaryDisabled: boolean;
+  onMic?: () => void;
+}) {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        paddingBottom: 32,
+      }}
+    >
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled: primaryDisabled }}
+        onPress={onPrimary}
+        disabled={primaryDisabled}
+        style={({ pressed }) => ({
+          flex: 1,
+          minHeight: 52,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 18,
+          // The one solid, un-tinted surface: the last thing you touch and the
+          // only one that changes anything.
+          backgroundColor: theme.colors.textPrimary,
+          opacity: primaryDisabled ? 0.4 : pressed ? 0.9 : 1,
+        })}
+      >
+        <Text color={theme.colors.bgBase} style={{ fontSize: 14, fontWeight: '600' }}>
+          {primaryLabel}
+        </Text>
+      </Pressable>
+
+      {onMic !== undefined ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('expenses.voice.mic')}
+          onPress={onMic}
+          style={({ pressed }) => ({
+            width: 54,
+            height: 54,
+            borderRadius: 27,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: withAlpha(theme.palette.acc, 0.16),
+            borderWidth: 1,
+            borderColor: withAlpha(theme.palette.acc, 0.22),
+            opacity: pressed ? 0.8 : 1,
+          })}
+        >
+          <Icon name="microphone" size={22} stroke={1.8} color={theme.palette.acc} />
+        </Pressable>
+      ) : null}
+    </View>
   );
 }
 

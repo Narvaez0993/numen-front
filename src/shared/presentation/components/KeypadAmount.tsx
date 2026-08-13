@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { TextInput, View } from 'react-native';
 
 import type { CurrencyCode } from '@/shared/domain';
 
@@ -25,6 +25,11 @@ type Props = {
   /** Replaces the currency symbol. `''` for a field that is not money — the day
    *  of the month is typed on the same pad and a `$` in front of it is a lie. */
   symbol?: string;
+  /** Takes the system keyboard instead of the app's pad. Sheets that also hold
+   *  WORDS use this: a pad cannot type a name, and one that covers the field you
+   *  are trying to name is worse than no pad at all. */
+  onChangeDigits?: (next: string) => void;
+  autoFocus?: boolean;
 };
 
 /**
@@ -46,38 +51,81 @@ export function KeypadAmount({
   color,
   size = 'sheet',
   symbol,
+  onChangeDigits,
+  autoFocus = false,
 }: Props) {
   const { theme } = useTheme();
   const s = SIZES[size];
   const tint = color ?? theme.colors.textPrimary;
+  const shown = symbol === '' ? digits : formatAmountDigits(digits, currency);
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-      <Text color={tint} style={{ fontSize: s.sign, fontWeight: '300' }}>
+      <Text
+        color={tint}
+        style={{
+          fontSize: s.sign,
+          fontWeight: '300',
+          // A TextInput lays its text out inside its own box, so `baseline`
+          // leaves the symbol sitting slightly under the digits. Measured on a
+          // 46px hero and kept proportional, so it holds at both sizes.
+          marginBottom: onChangeDigits === undefined ? 0 : s.digits * 0.1,
+        }}
+      >
         {sign}
         {symbol ?? currencySymbol(currency)}
       </Text>
-      <Text
-        tabular
-        color={tint}
-        style={{
-          fontSize: s.digits,
-          fontWeight: '500',
-          letterSpacing: s.tracking,
-          lineHeight: s.digits,
-        }}
-      >
-        {symbol === '' ? digits || '0' : formatAmountDigits(digits, currency) || '0'}
-      </Text>
-      <View
-        style={{
-          width: 2,
-          height: s.caret,
-          marginLeft: 2,
-          borderRadius: 1,
-          backgroundColor: theme.palette.acc,
-        }}
-      />
+
+      {onChangeDigits === undefined ? (
+        <Text
+          tabular
+          color={tint}
+          style={{
+            fontSize: s.digits,
+            fontWeight: '500',
+            letterSpacing: s.tracking,
+            lineHeight: s.digits,
+          }}
+        >
+          {shown || '0'}
+        </Text>
+      ) : (
+        <TextInput
+          value={shown}
+          onChangeText={(next) => onChangeDigits(next.replace(/\D/g, ''))}
+          keyboardType="number-pad"
+          placeholder="0"
+          placeholderTextColor={theme.colors.textTertiary}
+          autoFocus={autoFocus}
+          selectionColor={theme.palette.acc}
+          // No lineHeight: a TextInput lays its text out inside its own box, and
+          // forcing one moves the baseline away from the symbol beside it. Left
+          // alone, the platform's metrics line the two up.
+          style={{
+            flex: 1,
+            padding: 0,
+            fontSize: s.digits,
+            letterSpacing: s.tracking,
+            color: tint,
+            fontFamily: 'Geist_500Medium',
+            fontVariant: ['tabular-nums'],
+            includeFontPadding: false,
+          }}
+        />
+      )}
+
+      {/* The drawn caret is the pad's — a real field brings the system's own. */}
+      {onChangeDigits === undefined ? (
+        <View
+          style={{
+            width: 2,
+            height: s.caret,
+            marginLeft: 2,
+            borderRadius: 1,
+            backgroundColor: theme.palette.acc,
+          }}
+        />
+      ) : null}
     </View>
   );
 }

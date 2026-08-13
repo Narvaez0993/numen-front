@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 
 import type { CurrencyCode } from '@/shared/domain';
 import {
   AmountSheet,
   SheetDangerAction,
-  SheetFieldRow,
   SheetHeaderButton,
   Text,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
-import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { CreditCard } from '../../domain';
@@ -36,27 +34,19 @@ type Props = {
   onDelete: () => void;
 };
 
-/** Which number the pad is typing into. The sheet has four and there is one pad. */
-type Slot = 'debt' | 'limit' | 'cutoff' | 'due';
-
-const DAY_DIGITS = 2;
+const onlyDigits = (value: string) => value.replace(/[^0-9]/g, '');
 
 /**
- * A credit card — `CREAR` again, with four numbers instead of one.
+ * A credit card — `CREAR`'s shape with the system keyboard under it.
  *
- * The design draws one big amount and a couple of rows, which is exactly right
- * for a cap and looks impossible for a card. The resolution is that **the hero
- * is whichever number you are editing**: tapping a row promotes it, the label
- * above changes to name it, and the pad types into it. The rows carry the rest.
+ * It briefly had the app's number pad and a trick where tapping a row promoted
+ * it to the hero, because there were four numbers and one pad. The trick was
+ * clever and wrong: it existed to work around a constraint that only made sense
+ * for sheets holding nothing but numbers, and this one also holds a name. Every
+ * field is live now, which needs no explaining to anybody.
  *
- * That is a better fit than four boxes, and not only visually. A card is read as
- * a relationship — this much owed against that much allowed, closing on that day
- * — so the sheet always shows one number large with the others beside it, which
- * is the shape of the question rather than the shape of a database row.
- *
- * The day fields ride the same pad with no currency symbol and a two-digit
- * ceiling. The pad is this app's one way of typing numbers, and a `$` in front
- * of "15" would be a lie.
+ * The debt keeps the hero because it is the number that changes — the limit and
+ * the two days are set once and read for years.
  */
 export function CardFormSheet({
   visible,
@@ -67,17 +57,14 @@ export function CardFormSheet({
   onSave,
   onDelete,
 }: Props) {
-  const { theme } = useTheme();
   const { t } = useTranslation();
   const editing = card != null;
 
   const [name, setName] = useState('');
-  const [typingName, setTypingName] = useState(false);
   const [debtDigits, setDebtDigits] = useState('');
   const [limitDigits, setLimitDigits] = useState('');
   const [cutoff, setCutoff] = useState('');
   const [due, setDue] = useState('');
-  const [slot, setSlot] = useState<Slot>('debt');
 
   useEffect(() => {
     if (!visible) return;
@@ -86,8 +73,6 @@ export function CardFormSheet({
     setLimitDigits(card ? String(card.limit) : '');
     setCutoff(card ? String(card.cutoffDay) : '');
     setDue(card?.dueDay ? String(card.dueDay) : '');
-    setSlot('debt');
-    setTypingName(false);
   }, [visible, card]);
 
   const debt = Number(debtDigits || '0');
@@ -106,40 +91,16 @@ export function CardFormSheet({
     dayInMonth(cutoffDay) &&
     (dueDay === null ? !dueRequired : dayInMonth(dueDay));
 
-  const money = (digits: string) =>
-    digits ? formatMoney(Number(digits), currency) : '—';
-  const dayLabel = (value: string) => value || '—';
-
-  const HERO: Record<Slot, { label: string; digits: string; set: (v: string) => void }> =
-    {
-      debt: { label: t('accounts.form.debt'), digits: debtDigits, set: setDebtDigits },
-      limit: {
-        label: t('accounts.form.limit'),
-        digits: limitDigits,
-        set: setLimitDigits,
-      },
-      cutoff: { label: t('accounts.form.cutoffDay'), digits: cutoff, set: setCutoff },
-      due: { label: t('accounts.form.dueDay'), digits: due, set: setDue },
-    };
-  const hero = HERO[slot];
-  const isDay = slot === 'cutoff' || slot === 'due';
-
   return (
     <AmountSheet
       visible={visible}
       onClose={onClose}
-      digits={hero.digits}
-      onDigits={hero.set}
+      digits={debtDigits}
+      onDigits={setDebtDigits}
       currency={currency}
-      symbol={isDay ? '' : undefined}
-      maxDigits={isDay ? DAY_DIGITS : undefined}
-      label={hero.label}
-      help={
-        debtExceedsLimit
-          ? t('accounts.form.debtExceedsLimit')
-          : t('accounts.form.cardHelp')
-      }
-      amountColor={debtExceedsLimit ? theme.colors.accentCoral : undefined}
+      keyboard="system"
+      label={t('accounts.form.debt')}
+      help={debtExceedsLimit ? t('accounts.form.debtExceedsLimit') : undefined}
       primaryLabel={t('accounts.form.save')}
       primaryDisabled={!valid || submitting}
       onPrimary={() => onSave({ name: name.trim(), debt, limit, cutoffDay, dueDay })}
@@ -159,85 +120,58 @@ export function CardFormSheet({
         </>
       }
     >
-      <SheetFieldRow label={t('accounts.form.name')} onPress={() => setTypingName(true)}>
-        {typingName ? (
-          <TextInput
-            value={name}
-            onChangeText={setName}
-            placeholder={t('accounts.form.cardNamePlaceholder')}
-            placeholderTextColor={theme.colors.textTertiary}
-            autoFocus
-            maxLength={40}
-            onBlur={() => setTypingName(false)}
-            style={{
-              flex: 1,
-              textAlign: 'right',
-              fontSize: 13.5,
-              color: theme.colors.textPrimary,
-              fontFamily: 'Geist_400Regular',
-              padding: 0,
-            }}
-          />
-        ) : (
-          <Text
-            numberOfLines={1}
-            color={name ? theme.colors.textPrimary : theme.colors.textTertiary}
-            style={{ flex: 1, textAlign: 'right', fontSize: 13.5 }}
-          >
-            {name || t('accounts.form.cardNamePlaceholder')}
-          </Text>
-        )}
-      </SheetFieldRow>
+      <FieldRow label={t('accounts.form.name')}>
+        <RowInput
+          value={name}
+          placeholder={t('accounts.form.cardNamePlaceholder')}
+          onChangeText={setName}
+        />
+      </FieldRow>
 
-      <SlotRow
-        label={t('accounts.form.debt')}
-        value={money(debtDigits)}
-        active={slot === 'debt'}
-        onPress={() => setSlot('debt')}
-      />
-      <SlotRow
-        label={t('accounts.form.limit')}
-        value={money(limitDigits)}
-        active={slot === 'limit'}
-        onPress={() => setSlot('limit')}
-      />
-      <SlotRow
-        label={t('accounts.form.cutoffDay')}
-        value={dayLabel(cutoff)}
-        active={slot === 'cutoff'}
-        onPress={() => setSlot('cutoff')}
-      />
-      <SlotRow
-        label={t('accounts.form.dueDay')}
-        value={dayLabel(due)}
-        active={slot === 'due'}
-        onPress={() => setSlot('due')}
-      />
+      <FieldRow label={t('accounts.form.limit')}>
+        <RowInput
+          value={limitDigits ? formatMoney(limit, currency) : ''}
+          placeholder="—"
+          numeric
+          onChangeText={(next) => setLimitDigits(onlyDigits(next))}
+        />
+      </FieldRow>
+
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <FieldRow label={t('accounts.form.cutoffDay')}>
+            <RowInput
+              value={cutoff}
+              placeholder="—"
+              numeric
+              maxLength={2}
+              onChangeText={(next) => setCutoff(onlyDigits(next).slice(0, 2))}
+            />
+          </FieldRow>
+        </View>
+        <View style={{ flex: 1 }}>
+          <FieldRow label={t('accounts.form.dueDay')}>
+            <RowInput
+              value={due}
+              placeholder="—"
+              numeric
+              maxLength={2}
+              onChangeText={(next) => setDue(onlyDigits(next).slice(0, 2))}
+            />
+          </FieldRow>
+        </View>
+      </View>
     </AmountSheet>
   );
 }
 
-/** A number the pad can be pointed at. The active one is marked, because the
- *  hero above is otherwise the only clue about where the digits are landing. */
-function SlotRow({
-  label,
-  value,
-  active,
-  onPress,
-}: {
-  label: string;
-  value: string;
-  active: boolean;
-  onPress: () => void;
-}) {
+/** A labelled row with a live field in it. */
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   const { theme } = useTheme();
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
-      onPress={onPress}
-      style={({ pressed }) => ({
+    <View
+      style={{
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
@@ -245,29 +179,51 @@ function SlotRow({
         paddingHorizontal: 16,
         paddingVertical: 13,
         borderRadius: 16,
-        backgroundColor: active
-          ? withAlpha(theme.palette.acc, 0.15)
-          : theme.colors.bgSurface,
+        backgroundColor: theme.colors.bgSurface,
         borderWidth: 1,
-        borderColor: active
-          ? withAlpha(theme.palette.acc, 0.3)
-          : theme.colors.borderSubtle,
-        opacity: pressed ? 0.85 : 1,
-      })}
+        borderColor: theme.colors.borderSubtle,
+      }}
     >
-      <Text
-        color={active ? theme.palette.acc2 : theme.colors.textTertiary}
-        style={{ flex: 1, fontSize: 13.5 }}
-      >
+      <Text color={theme.colors.textTertiary} style={{ fontSize: 13.5 }}>
         {label}
       </Text>
-      <Text
-        tabular
-        color={active ? theme.palette.acc2 : theme.colors.textPrimary}
-        style={{ fontSize: 13.5 }}
-      >
-        {value}
-      </Text>
-    </Pressable>
+      {children}
+    </View>
+  );
+}
+
+function RowInput({
+  value,
+  placeholder,
+  numeric = false,
+  maxLength = 40,
+  onChangeText,
+}: {
+  value: string;
+  placeholder: string;
+  numeric?: boolean;
+  maxLength?: number;
+  onChangeText: (next: string) => void;
+}) {
+  const { theme } = useTheme();
+
+  return (
+    <TextInput
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor={theme.colors.textTertiary}
+      keyboardType={numeric ? 'number-pad' : 'default'}
+      maxLength={maxLength}
+      selectionColor={theme.palette.acc}
+      style={{
+        flex: 1,
+        textAlign: 'right',
+        fontSize: 13.5,
+        color: theme.colors.textPrimary,
+        fontFamily: 'Geist_400Regular',
+        padding: 0,
+      }}
+    />
   );
 }
