@@ -52,7 +52,7 @@ export function BudgetsHeader({ monthName, target, currency, onEditCeiling }: Pr
           numberOfLines={1}
           style={{ fontSize: 29, fontWeight: '300', letterSpacing: -1 }}
         >
-          {monthName}
+          {monthName.charAt(0).toUpperCase() + monthName.slice(1)}
         </Text>
       </View>
 

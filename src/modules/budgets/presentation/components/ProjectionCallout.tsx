@@ -50,7 +50,7 @@ export function ProjectionCallout({ cap, currency }: Props) {
         {t('budgets.projection.willEnd')}{' '}
         <Text tabular style={{ fontSize: 14.5, fontWeight: '500' }}>
           {formatMoney(cap.projected, currency)}
-        </Text>
+        </Text>{' '}
         {t('budgets.projection.atClose')}{' '}
         {t(over ? 'budgets.projection.overBy' : 'budgets.projection.underBy', {
           amount: formatMoney(gap, currency),

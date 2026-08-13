@@ -218,8 +218,7 @@ export function AccountsScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.bgBase }}>
-      <Aurora />
+    <Aurora>
       <ScrollView
         contentContainerStyle={{
           paddingTop: insets.top + 16,
@@ -455,6 +454,6 @@ export function AccountsScreen() {
         message={toast ?? ''}
         onDismiss={() => setToast(null)}
       />
-    </View>
+    </Aurora>
   );
 }

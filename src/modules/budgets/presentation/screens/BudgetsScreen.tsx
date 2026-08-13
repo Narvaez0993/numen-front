@@ -263,8 +263,10 @@ export function BudgetsScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.bgBase }}>
-      <Aurora />
+    // `Aurora` WRAPS — it is a flex:1 container that paints the blooms behind its
+    // children, not a backdrop layer. Rendered as a sibling it takes half the
+    // screen and leaves the scroll the other half.
+    <Aurora>
       <ScrollView
         contentContainerStyle={{
           paddingTop: insets.top + 18,
@@ -423,6 +425,6 @@ export function BudgetsScreen() {
         onConfirm={confirmDelete}
         onClose={() => setConfirm(null)}
       />
-    </View>
+    </Aurora>
   );
 }
