@@ -39,7 +39,7 @@ export function SubscriptionRow({
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
 
-  const { name, amount, currency, nextChargeOn, active } = subscription;
+  const { name, amount, currency, frequency, nextChargeOn, active } = subscription;
   const days = nextChargeOn === null ? null : daysBetween(today, nextChargeOn);
   // Nothing left to charge this cycle: the date has passed, so it is behind us.
   const charged = days !== null && days < 0;
@@ -112,7 +112,19 @@ export function SubscriptionRow({
           color={theme.colors.textTertiary}
           style={{ fontSize: 11, marginTop: 2 }}
         >
-          {[when, sourceName].filter(Boolean).join(' · ')}
+          {/* The cadence, unless it is the assumed one. Without it a weekly
+              $120.000 sits under a monthly total of $520.000 and reads as the
+              app contradicting itself — the total is right; the row was the
+              one keeping a secret. */}
+          {[
+            when,
+            frequency === 'monthly'
+              ? null
+              : t(`subscriptions.form.cadences.${frequency}`).toLowerCase(),
+            sourceName,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
         </Text>
       </View>
 
