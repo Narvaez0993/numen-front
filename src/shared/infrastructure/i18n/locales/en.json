@@ -335,13 +335,20 @@
       "title_one": "{{count}} charge to confirm",
       "title_other": "{{count}} charges to confirm",
       "hint": "If you do not answer within 3 hours we register it for you. You can always delete the movement afterwards.",
-      "dueToday": "Due today",
+      "dueToday": "was due today",
       "overdue": "Was due on {{date}}",
       "confirm": "Yes, I was charged",
       "skip": "Did not happen",
-      "unknown": "Subscription"
+      "unknown": "Subscription",
+      "question": "Has {{name}} charged you?",
+      "dueAgo_one": "due {{count}} day ago",
+      "dueAgo_other": "due {{count}} days ago",
+      "dueIn_one": "due in {{count}} day",
+      "dueIn_other": "due in {{count}} days",
+      "yes": "Yes, it did",
+      "notYet": "Not yet"
     },
-    "add": "Add subscription",
+    "add": "Add another subscription",
     "empty": "No subscriptions yet. Add the first one to see what leaves every month.",
     "footer": "A subscription is a forecast: on the due date we ask before registering it.",
     "form": {
@@ -362,15 +369,21 @@
       "category": "Category",
       "noSource": "Pick an account",
       "noCategory": "No category",
-      "pause": "Pause charges",
-      "resume": "Resume charges",
+      "pause": "Pause this subscription",
+      "resume": "Resume it",
       "save": "Save",
       "delete": "Delete",
       "deleteConfirmTitle": "Delete {{name}}?",
-      "deleteConfirm": "Yes, delete",
+      "deleteConfirm": "Sure?",
       "cancel": "Cancel",
       "tomorrow": "Tomorrow",
-      "pickDate": "Pick a date…"
+      "pickDate": "Pick a date…",
+      "amountLabel": {
+        "weekly": "Every week",
+        "monthly": "Every month",
+        "yearly": "Every year"
+      },
+      "help": "Deshka asks you on the day before recording the charge."
     },
     "error": {
       "title": "We could not load your subscriptions.",
@@ -382,6 +395,19 @@
       "deleteFailed": "We could not delete it.",
       "alreadySettled": "That charge was already registered.",
       "currencyMismatch": "That account is registered in another currency. Check it in Accounts first."
+    },
+    "hero": {
+      "label": "Every month",
+      "summary_one": "{{count}} active · {{amount}} a year",
+      "summary_other": "{{count}} active · {{amount}} a year"
+    },
+    "activeLabel": "Active",
+    "row": {
+      "charged": "Charged",
+      "today": "Due today",
+      "inDays_one": "In {{count}} day",
+      "inDays_other": "In {{count}} days",
+      "paused": "Paused"
     }
   },
   "accounts": {

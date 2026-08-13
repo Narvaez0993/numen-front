@@ -335,13 +335,20 @@
       "title_one": "{{count}} cobro por confirmar",
       "title_other": "{{count}} cobros por confirmar",
       "hint": "Si no respondes en 3 horas lo registramos por ti. Siempre puedes borrar el movimiento después.",
-      "dueToday": "Se cobra hoy",
+      "dueToday": "vencía hoy",
       "overdue": "Vencía el {{date}}",
       "confirm": "Sí, me cobraron",
       "skip": "No pasó",
-      "unknown": "Suscripción"
+      "unknown": "Suscripción",
+      "question": "¿{{name}} ya te cobró?",
+      "dueAgo_one": "vencía hace {{count}} día",
+      "dueAgo_other": "vencía hace {{count}} días",
+      "dueIn_one": "vence en {{count}} día",
+      "dueIn_other": "vence en {{count}} días",
+      "yes": "Sí, me cobró",
+      "notYet": "Todavía no"
     },
-    "add": "Agregar suscripción",
+    "add": "Anotar otra suscripción",
     "empty": "Aún no registras suscripciones. Agrega la primera y verás cuánto se te va cada mes.",
     "footer": "Una suscripción es un pronóstico: el día del cobro te preguntamos antes de registrarlo.",
     "form": {
@@ -362,15 +369,21 @@
       "category": "Categoría",
       "noSource": "Elige una cuenta",
       "noCategory": "Sin categoría",
-      "pause": "Pausar cobros",
-      "resume": "Reactivar cobros",
+      "pause": "Pausar esta suscripción",
+      "resume": "Reactivarla",
       "save": "Guardar",
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Eliminar {{name}}?",
-      "deleteConfirm": "Sí, eliminar",
+      "deleteConfirm": "¿Seguro?",
       "cancel": "Cancelar",
       "tomorrow": "Mañana",
-      "pickDate": "Elegir fecha…"
+      "pickDate": "Elegir fecha…",
+      "amountLabel": {
+        "weekly": "Cada semana",
+        "monthly": "Cada mes",
+        "yearly": "Cada año"
+      },
+      "help": "Deshka te pregunta el día del cobro antes de registrarlo."
     },
     "error": {
       "title": "No pudimos cargar tus suscripciones.",
@@ -382,6 +395,19 @@
       "deleteFailed": "No pudimos eliminarla.",
       "alreadySettled": "Ese cobro ya se registró.",
       "currencyMismatch": "Esa cuenta está registrada en otra moneda. Revísala en Cuentas antes de usarla aquí."
+    },
+    "hero": {
+      "label": "Todos los meses",
+      "summary_one": "{{count}} activa · {{amount}} al año",
+      "summary_other": "{{count}} activas · {{amount}} al año"
+    },
+    "activeLabel": "Activas",
+    "row": {
+      "charged": "Cobrado",
+      "today": "Vence hoy",
+      "inDays_one": "En {{count}} día",
+      "inDays_other": "En {{count}} días",
+      "paused": "Pausada"
     }
   },
   "accounts": {
