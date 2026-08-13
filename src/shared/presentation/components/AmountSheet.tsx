@@ -36,10 +36,16 @@ const SHEET_TOP = 150;
  * settles into a place it was nearly at already, which is what makes it read as
  * arriving rather than as being thrown. */
 const RISE_PX = 40;
-const IN_MS = 260;
-/** Leaving is quicker than arriving. Waiting to get out of the way is the one
- *  thing an animation should never make you do. */
-const OUT_MS = 180;
+
+/**
+ * Both ways, the same curve and the same time.
+ *
+ * Leaving used to be shorter (180ms against 260) and read as SLOWER, which is
+ * the useful part: it eased IN, so at half the animation the sheet had moved
+ * about 12% of the way. It looked frozen and then vanished. The clock was never
+ * the problem — a curve that starts still is.
+ */
+const DURATION_MS = 260;
 
 type Props = {
   visible: boolean;
@@ -147,14 +153,14 @@ export function AmountSheet({
     if (visible) {
       setMounted(true);
       progress.value = withTiming(1, {
-        duration: IN_MS,
+        duration: DURATION_MS,
         easing: Easing.out(Easing.cubic),
       });
       return;
     }
     progress.value = withTiming(
       0,
-      { duration: OUT_MS, easing: Easing.in(Easing.cubic) },
+      { duration: DURATION_MS, easing: Easing.out(Easing.cubic) },
       (finished) => {
         if (finished) runOnJS(setMounted)(false);
       },
