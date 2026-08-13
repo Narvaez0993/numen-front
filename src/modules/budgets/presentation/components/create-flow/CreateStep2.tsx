@@ -1,11 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
-import { Icon, IconBox, SectionLabel, Text } from '@/shared/presentation/components';
+import {
+  DashedButton,
+  Icon,
+  IconBox,
+  SectionLabel,
+  Text,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
-
-import { DashedButton } from '../DashedButton';
 
 import type { CandidateCategory } from '../../hooks/useWatchedCategories';
 

@@ -1,24 +1,32 @@
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
-import { Icon, Text } from '@/shared/presentation/components';
+import type { CurrencyCode } from '@/shared/domain';
+import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Cap } from '../../domain';
 
-type Props = { cap: Cap };
+type Props = { cap: Cap; currency: CurrencyCode };
 
 /**
- * Where the month lands, compared to the cap — the sentence that makes having both
- * numbers worth it.
+ * Where the month lands, in a sentence.
  *
- * It has two faces because the projection has two outcomes. It used to have one: an amber
- * alert triangle reading "you will end at $X" no matter what, which over a month closing
- * *inside* its cap was a warning about nothing. A `null` projection (the first days of a
- * month, when a single bill would forecast a month of them) renders nothing at all.
+ * The redesign took the colour out of it, and that is the point. It used to be
+ * an amber block with an alert triangle whenever a projection existed — over a
+ * month closing *inside* its cap, a warning about nothing. Then a mint block
+ * with a tick, which is a congratulation for being on the 12th.
+ *
+ * Now the two outcomes differ in what the sentence SAYS, not in what colour it
+ * is. A card that changes colour trains you to read the colour; a card that
+ * always looks the same makes you read the words, which are the part that
+ * actually knows something.
+ *
+ * A `null` projection renders nothing at all: in the first days of a month a
+ * single bill would forecast a month of them.
  */
-export function ProjectionCallout({ cap }: Props) {
+export function ProjectionCallout({ cap, currency }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -26,55 +34,28 @@ export function ProjectionCallout({ cap }: Props) {
 
   const over = cap.over !== null;
   const gap = cap.over ?? cap.target - cap.projected;
-  const accent = over ? theme.colors.accentAmber : theme.colors.accentMint;
 
   return (
     <View
       style={{
-        flexDirection: 'row',
-        gap: 12,
-        backgroundColor: over ? theme.colors.accentAmberBg : theme.colors.accentMintBg,
-        borderColor: over ? 'rgba(255, 181, 71, 0.18)' : 'rgba(94, 234, 190, 0.18)',
+        padding: 15,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        backgroundColor: theme.colors.bgSurface,
         borderWidth: 1,
-        borderRadius: 16,
-        padding: 14,
+        borderColor: theme.colors.borderSubtle,
       }}
     >
-      <View
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: 10,
-          backgroundColor: accent,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Icon
-          name={over ? 'alert-triangle' : 'check'}
-          size={18}
-          color={theme.colors.bgBase}
-          stroke={1.9}
-        />
-      </View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text variant="label" style={{ fontSize: 12.5, marginBottom: 2 }}>
-          {t('budgets.projection.willEnd')}{' '}
-          <Text variant="label" color={accent} tabular style={{ fontSize: 12.5 }}>
-            {formatMoney(cap.projected)}
-          </Text>
+      <Text style={{ fontSize: 14.5, lineHeight: 22.5, fontWeight: '300' }}>
+        {t('budgets.projection.willEnd')}{' '}
+        <Text tabular style={{ fontSize: 14.5, fontWeight: '500' }}>
+          {formatMoney(cap.projected, currency)}
         </Text>
-        <Text
-          variant="caption"
-          color={theme.colors.textSecondary}
-          style={{ fontSize: 11.5 }}
-        >
-          <Text variant="caption" tabular style={{ fontWeight: '500', fontSize: 11.5 }}>
-            {formatMoney(gap)}
-          </Text>{' '}
-          {t(over ? 'budgets.projection.over' : 'budgets.projection.under')}
-        </Text>
-      </View>
+        {t('budgets.projection.atClose')}{' '}
+        {t(over ? 'budgets.projection.overBy' : 'budgets.projection.underBy', {
+          amount: formatMoney(gap, currency),
+        })}
+      </Text>
     </View>
   );
 }

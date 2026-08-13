@@ -1,0 +1,355 @@
+import { useTranslation } from 'react-i18next';
+import { Modal, Pressable, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import type { CurrencyCode } from '@/shared/domain';
+
+import { useTheme } from '../theme';
+import { withAlpha } from '../theme/tokens';
+
+import { AmountKeypad, pressAmountKey } from './AmountKeypad';
+import { Icon } from './Icon';
+import { KeypadAmount } from './KeypadAmount';
+import { Scrim } from './Scrim';
+import { Text } from './Text';
+
+/** The design pins every one of these 150px from the top rather than sizing it
+ *  to its content: the keypad has to land in the same place every time, whatever
+ *  is being typed into it. */
+const SHEET_TOP = 150;
+
+type Props = {
+  visible: boolean;
+  onClose: () => void;
+  /** The whole header row. It is the one part that genuinely differs: a back
+   *  arrow and a type switcher here, a title and a Quitar there. */
+  header: React.ReactNode;
+  /** Micro label over the amount — "Techo del mes", "Tope de Mercado". */
+  label?: string;
+  digits: string;
+  onDigits: (next: string) => void;
+  currency?: CurrencyCode;
+  sign?: string;
+  amountColor?: string;
+  size?: 'sheet' | 'correct';
+  /** One line under the amount explaining what the number will do. */
+  help?: string;
+  /** Field rows between the amount and the keypad. */
+  children?: React.ReactNode;
+  primaryLabel: string;
+  onPrimary: () => void;
+  primaryDisabled?: boolean;
+  /** Shows the mic beside the save button. Absent on sheets where speaking makes
+   *  no sense — you cannot dictate a ceiling. */
+  onMic?: () => void;
+};
+
+/**
+ * The sheet the design draws three times: `HOJA MANUAL`, `EDITAR LO DETECTADO`
+ * and `CREAR` — the last of which alone serves five things (subscription,
+ * account, category, goal, cap).
+ *
+ * Once, therefore. The shape is a claim about how money is entered in this app:
+ * **the amount is the point**, so it is at the top at 46–50px with its caret, the
+ * details are ordinary rows under it, and the pad is pinned to the bottom where
+ * the thumb already is. Anything built later that takes a number should reach
+ * for this rather than reinvent the proportions.
+ *
+ * The pad is the app's own rather than the system keyboard, and that is the
+ * reason the layout can be fixed at all: a system keyboard is a different height
+ * on every device and covers whatever it lands on, which would force the sheet
+ * to scroll — and a form you scroll to reach the save button is a form, not a
+ * capture.
+ */
+export function AmountSheet({
+  visible,
+  onClose,
+  header,
+  label,
+  digits,
+  onDigits,
+  currency,
+  sign = '',
+  amountColor,
+  size = 'sheet',
+  help,
+  children,
+  primaryLabel,
+  onPrimary,
+  primaryDisabled = false,
+  onMic,
+}: Props) {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
+      <View style={{ flex: 1 }}>
+        <Scrim>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.close')}
+            onPress={onClose}
+            style={{ flex: 1 }}
+          />
+        </Scrim>
+
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: SHEET_TOP,
+            borderTopLeftRadius: 34,
+            borderTopRightRadius: 34,
+            // Opaque, unlike the app's cards: a panel with its own content has to
+            // cover what is behind it or neither is readable.
+            backgroundColor: theme.colors.bgSheet,
+            borderTopWidth: 1,
+            borderTopColor: theme.colors.borderDefault,
+          }}
+        >
+          <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+            <View
+              style={{
+                width: 38,
+                height: 4,
+                borderRadius: 2,
+                backgroundColor: theme.colors.borderDefault,
+                alignSelf: 'center',
+                marginTop: 12,
+              }}
+            />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                paddingHorizontal: 20,
+                paddingTop: 16,
+              }}
+            >
+              {header}
+            </View>
+
+            <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
+              {label !== undefined ? (
+                <Text
+                  variant="micro"
+                  uppercase
+                  color={theme.colors.textTertiary}
+                  style={{ letterSpacing: 2.2, marginBottom: 9 }}
+                >
+                  {label}
+                </Text>
+              ) : null}
+              <KeypadAmount
+                digits={digits}
+                currency={currency}
+                sign={sign}
+                size={size}
+                color={amountColor}
+              />
+              {help !== undefined ? (
+                <Text
+                  color={theme.colors.textTertiary}
+                  style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
+                >
+                  {help}
+                </Text>
+              ) : null}
+            </View>
+
+            {children !== undefined ? (
+              <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
+                {children}
+              </View>
+            ) : null}
+
+            <View style={{ flex: 1 }} />
+
+            <View style={{ paddingHorizontal: 20 }}>
+              <AmountKeypad onKey={(key) => onDigits(pressAmountKey(digits, key))} />
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
+                paddingHorizontal: 20,
+                paddingTop: 16,
+                paddingBottom: 32,
+              }}
+            >
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ disabled: primaryDisabled }}
+                onPress={onPrimary}
+                disabled={primaryDisabled}
+                style={({ pressed }) => ({
+                  flex: 1,
+                  minHeight: 52,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 18,
+                  // The one solid, un-tinted surface: the last thing you touch
+                  // and the only one that changes anything.
+                  backgroundColor: theme.colors.textPrimary,
+                  opacity: primaryDisabled ? 0.4 : pressed ? 0.9 : 1,
+                })}
+              >
+                <Text
+                  color={theme.colors.bgBase}
+                  style={{ fontSize: 14, fontWeight: '600' }}
+                >
+                  {primaryLabel}
+                </Text>
+              </Pressable>
+
+              {onMic !== undefined ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('expenses.voice.mic')}
+                  onPress={onMic}
+                  style={({ pressed }) => ({
+                    width: 54,
+                    height: 54,
+                    borderRadius: 27,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: withAlpha(theme.palette.acc, 0.16),
+                    borderWidth: 1,
+                    borderColor: withAlpha(theme.palette.acc, 0.22),
+                    opacity: pressed ? 0.8 : 1,
+                  })}
+                >
+                  <Icon
+                    name="microphone"
+                    size={22}
+                    stroke={1.8}
+                    color={theme.palette.acc}
+                  />
+                </Pressable>
+              ) : null}
+            </View>
+          </SafeAreaView>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+/**
+ * One row of a sheet: label on the left, value on the right, the whole thing
+ * tappable.
+ *
+ * Every field is this shape so nothing about which ones open a list has to be
+ * learned twice — the chevron is the only difference between a row that picks
+ * and a row that types.
+ */
+export function SheetFieldRow({
+  label,
+  value,
+  chevron = false,
+  onPress,
+  children,
+}: {
+  label?: string;
+  value?: string;
+  chevron?: boolean;
+  onPress: () => void;
+  children?: React.ReactNode;
+}) {
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        minHeight: 44,
+        paddingHorizontal: 16,
+        paddingVertical: 13,
+        borderRadius: 16,
+        backgroundColor: theme.colors.bgSurface,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
+        opacity: pressed ? 0.85 : 1,
+      })}
+    >
+      {label !== undefined ? (
+        <Text color={theme.colors.textTertiary} style={{ fontSize: 13.5 }}>
+          {label}
+        </Text>
+      ) : null}
+      {children ??
+        (value !== undefined ? (
+          <Text
+            numberOfLines={1}
+            style={{
+              flex: label !== undefined ? 1 : 0,
+              textAlign: 'right',
+              fontSize: 13.5,
+            }}
+          >
+            {value}
+          </Text>
+        ) : null)}
+      {chevron ? (
+        <Icon
+          name="chevron-down"
+          size={14}
+          stroke={2}
+          color={theme.colors.textTertiary}
+        />
+      ) : null}
+    </Pressable>
+  );
+}
+
+/** The round icon button the sheet headers open with — close, or back. */
+export function SheetHeaderButton({
+  icon,
+  label,
+  onPress,
+  size = 40,
+}: {
+  icon: string;
+  label: string;
+  onPress: () => void;
+  size?: number;
+}) {
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        width: size,
+        height: size,
+        flexShrink: 0,
+        borderRadius: size / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.bgSurface,
+        opacity: pressed ? 0.7 : 1,
+      })}
+    >
+      <Icon name={icon} size={15} stroke={2} color={theme.colors.textSecondary} />
+    </Pressable>
+  );
+}

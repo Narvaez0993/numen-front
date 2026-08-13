@@ -1,4 +1,5 @@
 export * from './AmountKeypad';
+export * from './AmountSheet';
 export * from './Aurora';
 export * from './KeypadAmount';
 export * from './Orb';
@@ -13,6 +14,7 @@ export * from './ProgressBar';
 export * from './IconBox';
 export * from './Pill';
 export * from './Chip';
+export * from './DashedButton';
 export * from './SectionLabel';
 export * from './Row';
 export * from './FAB';

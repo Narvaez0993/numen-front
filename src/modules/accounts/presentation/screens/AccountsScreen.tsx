@@ -1,22 +1,23 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthStore } from '@/modules/auth/presentation';
+import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
 import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
 import type { AccentColor } from '@/shared/domain';
 import {
+  Aurora,
+  DashedButton,
+  Icon,
   RetryState,
-  SectionLabel,
-  SettingsGroup,
-  SettingsRow,
-  SubScreenHeader,
   Text,
   Toast,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import {
@@ -26,10 +27,9 @@ import {
   CreditCardLimitReachedError,
 } from '../../domain';
 import { AccountFormSheet, type AccountFormInput } from '../components/AccountFormSheet';
-import { AddDashedButton } from '../components/AddDashedButton';
 import { CardFormSheet, type CardFormInput } from '../components/CardFormSheet';
-import { CreditCardItem } from '../components/CreditCardItem';
-import { NetBalanceCard } from '../components/NetBalanceCard';
+import { CardTile } from '../components/CardTile';
+import { SourceRow } from '../components/SourceRow';
 import { useAccounts } from '../hooks/useAccounts';
 import {
   useCreateAccount,
@@ -50,10 +50,27 @@ const ACCOUNT_COLORS: readonly AccentColor[] = [
 const FREE_ACCOUNTS = 2;
 const FREE_CARDS = 1;
 
+/**
+ * Everywhere money sits, on one screen.
+ *
+ * The redesign turned it from a settings page into an answer. It used to open
+ * with a "net balance" card and then a settings-style list; now it opens with
+ * **what you have** at 41px — the sum of the accounts, not the net — and puts the
+ * card debt in one quiet line under it. That ordering is the honest one: cash
+ * you can spend and a card you owe are different facts, and folding them into a
+ * single "net" number hides the one that decides what you can do today.
+ *
+ * Debts join the screen for the first time. They belong here rather than only in
+ * Deudas because "how much do I have?" is not answerable without them, and until
+ * now the two lived on screens that never mentioned each other.
+ */
 export function AccountsScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const today = useMemo(() => toIsoDate(new Date()), []);
   const { data, isLoading, isError, refetch } = useAccounts();
+  const debts = useDeudas(today);
 
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
@@ -76,9 +93,9 @@ export function AccountsScreen() {
   const tier = useAuthStore((s) => s.session?.tier);
   const isPlus = tier === 'plus';
 
-  /** This source's movements — the question a tap on a source is actually
-   * asking. Its own stack route, not the Movements tab: a tab has nothing to
-   * pop back to, and arriving here should always leave a way home. */
+  /** This source's movements — the question a tap on a source is actually asking.
+   * Its own stack route, not the Movements tab: a tab has nothing to pop back to,
+   * and arriving here should always leave a way home. */
   const goToMovements = (sourceId: string) => router.push(`/source/${sourceId}`);
 
   if (isError) {
@@ -87,7 +104,6 @@ export function AccountsScreen() {
         edges={['top']}
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       >
-        <SubScreenHeader title={t('accounts.title')} onBack={() => router.back()} />
         <RetryState
           titleKey="accounts.error.title"
           retryKey="accounts.error.retry"
@@ -108,14 +124,19 @@ export function AccountsScreen() {
           justifyContent: 'center',
         }}
       >
-        <ActivityIndicator color={theme.colors.accentMint} />
+        <ActivityIndicator color={theme.palette.acc} />
       </SafeAreaView>
     );
   }
 
   const { accounts, creditCards, currency } = data;
+  const cash = data.debitTotal + data.cashTotal;
   const atAccountLimit = !isPlus && accounts.length >= FREE_ACCOUNTS;
   const atCardLimit = !isPlus && creditCards.length >= FREE_CARDS;
+
+  const owedToMe = debts.data?.owedToMe;
+  const iOwe = debts.data?.iOwe;
+  const hasPeople = (owedToMe?.count ?? 0) + (iOwe?.count ?? 0) > 0;
 
   const closeAccountSheet = () => setAccountSheet({ open: false, account: null });
   const closeCardSheet = () => setCardSheet({ open: false, card: null });
@@ -197,89 +218,190 @@ export function AccountsScreen() {
   };
 
   return (
-    <SafeAreaView
-      edges={['top']}
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-    >
-      <SubScreenHeader title={t('accounts.title')} onBack={() => router.back()} />
+    <View style={{ flex: 1, backgroundColor: theme.colors.bgBase }}>
+      <Aurora />
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 8,
-          paddingBottom: 32,
+          paddingTop: insets.top + 16,
+          paddingBottom: insets.bottom + 26,
         }}
         showsVerticalScrollIndicator={false}
       >
-        <NetBalanceCard
-          netBalance={data.netBalance}
-          currency={currency}
-          accountsCount={data.accountsCount}
-          creditCardsCount={data.creditCardsCount}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            paddingHorizontal: 22,
+          }}
+        >
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back')}
+            onPress={() => router.back()}
+            style={({ pressed }) => ({
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Icon
+              name="arrow-left"
+              size={16}
+              stroke={2}
+              color={theme.colors.textSecondary}
+            />
+          </Pressable>
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>{t('accounts.title')}</Text>
+        </View>
 
-        {accounts.length > 0 ? (
-          <SettingsGroup label={t('accounts.groups.debit')}>
-            {accounts.map((account, i) => (
-              <SettingsRow
+        <View style={{ paddingHorizontal: 26, paddingTop: 24 }}>
+          <Text
+            variant="micro"
+            uppercase
+            color={theme.colors.textTertiary}
+            style={{ letterSpacing: 2.2, marginBottom: 8 }}
+          >
+            {t('accounts.have')}
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}>
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 19, fontWeight: '300' }}
+            >
+              $
+            </Text>
+            <Text
+              tabular
+              style={{
+                fontSize: 41,
+                lineHeight: 41,
+                fontWeight: '500',
+                letterSpacing: -2,
+              }}
+            >
+              {formatMoney(cash, currency).replace(/^[^\d-]*/, '')}
+            </Text>
+          </View>
+          {/* Only when there is a card. Without one the line would be arithmetic
+              about nothing. */}
+          {data.tcDebt > 0 ? (
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 12.5, marginTop: 9 }}
+            >
+              {t('accounts.minusCard')}{' '}
+              <Text tabular style={{ fontSize: 12.5 }}>
+                {formatMoney(data.netBalance, currency)}
+              </Text>
+            </Text>
+          ) : null}
+        </View>
+
+        <View style={{ paddingHorizontal: 26, paddingTop: 24 }}>
+          <Text
+            variant="micro"
+            uppercase
+            color={theme.colors.textTertiary}
+            style={{ letterSpacing: 2.2, marginBottom: 6 }}
+          >
+            {t('accounts.groups.accounts')}
+          </Text>
+
+          {accounts.length > 0 ? (
+            accounts.map((account, index) => (
+              <SourceRow
                 key={account.id}
+                name={account.name}
+                sub={account.sub || undefined}
                 icon={account.icon}
-                iconColor={account.color}
-                title={account.name}
-                subtitle={account.sub || undefined}
-                value={formatMoney(account.balance, currency)}
-                last={i === accounts.length - 1}
-                // Tapping a source asks "what have I done with this account?",
-                // not "let me rename it" — the balance is already on the row,
-                // its movements are the part you cannot see from here.
+                amount={account.balance}
+                currency={currency}
+                last={index === accounts.length - 1}
                 onPress={() => goToMovements(account.id)}
                 onEdit={() => setAccountSheet({ open: true, account })}
                 editLabel={t('accounts.edit', { name: account.name })}
               />
-            ))}
-          </SettingsGroup>
-        ) : (
-          <View
-            style={{
-              backgroundColor: theme.colors.bgSurface,
-              borderColor: theme.colors.borderSubtle,
-              borderWidth: 1,
-              borderRadius: 16,
-              padding: 18,
-              marginBottom: 18,
-              gap: 6,
-            }}
-          >
-            <Text variant="bodyLarge" style={{ fontSize: 14 }}>
-              {t('accounts.empty.title')}
-            </Text>
-            <Text variant="caption" muted style={{ fontSize: 12.5, lineHeight: 18 }}>
+            ))
+          ) : (
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 12.5, lineHeight: 18, paddingVertical: 12 }}
+            >
               {t('accounts.empty.body')}
             </Text>
-          </View>
-        )}
+          )}
 
-        {creditCards.length > 0 ? (
-          <>
-            <SectionLabel style={{ marginBottom: 10 }}>
-              {t('accounts.groups.credit')}
-            </SectionLabel>
-            <View style={{ gap: 10, marginBottom: 16 }}>
-              {creditCards.map((card) => (
-                <CreditCardItem
-                  key={card.id}
-                  card={card}
-                  onPress={() => goToMovements(card.id)}
-                  onEdit={() => setCardSheet({ open: true, card })}
-                  editLabel={t('accounts.edit', { name: card.name })}
+          {hasPeople ? (
+            <>
+              <Text
+                variant="micro"
+                uppercase
+                color={theme.colors.textTertiary}
+                style={{ letterSpacing: 2.2, marginTop: 20, marginBottom: 10 }}
+              >
+                {t('accounts.groups.people')}
+              </Text>
+              {(owedToMe?.count ?? 0) > 0 ? (
+                <SourceRow
+                  name={t('accounts.people.owedToMe')}
+                  sub={t('accounts.people.count', { count: owedToMe?.count ?? 0 })}
+                  icon="users"
+                  amount={owedToMe?.total ?? 0}
+                  currency={currency}
+                  tint={theme.colors.accentMint}
+                  last={(iOwe?.count ?? 0) === 0}
+                  onPress={() => router.push('/deudas')}
                 />
-              ))}
-            </View>
-          </>
-        ) : null}
+              ) : null}
+              {(iOwe?.count ?? 0) > 0 ? (
+                <SourceRow
+                  name={t('accounts.people.iOwe')}
+                  sub={t('accounts.people.count', { count: iOwe?.count ?? 0 })}
+                  icon="users"
+                  amount={iOwe?.total ?? 0}
+                  currency={currency}
+                  tint={theme.colors.accentCoral}
+                  last
+                  onPress={() => router.push('/deudas')}
+                />
+              ) : null}
+            </>
+          ) : null}
 
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <AddDashedButton
-            icon="plus"
+          {creditCards.length > 0 ? (
+            <>
+              <Text
+                variant="micro"
+                uppercase
+                color={theme.colors.textTertiary}
+                style={{ letterSpacing: 2.2, marginTop: 20, marginBottom: 10 }}
+              >
+                {t('accounts.groups.credit')}
+              </Text>
+              <View style={{ gap: 10 }}>
+                {creditCards.map((card) => (
+                  <CardTile
+                    key={card.id}
+                    card={card}
+                    onPress={() => goToMovements(card.id)}
+                    onEdit={() => setCardSheet({ open: true, card })}
+                    editLabel={t('accounts.edit', { name: card.name })}
+                  />
+                ))}
+              </View>
+            </>
+          ) : null}
+        </View>
+
+        <View style={{ paddingHorizontal: 24, paddingTop: 20, gap: 8 }}>
+          <DashedButton
             label={t('accounts.add.account')}
             onPress={() =>
               atAccountLimit
@@ -287,8 +409,11 @@ export function AccountsScreen() {
                 : setAccountSheet({ open: true, account: null })
             }
           />
-          <AddDashedButton
-            icon="plus"
+          {/* The bundle draws one adder because its mockup already has a card.
+              Two are needed for the screen to be usable from empty — and a
+              chooser in front of them would be a menu asking a question the
+              buttons already answer. */}
+          <DashedButton
             label={t('accounts.add.card')}
             onPress={() =>
               atCardLimit ? setGate('card') : setCardSheet({ open: true, card: null })
@@ -330,6 +455,6 @@ export function AccountsScreen() {
         message={toast ?? ''}
         onDismiss={() => setToast(null)}
       />
-    </SafeAreaView>
+    </View>
   );
 }

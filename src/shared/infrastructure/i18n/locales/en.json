@@ -12,7 +12,8 @@
     "close": "Close",
     "search": "Search",
     "noMatches": "Nothing matches that.",
-    "done": "Done"
+    "done": "Done",
+    "back": "Back"
   },
   "movements": {
     "title": "Movements",
@@ -90,9 +91,12 @@
       "overBy": "Over by"
     },
     "projection": {
-      "willEnd": "At this pace you close the month at",
+      "willEnd": "You are heading for",
       "over": "above your cap",
-      "under": "below your cap"
+      "under": "below your cap",
+      "atClose": "at close.",
+      "overBy": "That is {{amount}} past your ceiling.",
+      "underBy": "That fits, with {{amount}} to spare."
     },
     "byCategory": "By category",
     "urgencyOrder": "ordered by urgency",
@@ -194,6 +198,21 @@
     "error": {
       "title": "We couldn't load your budgets.",
       "retry": "Try again"
+    },
+    "hero": {
+      "left": "You have left",
+      "ceiling": "Ceiling",
+      "noCeiling": "No ceiling",
+      "used": "{{pct}}% used",
+      "pace": "even pace {{pct}}%"
+    },
+    "watched": "Watched",
+    "watchedCount_one": "{{count}} category",
+    "watchedCount_other": "{{count}} categories",
+    "goalsLink": {
+      "label": "Your goals",
+      "summary_one": "{{count}} active · {{amount}} saved",
+      "summary_other": "{{count}} active · {{amount}} saved"
     }
   },
   "plan": {
@@ -351,7 +370,7 @@
     }
   },
   "accounts": {
-    "title": "Sources and accounts",
+    "title": "Accounts and cards",
     "netBalance": {
       "label": "Net balance",
       "breakdown_zero": "No sources yet",
@@ -360,18 +379,21 @@
     },
     "groups": {
       "debit": "Debit and cash",
-      "credit": "Credit cards"
+      "credit": "Cards",
+      "accounts": "Accounts",
+      "people": "Between people"
     },
     "tc": {
       "debt": "Current debt",
       "usage": "{{pct}}% of limit",
       "limit": "{{amount}} limit",
       "cutoff": "Cutoff {{day}}",
-      "due": "Payment {{day}}"
+      "due": "Payment {{day}}",
+      "cycle": "closes on the {{cutoff}} · due the {{due}}"
     },
     "add": {
-      "account": "Add account",
-      "card": "Add card"
+      "account": "Add another account",
+      "card": "Add a card"
     },
     "form": {
       "newAccount": "New account",
@@ -419,7 +441,15 @@
       "saveFailed": "We couldn't save it. Try again.",
       "deleteFailed": "We couldn't delete it. Try again."
     },
-    "edit": "Edit {{name}}"
+    "edit": "Edit {{name}}",
+    "have": "You have",
+    "minusCard": "Minus the card, you keep",
+    "people": {
+      "owedToMe": "Owed to you",
+      "iOwe": "You owe",
+      "count_one": "{{count}} person",
+      "count_other": "{{count}} people"
+    }
   },
   "assistant": {
     "title": "Assistant",

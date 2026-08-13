@@ -12,7 +12,8 @@
     "close": "Cerrar",
     "search": "Buscar",
     "noMatches": "Nada coincide con eso.",
-    "done": "Listo"
+    "done": "Listo",
+    "back": "Atrás"
   },
   "movements": {
     "title": "Movimientos",
@@ -90,9 +91,12 @@
       "overBy": "Te pasaste"
     },
     "projection": {
-      "willEnd": "A este ritmo cierras el mes en",
+      "willEnd": "Vas para",
       "over": "por encima de tu tope",
-      "under": "por debajo de tu tope"
+      "under": "por debajo de tu tope",
+      "atClose": "al cierre.",
+      "overBy": "Te pasas del techo por {{amount}}.",
+      "underBy": "Cabes en el techo por {{amount}}."
     },
     "byCategory": "Por categoría",
     "urgencyOrder": "orden por urgencia",
@@ -194,6 +198,21 @@
     "error": {
       "title": "No pudimos cargar tus presupuestos.",
       "retry": "Reintentar"
+    },
+    "hero": {
+      "left": "Te queda",
+      "ceiling": "Techo",
+      "noCeiling": "Sin techo",
+      "used": "{{pct}}% usado",
+      "pace": "ritmo ideal {{pct}}%"
+    },
+    "watched": "Vigiladas",
+    "watchedCount_one": "{{count}} categoría",
+    "watchedCount_other": "{{count}} categorías",
+    "goalsLink": {
+      "label": "Tus metas",
+      "summary_one": "{{count}} activa · {{amount}} guardados",
+      "summary_other": "{{count}} activas · {{amount}} guardados"
     }
   },
   "plan": {
@@ -351,7 +370,7 @@
     }
   },
   "accounts": {
-    "title": "Fuentes y cuentas",
+    "title": "Cuentas y tarjetas",
     "netBalance": {
       "label": "Saldo neto",
       "breakdown_zero": "Aún sin fuentes registradas",
@@ -360,18 +379,21 @@
     },
     "groups": {
       "debit": "Débito y efectivo",
-      "credit": "Tarjetas de crédito"
+      "credit": "Tarjetas",
+      "accounts": "Cuentas",
+      "people": "Entre personas"
     },
     "tc": {
       "debt": "Deuda actual",
       "usage": "{{pct}}% del cupo",
       "limit": "{{amount}} de cupo",
       "cutoff": "Corte {{day}}",
-      "due": "Pago {{day}}"
+      "due": "Pago {{day}}",
+      "cycle": "corte el {{cutoff}} · pagas el {{due}}"
     },
     "add": {
-      "account": "Agregar cuenta",
-      "card": "Agregar tarjeta"
+      "account": "Anotar otra cuenta",
+      "card": "Anotar una tarjeta"
     },
     "form": {
       "newAccount": "Nueva cuenta",
@@ -419,7 +441,15 @@
       "saveFailed": "No pudimos guardar. Intenta de nuevo.",
       "deleteFailed": "No pudimos eliminar. Intenta de nuevo."
     },
-    "edit": "Editar {{name}}"
+    "edit": "Editar {{name}}",
+    "have": "Tienes",
+    "minusCard": "Menos la tarjeta, te quedan",
+    "people": {
+      "owedToMe": "Te deben",
+      "iOwe": "Debes",
+      "count_one": "{{count}} persona",
+      "count_other": "{{count}} personas"
+    }
   },
   "assistant": {
     "title": "Asistente",
