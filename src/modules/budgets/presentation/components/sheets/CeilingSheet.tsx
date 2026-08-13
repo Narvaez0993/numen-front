@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable } from 'react-native';
 
 import type { CurrencyCode } from '@/shared/domain';
 import {
   AmountSheet,
-  Icon,
+  SheetDangerAction,
   SheetHeaderButton,
   Text,
 } from '@/shared/presentation/components';
-import { useTheme } from '@/shared/presentation/theme';
-import { withAlpha } from '@/shared/presentation/theme/tokens';
 
 type Props = {
   visible: boolean;
@@ -46,7 +43,6 @@ export function CeilingSheet({
   onSave,
   onDelete,
 }: Props) {
-  const { theme } = useTheme();
   const { t } = useTranslation();
 
   const [digits, setDigits] = useState(current !== null ? String(current) : '');
@@ -76,33 +72,10 @@ export function CeilingSheet({
             {t('budgets.editTecho.title', { month: monthName })}
           </Text>
           {current !== null && onDelete ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={onDelete}
-              style={({ pressed }) => ({
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 7,
-                minHeight: 40,
-                paddingHorizontal: 14,
-                borderRadius: 14,
-                backgroundColor: withAlpha(theme.colors.accentCoral, 0.12),
-                opacity: pressed ? 0.8 : 1,
-              })}
-            >
-              <Icon
-                name="trash"
-                size={14}
-                stroke={1.9}
-                color={theme.colors.accentCoral}
-              />
-              <Text
-                color={theme.colors.accentCoral}
-                style={{ fontSize: 12.5, fontWeight: '500' }}
-              >
-                {t('expenses.correct.remove')}
-              </Text>
-            </Pressable>
+            <SheetDangerAction
+              label={t('expenses.correct.remove')}
+              onConfirm={onDelete}
+            />
           ) : null}
         </>
       }

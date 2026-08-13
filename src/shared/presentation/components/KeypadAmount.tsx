@@ -22,6 +22,9 @@ type Props = {
   sign?: string;
   color?: string;
   size?: keyof typeof SIZES;
+  /** Replaces the currency symbol. `''` for a field that is not money — the day
+   *  of the month is typed on the same pad and a `$` in front of it is a lie. */
+  symbol?: string;
 };
 
 /**
@@ -42,6 +45,7 @@ export function KeypadAmount({
   sign = '',
   color,
   size = 'sheet',
+  symbol,
 }: Props) {
   const { theme } = useTheme();
   const s = SIZES[size];
@@ -51,7 +55,7 @@ export function KeypadAmount({
     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
       <Text color={tint} style={{ fontSize: s.sign, fontWeight: '300' }}>
         {sign}
-        {currencySymbol(currency)}
+        {symbol ?? currencySymbol(currency)}
       </Text>
       <Text
         tabular
@@ -63,7 +67,7 @@ export function KeypadAmount({
           lineHeight: s.digits,
         }}
       >
-        {formatAmountDigits(digits, currency) || '0'}
+        {symbol === '' ? digits || '0' : formatAmountDigits(digits, currency) || '0'}
       </Text>
       <View
         style={{

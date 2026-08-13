@@ -1,17 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable } from 'react-native';
 
 import type { CurrencyCode } from '@/shared/domain';
 import {
   AmountSheet,
-  Icon,
+  SheetDangerAction,
   SheetFieldRow,
   SheetHeaderButton,
   Text,
 } from '@/shared/presentation/components';
-import { useTheme } from '@/shared/presentation/theme';
-import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { CandidateCategory } from '../../hooks/useWatchedCategories';
@@ -68,7 +65,6 @@ export function CapSheet({
   onSave,
   onDelete,
 }: Props) {
-  const { theme } = useTheme();
   const { t } = useTranslation();
 
   const [picked, setPicked] = useState<CapTarget | null>(target);
@@ -118,33 +114,10 @@ export function CapSheet({
               : t('budgets.editTopeSheet.title', { name: picked.name })}
           </Text>
           {editing && onDelete ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={onDelete}
-              style={({ pressed }) => ({
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 7,
-                minHeight: 40,
-                paddingHorizontal: 14,
-                borderRadius: 14,
-                backgroundColor: withAlpha(theme.colors.accentCoral, 0.12),
-                opacity: pressed ? 0.8 : 1,
-              })}
-            >
-              <Icon
-                name="trash"
-                size={14}
-                stroke={1.9}
-                color={theme.colors.accentCoral}
-              />
-              <Text
-                color={theme.colors.accentCoral}
-                style={{ fontSize: 12.5, fontWeight: '500' }}
-              >
-                {t('expenses.correct.remove')}
-              </Text>
-            </Pressable>
+            <SheetDangerAction
+              label={t('expenses.correct.remove')}
+              onConfirm={onDelete}
+            />
           ) : null}
         </>
       }

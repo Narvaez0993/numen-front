@@ -426,7 +426,9 @@
       "deleteConfirm": "Yes, delete",
       "cancel": "Cancel",
       "dueDay": "Payment day",
-      "deleting": "Deleting…"
+      "deleting": "Deleting…",
+      "balanceHelp": "What is in it today. Deshka moves it from your movements; here you only correct it.",
+      "cardHelp": "Tap any field below to type it up here."
     },
     "gate": {
       "accountTitle": "Free includes up to 2 accounts",

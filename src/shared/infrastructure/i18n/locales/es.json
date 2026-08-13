@@ -426,7 +426,9 @@
       "deleteConfirm": "Sí, eliminar",
       "cancel": "Cancelar",
       "dueDay": "Día de pago",
-      "deleting": "Eliminando…"
+      "deleting": "Eliminando…",
+      "balanceHelp": "Lo que tienes ahí hoy. Deshka lo mueve solo con tus movimientos; desde aquí solo lo corriges.",
+      "cardHelp": "Toca cualquier dato de abajo para escribirlo aquí arriba."
     },
     "gate": {
       "accountTitle": "Tu plan Free llega hasta 2 cuentas",

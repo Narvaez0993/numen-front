@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,6 +33,10 @@ type Props = {
   sign?: string;
   amountColor?: string;
   size?: 'sheet' | 'correct';
+  /** Replaces the currency symbol — `''` for a field that is not money. */
+  symbol?: string;
+  /** How many digits the pad will accept. Two for a day of the month. */
+  maxDigits?: number;
   /** One line under the amount explaining what the number will do. */
   help?: string;
   /** Field rows between the amount and the keypad. */
@@ -82,6 +87,8 @@ export function AmountSheet({
   sign = '',
   amountColor,
   size = 'sheet',
+  symbol,
+  maxDigits,
   help,
   children,
   primaryLabel,
@@ -192,7 +199,9 @@ export function AmountSheet({
                 <View style={{ flex: 1 }} />
 
                 <View style={{ paddingHorizontal: 20 }}>
-                  <AmountKeypad onKey={(key) => onDigits(pressAmountKey(digits, key))} />
+                  <AmountKeypad
+                    onKey={(key) => onDigits(pressAmountKey(digits, key, maxDigits))}
+                  />
                 </View>
 
                 <View
@@ -332,6 +341,59 @@ export function SheetFieldRow({
           color={theme.colors.textTertiary}
         />
       ) : null}
+    </Pressable>
+  );
+}
+
+/**
+ * The destructive action in a sheet's header — "Quitar", "Eliminar".
+ *
+ * `confirmLabel` makes it ask first, in place: the pill turns into the question
+ * and the second tap answers it. That is for things that already exist and have
+ * history hanging off them — an account with movements, a card with a debt.
+ * Without it the single tap acts immediately, which is right for a draft that
+ * was never saved.
+ *
+ * The confirmation lives in the pill rather than in a dialog because a dialog on
+ * top of a sheet is a second `Modal`, and stacking those is how this app has
+ * already lost one flow.
+ */
+export function SheetDangerAction({
+  label,
+  confirmLabel,
+  onConfirm,
+}: {
+  label: string;
+  confirmLabel?: string;
+  onConfirm: () => void;
+}) {
+  const { theme } = useTheme();
+  const [asking, setAsking] = useState(false);
+
+  const armed = confirmLabel === undefined || asking;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={() => (armed ? onConfirm() : setAsking(true))}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 7,
+        minHeight: 40,
+        paddingHorizontal: 14,
+        borderRadius: 14,
+        backgroundColor: withAlpha(theme.colors.accentCoral, asking ? 0.22 : 0.12),
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
+      <Icon name="trash" size={14} stroke={1.9} color={theme.colors.accentCoral} />
+      <Text
+        color={theme.colors.accentCoral}
+        style={{ fontSize: 12.5, fontWeight: '500' }}
+      >
+        {asking ? confirmLabel : label}
+      </Text>
     </Pressable>
   );
 }

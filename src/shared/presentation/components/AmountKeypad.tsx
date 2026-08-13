@@ -12,15 +12,21 @@ const BACK = 'back';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', TRIPLE, '0', BACK];
 
+/** Past this an amount is a mis-tap rather than a purchase. */
+const MAX_DIGITS = 12;
+
 /** Amounts are held as a digit string all the way through the form layer, so the
- *  keypad only ever appends and trims — no parsing, no float. */
-export function pressAmountKey(digits: string, key: string): string {
+ *  keypad only ever appends and trims — no parsing, no float.
+ *
+ *  `max` exists because the same pad types things that are not money: a day of
+ *  the month is two digits, and letting it reach twelve would accept the 4th of
+ *  never. */
+export function pressAmountKey(digits: string, key: string, max = MAX_DIGITS): string {
   if (key === BACK) return digits.slice(0, -1);
   const next = key === TRIPLE ? `${digits}000` : `${digits}${key}`;
-  // Leading zeros would let "007" happen, and a 12-digit amount is a mis-tap
-  // rather than a purchase.
+  // Leading zeros would let "007" happen.
   const trimmed = next.replace(/^0+/, '');
-  return trimmed.length > 12 ? digits : trimmed;
+  return trimmed.length > max ? digits : trimmed;
 }
 
 type Props = {

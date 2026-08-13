@@ -1,18 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 
-import {
-  AmountField,
-  BottomSheet,
-  Button,
-  DeleteFlow,
-  FieldLabel,
-  Segmented,
-  Text,
-  TextField,
-} from '@/shared/presentation/components';
 import type { CurrencyCode } from '@/shared/domain';
+import {
+  AmountSheet,
+  SheetDangerAction,
+  SheetFieldRow,
+  SheetHeaderButton,
+  Text,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 import type { Account, AccountKind } from '../../domain';
@@ -36,14 +33,34 @@ type Props = {
   onDelete: () => void;
 };
 
-const KINDS = ['debit', 'cash'] as const;
+const KINDS: AccountKind[] = ['debit', 'cash'];
 
+/** Which row has the system keyboard. */
+type Field = 'name' | 'sub' | null;
+
+/**
+ * An account — `CREAR`, the sheet the design draws once for subscription,
+ * account, category, goal and cap.
+ *
+ * It used to be a stacked form: three labelled inputs and a green button, which
+ * is what a settings page looks like. The redesign has one answer for entering
+ * money and this is it — **the balance at the top at 46px**, the details as
+ * ordinary rows under it, the pad pinned to the bottom.
+ *
+ * That ordering is a claim about which field matters. The name is a label you
+ * set once and read for years; the balance is the number that has to be true
+ * today, and it is the only reason to open this sheet twice.
+ *
+ * Débito vs efectivo lives in the header as a switch, exactly where the manual
+ * capture puts gasto/ingreso/traslado — and only while creating. What an account
+ * IS does not change, and offering to change it would be offering to turn a bank
+ * account into cash.
+ */
 export function AccountFormSheet({
   visible,
   account,
   currency,
   submitting = false,
-  deleting = false,
   onClose,
   onSave,
   onDelete,
@@ -56,7 +73,7 @@ export function AccountFormSheet({
   const [name, setName] = useState('');
   const [sub, setSub] = useState('');
   const [digits, setDigits] = useState('');
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [typing, setTyping] = useState<Field>(null);
 
   useEffect(() => {
     if (!visible) return;
@@ -64,95 +81,161 @@ export function AccountFormSheet({
     setName(account?.name ?? '');
     setSub(account?.sub ?? '');
     setDigits(account ? String(Math.max(0, account.balance)) : '');
-    setConfirmingDelete(false);
+    setTyping(null);
   }, [visible, account]);
 
   const valid = name.trim().length >= 2;
 
-  const handleSave = () => {
-    if (!valid || submitting) return;
-    onSave({
-      kind,
-      name: name.trim(),
-      sub: sub.trim(),
-      balance: Number(digits || '0'),
-    });
-  };
+  return (
+    <AmountSheet
+      visible={visible}
+      onClose={onClose}
+      digits={digits}
+      onDigits={setDigits}
+      currency={currency}
+      label={t('accounts.form.balance')}
+      help={t('accounts.form.balanceHelp')}
+      primaryLabel={t('accounts.form.save')}
+      primaryDisabled={!valid || submitting}
+      onPrimary={() =>
+        onSave({
+          kind,
+          name: name.trim(),
+          sub: sub.trim(),
+          balance: Number(digits || '0'),
+        })
+      }
+      header={
+        <>
+          <SheetHeaderButton icon="x" label={t('common.close')} onPress={onClose} />
+          {editing ? (
+            <>
+              <Text
+                numberOfLines={1}
+                style={{ flex: 1, fontSize: 16, fontWeight: '500' }}
+              >
+                {t('accounts.form.editAccount')}
+              </Text>
+              <SheetDangerAction
+                label={t('accounts.form.delete')}
+                confirmLabel={t('accounts.form.deleteConfirm')}
+                onConfirm={onDelete}
+              />
+            </>
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                gap: 6,
+                padding: 3,
+                borderRadius: 14,
+                backgroundColor: theme.colors.bgSurface,
+              }}
+            >
+              {KINDS.map((option) => {
+                const active = option === kind;
+                return (
+                  <Pressable
+                    key={option}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    onPress={() => setKind(option)}
+                    style={({ pressed }) => ({
+                      flex: 1,
+                      alignItems: 'center',
+                      paddingVertical: 8,
+                      borderRadius: 11,
+                      backgroundColor: active ? theme.colors.bgElevated : 'transparent',
+                      opacity: pressed ? 0.8 : 1,
+                    })}
+                  >
+                    <Text
+                      color={
+                        active ? theme.colors.textPrimary : theme.colors.textTertiary
+                      }
+                      style={{ fontSize: 12.5, fontWeight: '500' }}
+                    >
+                      {t(`accounts.form.kind.${option}`)}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+        </>
+      }
+    >
+      <SheetFieldRow label={t('accounts.form.name')} onPress={() => setTyping('name')}>
+        <RowInput
+          editing={typing === 'name'}
+          value={name}
+          placeholder={t('accounts.form.namePlaceholder')}
+          onChangeText={setName}
+          onBlur={() => setTyping(null)}
+        />
+      </SheetFieldRow>
+
+      <SheetFieldRow label={t('accounts.form.sub')} onPress={() => setTyping('sub')}>
+        <RowInput
+          editing={typing === 'sub'}
+          value={sub}
+          placeholder={t('accounts.form.subPlaceholder')}
+          onChangeText={setSub}
+          onBlur={() => setTyping(null)}
+        />
+      </SheetFieldRow>
+    </AmountSheet>
+  );
+}
+
+/** A row that types. The system keyboard is fine here — these are words, not
+ *  money, and the row sits near the top of the sheet so it stays visible above
+ *  whatever the keyboard covers. */
+function RowInput({
+  editing,
+  value,
+  placeholder,
+  onChangeText,
+  onBlur,
+}: {
+  editing: boolean;
+  value: string;
+  placeholder: string;
+  onChangeText: (next: string) => void;
+  onBlur: () => void;
+}) {
+  const { theme } = useTheme();
+
+  if (editing) {
+    return (
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.textTertiary}
+        autoFocus
+        maxLength={40}
+        onBlur={onBlur}
+        style={{
+          flex: 1,
+          textAlign: 'right',
+          fontSize: 13.5,
+          color: theme.colors.textPrimary,
+          fontFamily: 'Geist_400Regular',
+          padding: 0,
+        }}
+      />
+    );
+  }
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} maxHeight="88%">
-      <View style={{ paddingHorizontal: 22, paddingTop: 8, paddingBottom: 26, gap: 16 }}>
-        <View>
-          <Text variant="h1" style={{ fontSize: 16 }}>
-            {editing ? t('accounts.form.editAccount') : t('accounts.form.newAccount')}
-          </Text>
-          <Text
-            variant="caption"
-            color={theme.colors.textSecondary}
-            style={{ marginTop: 4 }}
-          >
-            {t('accounts.form.accountSubtitle')}
-          </Text>
-        </View>
-
-        {!editing ? (
-          <Segmented
-            options={KINDS}
-            value={kind}
-            onChange={setKind}
-            labels={{
-              debit: t('accounts.form.kind.debit'),
-              cash: t('accounts.form.kind.cash'),
-            }}
-          />
-        ) : null}
-
-        <View>
-          <FieldLabel label={t('accounts.form.name')} />
-          <TextField
-            value={name}
-            onChangeText={setName}
-            placeholder={t('accounts.form.namePlaceholder')}
-            autoFocus={!editing}
-          />
-        </View>
-
-        <View>
-          <FieldLabel label={t('accounts.form.sub')} />
-          <TextField
-            value={sub}
-            onChangeText={setSub}
-            placeholder={t('accounts.form.subPlaceholder')}
-          />
-        </View>
-
-        <View>
-          <FieldLabel label={t('accounts.form.balance')} />
-          <AmountField digits={digits} onChangeDigits={setDigits} currency={currency} />
-        </View>
-
-        <Button
-          label={t('accounts.form.save')}
-          full
-          disabled={!valid}
-          loading={submitting}
-          onPress={handleSave}
-        />
-
-        {editing ? (
-          <DeleteFlow
-            label={deleting ? t('accounts.form.deleting') : t('accounts.form.delete')}
-            confirmTitle={t('accounts.form.deleteConfirmTitle', {
-              name: account.name,
-            })}
-            confirmLabel={t('accounts.form.deleteConfirm')}
-            cancelLabel={t('accounts.form.cancel')}
-            confirming={confirmingDelete}
-            onToggle={setConfirmingDelete}
-            onConfirm={onDelete}
-          />
-        ) : null}
-      </View>
-    </BottomSheet>
+    <Text
+      numberOfLines={1}
+      color={value ? theme.colors.textPrimary : theme.colors.textTertiary}
+      style={{ flex: 1, textAlign: 'right', fontSize: 13.5 }}
+    >
+      {value || placeholder}
+    </Text>
   );
 }
