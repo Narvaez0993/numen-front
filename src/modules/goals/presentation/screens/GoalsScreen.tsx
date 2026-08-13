@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
-import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
+import { useTier } from '@/modules/plan/presentation/hooks/useTier';
 import type { CurrencyCode } from '@/shared/domain';
 import {
   Aurora,
@@ -63,7 +63,7 @@ export function GoalsScreen() {
     visible: false,
     message: '',
   });
-  const tier = usePlanStore((s) => s.tier);
+  const tier = useTier();
 
   if (isError) {
     return (

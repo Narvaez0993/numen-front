@@ -20,11 +20,10 @@ jest.mock('../../components/CategoryFormSheet', () => ({
   CategoryFormSheet: () => null,
 }));
 
-// The auth barrel pulls the DI container, which wants a configured API URL. Only
-// the tier is read here.
-jest.mock('@/modules/auth/presentation', () => ({
-  useAuthStore: (select: (s: unknown) => unknown) =>
-    select({ session: { tier: 'free' } }),
+// The hook asks the server for the plan, and the server is not here. The list
+// under test is the Free one.
+jest.mock('@/modules/plan/presentation/hooks/useTier', () => ({
+  useTier: () => 'free',
 }));
 
 jest.mock('../../hooks/useCategories', () => ({

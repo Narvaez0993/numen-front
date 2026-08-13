@@ -16,7 +16,7 @@ import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/use
 import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
 import { useGoals } from '@/modules/goals/presentation/hooks/useGoals';
 import { useSubscriptions } from '@/modules/subscriptions/presentation/hooks/useSubscriptions';
-import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
+import { useTier } from '@/modules/plan/presentation/hooks/useTier';
 import { CurrencyChangeBlockedError } from '@/modules/auth/domain';
 import type { Objective } from '@/shared/domain';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
@@ -55,7 +55,7 @@ export function ProfileScreen() {
   const session = useAuthStore((s) => s.session);
   const logout = useLogout();
   const updatePreferences = useUpdatePreferences();
-  const tier = usePlanStore((s) => s.tier);
+  const tier = useTier();
   // Real subtitles: these two rows used to carry hardcoded figures ("4 activas ·
   // saldo neto $5.245.000") over data that has been real for a while.
   const accounts = useAccounts();

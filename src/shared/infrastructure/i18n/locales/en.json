@@ -236,9 +236,8 @@
       "notNow": "Not now"
     },
     "toast": {
-      "activated": "Plus active · 7-day trial"
-    },
-    "backToFree": "Back to Free (demo)"
+      "soon": "Checkout is coming soon · we'll let you know"
+    }
   },
   "categories": {
     "title": "Categories",

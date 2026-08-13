@@ -236,9 +236,8 @@
       "notNow": "Ahora no"
     },
     "toast": {
-      "activated": "Plus activo · 7 días de prueba"
-    },
-    "backToFree": "Volver a Free (demo)"
+      "soon": "El pago llega pronto · te avisamos"
+    }
   },
   "categories": {
     "title": "Categorías",

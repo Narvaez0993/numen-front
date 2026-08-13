@@ -31,6 +31,7 @@ import { GetCategoriesUseCase } from '@/modules/categories/application/use-cases
 import { UpdateCategoryUseCase } from '@/modules/categories/application/use-cases/UpdateCategoryUseCase';
 import { HttpCategoriesRepository } from '@/modules/categories/infrastructure';
 import {
+  GetCurrentUserUseCase,
   LoginUseCase,
   LogoutUseCase,
   RegisterUseCase,
@@ -122,6 +123,7 @@ export const registerUseCase = new RegisterUseCase(authRepository);
 export const verifyEmailUseCase = new VerifyEmailUseCase(authRepository);
 export const resendCodeUseCase = new ResendCodeUseCase(authRepository);
 export const logoutUseCase = new LogoutUseCase(authRepository);
+export const getCurrentUserUseCase = new GetCurrentUserUseCase(authRepository);
 export const updateDisplayNameUseCase = new UpdateDisplayNameUseCase(authRepository);
 export const updatePreferencesUseCase = new UpdatePreferencesUseCase(authRepository);
 export const getHomeOverviewUseCase = new GetHomeOverviewUseCase(homeRepository);

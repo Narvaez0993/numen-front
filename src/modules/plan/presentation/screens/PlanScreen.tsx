@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SubScreenHeader, Text, Toast } from '@/shared/presentation/components';
@@ -12,19 +12,16 @@ import type { BillingPeriod, Plan } from '../../domain';
 import { PeriodToggle } from '../components/PeriodToggle';
 import { PlanCard } from '../components/PlanCard';
 import { usePlanComparison } from '../hooks/usePlanComparison';
-import { usePlanStore } from '../stores/usePlanStore';
+import { useTier } from '../hooks/useTier';
 
 export function PlanScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { data, isLoading } = usePlanComparison();
   const [period, setPeriod] = useState<BillingPeriod>('mensual');
-  const [activating, setActivating] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
 
-  const tier = usePlanStore((s) => s.tier);
-  const activatePlus = usePlanStore((s) => s.activatePlus);
-  const downgradeToFree = usePlanStore((s) => s.downgradeToFree);
+  const tier = useTier();
 
   if (isLoading || !data) {
     return (
@@ -42,15 +39,13 @@ export function PlanScreen() {
     );
   }
 
-  // Simulated purchase until RevenueCat lands.
+  // There is no checkout yet. What there IS is a server that decides the plan,
+  // and this screen used to flip a local flag instead — so it said "Plus activo"
+  // while every gate kept refusing on Free. Saying "todavía no" is the honest
+  // version of the same button until RevenueCat lands.
   const handleActivate = () => {
-    if (activating || tier === 'plus') return;
-    setActivating(true);
-    setTimeout(() => {
-      activatePlus();
-      setActivating(false);
-      setToastVisible(true);
-    }, 900);
+    if (tier === 'plus') return;
+    setToastVisible(true);
   };
 
   const plans: Plan[] = data.plans.map((plan) => {
@@ -81,13 +76,7 @@ export function PlanScreen() {
 
         <View style={{ gap: 14 }}>
           {plans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              period={period}
-              onCta={handleActivate}
-              ctaLoading={activating}
-            />
+            <PlanCard key={plan.id} plan={plan} period={period} onCta={handleActivate} />
           ))}
         </View>
 
@@ -103,31 +92,11 @@ export function PlanScreen() {
         >
           {t('plan.footer')}
         </Text>
-
-        {tier === 'plus' ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={downgradeToFree}
-            style={({ pressed }) => ({
-              alignItems: 'center',
-              paddingVertical: 12,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={theme.colors.textTertiary}
-              style={{ fontSize: 11.5 }}
-            >
-              {t('plan.backToFree')}
-            </Text>
-          </Pressable>
-        ) : null}
       </ScrollView>
 
       <Toast
         visible={toastVisible}
-        message={t('plan.toast.activated')}
+        message={t('plan.toast.soon')}
         onDismiss={() => setToastVisible(false)}
       />
     </SafeAreaView>

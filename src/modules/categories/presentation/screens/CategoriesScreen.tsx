@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useAuthStore } from '@/modules/auth/presentation';
+import { useTier } from '@/modules/plan/presentation/hooks/useTier';
 import { useBudgets } from '@/modules/budgets/presentation/hooks/useBudgets';
 import { useMovementsSummary } from '@/modules/movements/presentation/hooks/useMovementsSummary';
 import type { CurrencyCode } from '@/shared/domain';
@@ -67,7 +67,6 @@ export function CategoriesScreen() {
   // Only for the caps in each row's subtitle — the numbers themselves come from
   // the summary, exactly as Presupuesto reads them.
   const budgets = useBudgets(today);
-  const tier = useAuthStore((s) => s.session?.tier);
 
   const [query, setQuery] = useState('');
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -104,7 +103,7 @@ export function CategoriesScreen() {
   }, [query, categories]);
 
   const customCount = categories.filter((c) => !c.isStandard).length;
-  const isPlus = tier === 'plus';
+  const isPlus = useTier() === 'plus';
   const atLimit = !isPlus && customCount >= FREE_CUSTOM_LIMIT;
   const submitting = create.isPending || update.isPending;
 

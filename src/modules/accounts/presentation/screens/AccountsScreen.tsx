@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAuthStore } from '@/modules/auth/presentation';
+import { useTier } from '@/modules/plan/presentation/hooks/useTier';
 import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
 import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
 import type { AccentColor } from '@/shared/domain';
@@ -90,8 +90,7 @@ export function AccountsScreen() {
   const [gate, setGate] = useState<'account' | 'card' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  const tier = useAuthStore((s) => s.session?.tier);
-  const isPlus = tier === 'plus';
+  const isPlus = useTier() === 'plus';
 
   /** This source's movements — the question a tap on a source is actually asking.
    * Its own stack route, not the Movements tab: a tab has nothing to pop back to,

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
-import { usePlanStore } from '@/modules/plan/presentation/stores/usePlanStore';
+import { useTier } from '@/modules/plan/presentation/hooks/useTier';
 import { Card, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
@@ -55,7 +55,7 @@ export function UsageMeterStrip({ usage, onPress }: Props & { onPress: () => voi
 
 export function UsageMeter({ usage }: Props) {
   const { t } = useTranslation();
-  const tier = usePlanStore((s) => s.tier);
+  const tier = useTier();
 
   return (
     <Card padding={12}>
