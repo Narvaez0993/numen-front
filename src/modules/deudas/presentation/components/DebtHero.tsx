@@ -57,7 +57,10 @@ export function DebtHero({ direction, total, count, currency }: Props) {
             fontSize: 43,
             fontWeight: '500',
             letterSpacing: -2.1,
-            lineHeight: 41,
+            // Never under `fontSize`. The bundle says `line-height:.95`, which in
+            // CSS only tightens the box and lets the glyphs overflow it; React
+            // Native clips to it instead, and the tops of the digits were cut.
+            lineHeight: 43,
           }}
         >
           {amountDigits(total, currency)}
