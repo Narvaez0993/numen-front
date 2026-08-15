@@ -1,26 +1,22 @@
 import { router } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useAuthStore } from '@/modules/auth/presentation';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
-import {
-  BottomSheet,
-  Card,
-  RetryState,
-  SectionLabel,
-  Text,
-  Toast,
-} from '@/shared/presentation/components';
+import { Aurora, Icon, RetryState, Text, Toast } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { ChatLimitReachedError } from '../../domain';
@@ -30,15 +26,13 @@ import type {
   DraftOverrides,
   MovementDraft,
 } from '../../domain/types/Assistant';
-import { AssistantBubble } from '../components/AssistantBubble';
-import { AssistantHeader } from '../components/AssistantHeader';
-import { BlockView } from '../components/BlockView';
-import { ChatInput } from '../components/ChatInput';
+import { AnswerView } from '../components/AnswerView';
+import { ChatComposer } from '../components/ChatComposer';
 import { LimitGateCard } from '../components/LimitGateCard';
 import { SuggestedChips } from '../components/SuggestedChips';
+import { ThreadMeter } from '../components/ThreadMeter';
+import { ThreadSheet } from '../components/ThreadSheet';
 import { TypingIndicator } from '../components/TypingIndicator';
-import { UsageMeter, UsageMeterStrip } from '../components/UsageMeter';
-import { UserBubble } from '../components/UserBubble';
 import { useAssistantUsage } from '../hooks/useAssistantUsage';
 import {
   useConfirmDebtDraft,
@@ -51,9 +45,34 @@ import { useChatHistory } from '../hooks/useChatHistory';
 
 const CHIP_KEYS = ['month', 'topSpend', 'upcoming'] as const;
 
+/** The first two letters of a name, for the avatar. */
+function initialsOf(name: string): string {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
+/**
+ * The assistant, as one question and its answer.
+ *
+ * The transcript is gone from the screen, and that is the whole change. A chat
+ * about your money is not a conversation you re-read — it is one thing you asked,
+ * and the reply is what you came for. So the reply opens at 27px with the room
+ * to say something, the question that caused it sits above it in grey, and the
+ * thread itself becomes a count you can tap when you do want to look back.
+ *
+ * Nothing was dropped to get there: the drafts the agent proposes still render
+ * inside the answer, the quota still gates, and the history lives behind
+ * `ThreadSheet`.
+ */
 export function AssistantScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const today = useMemo(() => toIsoDate(new Date()), []);
 
   const history = useChatHistory();
@@ -64,22 +83,23 @@ export function AssistantScreen() {
   const confirmDebt = useConfirmDebtDraft(today);
   const discardDebt = useDiscardDebtDraft();
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
+  const name = useAuthStore((s) => s.session?.displayName ?? '');
 
   const [input, setInput] = useState('');
   const [limitHit, setLimitHit] = useState(false);
-  const [meterOpen, setMeterOpen] = useState(false);
+  const [threadOpen, setThreadOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const scrollRef = useRef<ScrollView>(null);
   const tabBarClearance = useFloatingTabBarClearance();
 
   const messages = history.data?.messages ?? [];
   const typing = send.isPending;
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollToEnd({ animated: true });
-    }
-  }, [messages.length, typing, limitHit]);
+  // The exchange on screen is the last one that happened. Anything before it is
+  // in the thread sheet.
+  const lastAnswer = [...messages].reverse().find((m) => m.role === 'assistant');
+  const lastQuestion = [...messages].reverse().find((m) => m.role === 'user');
+  const questionText =
+    lastQuestion?.blocks.find((block) => block.type === 'text')?.text ?? '';
 
   const sendMessage = useCallback(
     (text: string) => {
@@ -168,56 +188,115 @@ export function AssistantScreen() {
   const overLimit =
     messagesUsage !== undefined &&
     messagesUsage.used >= messagesUsage.limit + messagesUsage.grace;
-  const inGrace =
-    messagesUsage !== undefined &&
-    !overLimit &&
-    messagesUsage.used >= messagesUsage.limit;
   const gateVisible = limitHit || overLimit;
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-      edges={['top']}
-    >
+    <Aurora>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingTop: insets.top }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* The dock holds only what belongs to the conversation: who you are
-            talking to and the quota that governs what you are about to send.
-            The agent's deliveries moved to Home — docked here they cost the
-            chat a third of its screen for artifacts that arrive five times a
-            month. The hairline mirrors the input bar's top edge, so the stream
-            clips against a deliberate border. */}
         <View
           style={{
-            paddingTop: 14,
-            paddingHorizontal: 16,
-            paddingBottom: 12,
+            flexDirection: 'row',
+            alignItems: 'center',
             gap: 12,
-            borderBottomWidth: 1,
-            borderBottomColor: theme.colors.borderSubtle,
+            paddingHorizontal: 22,
+            paddingTop: 14,
           }}
         >
-          <AssistantHeader onAvatarPress={() => router.push('/profile')} />
-          <UsageMeterStrip usage={usage.data} onPress={() => setMeterOpen(true)} />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back')}
+            onPress={() => router.push('/')}
+            style={({ pressed }) => ({
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Icon
+              name="arrow-left"
+              size={16}
+              stroke={2}
+              color={theme.colors.textSecondary}
+            />
+          </Pressable>
+
+          <Text style={{ flex: 1, fontSize: 16, fontWeight: '500' }}>
+            {t('assistant.title')}
+          </Text>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.title')}
+            onPress={() => router.push('/profile')}
+            style={({ pressed }) => ({
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: withAlpha(theme.palette.acc, 0.16),
+              borderWidth: 1,
+              borderColor: withAlpha(theme.palette.acc, 0.22),
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Text color={theme.palette.acc3} style={{ fontSize: 13, fontWeight: '600' }}>
+              {initialsOf(name) || '·'}
+            </Text>
+          </Pressable>
         </View>
 
-        <ScrollView
-          ref={scrollRef}
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            paddingTop: 12,
-            paddingBottom: 12,
-            paddingHorizontal: 16,
-            gap: 14,
+        <ThreadMeter usage={usage.data} onPress={() => setThreadOpen(true)} />
+
+        {questionText ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 10,
+              paddingHorizontal: 24,
+              paddingTop: 14,
+            }}
+          >
+            <Text color={theme.colors.textTertiary} style={{ fontSize: 11, width: 16 }}>
+              {t('assistant.thread.you')}
+            </Text>
+            <Text
+              numberOfLines={2}
+              color={theme.colors.textPrimary}
+              style={{ flex: 1, fontSize: 12.5, lineHeight: 18 }}
+            >
+              {questionText}
+            </Text>
+          </View>
+        ) : null}
+
+        <View
+          style={{
+            height: 1,
+            backgroundColor: theme.colors.borderSubtle,
+            marginHorizontal: 24,
+            marginTop: 18,
           }}
+        />
+
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           {history.isLoading ? (
-            <View style={{ paddingVertical: 28, alignItems: 'center' }}>
-              <ActivityIndicator color={theme.colors.accentMint} />
+            <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+              <ActivityIndicator color={theme.palette.acc} />
             </View>
           ) : history.isError ? (
             <RetryState
@@ -225,75 +304,57 @@ export function AssistantScreen() {
               retryKey="assistant.errors.retry"
               onRetry={() => void history.refetch()}
             />
-          ) : messages.length === 0 ? (
-            <Card padding={16}>
-              <Text variant="body" style={{ fontWeight: '500', marginBottom: 4 }}>
+          ) : typing ? (
+            <View style={{ paddingHorizontal: 26, paddingTop: 30 }}>
+              <TypingIndicator />
+            </View>
+          ) : lastAnswer ? (
+            <AnswerView
+              blocks={lastAnswer.blocks}
+              handlers={{
+                draftHandlers: {
+                  onConfirm: onConfirmDraft,
+                  onEdit: onEditDraft,
+                  onDiscard: onDiscardDraft,
+                  busyDraftId,
+                },
+                debtDraftHandlers: {
+                  today,
+                  onConfirm: onConfirmDebtDraft,
+                  onDiscard: onDiscardDebtDraft,
+                  busyDraftId: busyDebtDraftId,
+                },
+              }}
+            />
+          ) : (
+            <View style={{ paddingHorizontal: 26, paddingTop: 30 }}>
+              <Text
+                style={{
+                  fontSize: 27,
+                  lineHeight: 34,
+                  fontWeight: '300',
+                  letterSpacing: -0.8,
+                }}
+              >
                 {t('assistant.empty.title')}
               </Text>
-              <Text variant="caption" muted>
+              <Text
+                color={theme.colors.textTertiary}
+                style={{ fontSize: 14, lineHeight: 22, marginTop: 14 }}
+              >
                 {t('assistant.empty.body')}
               </Text>
-            </Card>
-          ) : (
-            <View style={{ gap: 12, paddingTop: 4 }}>
-              <SectionLabel>{t('assistant.conversation')}</SectionLabel>
-              {messages.map((message) =>
-                message.role === 'user' ? (
-                  <UserBubble
-                    key={message.id}
-                    text={
-                      message.blocks[0]?.type === 'text' ? message.blocks[0].text : ''
-                    }
-                  />
-                ) : (
-                  <AssistantBubble key={message.id}>
-                    <View style={{ gap: 10 }}>
-                      {message.blocks.map((block, index) => (
-                        <BlockView
-                          key={`${message.id}-${index}`}
-                          block={block}
-                          draftHandlers={{
-                            onConfirm: onConfirmDraft,
-                            onEdit: onEditDraft,
-                            onDiscard: onDiscardDraft,
-                            busyDraftId,
-                          }}
-                          debtDraftHandlers={{
-                            today,
-                            onConfirm: onConfirmDebtDraft,
-                            onDiscard: onDiscardDebtDraft,
-                            busyDraftId: busyDebtDraftId,
-                          }}
-                        />
-                      ))}
-                    </View>
-                  </AssistantBubble>
-                ),
-              )}
-              {typing ? <TypingIndicator /> : null}
             </View>
           )}
 
-          {inGrace && !gateVisible ? (
-            <Text variant="caption" muted style={{ textAlign: 'center' }}>
-              {t('assistant.nudge', {
-                left: messagesUsage.limit + messagesUsage.grace - messagesUsage.used,
-              })}
-            </Text>
+          {gateVisible ? (
+            <View style={{ paddingHorizontal: 24, paddingTop: 20 }}>
+              <LimitGateCard onSeePlus={() => router.push('/plan')} />
+            </View>
           ) : null}
-          {gateVisible ? <LimitGateCard onSeePlus={() => router.push('/plan')} /> : null}
         </ScrollView>
 
-        <View
-          style={{
-            paddingTop: 8,
-            paddingBottom: tabBarClearance,
-            paddingHorizontal: 16,
-            backgroundColor: theme.colors.bgBase,
-            borderTopColor: theme.colors.borderSubtle,
-            borderTopWidth: 1,
-          }}
-        >
+        <View style={{ paddingBottom: tabBarClearance }}>
           <SuggestedChips
             chips={CHIP_KEYS.map((key) => ({
               id: key,
@@ -302,31 +363,27 @@ export function AssistantScreen() {
             disabled={typing || gateVisible}
             onPick={(chip) => sendMessage(chip.label)}
           />
-          <ChatInput
+          <ChatComposer
             value={input}
             onChangeText={setInput}
             onSend={() => sendMessage(input)}
+            onAttach={() => setToast(t('assistant.composer.attachSoon'))}
             disabled={typing || gateVisible}
           />
         </View>
       </KeyboardAvoidingView>
 
-      {/* The strip's detail: the full meter with the renewal caption. */}
-      <BottomSheet
-        visible={meterOpen}
-        onClose={() => setMeterOpen(false)}
-        maxHeight="40%"
-      >
-        <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 26 }}>
-          <UsageMeter usage={usage.data} />
-        </View>
-      </BottomSheet>
+      <ThreadSheet
+        visible={threadOpen}
+        messages={messages}
+        onClose={() => setThreadOpen(false)}
+      />
 
       <Toast
         visible={toast !== null}
         message={toast ?? ''}
         onDismiss={() => setToast(null)}
       />
-    </SafeAreaView>
+    </Aurora>
   );
 }

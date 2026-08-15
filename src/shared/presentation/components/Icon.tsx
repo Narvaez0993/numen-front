@@ -5,6 +5,13 @@ import Svg, { Path } from 'react-native-svg';
  * (`icons.jsx`). To add a new icon, paste its Tabler path here.
  */
 const TABLER_PATHS: Record<string, string[]> = {
+  // The chat's attach button, from the CHAT section of the bundle.
+  photo: [
+    'M15 8h.01',
+    'M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2H6a2 2 0 0 1 -2 -2z',
+    'M4 15l4 -4c.9 -.86 2 -.86 3 0l5 5',
+    'M14 14l1 -1c.9 -.86 2 -.86 3 0l2 2',
+  ],
   // The five tabs. Paths verbatim from the redesign bundle, which picked a
   // different metaphor for each: a pulse for the month's pace, two crossing
   // arrows for money moving, bars for the year, a gauge for the cap.
@@ -333,6 +340,13 @@ const TABLER_PATHS: Record<string, string[]> = {
   ],
   'alert-circle': ['M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0', 'M12 8v4', 'M12 16h.01'],
   equal: ['M5 10h14', 'M5 14h14'],
+  // Tabler `user`, the head-and-shoulders of `user-up` without the arrow. The
+  // split step draws it for "yo", which is the one row that is not a person you
+  // picked.
+  user: [
+    'M12 10a4 4 0 1 0 0 -8a4 4 0 0 0 0 8z',
+    'M6 22v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2',
+  ],
   'user-up': [
     'M9 10a4 4 0 1 0 0 -8a4 4 0 0 0 0 8z',
     'M3 22v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2',

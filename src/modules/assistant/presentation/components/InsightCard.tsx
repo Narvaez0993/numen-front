@@ -84,11 +84,9 @@ export function InsightCard({ insight, onCtaPress, onDismiss }: Props) {
 
       {insight.chart ? (
         <View style={{ paddingTop: 4 }}>
-          <MiniBarChart
-            data={insight.chart}
-            highlight={insight.chartHighlight}
-            color={insight.color}
-          />
+          {/* No per-insight colour any more: the chart wears the palette's
+              accent like every other one in the app. */}
+          <MiniBarChart data={insight.chart} highlight={insight.chartHighlight} />
         </View>
       ) : null}
 

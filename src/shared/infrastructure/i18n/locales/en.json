@@ -495,9 +495,6 @@
   },
   "assistant": {
     "title": "Assistant",
-    "greeting": "How can I help, {{name}}?",
-    "conversation": "Conversation",
-    "inputPlaceholder": "Ask me anything…",
     "corte": {
       "title": "El Corte",
       "pillNew": "New",
@@ -701,6 +698,21 @@
       "whichDebt": "Which debt is this repayment for?",
       "remaining": "{{amount}} left",
       "overpaying": "That is more than what is left ({{amount}})."
+    },
+    "thread": {
+      "label": "The thread",
+      "count": "{{used}}/{{limit}} messages",
+      "title": "The thread",
+      "empty": "Nothing said yet.",
+      "you": "you",
+      "agent": "me"
+    },
+    "composer": {
+      "placeholder": "Ask me something",
+      "send": "Send",
+      "attach": "Attach",
+      "attachSoon": "Sending me a photo is coming soon",
+      "hint": "Speak or type · you can send me a photo of a receipt"
     }
   },
   "onboarding": {

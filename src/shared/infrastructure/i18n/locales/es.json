@@ -495,9 +495,6 @@
   },
   "assistant": {
     "title": "Asistente",
-    "greeting": "¿En qué te ayudo, {{name}}?",
-    "conversation": "Conversación",
-    "inputPlaceholder": "Pregúntame lo que sea…",
     "corte": {
       "title": "El Corte",
       "pillNew": "Nuevo",
@@ -701,6 +698,21 @@
       "whichDebt": "¿De cuál deuda es este abono?",
       "remaining": "faltan {{amount}}",
       "overpaying": "Ese abono es más de lo que queda ({{amount}})."
+    },
+    "thread": {
+      "label": "El hilo",
+      "count": "{{used}}/{{limit}} mensajes",
+      "title": "El hilo",
+      "empty": "Todavía no han hablado.",
+      "you": "tú",
+      "agent": "yo"
+    },
+    "composer": {
+      "placeholder": "Pregúntame algo",
+      "send": "Enviar",
+      "attach": "Adjuntar",
+      "attachSoon": "Mandarme una foto llega pronto",
+      "hint": "Habla o escribe · puedes mandarme la foto de un recibo"
     }
   },
   "onboarding": {
