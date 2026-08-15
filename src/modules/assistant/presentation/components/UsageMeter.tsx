@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
 import { useTier } from '@/modules/plan/presentation/hooks/useTier';
-import { Card, ProgressBar, Text } from '@/shared/presentation/components';
+import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 
 import type { AssistantUsage } from '../../domain/types/Assistant';
 
@@ -13,53 +14,31 @@ type Props = {
 };
 
 /**
- * The quota, docked: it lives OUTSIDE the conversation's scroll because it is
- * the one number that governs what the user is about to do — buried in the
- * stream it was three screens up after a few questions. One slim row; the tap
- * opens the full card with the renewal caption.
+ * Both quotas, and the day they come back.
+ *
+ * The chat screen only counts messages now — that is the number governing what
+ * you are about to send, and the design gives it one line. But the agent spends
+ * a second quota nobody was left able to see: the captures it registers for you,
+ * which run out on their own schedule and would otherwise fail with an
+ * explanation instead of a warning. So both live here, behind the count that
+ * opens the thread, with the sentence that says when they reset.
  */
-export function UsageMeterStrip({ usage, onPress }: Props & { onPress: () => void }) {
-  const { theme } = useTheme();
-  const { t } = useTranslation();
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={t('assistant.usage.planFree')}
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flexDirection: 'row',
-        gap: 14,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 12,
-        backgroundColor: theme.colors.bgSurface,
-        borderWidth: 1,
-        borderColor: theme.colors.borderSubtle,
-        opacity: pressed ? 0.85 : 1,
-      })}
-    >
-      <MeterColumn
-        label={t('assistant.usage.registrations')}
-        used={usage?.registrations.used}
-        limit={usage?.registrations.limit}
-      />
-      <MeterColumn
-        label={t('assistant.usage.messages')}
-        used={usage?.messages.used}
-        limit={usage?.messages.limit}
-      />
-    </Pressable>
-  );
-}
-
 export function UsageMeter({ usage }: Props) {
+  const { theme } = useTheme();
   const { t } = useTranslation();
   const tier = useTier();
 
   return (
-    <Card padding={12}>
-      <View style={{ flexDirection: 'row', gap: 14 }}>
+    <View
+      style={{
+        padding: 16,
+        borderRadius: 20,
+        backgroundColor: theme.colors.bgFloat,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
+      }}
+    >
+      <View style={{ flexDirection: 'row', gap: 16 }}>
         <MeterColumn
           label={t('assistant.usage.registrations')}
           used={usage?.registrations.used}
@@ -71,10 +50,13 @@ export function UsageMeter({ usage }: Props) {
           limit={usage?.messages.limit}
         />
       </View>
-      <Text variant="caption" muted style={{ fontSize: 10.5, marginTop: 8 }}>
+      <Text
+        color={theme.colors.textTertiary}
+        style={{ fontSize: 11, lineHeight: 17, marginTop: 12 }}
+      >
         {t(tier === 'plus' ? 'assistant.usage.planPlus' : 'assistant.usage.planFree')}
       </Text>
-    </Card>
+    </View>
   );
 }
 
@@ -88,9 +70,14 @@ function MeterColumn({
   limit: number | undefined;
 }) {
   const { theme } = useTheme();
-  const pct = used !== undefined && limit !== undefined && limit > 0 ? used / limit : 0;
+  const filled =
+    used !== undefined && limit !== undefined && limit > 0
+      ? Math.min(1, used / limit)
+      : 0;
+  const spent = used !== undefined && limit !== undefined && used >= limit;
+
   return (
-    <View style={{ flex: 1, gap: 6 }}>
+    <View style={{ flex: 1, gap: 8 }}>
       <View
         style={{
           flexDirection: 'row',
@@ -101,18 +88,40 @@ function MeterColumn({
       >
         <Text
           variant="micro"
-          muted
           uppercase
           numberOfLines={1}
-          style={{ fontSize: 10, letterSpacing: 0.8, flexShrink: 1 }}
+          color={theme.colors.textTertiary}
+          style={{ letterSpacing: 1.6, flexShrink: 1 }}
         >
           {label}
         </Text>
-        <Text variant="caption" tabular color={theme.colors.textSecondary}>
-          {used ?? '–'}/{limit ?? '–'}
+        <Text
+          tabular
+          color={spent ? theme.colors.accentCoralSoft : theme.colors.textSecondary}
+          style={{ fontSize: 11.5 }}
+        >
+          {`${used ?? '–'}/${limit ?? '–'}`}
         </Text>
       </View>
-      <ProgressBar pct={pct} height={4} />
+
+      <View
+        style={{
+          height: 2,
+          borderRadius: 2,
+          backgroundColor: withAlpha(theme.colors.textPrimary, 0.1),
+          overflow: 'hidden',
+        }}
+      >
+        <View
+          style={{
+            width: `${filled * 100}%`,
+            height: '100%',
+            backgroundColor: spent
+              ? theme.colors.accentCoral
+              : withAlpha(theme.palette.acc, 0.75),
+          }}
+        />
+      </View>
     </View>
   );
 }

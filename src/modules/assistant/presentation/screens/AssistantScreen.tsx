@@ -376,6 +376,7 @@ export function AssistantScreen() {
       <ThreadSheet
         visible={threadOpen}
         messages={messages}
+        usage={usage.data}
         onClose={() => setThreadOpen(false)}
       />
 

@@ -552,7 +552,9 @@
         "applied": "Jugada aplicada",
         "notNow": "Ahora no",
         "backToAssistant": "Volver al Asistente"
-      }
+      },
+      "exit": "Salir",
+      "next": "Siguiente"
     },
     "summaries": {
       "title": "Resúmenes",

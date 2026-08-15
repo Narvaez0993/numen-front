@@ -552,7 +552,9 @@
         "applied": "Play applied",
         "notNow": "Not now",
         "backToAssistant": "Back to the Assistant"
-      }
+      },
+      "exit": "Exit",
+      "next": "Next"
     },
     "summaries": {
       "title": "Summaries",

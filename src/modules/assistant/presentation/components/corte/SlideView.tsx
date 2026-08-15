@@ -5,9 +5,9 @@ import { Animated, Easing, Pressable, useWindowDimensions, View } from 'react-na
 import { Ellipse, Svg } from 'react-native-svg';
 
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
-import type { AccentColor } from '@/shared/domain';
 import { Icon, IconBox, Text } from '@/shared/presentation/components';
-import { accentColorKey, useTheme } from '@/shared/presentation/theme';
+import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { monthName, shiftMonth, weekdayName } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
@@ -29,25 +29,15 @@ const CURVE = Easing.bezier(0.32, 0.72, 0, 1);
 const ON_MINT = '#0A0E1A';
 
 /**
- * One accent per story — the design's whole color system. The wash, the
- * kicker and the protagonist number all wear it; everything else stays
- * bg-base and text ramps ("Restrained Wrapped").
+ * There is no accent per slide any more.
+ *
+ * Each story used to pick its own — coral for the big number, amber for the
+ * categories, mint or coral for the pulse depending on the sign — so seven
+ * screens in a row each announced a different mood, and the colour was making a
+ * judgement the sentence had not made. The redesign gives the whole Corte one
+ * accent, the palette's, and lets the number be ink. Which stories are good news
+ * is what the words are for.
  */
-function accentFor(slide: Slide): AccentColor {
-  switch (slide.type) {
-    case 'big_number':
-      return 'coral';
-    case 'category_bars':
-    case 'goal':
-      return 'amber';
-    case 'fun_fact':
-      return 'purple';
-    case 'pulse':
-      return slide.deltaPct <= 0 ? 'mint' : 'coral';
-    default:
-      return 'mint';
-  }
-}
 
 /**
  * One story slide, full screen, faithful to the Corte design: an atmospheric
@@ -60,12 +50,12 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const language = i18n.language;
-  const catalogs = useMovementCatalogs();
   const { width, height } = useWindowDimensions();
 
-  const accent = accentFor(slide);
-  const accentFg = theme.colors[accentColorKey(accent, 'fg')];
-  const accentBg = theme.colors[accentColorKey(accent, 'bg')];
+  // One accent for the whole Corte. `accentFg` is what the kicker, the links and
+  // the leading bar wear; `accentBg` is the wash behind the story.
+  const accentFg = theme.palette.acc;
+  const accentBg = withAlpha(theme.palette.acc, 0.12);
   const month = monthName(`${corte.period}-01`, language);
 
   const narration = (delay = 320) => (
@@ -125,7 +115,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
               {t('assistant.corte.stories.kickerSpent', { month })}
             </Kicker>
             <View style={{ height: 18 }} />
-            <BigNum color={accentFg} size={54}>
+            <BigNum color={theme.colors.textPrimary} size={54}>
               {formatMoney(slide.amount)}
             </BigNum>
             <View style={{ height: 26 }} />
@@ -141,13 +131,13 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
             <View style={{ height: 24 }} />
             <View style={{ gap: 20 }}>
               {slide.bars.map((bar, position) => {
+                // The leader wears the accent; the rest are a tint to measure it
+                // against. Colouring each by its category turned the slide into
+                // the confetti Movimientos already gave up.
                 const color =
-                  theme.colors[
-                    accentColorKey(
-                      catalogs.categoryById[bar.categoryId]?.color ?? 'mint',
-                      'fg',
-                    )
-                  ];
+                  position === 0
+                    ? theme.palette.acc
+                    : withAlpha(theme.colors.textPrimary, 0.22);
                 return (
                   <Rise key={bar.categoryId} delay={140 + position * 130}>
                     <View
@@ -230,7 +220,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
               </Text>
             </Rise>
             <View style={{ height: 20 }} />
-            <BigNum color={accentFg} size={50} delay={300}>
+            <BigNum color={theme.colors.textPrimary} size={50} delay={300}>
               {formatMoney(slide.amount)}
             </BigNum>
             <View style={{ height: 22 }} />
@@ -252,7 +242,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
           <View>
             <Kicker color={accentFg}>{t('assistant.corte.stories.kickerPulse')}</Kicker>
             <View style={{ height: 18 }} />
-            <BigNum color={accentFg} size={62}>
+            <BigNum color={theme.colors.textPrimary} size={62}>
               {`${less ? '−' : '+'}${pct}%`}
             </BigNum>
             <View style={{ height: 24 }} />
@@ -333,7 +323,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
             </Rise>
             <View style={{ height: 22 }} />
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
-              <BigNum color={accentFg} size={64} delay={220}>
+              <BigNum color={theme.colors.textPrimary} size={64} delay={220}>
                 {`${pct}%`}
               </BigNum>
               <Rise delay={400}>
@@ -550,7 +540,7 @@ function Kicker({ color, children }: { color: string; children: ReactNode }) {
         variant="micro"
         uppercase
         color={color}
-        style={{ fontSize: 11, fontWeight: '500', letterSpacing: 1.54 }}
+        style={{ fontSize: 10.5, letterSpacing: 2.4 }}
       >
         {children}
       </Text>
@@ -558,7 +548,13 @@ function Kicker({ color, children }: { color: string; children: ReactNode }) {
   );
 }
 
-/** The number that owns the screen — always in the story's accent. */
+/**
+ * The number that owns the screen — in ink.
+ *
+ * No `lineHeight`. It was `size * 1.02`, which is a box the height of the font
+ * for a font that draws taller than that, so at 54px the tops of the digits came
+ * off. Computed, so the project's scan for this could not see it.
+ */
 function BigNum({
   color,
   size,
@@ -578,7 +574,6 @@ function BigNum({
         style={{
           fontFamily: 'Geist_500Medium',
           fontSize: size,
-          lineHeight: Math.round(size * 1.02),
           letterSpacing: -0.045 * size,
         }}
       >

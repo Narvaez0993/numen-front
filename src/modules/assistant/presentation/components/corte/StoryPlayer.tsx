@@ -125,7 +125,7 @@ export function StoryPlayer({ corte, onClose, onOpenFlat, playAction }: Props) {
                 justifyContent: 'space-between',
               }}
             >
-              {/* The design's wordmark: «El Corte.» with the mint period. */}
+              {/* «El Corte.» — the period is the only accent in the header. */}
               <Text
                 variant="label"
                 color={theme.colors.textSecondary}
@@ -134,7 +134,7 @@ export function StoryPlayer({ corte, onClose, onOpenFlat, playAction }: Props) {
                 {t('assistant.corte.title')}
                 <Text
                   variant="label"
-                  color={theme.colors.accentMint}
+                  color={theme.palette.acc}
                   style={{ fontSize: 12.5 }}
                 >
                   .
@@ -164,14 +164,72 @@ export function StoryPlayer({ corte, onClose, onOpenFlat, playAction }: Props) {
             <View style={{ flex: 1 }} />
           )}
 
-          <View style={{ paddingBottom: insets.bottom + 6 }} />
+          {/* The way out and the way on, said in words.
+              Tapping the sides moves between stories and always did, but that is
+              a thing you have to already know — and the counter is what tells you
+              a Corte ends rather than loops. */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingHorizontal: 26,
+              paddingBottom: insets.bottom + 12,
+            }}
+          >
+            <Pressable
+              accessibilityRole="button"
+              onPress={onClose}
+              style={({ pressed }) => ({
+                minHeight: 44,
+                justifyContent: 'center',
+                opacity: pressed ? 0.7 : 1,
+              })}
+            >
+              <Text color={theme.colors.textTertiary} style={{ fontSize: 11.5 }}>
+                {t('assistant.corte.exit')}
+              </Text>
+            </Pressable>
+
+            <Text tabular color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
+              {`${index + 1}/${slides.length}`}
+            </Text>
+
+            <Pressable
+              accessibilityRole="button"
+              disabled={index >= slides.length - 1}
+              onPress={() => goTo(index + 1)}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 7,
+                minHeight: 44,
+                opacity: index >= slides.length - 1 ? 0 : pressed ? 0.7 : 1,
+              })}
+            >
+              <Text
+                color={theme.palette.acc3}
+                style={{ fontSize: 12, fontWeight: '500' }}
+              >
+                {t('assistant.corte.next')}
+              </Text>
+              <Icon
+                name="chevron-right"
+                size={14}
+                stroke={2.2}
+                color={theme.palette.acc}
+              />
+            </Pressable>
+          </View>
         </View>
       </Pressable>
     </View>
   );
 }
 
-/** The design's chrome buttons: a 30px float circle with a subtle border. */
+/** The chrome buttons. 44px, not the 30 they were: they sit in the corner of a
+ *  screen whose whole surface is a tap target for moving between stories, so
+ *  missing one by 7px meant skipping the story instead of leaving. */
 function ChromeButton({ icon, onPress }: { icon: string; onPress: () => void }) {
   const { theme } = useTheme();
   return (
@@ -180,9 +238,9 @@ function ChromeButton({ icon, onPress }: { icon: string; onPress: () => void }) 
       onPress={onPress}
       hitSlop={8}
       style={({ pressed }) => ({
-        width: 30,
-        height: 30,
-        borderRadius: 15,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         backgroundColor: theme.colors.bgFloat,
         borderWidth: 1,
         borderColor: theme.colors.borderSubtle,
@@ -191,7 +249,7 @@ function ChromeButton({ icon, onPress }: { icon: string; onPress: () => void }) 
         opacity: pressed ? 0.8 : 1,
       })}
     >
-      <Icon name={icon} size={14} color={theme.colors.textSecondary} />
+      <Icon name={icon} size={15} stroke={2} color={theme.colors.textSecondary} />
     </Pressable>
   );
 }

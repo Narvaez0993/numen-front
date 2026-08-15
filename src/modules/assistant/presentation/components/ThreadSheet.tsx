@@ -9,11 +9,14 @@ import {
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
-import type { ChatMessage } from '../../domain/types/Assistant';
+import type { AssistantUsage, ChatMessage } from '../../domain/types/Assistant';
+
+import { UsageMeter } from './UsageMeter';
 
 type Props = {
   visible: boolean;
   messages: ChatMessage[];
+  usage: AssistantUsage | undefined;
   onClose: () => void;
 };
 
@@ -37,7 +40,7 @@ function textOf(message: ChatMessage): string {
  * Newest first. You open it to find what was said a moment ago, not to read the
  * conversation from the beginning.
  */
-export function ThreadSheet({ visible, messages, onClose }: Props) {
+export function ThreadSheet({ visible, messages, usage, onClose }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -65,6 +68,10 @@ export function ThreadSheet({ visible, messages, onClose }: Props) {
         }}
         showsVerticalScrollIndicator={false}
       >
+        <View style={{ paddingBottom: 4 }}>
+          <UsageMeter usage={usage} />
+        </View>
+
         {shown.length === 0 ? (
           <Text color={theme.colors.textTertiary} style={{ fontSize: 12.5 }}>
             {t('assistant.thread.empty')}

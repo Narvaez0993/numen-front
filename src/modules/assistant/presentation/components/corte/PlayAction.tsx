@@ -1,14 +1,75 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { Button, Text } from '@/shared/presentation/components';
+import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 import type { AgentOutput, AgentPlay } from '../../../domain/types/AgentFeed';
 import { useApplyPlay } from '../../hooks/useCorteMutations';
 import { PlayAccountSheet } from './PlayAccountSheet';
+
+/** The one solid button of a story: light on dark, dark on light. It is the only
+ *  thing on the screen that changes anything, so it is the only thing filled. */
+function SolidButton({
+  label,
+  busy = false,
+  onPress,
+}: {
+  label: string;
+  busy?: boolean;
+  onPress: () => void;
+}) {
+  const { theme } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: busy }}
+      disabled={busy}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 18,
+        borderRadius: 16,
+        backgroundColor: theme.colors.textPrimary,
+        opacity: busy ? 0.5 : pressed ? 0.85 : 1,
+      })}
+    >
+      <Text color={theme.colors.bgBase} style={{ fontSize: 12.5, fontWeight: '600' }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+/** The quieter one, for a step that leads somewhere rather than doing something. */
+function GhostButton({ label, onPress }: { label: string; onPress: () => void }) {
+  const { theme } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 18,
+        borderRadius: 16,
+        backgroundColor: theme.colors.bgFloat,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
+      <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
 
 type Props = {
   /** The Corte or the weekly review the play belongs to. */
@@ -48,9 +109,8 @@ export function PlayAction({ output, play, today }: Props) {
           >
             {t('assistant.corte.play.planLimit')}
           </Text>
-          <Button
+          <GhostButton
             label={t('assistant.corte.play.seePlus')}
-            variant="secondary"
             onPress={() => router.push('/plan')}
           />
         </View>
@@ -65,10 +125,9 @@ export function PlayAction({ output, play, today }: Props) {
 
   return (
     <>
-      <Button
+      <SolidButton
         label={t('assistant.corte.play.apply')}
-        loading={apply.isPending || play.status === 'applying'}
-        disabled={apply.isPending || play.status === 'applying'}
+        busy={apply.isPending || play.status === 'applying'}
         onPress={() =>
           play.action === 'contribute_goal' ? setPickingAccount(true) : run(null)
         }
