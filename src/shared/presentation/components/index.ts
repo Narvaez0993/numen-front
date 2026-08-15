@@ -1,5 +1,7 @@
 export * from './AmountKeypad';
 export * from './AmountSheet';
+export * from './Segmented';
+export * from './SheetShell';
 export * from './Aurora';
 export * from './KeypadAmount';
 export * from './Orb';

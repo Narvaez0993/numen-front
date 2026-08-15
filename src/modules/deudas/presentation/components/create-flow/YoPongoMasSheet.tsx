@@ -1,133 +1,77 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TextInput, View } from 'react-native';
 
-import { BottomSheet, Button, Text } from '@/shared/presentation/components';
+import type { CurrencyCode } from '@/shared/domain';
+import { AmountSheet, SheetHeaderButton, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   visible: boolean;
   total: number;
+  currency: CurrencyCode;
   personsCount: number;
   onClose: () => void;
-  onApply: (yoAmount: number) => void;
+  onApply: (mine: number) => void;
 };
 
-const formatThousands = (n: number) =>
-  n > 0 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
-
+/**
+ * "Yo pongo más" — you type your own share, and the rest divides itself.
+ *
+ * It is the one shortcut that cannot be a chip: the number is different every
+ * time. What it gives back is the same arithmetic the split step does, run
+ * backwards, so the line under the amount says what each of the others ends up
+ * owing before you commit to it.
+ */
 export function YoPongoMasSheet({
   visible,
   total,
+  currency,
   personsCount,
   onClose,
   onApply,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const [val, setVal] = useState(0);
+  const [digits, setDigits] = useState('');
 
   useEffect(() => {
-    if (visible) setVal(0);
+    if (visible) setDigits('');
   }, [visible]);
 
-  const valid = val > 0 && val <= total;
-  const others = personsCount;
-  const perOther = others > 0 ? Math.floor((total - val) / others / 100) * 100 : 0;
-  const display = formatThousands(val);
+  const mine = Number(digits || '0');
+  const valid = mine > 0 && mine <= total;
+  const perOther =
+    personsCount > 0 ? Math.floor((total - mine) / personsCount / 100) * 100 : 0;
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} maxHeight="60%">
-      <View style={{ paddingHorizontal: 22, paddingTop: 14, paddingBottom: 26 }}>
-        <View style={{ paddingRight: 40, paddingBottom: 16 }}>
-          <Text
-            style={{
-              fontSize: 19,
-              fontWeight: '500',
-              letterSpacing: -0.38,
-              marginBottom: 6,
-            }}
-          >
-            {t('deudas.create.yoPongoMas.title')}
+    <AmountSheet
+      visible={visible}
+      onClose={onClose}
+      digits={digits}
+      onDigits={setDigits}
+      currency={currency}
+      label={t('deudas.create.yoPongoMas.title')}
+      help={
+        valid
+          ? t('deudas.create.yoPongoMas.perOther', {
+              count: personsCount,
+              amount: formatMoney(perOther, currency),
+            })
+          : t('deudas.create.yoPongoMas.subtitle', { count: personsCount })
+      }
+      amountColor={mine > total ? theme.colors.accentCoral : undefined}
+      primaryLabel={t('deudas.create.yoPongoMas.apply')}
+      primaryDisabled={!valid}
+      onPrimary={() => valid && onApply(mine)}
+      header={
+        <>
+          <SheetHeaderButton icon="x" label={t('common.close')} onPress={onClose} />
+          <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, fontWeight: '500' }}>
+            {t('deudas.create.iPayMore')}
           </Text>
-          <Text
-            color={theme.colors.textSecondary}
-            style={{ fontSize: 13, lineHeight: 18.85 }}
-          >
-            {t('deudas.create.yoPongoMas.subtitle', { count: others })}
-          </Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'baseline',
-            gap: 4,
-            paddingVertical: 8,
-            borderBottomWidth: 2,
-            borderBottomColor: theme.colors.borderDefault,
-          }}
-        >
-          <Text color={theme.colors.textSecondary} style={{ fontSize: 18 }}>
-            $
-          </Text>
-          <TextInput
-            autoFocus
-            keyboardType="numeric"
-            inputMode="numeric"
-            value={display}
-            onChangeText={(v) => {
-              const raw = v.replace(/\D/g, '').slice(0, 10);
-              setVal(raw === '' ? 0 : parseInt(raw, 10));
-            }}
-            placeholder="0"
-            placeholderTextColor={theme.colors.textTertiary}
-            style={{
-              flex: 1,
-              color: theme.colors.textPrimary,
-              fontSize: 28,
-              fontFamily: 'Geist_500Medium',
-              letterSpacing: -0.56,
-              padding: 0,
-              fontVariant: ['tabular-nums'],
-            }}
-          />
-        </View>
-
-        {valid && others > 0 ? (
-          <View
-            style={{
-              marginTop: 14,
-              paddingVertical: 10,
-              paddingHorizontal: 12,
-              backgroundColor: theme.colors.bgFloat,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              borderRadius: 10,
-            }}
-          >
-            <Text
-              color={theme.colors.textSecondary}
-              style={{ fontSize: 12, lineHeight: 17.4 }}
-            >
-              {t('deudas.create.yoPongoMas.perOther', {
-                count: others,
-                amount: formatMoney(perOther),
-              })}
-            </Text>
-          </View>
-        ) : null}
-
-        <View style={{ marginTop: 18 }}>
-          <Button
-            full
-            label={t('deudas.create.yoPongoMas.apply')}
-            disabled={!valid}
-            onPress={() => valid && onApply(val)}
-          />
-        </View>
-      </View>
-    </BottomSheet>
+        </>
+      }
+    />
   );
 }

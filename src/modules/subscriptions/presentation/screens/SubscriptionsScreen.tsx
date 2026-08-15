@@ -15,7 +15,7 @@ import {
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
-import { formatMoney } from '@/shared/presentation/utils/formatMoney';
+import { amountDigits, formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import {
   ChargeAlreadySettledError,
@@ -224,7 +224,7 @@ export function SubscriptionsScreen() {
                 letterSpacing: -2.1,
               }}
             >
-              {formatMoney(data.monthly, data.currency).replace(/^[^\d-]*/, '')}
+              {amountDigits(data.monthly, data.currency)}
             </Text>
           </View>
           {/* The yearly figure is the one that changes minds. */}

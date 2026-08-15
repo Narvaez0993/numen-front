@@ -6,7 +6,7 @@ import type { CurrencyCode } from '@/shared/domain';
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { withAlpha } from '@/shared/presentation/theme/tokens';
-import { formatMoney } from '@/shared/presentation/utils/formatMoney';
+import { amountDigits } from '@/shared/presentation/utils/formatMoney';
 
 import type { Cap } from '../../domain';
 
@@ -71,7 +71,7 @@ export function BudgetHero({ cap, currency, daysElapsed, daysLeft }: Props) {
             letterSpacing: -2.2,
           }}
         >
-          {formatMoney(Math.abs(cap.remaining), currency).replace(/^[^\d]*/, '')}
+          {amountDigits(Math.abs(cap.remaining), currency)}
         </Text>
       </View>
 

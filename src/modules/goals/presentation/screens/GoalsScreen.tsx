@@ -17,7 +17,7 @@ import {
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
-import { formatMoney } from '@/shared/presentation/utils/formatMoney';
+import { amountDigits, formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { GoalLimitReachedError, GoalNotEmptyError, type Goal } from '../../domain';
 import { ContributionSheet } from '../components/ContributionSheet';
@@ -237,7 +237,7 @@ export function GoalsScreen() {
                 letterSpacing: -2,
               }}
             >
-              {formatMoney(savedTotal, currency).replace(/^[^\d-]*/, '')}
+              {amountDigits(savedTotal, currency)}
             </Text>
           </View>
           {active.length > 0 ? (

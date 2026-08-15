@@ -1066,9 +1066,15 @@
   },
   "deudas": {
     "title": "Debts",
-    "summary": {
-      "owedToMe": "owe me",
-      "iOwe": "I owe"
+    "hero": {
+      "incoming": "owed to me",
+      "outgoing": "i owe",
+      "foot": {
+        "incoming_one": "{{count}} person owes you",
+        "incoming_other": "{{count}} people owe you",
+        "outgoing_one": "you owe {{count}} person",
+        "outgoing_other": "you owe {{count}} people"
+      }
     },
     "tabs": {
       "incoming": "Owed to me",
@@ -1081,151 +1087,131 @@
       "overdue": "OVERDUE",
       "written_off": "WRITTEN OFF"
     },
-    "pctPaid": "{{pct}}% paid",
     "due": {
       "none": "no due date",
       "todayLabel": "due today",
-      "overdue_one": "overdue by {{count}} day",
-      "overdue_other": "overdue by {{count}} days",
+      "overdue_one": "{{count}} day overdue",
+      "overdue_other": "{{count}} days overdue",
       "inDays_one": "due in {{count}} day",
       "inDays_other": "due in {{count}} days",
       "onDate": "due {{date}}"
     },
     "card": {
-      "loanShort": "Loan",
-      "sharedWith_one": "Shared with {{count}} person",
-      "sharedWith_other": "Shared with {{count}} people",
-      "collected": "collected",
-      "pending_one": "{{count}} pending",
-      "pending_other": "{{count}} pending",
-      "remaining": "{{amount}} to go",
-      "bulkMarkPaid": "Mark several as paid"
+      "sharedWith_one": "{{count}} person",
+      "sharedWith_other": "{{count}} people"
     },
     "empty": {
       "incomingTitle": "Nobody owes you",
-      "outgoingTitle": "You don't owe anyone",
-      "incomingBody": "When you lend money or pay for others, log it here so you don't forget to collect.",
-      "outgoingBody": "When someone lends you money or pays something for you, log it here.",
-      "cta": "New debt"
+      "outgoingTitle": "You owe nobody",
+      "body": "When you lend or borrow, just say it and I'll note it here so you don't have to keep the tally in your head."
     },
+    "newDebt": "Note a new debt",
+    "voiceHint": "Or say it: “I lent Andrés 50”",
+    "viewHistory": "See history",
     "history": {
       "title": "Debt history",
-      "subtitle": "The ones that closed: collected or written off.",
-      "empty": "No paid debts yet.",
+      "subtitle": "The closed ones: collected, or given up on.",
+      "empty": "No closed debts yet.",
       "noNote": "No note"
     },
     "detail": {
-      "balancePending": "Pending balance",
-      "ofOriginal": "of {{amount}} original",
-      "overdueAlert": "This debt was due on {{date}}. Consider reaching out to {{name}}.",
       "subTheyOweYou": "Owes you",
       "subYouOweThem": "You owe",
-      "partOf": "Part of '{{event}}'",
-      "registerAbono": "Record payment",
+      "partOf": "Part of “{{event}}”",
+      "ofOriginal": "of {{amount}} originally",
+      "payments": "Payments",
+      "noPayments": "No payments yet.",
+      "payLabel": "Pay",
+      "payAll": "All",
+      "payOther": "Other",
+      "done": "Done",
       "delete": "Delete debt",
       "deleted": "Debt deleted"
     },
     "abono": {
-      "title": "Record payment",
+      "title": "Record a payment",
       "subIncoming": "{{name}} paid you",
       "subOutgoing": "Payment to {{name}}",
-      "balanceLabel": "Current balance",
+      "accountIn": "Which account did it land in?",
+      "accountOut": "Which account did it leave?",
+      "noAccount": "Pick one",
       "save": "Save payment",
       "toast": "Payment recorded · {{amount}}",
-      "overpaid": "That payment is more than what is left.",
-      "accountIn": "Which account did it land in?",
-      "accountOut": "Which account did it leave?"
+      "overpaid": "That is more than what is left."
+    },
+    "account": {
+      "none": "No cash moved"
     },
     "create": {
-      "step": "Step {{current}} of {{total}}",
+      "titles": {
+        "who": "Who is this debt with?",
+        "amount": "How much are we talking about?",
+        "split": "How does it split?",
+        "detail": "A couple of details and we're done"
+      },
+      "searchPeople": "Search your contacts",
+      "addAsNew": "Add as a new person",
+      "newPerson": "New person",
+      "openDebts_one": "{{count}} open debt",
+      "openDebts_other": "{{count}} open debts",
+      "noOpenDebts": "No open debts",
+      "noPeople": "Type a name to add someone.",
+      "theyOweMe": "Owes me",
+      "iOweThem": "I owe them",
+      "equalSplit": "Even split · {{amount}}",
+      "iPayMore": "I put in more",
+      "you": "You",
+      "yourShare": "Your share",
+      "splitOver": "{{amount}} over the total",
+      "why": "What for",
+      "whyPlaceholder": "Lent for groceries",
+      "eventName": "Name",
+      "eventPlaceholder": "Friday dinner",
+      "defaultEventName": "Shared expense",
+      "cameFrom": "Came out of",
+      "wentTo": "Went into",
+      "remindMe": "Remind me",
+      "remindMeHint": "If it is still unpaid in {{count}} days",
+      "soFar": "This is it",
+      "summaryOwesYou": "{{name}} owes you",
+      "summaryYouOwe": "You owe {{name}}",
+      "summaryShared_one": "{{count}} person",
+      "summaryShared_other": "{{count}} people",
+      "noReason": "No reason given",
       "next": "Continue",
-      "saveIndividual": "Save debt",
-      "saveShared": "Create shared debt",
-      "step1": {
-        "title": "New debt",
-        "subtitle": "Who is involved?",
-        "personsLabel_one": "Person",
-        "personsLabel_other": "People ({{count}})",
-        "searchPlaceholder": "Search or add a person",
-        "addPersonPrefix": "Add",
-        "addPersonSuffix": "as a new person",
-        "sharedBanner": "You are creating a shared expense. There will be an extra step to split the total."
-      },
-      "step2": {
-        "titleIndividual": "Loan details",
-        "titleShared": "Expense details",
-        "subIndividual": "How much, and which account does it leave?",
-        "subShared": "Total amount and category of the expense.",
-        "amountLabel": "Amount",
-        "amountSharedLabel": "Total amount",
-        "dueLabel": "Due date",
-        "dueSheetTitle": "Due date",
-        "dueNone": "No due date",
-        "optional": "Optional",
-        "noteLabel": "Note (optional)",
-        "notePlaceholder": "Ex. Thursday lunch, car loan, etc.",
-        "noteSharedLabel": "Event name",
-        "noteSharedPlaceholder": "Friday dinner, trip, gift…",
-        "accountOutLabel": "Which account did it leave?",
-        "accountInLabel": "Which account did it land in?",
-        "accountNone": "No money moved (I logged it separately)",
-        "accountHintOut": "Lending is not spending: the cash leaves your account and becomes a claim, not an expense for the month.",
-        "accountHintIn": "Money you borrowed lands in your account and is booked as a debt, not as income."
-      },
-      "step3": {
-        "title": "How is it split?",
-        "subtitle": "Total {{amount}} · {{count}} people",
-        "equalSplit": "Equal parts · {{amount}} each",
-        "youPayMore": "I pay more, the rest is split",
-        "personsLabel": "People",
-        "you": "Me",
-        "yourPart": "Your actual share",
-        "pctOfTotal": "{{pct}}% of total",
-        "sumLabel": "Total split",
-        "remaining": "{{amount}} short",
-        "overage": "{{amount}} over"
-      },
-      "yoPongoMas": {
-        "title": "How much are you paying?",
-        "subtitle_one": "The rest stays with the other person.",
-        "subtitle_other": "The rest is split among the other {{count}} people.",
-        "perOther_one": "The other person pays {{amount}}",
-        "perOther_other": "Each of the other {{count}} pays {{amount}}",
-        "apply": "Apply"
-      },
+      "save": "Save debt",
+      "voiceHint": "Or just say it: “I lent Julián 80 thousand”",
       "toastIndividual": "Debt recorded · {{name}}",
-      "toastShared": "Shared debt created · {{event}}"
+      "toastShared": "Shared debt created · {{event}}",
+      "yoPongoMas": {
+        "title": "How much do you put in?",
+        "subtitle_one": "The rest goes to the other person.",
+        "subtitle_other": "The rest splits between the other {{count}} people.",
+        "perOther_one": "The other person puts in {{amount}}",
+        "perOther_other": "Each of the other {{count}} puts in {{amount}}",
+        "apply": "Apply"
+      }
     },
-    "viewHistory": "See history",
     "share": {
       "button": "Share summary",
-      "messageIncoming": "Hi {{name}}: friendly reminder — you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
+      "messageIncoming": "Hi {{name}}: just a reminder that you owe me {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
       "messageOutgoing": "Hi {{name}}: I haven't forgotten — I owe you {{balance}} (of {{total}}, {{pct}}% paid). — sent from Deshka",
-      "ofEvent": "for {{event}}",
-      "dueOn": "due {{date}}"
+      "ofEvent": "from {{event}}"
+    },
+    "confirmDelete": {
+      "body": "Tap again and the record, its payments and the movements that moved that money are all deleted."
+    },
+    "writeOff": {
+      "action": "Forgive the rest",
+      "cta": "Yes, forgive it",
+      "toast": "Debt written off",
+      "banner": "You gave up on it on {{date}}. The expense was recorded that day.",
+      "reopen": "Reopen debt",
+      "reopenToast": "Debt reopened · the expense was removed"
     },
     "error": {
       "title": "We couldn't load your debts.",
-      "retry": "Try again"
-    },
-    "confirmDelete": {
-      "title": "Delete this debt?",
-      "body": "The record, its repayments and the movements that carried the cash are all removed. Your accounts go back to where they were.",
-      "cta": "Delete debt"
-    },
-    "account": {
-      "none": "No money moved"
-    },
-    "writeOff": {
-      "action": "Write it off",
-      "title": "Write off what {{name}} owes you?",
-      "body": "It books an expense for the cash that left your accounts and never came back. Until now it was a transfer and had cost you nothing.",
-      "undo": "If they pay later you can reopen it, and the expense is deleted.",
-      "cta": "Yes, write it off",
-      "toast": "Debt written off",
-      "banner": "You wrote this off on {{date}}. The expense was booked that day.",
-      "reopen": "Reopen debt",
-      "reopenToast": "Debt reopened · the expense was deleted"
+      "retry": "Retry"
     }
   },
   "profile": {

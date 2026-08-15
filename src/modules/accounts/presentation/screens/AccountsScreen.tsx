@@ -18,7 +18,7 @@ import {
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
-import { formatMoney } from '@/shared/presentation/utils/formatMoney';
+import { amountDigits, formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import {
   AccountLimitReachedError,
@@ -284,7 +284,7 @@ export function AccountsScreen() {
                 letterSpacing: -2,
               }}
             >
-              {formatMoney(cash, currency).replace(/^[^\d-]*/, '')}
+              {amountDigits(cash, currency)}
             </Text>
           </View>
           {/* Only when there is a card. Without one the line would be arithmetic

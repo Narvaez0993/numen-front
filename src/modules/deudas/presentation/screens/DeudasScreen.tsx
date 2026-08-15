@@ -2,90 +2,100 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { FAB, Icon, RetryState, Text, Toast } from '@/shared/presentation/components';
+import type { CurrencyCode } from '@/shared/domain';
+import {
+  Aurora,
+  DashedButton,
+  Icon,
+  RetryState,
+  Text,
+  Toast,
+} from '@/shared/presentation/components';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { useTheme } from '@/shared/presentation/theme';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DebtDirection } from '../../domain';
-import { DeudaCardIndividual } from '../components/DeudaCardIndividual';
+import { DebtHero } from '../components/DebtHero';
+import { DebtRow } from '../components/DebtRow';
 import { DeudaCardShared } from '../components/DeudaCardShared';
-import { DeudaDetail } from '../components/DeudaDetail';
-import { DeudasHeader } from '../components/DeudasHeader';
+import { DeudaDetailSheet } from '../components/DeudaDetailSheet';
 import { DirectionTabs } from '../components/DirectionTabs';
 import { EmptyDeudasState } from '../components/EmptyDeudasState';
-import { NuevaDeudaFlow } from '../components/create-flow/NuevaDeudaFlow';
-import { ConfirmDeleteSheet } from '../components/sheets/ConfirmDeleteSheet';
-import { ConfirmWriteOffSheet } from '../components/sheets/ConfirmWriteOffSheet';
+import { NuevaDeudaSheet } from '../components/create-flow/NuevaDeudaSheet';
 import { HistorySheet } from '../components/sheets/HistorySheet';
-import { RegistrarAbonoSheet } from '../components/sheets/RegistrarAbonoSheet';
 import { DebtsProvider } from '../context/DebtsContext';
 import { useDeleteDebt, useReopenDebt, useWriteOffDebt } from '../hooks/useDebtMutations';
 import { useDeudas } from '../hooks/useDeudas';
 import { useDeudasFlowStore } from '../stores/useDeudasFlowStore';
 
+type Item = { kind: 'debt'; id: string } | { kind: 'event'; id: string };
+
 /**
- * The ledger of who owes whom, running on the API.
+ * Who owes whom, as one list per side.
  *
- * The prototype held everything in a zustand store, so a debt registered on Tuesday
- * was gone on Wednesday. The snapshot is the state now: every sheet calls its
- * mutation, the query refreshes, and the whole screen redraws from truth.
+ * The screen used to lead with both totals at 12.5px and then a stack of cards.
+ * It now leads with the switch and the one total that answers the question you
+ * opened it with, and the debts are rows rather than cards — a card per person
+ * turns eight debts into eight boxes and loses the thread on the way down.
+ *
+ * A shared bill keeps its group and its disclosure, because four people who
+ * split a dinner are not four unrelated loans. It just wears the same row as
+ * everybody else, so the list still reads as one list.
  */
 export function DeudasScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const currency = useCurrencyStore((s) => s.currency) as CurrencyCode;
 
   // Pinned once per mount: `status` (and so overdue) is derived for this day.
   const today = useMemo(() => toIsoDate(new Date()), []);
   const { data, isLoading, isError, refetch } = useDeudas(today);
 
   const selectedDebtId = useDeudasFlowStore((s) => s.selectedDebtId);
-  const abonoForId = useDeudasFlowStore((s) => s.abonoForId);
   const createOpen = useDeudasFlowStore((s) => s.createOpen);
   const createDirection = useDeudasFlowStore((s) => s.createDirection);
   const openDetail = useDeudasFlowStore((s) => s.openDetail);
   const closeDetail = useDeudasFlowStore((s) => s.closeDetail);
-  const openAbono = useDeudasFlowStore((s) => s.openAbono);
-  const closeAbono = useDeudasFlowStore((s) => s.closeAbono);
   const openCreate = useDeudasFlowStore((s) => s.openCreate);
   const closeCreate = useDeudasFlowStore((s) => s.closeCreate);
 
   const [direction, setDirection] = useState<DebtDirection>('incoming');
-  const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [confirmWriteOffId, setConfirmWriteOffId] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ visible: boolean; message: string }>({
-    visible: false,
-    message: '',
-  });
+  const [toast, setToast] = useState<string | null>(null);
 
   const deleteDebt = useDeleteDebt();
-  const writeOffDebt = useWriteOffDebt(today);
-  const reopenDebt = useReopenDebt(today);
+  const writeOff = useWriteOffDebt(today);
+  const reopen = useReopenDebt(today);
 
-  const activeDebts = useMemo(
+  const active = useMemo(
     () =>
       (data?.debts ?? []).filter(
-        (d) =>
-          d.direction === direction && d.status !== 'paid' && d.status !== 'written_off',
+        (debt) =>
+          debt.direction === direction &&
+          debt.status !== 'paid' &&
+          debt.status !== 'written_off',
       ),
     [data, direction],
   );
 
-  // Group items: events first, then individuals
-  const items = useMemo(() => {
-    const individuals = activeDebts.filter((d) => !d.eventId);
+  /** Splits first, then the individual loans. A group is one entry either way. */
+  const items = useMemo<Item[]>(() => {
     const eventIds = Array.from(
-      new Set(activeDebts.filter((d) => d.eventId).map((d) => d.eventId!)),
+      new Set(active.filter((debt) => debt.eventId).map((debt) => debt.eventId!)),
     );
     return [
-      ...eventIds.map((eid) => ({ type: 'event' as const, eventId: eid })),
-      ...individuals.map((d) => ({ type: 'individual' as const, debt: d })),
+      ...eventIds.map((id) => ({ kind: 'event' as const, id })),
+      ...active
+        .filter((debt) => !debt.eventId)
+        .map((debt) => ({ kind: 'debt' as const, id: debt.id })),
     ];
-  }, [activeDebts]);
+  }, [active]);
 
   if (isError) {
     return (
@@ -105,6 +115,7 @@ export function DeudasScreen() {
   if (isLoading || !data) {
     return (
       <SafeAreaView
+        edges={['top']}
         style={{
           flex: 1,
           backgroundColor: theme.colors.bgBase,
@@ -112,212 +123,210 @@ export function DeudasScreen() {
           justifyContent: 'center',
         }}
       >
-        <ActivityIndicator color={theme.colors.accentMint} />
+        <ActivityIndicator color={theme.palette.acc} />
       </SafeAreaView>
     );
   }
 
-  const showToast = (message: string) => setToast({ visible: true, message });
+  const side = direction === 'incoming' ? data.owedToMe : data.iOwe;
 
-  const handleConfirmDelete = () => {
-    const id = confirmDeleteId;
-    setConfirmDeleteId(null);
-    if (!id) return;
+  const handleDelete = (id: string) => {
     closeDetail();
     deleteDebt.mutate(id, {
-      onSuccess: () => showToast(t('deudas.detail.deleted')),
-      onError: () => showToast(t('common.error')),
+      onSuccess: () => setToast(t('deudas.detail.deleted')),
+      onError: () => setToast(t('common.error')),
     });
   };
 
-  const handleConfirmWriteOff = () => {
-    const id = confirmWriteOffId;
-    setConfirmWriteOffId(null);
-    if (!id) return;
-    writeOffDebt.mutate(id, {
-      onSuccess: () => showToast(t('deudas.writeOff.toast')),
-      onError: () => showToast(t('common.error')),
+  const handleWriteOff = (id: string) => {
+    writeOff.mutate(id, {
+      onSuccess: () => {
+        closeDetail();
+        setToast(t('deudas.writeOff.toast'));
+      },
+      onError: () => setToast(t('common.error')),
     });
   };
 
   const handleReopen = (id: string) => {
-    reopenDebt.mutate(id, {
-      onSuccess: () => showToast(t('deudas.writeOff.reopenToast')),
-      onError: () => showToast(t('common.error')),
+    reopen.mutate(id, {
+      onSuccess: () => setToast(t('deudas.writeOff.reopenToast')),
+      onError: () => setToast(t('common.error')),
     });
   };
 
-  const writeOffTarget = confirmWriteOffId
-    ? data.debts.find((d) => d.id === confirmWriteOffId)
-    : undefined;
-
-  const sheets = (
-    <>
-      <RegistrarAbonoSheet
-        visible={!!abonoForId}
-        debtId={abonoForId}
-        onClose={closeAbono}
-        onSaved={(amount) =>
-          showToast(t('deudas.abono.toast', { amount: formatMoney(amount) }))
-        }
-      />
-      <NuevaDeudaFlow
-        visible={createOpen}
-        defaultDirection={createDirection}
-        onClose={closeCreate}
-        onCreated={showToast}
-        onFailed={showToast}
-      />
-      <ConfirmDeleteSheet
-        visible={confirmDeleteId !== null}
-        onConfirm={handleConfirmDelete}
-        onClose={() => setConfirmDeleteId(null)}
-      />
-      <ConfirmWriteOffSheet
-        visible={writeOffTarget !== undefined}
-        remaining={writeOffTarget?.remaining ?? 0}
-        name={
-          writeOffTarget
-            ? (data.counterparties.find((c) => c.id === writeOffTarget.counterpartyId)
-                ?.name ?? '')
-            : ''
-        }
-        busy={writeOffDebt.isPending}
-        onConfirm={handleConfirmWriteOff}
-        onClose={() => setConfirmWriteOffId(null)}
-      />
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        onDismiss={() => setToast({ visible: false, message: '' })}
-      />
-    </>
-  );
-
-  // === DETAIL VIEW ===
-  if (selectedDebtId) {
-    const exists = data.debts.find((d) => d.id === selectedDebtId);
-    if (!exists) {
-      closeDetail();
-      return null;
-    }
-    return (
-      <DebtsProvider snapshot={data}>
-        <SafeAreaView
-          style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-          edges={['top']}
-        >
-          <DeudaDetail
-            debtId={selectedDebtId}
-            onBack={closeDetail}
-            onAbono={() => openAbono(selectedDebtId)}
-            onDelete={() => setConfirmDeleteId(selectedDebtId)}
-            onWriteOff={() => setConfirmWriteOffId(selectedDebtId)}
-            onReopen={() => handleReopen(selectedDebtId)}
-          />
-          <FAB variant="pink" bottomOffset={28} onPress={() => openCreate(direction)} />
-          {sheets}
-        </SafeAreaView>
-      </DebtsProvider>
-    );
-  }
-
-  // === LIST VIEW ===
-  const isEmpty = items.length === 0;
-
   return (
     <DebtsProvider snapshot={data}>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-        edges={['top']}
-      >
+      <Aurora>
         <ScrollView
           contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 14,
-            paddingBottom: 130,
+            paddingTop: insets.top + 16,
+            paddingBottom: insets.bottom + 26,
           }}
           showsVerticalScrollIndicator={false}
         >
-          <View style={{ gap: 16 }}>
-            <DeudasHeader
-              onBack={() => router.back()}
-              onProfile={() => router.push('/profile')}
-            />
-            <DirectionTabs direction={direction} onChange={setDirection} />
-
-            {isEmpty ? (
-              <EmptyDeudasState
-                direction={direction}
-                onCreate={() => openCreate(direction)}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              paddingHorizontal: 22,
+            }}
+          >
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+              onPress={() => router.back()}
+              style={({ pressed }) => ({
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: theme.colors.bgFloat,
+                borderWidth: 1,
+                borderColor: theme.colors.borderSubtle,
+                opacity: pressed ? 0.8 : 1,
+              })}
+            >
+              <Icon
+                name="arrow-left"
+                size={16}
+                stroke={2}
+                color={theme.colors.textSecondary}
               />
+            </Pressable>
+            <Text style={{ fontSize: 16, fontWeight: '500' }}>{t('deudas.title')}</Text>
+          </View>
+
+          <View style={{ paddingHorizontal: 24, paddingTop: 20 }}>
+            <DirectionTabs direction={direction} onChange={setDirection} />
+          </View>
+
+          <DebtHero
+            direction={direction}
+            total={side.total}
+            count={side.count}
+            currency={currency}
+          />
+
+          <View style={{ paddingHorizontal: 26, paddingTop: 26 }}>
+            {items.length === 0 ? (
+              <EmptyDeudasState direction={direction} />
             ) : (
-              <View style={{ gap: 10 }}>
-                {items.map((item) => {
-                  if (item.type === 'individual') {
-                    return (
-                      <DeudaCardIndividual
-                        key={item.debt.id}
-                        deuda={item.debt}
-                        onPress={() => openDetail(item.debt.id)}
-                      />
-                    );
-                  }
-                  const ev = data.events.find((e) => e.id === item.eventId);
-                  if (!ev) return null;
-                  const eventDebts = activeDebts.filter(
-                    (d) => d.eventId === item.eventId,
-                  );
+              items.map((item, index) => {
+                const last = index === items.length - 1;
+                if (item.kind === 'event') {
+                  const event = data.events.find((one) => one.id === item.id);
+                  if (!event) return null;
                   return (
                     <DeudaCardShared
-                      key={item.eventId}
-                      event={ev}
-                      debts={eventDebts}
-                      expanded={expandedEvent === item.eventId}
-                      onToggle={() =>
-                        setExpandedEvent(
-                          expandedEvent === item.eventId ? null : item.eventId,
-                        )
-                      }
-                      onPersonPress={(d) => openDetail(d.id)}
+                      key={item.id}
+                      event={event}
+                      debts={active.filter((debt) => debt.eventId === item.id)}
+                      currency={currency}
+                      expanded={expanded === item.id}
+                      last={last}
+                      onToggle={() => setExpanded(expanded === item.id ? null : item.id)}
+                      onPersonPress={(debt) => openDetail(debt.id)}
                     />
                   );
-                })}
-              </View>
+                }
+                const debt = active.find((one) => one.id === item.id);
+                if (!debt) return null;
+                const person = data.counterparties.find(
+                  (one) => one.id === debt.counterpartyId,
+                );
+                return (
+                  <DebtRow
+                    key={debt.id}
+                    deuda={debt}
+                    name={person?.name ?? '—'}
+                    detail={
+                      debt.note?.trim() ||
+                      t(
+                        debt.direction === 'incoming'
+                          ? 'deudas.detail.subTheyOweYou'
+                          : 'deudas.detail.subYouOweThem',
+                      )
+                    }
+                    currency={currency}
+                    last={last}
+                    onPress={() => openDetail(debt.id)}
+                  />
+                );
+              })
             )}
-
-            {!isEmpty ? (
-              <Pressable
-                onPress={() => setHistoryOpen(true)}
-                style={({ pressed }) => ({
-                  marginTop: 4,
-                  alignSelf: 'center',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 6,
-                  paddingVertical: 12,
-                  paddingHorizontal: 8,
-                  opacity: pressed ? 0.7 : 1,
-                })}
-              >
-                <Text
-                  variant="label"
-                  color={theme.colors.textSecondary}
-                  style={{ fontSize: 12.5 }}
-                >
-                  {t('deudas.viewHistory')}
-                </Text>
-                <Icon name="chevron-right" size={12} color={theme.colors.textSecondary} />
-              </Pressable>
-            ) : null}
           </View>
+
+          <View style={{ paddingHorizontal: 24, paddingTop: 18 }}>
+            <DashedButton
+              label={t('deudas.newDebt')}
+              onPress={() => openCreate(direction)}
+            />
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 11, textAlign: 'center', marginTop: 12 }}
+            >
+              {t('deudas.voiceHint')}
+            </Text>
+          </View>
+
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setHistoryOpen(true)}
+            style={({ pressed }) => ({
+              alignSelf: 'center',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              minHeight: 44,
+              paddingHorizontal: 8,
+              marginTop: 6,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Text color={theme.colors.textTertiary} style={{ fontSize: 12 }}>
+              {t('deudas.viewHistory')}
+            </Text>
+            <Icon name="chevron-right" size={12} color={theme.colors.textTertiary} />
+          </Pressable>
         </ScrollView>
 
-        <FAB variant="pink" onPress={() => openCreate(direction)} />
+        <DeudaDetailSheet
+          debtId={selectedDebtId}
+          currency={currency}
+          writingOff={writeOff.isPending}
+          onClose={closeDetail}
+          onWriteOff={() => selectedDebtId && handleWriteOff(selectedDebtId)}
+          onReopen={() => selectedDebtId && handleReopen(selectedDebtId)}
+          onDelete={() => selectedDebtId && handleDelete(selectedDebtId)}
+          onPaid={(amount) =>
+            setToast(t('deudas.abono.toast', { amount: formatMoney(amount, currency) }))
+          }
+        />
 
-        <HistorySheet visible={historyOpen} onClose={() => setHistoryOpen(false)} />
-        {sheets}
-      </SafeAreaView>
+        <NuevaDeudaSheet
+          visible={createOpen}
+          defaultDirection={createDirection}
+          currency={currency}
+          onClose={closeCreate}
+          onCreated={setToast}
+          onFailed={setToast}
+        />
+
+        <HistorySheet
+          visible={historyOpen}
+          currency={currency}
+          onClose={() => setHistoryOpen(false)}
+        />
+
+        <Toast
+          visible={toast !== null}
+          message={toast ?? ''}
+          onDismiss={() => setToast(null)}
+        />
+      </Aurora>
     </DebtsProvider>
   );
 }

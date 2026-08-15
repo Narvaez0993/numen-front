@@ -12,6 +12,7 @@ import {
   DatePickerSheet,
   SheetDangerAction,
   SheetFieldRow,
+  Segmented,
   SheetHeaderButton,
   Text,
 } from '@/shared/presentation/components';
@@ -180,44 +181,15 @@ export function SubscriptionFormSheet({
         header={
           <>
             <SheetHeaderButton icon="x" label={t('common.close')} onPress={onClose} />
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                gap: 6,
-                padding: 3,
-                borderRadius: 14,
-                backgroundColor: theme.colors.bgSurface,
-              }}
-            >
-              {FREQUENCIES.map((option) => {
-                const selected = option === frequency;
-                return (
-                  <Pressable
-                    key={option}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}
-                    onPress={() => setFrequency(option)}
-                    style={({ pressed }) => ({
-                      flex: 1,
-                      alignItems: 'center',
-                      paddingVertical: 8,
-                      borderRadius: 11,
-                      backgroundColor: selected ? theme.colors.bgElevated : 'transparent',
-                      opacity: pressed ? 0.8 : 1,
-                    })}
-                  >
-                    <Text
-                      color={
-                        selected ? theme.colors.textPrimary : theme.colors.textTertiary
-                      }
-                      style={{ fontSize: 12.5, fontWeight: '500' }}
-                    >
-                      {t(`subscriptions.form.cadences.${option}`)}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+            <View style={{ flex: 1 }}>
+              <Segmented
+                value={frequency}
+                onChange={setFrequency}
+                options={FREQUENCIES.map((option) => ({
+                  value: option,
+                  label: t(`subscriptions.form.cadences.${option}`),
+                }))}
+              />
             </View>
             {editing ? (
               <SheetDangerAction

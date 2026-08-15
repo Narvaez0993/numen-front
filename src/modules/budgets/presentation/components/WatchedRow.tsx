@@ -4,7 +4,7 @@ import type { CurrencyCode } from '@/shared/domain';
 import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { withAlpha } from '@/shared/presentation/theme/tokens';
-import { formatMoney } from '@/shared/presentation/utils/formatMoney';
+import { amountDigits, formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
   name: string;
@@ -101,7 +101,7 @@ export function WatchedRow({
             style={{ fontSize: 13.5, fontWeight: '400' }}
           >
             {' / '}
-            {formatMoney(target, currency).replace(/^[^\d]*/, '')}
+            {amountDigits(target, currency)}
           </Text>
         </Text>
       </View>

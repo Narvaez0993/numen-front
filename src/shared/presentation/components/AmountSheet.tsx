@@ -1,14 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Modal, Pressable, ScrollView, View } from 'react-native';
-import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, ScrollView, View } from 'react-native';
 
 import type { CurrencyCode } from '@/shared/domain';
 
@@ -19,39 +11,8 @@ import { withAlpha } from '../theme/tokens';
 import { AmountKeypad, pressAmountKey } from './AmountKeypad';
 import { Icon } from './Icon';
 import { KeypadAmount } from './KeypadAmount';
-import { Scrim } from './Scrim';
+import { SHEET_TOP, SheetShell } from './SheetShell';
 import { Text } from './Text';
-
-/** The design pins every one of these 150px from the top rather than sizing it
- *  to its content: the keypad has to land in the same place every time, whatever
- *  is being typed into it. */
-const SHEET_TOP = 150;
-
-/** The bundle's own keyframe:
- *
- *    @keyframes sheetUp { from { transform:translateY(40px); opacity:.6 }
- *                         to   { transform:translateY(0);    opacity:1  } }
- *
- * at `.26s ease`. A short rise rather than a slide from off-screen: the sheet
- * settles into a place it was nearly at already, which is what makes it read as
- * arriving rather than as being thrown. */
-/**
- * The sheet's motion, matched to `BottomSheet`'s — which is the one in this app
- * that feels right, and the reason is worth writing down.
- *
- * **The panel slides the whole way off the screen.** It does not fade. An
- * earlier version rose 40px and dropped to 60% opacity, taken from the bundle's
- * `sheetUp` keyframe — right for an entrance, and as an exit it meant the sheet
- * finished still visible and was then removed. That cut is what read as sticking.
- * With a full slide there is nothing left on screen to cut.
- *
- * The scrim also runs faster than the panel, both ways. The light comes back
- * before the sheet has finished leaving, which is what makes the screen behind
- * feel like it was there all along.
- */
-const SCREEN_HEIGHT = Dimensions.get('window').height;
-const IN = { scrim: 220, panel: 320 };
-const OUT = { scrim: 180, panel: 240 };
 
 type Props = {
   visible: boolean;
@@ -156,232 +117,129 @@ export function AmountSheet({
   overlays,
 }: Props) {
   const { theme } = useTheme();
-  const { t } = useTranslation();
   const lift = useKeyboardInset();
   const system = keyboard === 'system';
 
-  // The Modal outlives `visible` by exactly one animation, so the sheet can be
-  // seen leaving instead of blinking out.
-  const [mounted, setMounted] = useState(visible);
-  const scrim = useSharedValue(0);
-  const slide = useSharedValue(SCREEN_HEIGHT);
-
-  useEffect(() => {
-    if (visible) {
-      setMounted(true);
-      scrim.value = withTiming(1, {
-        duration: IN.scrim,
-        easing: Easing.out(Easing.quad),
-      });
-      slide.value = withTiming(0, {
-        duration: IN.panel,
-        easing: Easing.out(Easing.cubic),
-      });
-      return;
-    }
-    scrim.value = withTiming(0, {
-      duration: OUT.scrim,
-      easing: Easing.in(Easing.quad),
-    });
-    slide.value = withTiming(
-      SCREEN_HEIGHT,
-      { duration: OUT.panel, easing: Easing.in(Easing.cubic) },
-      (finished) => {
-        if (finished) runOnJS(setMounted)(false);
-      },
-    );
-  }, [visible, scrim, slide]);
-
-  const scrimStyle = useAnimatedStyle(() => ({ opacity: scrim.value }));
-  const panelStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: slide.value }],
-  }));
-
-  if (!mounted) return null;
-
   return (
-    <Modal
-      visible
-      transparent
-      // Driven here instead: the platform's fade cannot rise, and running both
-      // would be two animations disagreeing about when the sheet has arrived.
-      animationType="none"
-      statusBarTranslucent
-      onRequestClose={onClose}
+    <SheetShell
+      visible={visible}
+      onClose={onClose}
+      top={SHEET_TOP.amount}
+      fitContent={system}
+      paddingBottom={system ? lift.paddingBottom : undefined}
+      onLayout={lift.onLayout}
+      header={header}
+      overlays={overlays}
     >
-      <View style={{ flex: 1 }}>
-        <Animated.View style={[{ flex: 1 }, scrimStyle]}>
-          <Scrim>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('common.close')}
-              onPress={onClose}
-              style={{ flex: 1 }}
-            />
-          </Scrim>
-        </Animated.View>
-
-        <Animated.View
-          onLayout={lift.onLayout}
-          style={[
-            {
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              // The pad's height is known, so its sheet is pinned and never moves.
-              // A system keyboard is a different height on every device, so that
-              // sheet sizes to its content and is lifted clear of it instead.
-              ...(system
-                ? { maxHeight: '94%', paddingBottom: lift.paddingBottom }
-                : { top: SHEET_TOP }),
-              borderTopLeftRadius: 34,
-              borderTopRightRadius: 34,
-              // Opaque, unlike the app's cards: a panel with its own content has to
-              // cover what is behind it or neither is readable.
-              backgroundColor: theme.colors.bgSheet,
-              borderTopWidth: 1,
-              borderTopColor: theme.colors.borderDefault,
-            },
-            panelStyle,
-          ]}
-        >
-          <SafeAreaView style={system ? undefined : { flex: 1 }} edges={['bottom']}>
-            <View
-              style={{
-                width: 38,
-                height: 4,
-                borderRadius: 2,
-                backgroundColor: theme.colors.borderDefault,
-                alignSelf: 'center',
-                marginTop: 12,
-              }}
-            />
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 12,
-                paddingHorizontal: 20,
-                paddingTop: 16,
-              }}
+      <>
+        {replaceBody !== undefined ? (
+          <View style={{ flex: 1 }}>{replaceBody}</View>
+        ) : system ? (
+          <>
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 4 }}
             >
-              {header}
+              <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
+                {label !== undefined ? (
+                  <Text
+                    variant="micro"
+                    uppercase
+                    color={theme.colors.textTertiary}
+                    style={{ letterSpacing: 2.2, marginBottom: 9 }}
+                  >
+                    {label}
+                  </Text>
+                ) : null}
+                <KeypadAmount
+                  digits={digits}
+                  currency={currency}
+                  sign={sign}
+                  size={size}
+                  color={amountColor}
+                  symbol={symbol}
+                  onChangeDigits={onDigits}
+                />
+                {help !== undefined ? (
+                  <Text
+                    color={theme.colors.textTertiary}
+                    style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
+                  >
+                    {help}
+                  </Text>
+                ) : null}
+              </View>
+              {children !== undefined ? (
+                <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
+                  {children}
+                </View>
+              ) : null}
+            </ScrollView>
+            {/* A little air over the keyboard. Flush against it, the save
+                    button reads as part of the keyboard's own top row. */}
+            <Footer
+              primaryLabel={primaryLabel}
+              onPrimary={onPrimary}
+              primaryDisabled={primaryDisabled}
+              onMic={onMic}
+              extraBottom={lift.raised ? 18 : 0}
+            />
+          </>
+        ) : (
+          <>
+            <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
+              {label !== undefined ? (
+                <Text
+                  variant="micro"
+                  uppercase
+                  color={theme.colors.textTertiary}
+                  style={{ letterSpacing: 2.2, marginBottom: 9 }}
+                >
+                  {label}
+                </Text>
+              ) : null}
+              <KeypadAmount
+                digits={digits}
+                currency={currency}
+                sign={sign}
+                size={size}
+                color={amountColor}
+              />
+              {help !== undefined ? (
+                <Text
+                  color={theme.colors.textTertiary}
+                  style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
+                >
+                  {help}
+                </Text>
+              ) : null}
             </View>
 
-            {replaceBody !== undefined ? (
-              <View style={{ flex: 1 }}>{replaceBody}</View>
-            ) : system ? (
-              <>
-                <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{ paddingBottom: 4 }}
-                >
-                  <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
-                    {label !== undefined ? (
-                      <Text
-                        variant="micro"
-                        uppercase
-                        color={theme.colors.textTertiary}
-                        style={{ letterSpacing: 2.2, marginBottom: 9 }}
-                      >
-                        {label}
-                      </Text>
-                    ) : null}
-                    <KeypadAmount
-                      digits={digits}
-                      currency={currency}
-                      sign={sign}
-                      size={size}
-                      color={amountColor}
-                      symbol={symbol}
-                      onChangeDigits={onDigits}
-                    />
-                    {help !== undefined ? (
-                      <Text
-                        color={theme.colors.textTertiary}
-                        style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
-                      >
-                        {help}
-                      </Text>
-                    ) : null}
-                  </View>
-                  {children !== undefined ? (
-                    <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
-                      {children}
-                    </View>
-                  ) : null}
-                </ScrollView>
-                {/* A little air over the keyboard. Flush against it, the save
-                    button reads as part of the keyboard's own top row. */}
-                <Footer
-                  primaryLabel={primaryLabel}
-                  onPrimary={onPrimary}
-                  primaryDisabled={primaryDisabled}
-                  onMic={onMic}
-                  extraBottom={lift.raised ? 18 : 0}
-                />
-              </>
-            ) : (
-              <>
-                <View style={{ paddingHorizontal: 26, paddingTop: 20 }}>
-                  {label !== undefined ? (
-                    <Text
-                      variant="micro"
-                      uppercase
-                      color={theme.colors.textTertiary}
-                      style={{ letterSpacing: 2.2, marginBottom: 9 }}
-                    >
-                      {label}
-                    </Text>
-                  ) : null}
-                  <KeypadAmount
-                    digits={digits}
-                    currency={currency}
-                    sign={sign}
-                    size={size}
-                    color={amountColor}
-                  />
-                  {help !== undefined ? (
-                    <Text
-                      color={theme.colors.textTertiary}
-                      style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
-                    >
-                      {help}
-                    </Text>
-                  ) : null}
-                </View>
+            {children !== undefined ? (
+              <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
+                {children}
+              </View>
+            ) : null}
 
-                {children !== undefined ? (
-                  <View style={{ paddingHorizontal: 24, paddingTop: 18, gap: 10 }}>
-                    {children}
-                  </View>
-                ) : null}
+            <View style={{ flex: 1 }} />
 
-                <View style={{ flex: 1 }} />
+            <View style={{ paddingHorizontal: 20 }}>
+              <AmountKeypad
+                onKey={(key) => onDigits(pressAmountKey(digits, key, maxDigits))}
+              />
+            </View>
 
-                <View style={{ paddingHorizontal: 20 }}>
-                  <AmountKeypad
-                    onKey={(key) => onDigits(pressAmountKey(digits, key, maxDigits))}
-                  />
-                </View>
-
-                <Footer
-                  primaryLabel={primaryLabel}
-                  onPrimary={onPrimary}
-                  primaryDisabled={primaryDisabled}
-                  onMic={onMic}
-                />
-              </>
-            )}
-          </SafeAreaView>
-        </Animated.View>
-
-        {overlays}
-      </View>
-    </Modal>
+            <Footer
+              primaryLabel={primaryLabel}
+              onPrimary={onPrimary}
+              primaryDisabled={primaryDisabled}
+              onMic={onMic}
+            />
+          </>
+        )}
+      </>
+    </SheetShell>
   );
 }
 

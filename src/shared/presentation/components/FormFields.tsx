@@ -126,62 +126,6 @@ export function AmountField({
   );
 }
 
-export function Segmented<T extends string>({
-  options,
-  value,
-  onChange,
-  labels,
-}: {
-  options: readonly T[];
-  value: T;
-  onChange: (value: T) => void;
-  labels: Record<T, string>;
-}) {
-  const { theme } = useTheme();
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        backgroundColor: theme.colors.bgFloat,
-        borderColor: theme.colors.borderSubtle,
-        borderWidth: 1,
-        borderRadius: 12,
-        padding: 3,
-        gap: 3,
-      }}
-    >
-      {options.map((option) => {
-        const active = option === value;
-        return (
-          <Pressable
-            key={option}
-            accessibilityRole="button"
-            onPress={() => onChange(option)}
-            style={({ pressed }) => ({
-              flex: 1,
-              alignItems: 'center',
-              paddingVertical: 8,
-              borderRadius: 9,
-              backgroundColor: active ? theme.colors.bgElevated : 'transparent',
-              borderWidth: active ? 1 : 0,
-              borderColor: theme.colors.borderDefault,
-              opacity: pressed ? 0.8 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={active ? theme.colors.textPrimary : theme.colors.textTertiary}
-              style={{ fontSize: 12 }}
-            >
-              {labels[option]}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
 export function SelectRow({
   label,
   value,

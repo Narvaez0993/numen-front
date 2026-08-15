@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
 
-import { Text } from '@/shared/presentation/components';
-import { useTheme } from '@/shared/presentation/theme';
+import { Segmented } from '@/shared/presentation/components';
 
 import type { DebtDirection } from '../../domain/types/Deuda';
 
@@ -11,51 +9,19 @@ type Props = {
   onChange: (direction: DebtDirection) => void;
 };
 
-const TABS: DebtDirection[] = ['incoming', 'outgoing'];
-
+/** Which side of the ledger you are looking at. It drives the total under it, so
+ *  it is the design's segmented switch and nothing more. */
 export function DirectionTabs({ direction, onChange }: Props) {
-  const { theme } = useTheme();
   const { t } = useTranslation();
+
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        backgroundColor: theme.colors.bgSurface,
-        borderWidth: 1,
-        borderColor: theme.colors.borderSubtle,
-        borderRadius: 12,
-        padding: 4,
-        gap: 6,
-      }}
-    >
-      {TABS.map((id) => {
-        const active = id === direction;
-        return (
-          <Pressable
-            key={id}
-            onPress={() => onChange(id)}
-            style={({ pressed }) => ({
-              flex: 1,
-              paddingVertical: 8,
-              paddingHorizontal: 10,
-              borderRadius: 8,
-              backgroundColor: active ? theme.colors.bgFloat : 'transparent',
-              borderWidth: 1,
-              borderColor: active ? theme.colors.borderSubtle : 'transparent',
-              alignItems: 'center',
-              opacity: pressed ? 0.85 : 1,
-            })}
-          >
-            <Text
-              variant="label"
-              color={active ? theme.colors.textPrimary : theme.colors.textTertiary}
-              style={{ fontSize: 12.5 }}
-            >
-              {t(`deudas.tabs.${id}`)}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
+    <Segmented
+      value={direction}
+      onChange={onChange}
+      options={[
+        { value: 'incoming', label: t('deudas.tabs.incoming') },
+        { value: 'outgoing', label: t('deudas.tabs.outgoing') },
+      ]}
+    />
   );
 }
