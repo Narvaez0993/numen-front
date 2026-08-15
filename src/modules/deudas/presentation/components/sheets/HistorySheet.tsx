@@ -9,11 +9,12 @@ import {
   Text,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { initialOf } from '../../../domain';
 import { useDebtsContext } from '../../context/DebtsContext';
-import { debtTone } from '../../utils/debtTone';
+import { debtAccent, debtAccentSoft } from '../../utils/debtAccent';
 
 type Props = {
   visible: boolean;
@@ -96,15 +97,13 @@ export function HistorySheet({ visible, currency, onClose }: Props) {
                     width: 34,
                     height: 34,
                     borderRadius: 17,
-                    backgroundColor: theme.colors.bgFloat,
+                    backgroundColor: withAlpha(debtAccent(theme), lost ? 0.06 : 0.14),
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
                   <Text
-                    color={
-                      lost ? theme.colors.textTertiary : debtTone(theme, debt.direction)
-                    }
+                    color={lost ? theme.colors.textTertiary : debtAccentSoft(theme)}
                     style={{ fontSize: 13, fontWeight: '600' }}
                   >
                     {initialOf(person?.name ?? '?')}

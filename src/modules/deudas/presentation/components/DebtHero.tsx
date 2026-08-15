@@ -7,7 +7,6 @@ import { useTheme } from '@/shared/presentation/theme';
 import { amountDigits } from '@/shared/presentation/utils/formatMoney';
 
 import type { DebtDirection } from '../../domain';
-import { debtTone } from '../utils/debtTone';
 
 type Props = {
   direction: DebtDirection;
@@ -30,7 +29,6 @@ type Props = {
 export function DebtHero({ direction, total, count, currency }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const tone = debtTone(theme, direction);
 
   return (
     <View style={{ paddingHorizontal: 26, paddingTop: 26 }}>
@@ -52,7 +50,6 @@ export function DebtHero({ direction, total, count, currency }: Props) {
         </Text>
         <Text
           tabular
-          color={tone}
           style={{
             fontSize: 43,
             fontWeight: '500',

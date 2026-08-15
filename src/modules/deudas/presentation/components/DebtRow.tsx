@@ -7,7 +7,7 @@ import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { type Deuda, debtProgress, initialOf } from '../../domain';
-import { debtTone } from '../utils/debtTone';
+import { debtAccent, debtAccentSoft } from '../utils/debtAccent';
 
 type Props = {
   deuda: Deuda;
@@ -28,13 +28,16 @@ type Props = {
  * along it is. The bar carries the progress on its own; a number beside it is the
  * same fact twice.
  *
- * The avatar's disc stays neutral and only the letter takes the tone. Filling
- * eight discs with colour turns the list into confetti and pulls the eye to the
- * initials, which are the least useful thing on the line.
+ * The disc and the bar wear the palette's accent — the same one, on every row.
+ * The amount is plain ink. It was mint for "me deben" and amber for "yo debo",
+ * both from the old system, and mint is the colour money that has ARRIVED wears;
+ * on a debt it announced a deposit that never happened. Which side you are on is
+ * already said three times: by the tab, by the label over the total, and by this
+ * row's own subtitle.
  */
 export function DebtRow({ deuda, name, detail, currency, last = false, onPress }: Props) {
   const { theme } = useTheme();
-  const tone = debtTone(theme, deuda.direction);
+  const accent = debtAccent(theme);
   const progress = debtProgress(deuda);
 
   return (
@@ -62,12 +65,12 @@ export function DebtRow({ deuda, name, detail, currency, last = false, onPress }
             width: 34,
             height: 34,
             borderRadius: 17,
-            backgroundColor: theme.colors.bgFloat,
+            backgroundColor: withAlpha(accent, 0.14),
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Text color={tone} style={{ fontSize: 13, fontWeight: '600' }}>
+          <Text color={debtAccentSoft(theme)} style={{ fontSize: 13, fontWeight: '600' }}>
             {initialOf(name)}
           </Text>
         </View>
@@ -85,7 +88,7 @@ export function DebtRow({ deuda, name, detail, currency, last = false, onPress }
           </Text>
         </View>
 
-        <Text tabular color={tone} style={{ fontSize: 15, fontWeight: '500' }}>
+        <Text tabular style={{ fontSize: 15, fontWeight: '500' }}>
           {formatMoney(deuda.remaining, currency)}
         </Text>
       </View>
@@ -102,7 +105,7 @@ export function DebtRow({ deuda, name, detail, currency, last = false, onPress }
           style={{
             width: `${Math.min(100, Math.max(0, progress * 100))}%`,
             height: '100%',
-            backgroundColor: tone,
+            backgroundColor: accent,
           }}
         />
       </View>

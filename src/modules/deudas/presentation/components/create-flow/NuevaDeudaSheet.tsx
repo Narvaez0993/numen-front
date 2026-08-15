@@ -21,7 +21,6 @@ import { addDays, toIsoDate } from '@/shared/presentation/utils/dates';
 import type { DebtDirection } from '../../../domain';
 import { useDebtsContext } from '../../context/DebtsContext';
 import { useCreateDebt, useCreateSharedEvent } from '../../hooks/useDebtMutations';
-import { debtTone } from '../../utils/debtTone';
 
 import { DetailStep } from './DetailStep';
 import { SplitStep } from './SplitStep';
@@ -239,8 +238,6 @@ export function NuevaDeudaSheet({
     else setIndex(index - 1);
   };
 
-  const tone = debtTone(theme, direction);
-
   return (
     <SheetShell
       visible={visible}
@@ -340,7 +337,7 @@ export function NuevaDeudaSheet({
             />
           </View>
           <View style={{ paddingHorizontal: 26, paddingTop: 22 }}>
-            <KeypadAmount digits={digits} currency={currency} color={tone} />
+            <KeypadAmount digits={digits} currency={currency} />
           </View>
           <View style={{ flex: 1 }} />
           <View style={{ paddingHorizontal: 20 }}>

@@ -11,7 +11,7 @@ import { amountDigits, formatMoney } from '@/shared/presentation/utils/formatMon
 
 import { debtProgress, initialOf } from '../../domain';
 import { useDebtsContext } from '../context/DebtsContext';
-import { debtTone } from '../utils/debtTone';
+import { debtAccent, debtAccentSoft } from '../utils/debtAccent';
 import { useDueLabel } from '../utils/useDueLabel';
 
 import { RegistrarAbonoSheet } from './sheets/RegistrarAbonoSheet';
@@ -76,7 +76,7 @@ export function DeudaDetailSheet({
   }, [debtId]);
 
   const visible = debtId !== null && deuda !== undefined && person !== undefined;
-  const tone = deuda ? debtTone(theme, deuda.direction) : theme.colors.textPrimary;
+  const accent = debtAccent(theme);
   const givenUp = deuda?.status === 'written_off';
 
   const openAbono = (amount?: number) => {
@@ -117,12 +117,15 @@ export function DeudaDetailSheet({
                 width: 44,
                 height: 44,
                 borderRadius: 22,
-                backgroundColor: theme.colors.bgFloat,
+                backgroundColor: withAlpha(accent, 0.14),
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Text color={tone} style={{ fontSize: 15, fontWeight: '600' }}>
+              <Text
+                color={debtAccentSoft(theme)}
+                style={{ fontSize: 15, fontWeight: '600' }}
+              >
                 {initialOf(person.name)}
               </Text>
             </View>
@@ -189,7 +192,6 @@ export function DeudaDetailSheet({
               </Text>
               <Text
                 tabular
-                color={tone}
                 style={{
                   fontSize: 44,
                   fontWeight: '500',

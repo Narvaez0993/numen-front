@@ -9,7 +9,7 @@ import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import { type Deuda, type SharedEvent, initialOf } from '../../domain';
 import { useDebtsContext } from '../context/DebtsContext';
-import { debtTone } from '../utils/debtTone';
+import { debtAccent, debtAccentSoft } from '../utils/debtAccent';
 
 type Props = {
   event: SharedEvent;
@@ -49,7 +49,7 @@ export function DeudaCardShared({
   // Progress over what is actually owed: the user's own share needs no collecting.
   const owed = paid + left;
   const progress = owed > 0 ? paid / owed : 0;
-  const tone = debtTone(theme, debts[0]?.direction ?? 'incoming');
+  const accent = debtAccent(theme);
 
   return (
     <View
@@ -81,12 +81,12 @@ export function DeudaCardShared({
               width: 34,
               height: 34,
               borderRadius: 17,
-              backgroundColor: theme.colors.bgFloat,
+              backgroundColor: withAlpha(accent, 0.14),
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Icon name="users" size={16} stroke={1.9} color={tone} />
+            <Icon name="users" size={16} stroke={1.9} color={debtAccentSoft(theme)} />
           </View>
 
           <View style={{ flex: 1, minWidth: 0 }}>
@@ -102,7 +102,7 @@ export function DeudaCardShared({
             </Text>
           </View>
 
-          <Text tabular color={tone} style={{ fontSize: 15, fontWeight: '500' }}>
+          <Text tabular style={{ fontSize: 15, fontWeight: '500' }}>
             {formatMoney(left, currency)}
           </Text>
           <View style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }}>
@@ -122,7 +122,7 @@ export function DeudaCardShared({
             style={{
               width: `${Math.min(100, Math.max(0, progress * 100))}%`,
               height: '100%',
-              backgroundColor: tone,
+              backgroundColor: accent,
             }}
           />
         </View>
@@ -157,12 +157,15 @@ export function DeudaCardShared({
                     width: 26,
                     height: 26,
                     borderRadius: 13,
-                    backgroundColor: theme.colors.bgFloat,
+                    backgroundColor: withAlpha(accent, 0.14),
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <Text color={tone} style={{ fontSize: 11, fontWeight: '600' }}>
+                  <Text
+                    color={debtAccentSoft(theme)}
+                    style={{ fontSize: 11, fontWeight: '600' }}
+                  >
                     {initialOf(person.name)}
                   </Text>
                 </View>

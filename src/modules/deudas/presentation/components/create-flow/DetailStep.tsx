@@ -4,11 +4,12 @@ import { Pressable, ScrollView, TextInput, View } from 'react-native';
 import type { CurrencyCode } from '@/shared/domain';
 import { SheetFieldRow, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DebtDirection } from '../../../domain';
 import { initialOf } from '../../../domain';
-import { debtTone } from '../../utils/debtTone';
+import { debtAccent, debtAccentSoft } from '../../utils/debtAccent';
 
 import type { PersonPick } from './personPick';
 
@@ -63,7 +64,7 @@ export function DetailStep({
   const { theme } = useTheme();
   const { t } = useTranslation();
 
-  const tone = debtTone(theme, direction);
+  const accent = debtAccent(theme);
   const incoming = direction === 'incoming';
 
   const who = isShared
@@ -187,12 +188,15 @@ export function DetailStep({
                 width: 38,
                 height: 38,
                 borderRadius: 19,
-                backgroundColor: theme.colors.bgElevated,
+                backgroundColor: withAlpha(accent, 0.14),
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Text color={tone} style={{ fontSize: 14, fontWeight: '600' }}>
+              <Text
+                color={debtAccentSoft(theme)}
+                style={{ fontSize: 14, fontWeight: '600' }}
+              >
                 {initialOf(who)}
               </Text>
             </View>
@@ -215,7 +219,8 @@ export function DetailStep({
                 {note.trim() || t('deudas.create.noReason')}
               </Text>
             </View>
-            <Text tabular color={tone} style={{ fontSize: 16, fontWeight: '500' }}>
+            {/* The sign carries the direction; colour is not asked to repeat it. */}
+            <Text tabular style={{ fontSize: 16, fontWeight: '500' }}>
               {`${incoming ? '+' : '−'}${formatMoney(amount, currency)}`}
             </Text>
           </View>
