@@ -72,7 +72,9 @@ export function Text({
 function variantStyles(variant: TextVariant): TextStyle {
   switch (variant) {
     case 'display':
-      return { fontSize: 30, fontWeight: '500', letterSpacing: -0.6, lineHeight: 30 };
+      // No lineHeight: at this size a box the height of the font shaves the tops
+      // off the digits, and this variant exists to carry numbers.
+      return { fontSize: 30, fontWeight: '500', letterSpacing: -0.6 };
     case 'h1':
       return { fontSize: 17, fontWeight: '500', letterSpacing: -0.34 };
     case 'h2':

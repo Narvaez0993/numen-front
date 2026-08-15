@@ -232,7 +232,6 @@ export function GoalsScreen() {
               tabular
               style={{
                 fontSize: 41,
-                lineHeight: 41,
                 fontWeight: '500',
                 letterSpacing: -2,
               }}

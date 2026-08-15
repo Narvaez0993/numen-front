@@ -57,10 +57,11 @@ export function DebtHero({ direction, total, count, currency }: Props) {
             fontSize: 43,
             fontWeight: '500',
             letterSpacing: -2.1,
-            // Never under `fontSize`. The bundle says `line-height:.95`, which in
-            // CSS only tightens the box and lets the glyphs overflow it; React
-            // Native clips to it instead, and the tops of the digits were cut.
-            lineHeight: 43,
+            // No lineHeight at all. The bundle says `line-height:.95`, which in
+            // CSS only tightens the box and lets the glyphs spill out of it;
+            // React Native clips to it instead. Even at exactly `fontSize` the
+            // tops of the digits were still shaved — the font's box is taller
+            // than its em. Left alone, the metrics fit by construction.
           }}
         >
           {amountDigits(total, currency)}

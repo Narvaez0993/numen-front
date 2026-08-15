@@ -85,7 +85,6 @@ export function BudgetPulse({ budget, daysLeft, elapsed, onPress }: Props) {
                 fontSize: 26,
                 fontWeight: '500',
                 letterSpacing: -1.1,
-                lineHeight: 27,
                 color: over ? theme.colors.accentCoral : theme.colors.textPrimary,
               }}
             >

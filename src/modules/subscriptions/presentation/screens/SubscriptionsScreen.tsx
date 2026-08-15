@@ -219,7 +219,6 @@ export function SubscriptionsScreen() {
               tabular
               style={{
                 fontSize: 43,
-                lineHeight: 43,
                 fontWeight: '500',
                 letterSpacing: -2.1,
               }}

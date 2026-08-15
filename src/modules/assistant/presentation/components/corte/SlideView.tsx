@@ -93,10 +93,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
             </NumIn>
             <View>
               <NumIn delay={200}>
-                <Text
-                  variant="display"
-                  style={{ fontSize: 44, lineHeight: 46, letterSpacing: -1.5 }}
-                >
+                <Text variant="display" style={{ fontSize: 44, letterSpacing: -1.5 }}>
                   {t('assistant.corte.stories.coverTitle', { month })}
                 </Text>
               </NumIn>

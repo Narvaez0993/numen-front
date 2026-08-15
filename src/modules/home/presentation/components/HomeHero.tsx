@@ -105,7 +105,6 @@ export function HomeHero({ spent, change, monthName, onCortePress }: Props) {
               fontSize: 38,
               fontWeight: '500',
               letterSpacing: -1.8,
-              lineHeight: 40,
               color: theme.colors.textPrimary,
             }}
           >

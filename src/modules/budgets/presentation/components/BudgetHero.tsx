@@ -66,7 +66,6 @@ export function BudgetHero({ cap, currency, daysElapsed, daysLeft }: Props) {
           color={over ? theme.colors.accentCoral : theme.colors.textPrimary}
           style={{
             fontSize: 45,
-            lineHeight: 45,
             fontWeight: '500',
             letterSpacing: -2.2,
           }}

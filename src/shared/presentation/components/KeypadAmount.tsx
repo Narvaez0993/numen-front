@@ -80,11 +80,12 @@ export function KeypadAmount({
         <Text
           tabular
           color={tint}
+          // No lineHeight, for the same reason as the input below: a box the
+          // size of the font is smaller than the glyphs the font draws in it.
           style={{
             fontSize: s.digits,
             fontWeight: '500',
             letterSpacing: s.tracking,
-            lineHeight: s.digits,
           }}
         >
           {shown || '0'}

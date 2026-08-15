@@ -192,7 +192,6 @@ export function DeudaDetailSheet({
                 color={tone}
                 style={{
                   fontSize: 44,
-                  lineHeight: 44,
                   fontWeight: '500',
                   letterSpacing: -2.2,
                 }}
