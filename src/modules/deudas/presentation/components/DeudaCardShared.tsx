@@ -129,7 +129,12 @@ export function DeudaCardShared({
       </Pressable>
 
       {expanded ? (
-        <View style={{ paddingBottom: 12, paddingLeft: 46 }}>
+        // Enough that each name lands exactly under the event's own: the disc is
+        // 26 and its gap 10, against 34 and 12 on the row above. Indenting by the
+        // parent's whole 46 instead pushed the names to 82px, far enough that
+        // they read as a different list rather than as this one opened up. The
+        // smaller disc is what carries the nesting.
+        <View style={{ paddingBottom: 12, paddingLeft: 10 }}>
           {debts.map((debt) => {
             const person = counterpartyById[debt.counterpartyId];
             if (!person) return null;
