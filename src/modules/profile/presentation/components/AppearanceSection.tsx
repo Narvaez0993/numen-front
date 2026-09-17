@@ -21,6 +21,8 @@ import {
   type ThemePreference,
 } from '@/shared/presentation/theme';
 
+import { GroupLabel as Label } from './GroupLabel';
+
 const MODES: ThemePreference[] = ['auto', 'dark', 'light'];
 const STRIPE_HEIGHT = 60;
 const GAP = 3;
@@ -217,25 +219,5 @@ function Stripe({
         </Animated.View>
       </Pressable>
     </Animated.View>
-  );
-}
-
-function Label({
-  children,
-  style,
-}: {
-  children: React.ReactNode;
-  style?: { marginBottom?: number };
-}) {
-  const { theme } = useTheme();
-  return (
-    <Text
-      variant="micro"
-      uppercase
-      color={theme.colors.textTertiary}
-      style={{ letterSpacing: 2.2, marginBottom: 10, ...style }}
-    >
-      {children}
-    </Text>
   );
 }

@@ -370,6 +370,23 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M4 11h16',
     'M8 15h2v2h-2z',
   ],
+
+  // Perfil's own four, from the PERFIL section of the bundle. Subscriptions are
+  // two arrows swapping rather than one going round: a subscription comes back,
+  // it does not reload.
+  'switch-horizontal': [
+    'M4 12V9a3 3 0 0 1 3 -3h13l-3 -3',
+    'M20 12v3a3 3 0 0 1 -3 3H4l3 3',
+  ],
+  lock: [
+    'M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2H7a2 2 0 0 1 -2 -2z',
+    'M8 11V7a4 4 0 1 1 8 0v4',
+  ],
+  rotate: ['M20 11a8 8 0 1 0 -2.3 5.7', 'M20 5v6h-6'],
+  logout: [
+    'M14 8V6a2 2 0 0 0 -2 -2H6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2 -2v-2',
+    'M9 12h12l-3 -3m3 3l-3 3',
+  ],
 };
 
 /**

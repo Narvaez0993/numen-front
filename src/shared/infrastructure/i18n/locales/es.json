@@ -1243,60 +1243,45 @@
     }
   },
   "profile": {
-    "title": "Perfil",
-    "edit": "Editar",
+    "title": "Tu cuenta",
     "signOut": "Cerrar sesión",
+    "identity": {
+      "noName": "Ponte un nombre",
+      "since": "Contigo desde {{month}}",
+      "sinceYear": "Contigo desde {{month}} de {{year}}"
+    },
+    "plan": {
+      "free": "Estás en el plan gratis",
+      "freeSub_one": "Te queda {{count}} pregunta del mes",
+      "freeSub_other": "Te quedan {{count}} preguntas del mes",
+      "freeSubUnknown": "Con preguntas al agente incluidas",
+      "plus": "Estás en Plus",
+      "plusSub": "Pregúntame lo que quieras",
+      "ctaFree": "Ver Plus",
+      "ctaPlus": "Ver plan"
+    },
     "groups": {
-      "myData": "Mis datos",
-      "app": "App",
-      "account": "Cuenta",
-      "developer": "Developer"
+      "myMoney": "Tu dinero",
+      "settings": "Ajustes"
     },
     "rows": {
-      "accounts": {
-        "title": "Fuentes y cuentas",
-        "subtitle_one": "{{count}} activa · saldo neto {{net}}",
-        "subtitle_other": "{{count}} activas · saldo neto {{net}}"
-      },
-      "subs": {
-        "title": "Suscripciones",
-        "subtitle_one": "{{count}} activa · {{monthly}} al mes",
-        "subtitle_other": "{{count}} activas · {{monthly}} al mes",
-        "subtitleEmpty": "Aún no registras ninguna"
-      },
       "categories": {
-        "title": "Categorías",
-        "subtitle": "{{standard}} estándar · {{custom}} personalizadas"
+        "title": "Categorías"
+      },
+      "accounts": {
+        "title": "Cuentas y tarjetas"
       },
       "deudas": {
-        "title": "Deudas",
-        "subtitleEmpty": "Sin deudas activas",
-        "subtitle_one": "{{count}} deuda activa",
-        "subtitle_other": "{{count}} deudas activas"
+        "title": "Deudas entre personas"
       },
-      "notifications": {
-        "title": "Notificaciones"
+      "goals": {
+        "title": "Metas"
       },
-      "appearance": {
-        "title": "Apariencia"
+      "subs": {
+        "title": "Suscripciones"
       },
-      "assistant": {
-        "title": "Asistente",
-        "value": "Proactivo"
-      },
-      "security": {
-        "title": "Seguridad y PIN"
-      },
-      "plan": {
-        "title": "Plan",
-        "value": "Free"
-      },
-      "export": {
-        "title": "Exportar datos"
-      },
-      "resetOnboarding": {
-        "title": "Resetear onboarding",
-        "subtitle": "Solo en desarrollo"
+      "objective": {
+        "title": "Tu objetivo"
       },
       "language": {
         "title": "Idioma"
@@ -1304,14 +1289,20 @@
       "currency": {
         "title": "Moneda"
       },
-      "objective": {
-        "title": "Tu objetivo"
+      "reminder": {
+        "title": "Recordarme de noche",
+        "subtitle": "A las 9 pm, si no apuntaste nada"
       },
-      "goals": {
-        "title": "Metas",
-        "subtitleEmpty": "Sin metas activas",
-        "subtitle_one": "{{count}} meta activa",
-        "subtitle_other": "{{count}} metas activas"
+      "pin": {
+        "title": "Pedir PIN al abrir",
+        "subtitle": "Con Face ID cuando se pueda"
+      },
+      "export": {
+        "title": "Bajar mis datos"
+      },
+      "resetOnboarding": {
+        "title": "Ver el arranque",
+        "subtitle": "Solo en desarrollo"
       }
     },
     "appearance": {
@@ -1324,7 +1315,6 @@
       },
       "hint": "Toca una franja. El morado es el de casa; los demás usan el mismo sistema de luz."
     },
-    "soon": "Próximamente",
     "editName": {
       "title": "Tu nombre",
       "subtitle": "Así te saluda Deshka.",

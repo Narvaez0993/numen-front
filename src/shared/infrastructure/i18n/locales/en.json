@@ -1243,60 +1243,45 @@
     }
   },
   "profile": {
-    "title": "Profile",
-    "edit": "Edit",
+    "title": "Your account",
     "signOut": "Sign out",
+    "identity": {
+      "noName": "Add your name",
+      "since": "With you since {{month}}",
+      "sinceYear": "With you since {{month}} {{year}}"
+    },
+    "plan": {
+      "free": "You are on the free plan",
+      "freeSub_one": "{{count}} question left this month",
+      "freeSub_other": "{{count}} questions left this month",
+      "freeSubUnknown": "Questions to the agent included",
+      "plus": "You are on Plus",
+      "plusSub": "Ask me anything",
+      "ctaFree": "See Plus",
+      "ctaPlus": "See plan"
+    },
     "groups": {
-      "myData": "My data",
-      "app": "App",
-      "account": "Account",
-      "developer": "Developer"
+      "myMoney": "Your money",
+      "settings": "Settings"
     },
     "rows": {
-      "accounts": {
-        "title": "Sources and accounts",
-        "subtitle_one": "{{count}} active · net balance {{net}}",
-        "subtitle_other": "{{count}} active · net balance {{net}}"
-      },
-      "subs": {
-        "title": "Subscriptions",
-        "subtitle_one": "{{count}} active · {{monthly}} a month",
-        "subtitle_other": "{{count}} active · {{monthly}} a month",
-        "subtitleEmpty": "None registered yet"
-      },
       "categories": {
-        "title": "Categories",
-        "subtitle": "{{standard}} standard · {{custom}} custom"
+        "title": "Categories"
+      },
+      "accounts": {
+        "title": "Accounts and cards"
       },
       "deudas": {
-        "title": "Debts",
-        "subtitleEmpty": "No active debts",
-        "subtitle_one": "{{count}} active debt",
-        "subtitle_other": "{{count}} active debts"
+        "title": "Debts between people"
       },
-      "notifications": {
-        "title": "Notifications"
+      "goals": {
+        "title": "Goals"
       },
-      "appearance": {
-        "title": "Appearance"
+      "subs": {
+        "title": "Subscriptions"
       },
-      "assistant": {
-        "title": "Assistant",
-        "value": "Proactive"
-      },
-      "security": {
-        "title": "Security and PIN"
-      },
-      "plan": {
-        "title": "Plan",
-        "value": "Free"
-      },
-      "export": {
-        "title": "Export data"
-      },
-      "resetOnboarding": {
-        "title": "Reset onboarding",
-        "subtitle": "Development only"
+      "objective": {
+        "title": "Your objective"
       },
       "language": {
         "title": "Language"
@@ -1304,14 +1289,20 @@
       "currency": {
         "title": "Currency"
       },
-      "objective": {
-        "title": "Your goal"
+      "reminder": {
+        "title": "Remind me at night",
+        "subtitle": "At 9 pm, if you noted nothing"
       },
-      "goals": {
-        "title": "Goals",
-        "subtitleEmpty": "No active goals",
-        "subtitle_one": "{{count}} active goal",
-        "subtitle_other": "{{count}} active goals"
+      "pin": {
+        "title": "Ask for a PIN",
+        "subtitle": "With Face ID where it works"
+      },
+      "export": {
+        "title": "Download my data"
+      },
+      "resetOnboarding": {
+        "title": "Replay the start",
+        "subtitle": "Development only"
       }
     },
     "appearance": {
@@ -1324,7 +1315,6 @@
       },
       "hint": "Tap a stripe. Violet is the house colour; the rest use the same light system."
     },
-    "soon": "Coming soon",
     "editName": {
       "title": "Your name",
       "subtitle": "How Deshka greets you.",

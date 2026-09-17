@@ -37,6 +37,7 @@ type CurrentUserResponse = {
   display_name: string;
   tier: string;
   email_verified: boolean;
+  created_at: string;
   language: string;
   currency: string;
   theme: string;
@@ -52,6 +53,7 @@ function toUser(data: CurrentUserResponse): User {
     emailVerified: data.email_verified,
     currency: data.currency,
     objective: data.objective as Objective | null,
+    createdAt: data.created_at ? new Date(data.created_at) : null,
   });
 }
 

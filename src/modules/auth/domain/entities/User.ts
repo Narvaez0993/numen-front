@@ -14,6 +14,9 @@ export type UserProps = {
   currency?: string;
   /** What they said they came for; Home leads with the figure that serves it. */
   objective?: Objective | null;
+  /** When the account was born. Only the profile-shaped endpoints carry it —
+   *  the session payload does not — so it is null until `/auth/me` answers. */
+  createdAt?: Date | null;
 };
 
 export class User {
@@ -24,6 +27,7 @@ export class User {
   readonly emailVerified: boolean;
   readonly currency: string;
   readonly objective: Objective | null;
+  readonly createdAt: Date | null;
 
   constructor(props: UserProps) {
     this.id = props.id;
@@ -33,6 +37,7 @@ export class User {
     this.emailVerified = props.emailVerified ?? false;
     this.currency = props.currency ?? 'USD';
     this.objective = props.objective ?? null;
+    this.createdAt = props.createdAt ?? null;
   }
 
   equals(other: User): boolean {
