@@ -1,4 +1,5 @@
 export * from './stores/useAuthStore';
+export * from './hooks/useMe';
 export * from './hooks/useLogin';
 export * from './hooks/useRegister';
 export * from './hooks/useVerifyEmail';

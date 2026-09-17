@@ -220,17 +220,31 @@
     }
   },
   "plan": {
-    "title": "Tu plan",
-    "period": {
-      "mensual": "Mensual",
-      "anual": "Anual",
-      "savings": "-48%"
+    "eyebrow": "deshka Plus",
+    "headline": "Pregúntame lo que quieras,",
+    "headlineStrong": "sin contar preguntas.",
+    "features": {
+      "messages": "Preguntas ilimitadas al asistente",
+      "limits": "Categorías y metas sin límite",
+      "corte": "El Corte cada semana, no solo al mes",
+      "voice": "Notas de voz largas y sin cortes"
     },
-    "status": {
-      "current": "Tu plan",
-      "recommended": "Recomendado"
+    "freeForever": "Apuntar gastos hablando sigue siendo gratis, siempre.",
+    "monthly": {
+      "title": "Mes a mes",
+      "note": "Cancelas cuando quieras"
     },
-    "footer": "7 días gratis · cancela cuando quieras",
+    "annual": {
+      "title": "Todo el año",
+      "badge": "Ahorras {{percent}}%",
+      "note": "Sale en {{amount}} al mes"
+    },
+    "cta": {
+      "start": "Empezar la prueba",
+      "current": "Ya estás en Plus"
+    },
+    "trial_one": "{{count}} día de prueba · sin tarjeta",
+    "trial_other": "{{count}} días de prueba · sin tarjeta",
     "gate": {
       "cta": "Ver Plus",
       "notNow": "Ahora no"

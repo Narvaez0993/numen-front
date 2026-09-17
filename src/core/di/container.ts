@@ -86,7 +86,7 @@ import type { OnboardingRepository } from '@/modules/onboarding/application/port
 import { CompleteOnboardingUseCase } from '@/modules/onboarding/application/use-cases/CompleteOnboardingUseCase';
 import { InMemoryOnboardingRepository } from '@/modules/onboarding/infrastructure/repositories/InMemoryOnboardingRepository';
 import type { PlanRepository } from '@/modules/plan/application/ports/PlanRepository';
-import { GetPlanComparisonUseCase } from '@/modules/plan/application/use-cases/GetPlanComparisonUseCase';
+import { GetPlusOfferUseCase } from '@/modules/plan/application/use-cases/GetPlusOfferUseCase';
 import { InMemoryPlanRepository } from '@/modules/plan/infrastructure/repositories/InMemoryPlanRepository';
 import type { SubscriptionsRepository } from '@/modules/subscriptions/application/ports/SubscriptionsRepository';
 import { CreateSubscriptionUseCase } from '@/modules/subscriptions/application/use-cases/CreateSubscriptionUseCase';
@@ -193,7 +193,7 @@ export const getCategoriesUseCase = new GetCategoriesUseCase(categoriesRepositor
 export const createCategoryUseCase = new CreateCategoryUseCase(categoriesRepository);
 export const updateCategoryUseCase = new UpdateCategoryUseCase(categoriesRepository);
 export const deleteCategoryUseCase = new DeleteCategoryUseCase(categoriesRepository);
-export const getPlanComparisonUseCase = new GetPlanComparisonUseCase(planRepository);
+export const getPlusOfferUseCase = new GetPlusOfferUseCase(planRepository);
 export const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   onboardingRepository,
 );
@@ -272,6 +272,6 @@ export const container = {
   createCategoryUseCase,
   updateCategoryUseCase,
   deleteCategoryUseCase,
-  getPlanComparisonUseCase,
+  getPlusOfferUseCase,
   completeOnboardingUseCase,
 };

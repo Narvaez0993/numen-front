@@ -220,23 +220,37 @@
     }
   },
   "plan": {
-    "title": "Your plan",
-    "period": {
-      "mensual": "Monthly",
-      "anual": "Yearly",
-      "savings": "-48%"
+    "eyebrow": "deshka Plus",
+    "headline": "Ask me anything,",
+    "headlineStrong": "without counting questions.",
+    "features": {
+      "messages": "Unlimited questions to the assistant",
+      "limits": "Categories and goals without a cap",
+      "corte": "El Corte every week, not just monthly",
+      "voice": "Long voice notes, uncut"
     },
-    "status": {
-      "current": "Your plan",
-      "recommended": "Recommended"
+    "freeForever": "Noting expenses out loud stays free, always.",
+    "monthly": {
+      "title": "Month to month",
+      "note": "Cancel whenever you want"
     },
-    "footer": "7-day free trial · cancel any time",
+    "annual": {
+      "title": "The whole year",
+      "badge": "Save {{percent}}%",
+      "note": "Works out to {{amount}} a month"
+    },
+    "cta": {
+      "start": "Start the trial",
+      "current": "You are on Plus"
+    },
+    "trial_one": "{{count}} day free · no card",
+    "trial_other": "{{count}} days free · no card",
     "gate": {
       "cta": "See Plus",
       "notNow": "Not now"
     },
     "toast": {
-      "soon": "Checkout is coming soon · we'll let you know"
+      "soon": "Payment is coming · we will tell you"
     }
   },
   "categories": {

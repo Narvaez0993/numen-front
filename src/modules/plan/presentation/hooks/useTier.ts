@@ -1,11 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-
-import { getCurrentUserUseCase } from '@/core/di/container';
 import { useAuthStore } from '@/modules/auth/presentation';
+// By path, not through the barrel: the barrel pulls in screens, and the test for
+// this hook stubs it to control the stored session. `useMe` has to stay real.
+import { useMe } from '@/modules/auth/presentation/hooks/useMe';
 
 export type PlanTier = 'free' | 'plus';
-
-export const TIER_KEY = ['auth', 'me'] as const;
 
 /**
  * What the user's plan actually is, according to the server.
@@ -25,14 +23,7 @@ export const TIER_KEY = ['auth', 'me'] as const;
  */
 export function useTier(): PlanTier {
   const stored = useAuthStore((s) => s.session?.tier);
-
-  const { data } = useQuery({
-    queryKey: TIER_KEY,
-    queryFn: () => getCurrentUserUseCase.execute(),
-    // A plan changes rarely, but "rarely" is not "never", and the cost of being
-    // stale is telling someone they cannot do what they are paying for.
-    staleTime: 60_000,
-  });
+  const { data } = useMe();
 
   const tier = data?.user.tier ?? stored;
   return tier === 'plus' ? 'plus' : 'free';
