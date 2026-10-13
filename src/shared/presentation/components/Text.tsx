@@ -1,7 +1,39 @@
-import { Text as RNText, TextProps as RNTextProps, TextStyle } from 'react-native';
+import {
+  Text as RNText,
+  TextProps as RNTextProps,
+  StyleSheet,
+  TextStyle,
+} from 'react-native';
 
 import { useTheme } from '../theme';
 import { usePrivacy } from '../theme/usePrivacy';
+
+/**
+ * The Geist face for a weight. Each weight is its own font file, and asking a
+ * single-weight family for another weight does not reach the next file — it
+ * renders the one it has. So the face follows the weight the text ends up
+ * with, overrides included: `fontWeight: '500'` on a body line used to come
+ * out at 400, and every light sentence and medium figure of the redesign with
+ * it.
+ */
+function geistFor(weight: TextStyle['fontWeight']): string {
+  switch (String(weight ?? '400')) {
+    case '100':
+    case '200':
+    case '300':
+      return 'Geist_300Light';
+    case '500':
+      return 'Geist_500Medium';
+    case '600':
+    case '700':
+    case '800':
+    case '900':
+    case 'bold':
+      return 'Geist_600SemiBold';
+    default:
+      return 'Geist_400Regular';
+  }
+}
 
 /** What a hidden figure reads as. `•` is the same width in a tabular font, so the
  *  layout does not move when the eye is switched. */
@@ -56,8 +88,9 @@ export function Text({
         variantStyle,
         {
           color: resolvedColor,
-          fontFamily:
-            variantStyle.fontWeight === '500' ? 'Geist_500Medium' : 'Geist_400Regular',
+          fontFamily: geistFor(
+            StyleSheet.flatten(style)?.fontWeight ?? variantStyle.fontWeight,
+          ),
         },
         tabular && { fontVariant: ['tabular-nums'] satisfies TextStyle['fontVariant'] },
         uppercase && { textTransform: 'uppercase' as const },
