@@ -736,9 +736,35 @@
     "skip": "Skip",
     "welcome": {
       "title": "Hi.\nI'm <b>Deshka</b>.",
-      "body": "Tell me your expenses the way you'd tell a friend, and I'll keep the books. No forms, no spreadsheets.",
+      "body": "You tell me, I keep the books.",
       "start": "Get started",
-      "haveAccount": "I already have an account"
+      "haveAccount": "I already have an account",
+      "demo": {
+        "listening": "Listening",
+        "saved": "Done · it's saved",
+        "a11y": "For example: you say “lunch for 12 dollars with my card” and Deshka records it as an eating-out expense, from your card, today.",
+        "examples": [
+          {
+            "words": "lunch for *12 dollars* with my card",
+            "title": "Lunch",
+            "amount": "−$12.00",
+            "chips": ["Eating out", "Visa", "Today"]
+          },
+          {
+            "words": "my *salary* came in",
+            "title": "Salary",
+            "amount": "+$2,400.00",
+            "chips": ["Income", "Checking", "Today"],
+            "income": true
+          },
+          {
+            "words": "I lent *50 dollars* to Andrew",
+            "title": "Loan to Andrew",
+            "amount": "$50.00",
+            "chips": ["Owes you", "Cash", "Today"]
+          }
+        ]
+      }
     },
     "perso": {
       "step1": "Step 1 of 3",

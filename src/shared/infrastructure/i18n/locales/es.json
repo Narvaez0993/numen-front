@@ -736,9 +736,35 @@
     "skip": "Saltar",
     "welcome": {
       "title": "Hola.\nSoy <b>Deshka</b>.",
-      "body": "Me cuentas tus gastos como se los contarías a alguien, y yo llevo las cuentas. Nada de formularios ni de Excel.",
+      "body": "Tú me cuentas, yo llevo las cuentas.",
       "start": "Empezar",
-      "haveAccount": "Ya tengo cuenta"
+      "haveAccount": "Ya tengo cuenta",
+      "demo": {
+        "listening": "Te escucho",
+        "saved": "Listo · ya quedó",
+        "a11y": "Por ejemplo: dices «almuerzo de 18 mil con Nequi» y Deshka lo anota como un gasto de comida fuera, desde Nequi, hoy.",
+        "examples": [
+          {
+            "words": "almuerzo de *18 mil* con Nequi",
+            "title": "Almuerzo",
+            "amount": "−$18.000",
+            "chips": ["Comida fuera", "Nequi", "Hoy"]
+          },
+          {
+            "words": "me pagaron la *nómina*",
+            "title": "Nómina",
+            "amount": "+$2.950.000",
+            "chips": ["Ingreso", "Bancolombia", "Hoy"],
+            "income": true
+          },
+          {
+            "words": "le presté *50 mil* a Andrés",
+            "title": "Préstamo a Andrés",
+            "amount": "$50.000",
+            "chips": ["Te debe", "Efectivo", "Hoy"]
+          }
+        ]
+      }
     },
     "perso": {
       "step1": "Paso 1 de 3",

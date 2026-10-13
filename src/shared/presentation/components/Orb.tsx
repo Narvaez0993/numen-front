@@ -10,6 +10,13 @@ type Props = {
   size: number;
   children?: React.ReactNode;
   style?: ViewStyle;
+  /**
+   * The frosted backdrop. Off where the orb sits over a still background and
+   * moves — the welcome's breathing orb: the blur is the costliest layer here,
+   * on Android it re-blurs on every frame the orb changes size, and over the
+   * dark aurora behind it there is nothing to see through anyway.
+   */
+  glass?: boolean;
 };
 
 /**
@@ -33,7 +40,7 @@ type Props = {
  * (sin160°, −cos160°) = (0.34, 0.94), which is where the gradient coordinates
  * below come from — they are not eyeballed.
  */
-export function Orb({ size, children, style }: Props) {
+export function Orb({ size, children, style, glass = true }: Props) {
   const { theme, mode } = useTheme();
   const { orb1, orb2, orb3 } = theme.palette;
   const radius = size / 2;
@@ -54,12 +61,16 @@ export function Orb({ size, children, style }: Props) {
         style,
       ]}
     >
-      <BlurView
-        intensity={28}
-        tint={mode === 'dark' ? 'dark' : 'light'}
-        experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : undefined}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      />
+      {glass ? (
+        <BlurView
+          intensity={28}
+          tint={mode === 'dark' ? 'dark' : 'light'}
+          experimentalBlurMethod={
+            Platform.OS === 'android' ? 'dimezisBlurView' : undefined
+          }
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        />
+      ) : null}
 
       <Svg
         pointerEvents="none"
