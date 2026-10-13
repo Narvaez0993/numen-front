@@ -4,11 +4,20 @@ import { Pressable, View } from 'react-native';
 
 import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
 import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
-import { Button, Pill, Text } from '@/shared/presentation/components';
+import { Pill, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DebtDraft, DebtDraftOverrides } from '../../domain/types/Assistant';
+
+import {
+  AskLabel,
+  ConfirmButton,
+  DraftShell,
+  PickChip,
+  QuietAction,
+} from './draftChrome';
 
 type Props = {
   debtDraft: DebtDraft;
@@ -42,6 +51,12 @@ const NO_ACCOUNT = '__none__';
  * a dinner split records who owes what and moves nothing, because the bill already
  * left as one expense. A payment never offers it — being paid back IS the money
  * changing hands, so there is nothing it could honestly mean.
+ *
+ * The redesign changed only the skin, deliberately: every rule above was paid for
+ * by a bug that shipped, so the questions, their order and their wording are the
+ * ones that were already correct. What changed is that the amount leads, the
+ * direction is one quiet word instead of a coloured pill, and a selected option
+ * is the accent at 15% rather than a filled mint block that read as "confirmed".
  */
 export function DebtDraftCard({
   debtDraft,
@@ -129,37 +144,39 @@ export function DebtDraftCard({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: theme.colors.bgFloat,
-        borderColor: theme.colors.borderSubtle,
-        borderWidth: 1,
-        borderRadius: 14,
-        padding: 12,
-        gap: 8,
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Pill variant={isPayment ? 'purple' : isIncoming ? 'mint' : 'amber'} uppercase>
-          {t(
-            isPayment
-              ? 'assistant.debtDraft.paymentPill'
-              : `assistant.debtDraft.direction.${debtDraft.direction}`,
-          )}
-        </Pill>
-        {!pending ? (
-          <Pill variant="neutral" uppercase>
-            {t(`assistant.draft.status.${debtDraft.status}`)}
-          </Pill>
-        ) : null}
-      </View>
-
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
-        <View style={{ flexShrink: 1 }}>
-          <Text variant="body" style={{ fontWeight: '500' }} numberOfLines={1}>
+    <DraftShell>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
+        <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text
+              variant="micro"
+              uppercase
+              color={theme.palette.acc2}
+              style={{ letterSpacing: 2 }}
+            >
+              {t(
+                isPayment
+                  ? 'assistant.debtDraft.paymentPill'
+                  : `assistant.debtDraft.direction.${debtDraft.direction}`,
+              )}
+            </Text>
+            {!pending ? (
+              <Pill variant="neutral" uppercase>
+                {t(`assistant.draft.status.${debtDraft.status}`)}
+              </Pill>
+            ) : null}
+          </View>
+          <Text tabular style={{ fontSize: 29, fontWeight: '300', letterSpacing: -0.9 }}>
+            {formatMoney(debtDraft.amount)}
+          </Text>
+          <Text numberOfLines={1} style={{ fontSize: 14.5 }}>
             {personName}
           </Text>
-          <Text variant="caption" muted numberOfLines={1}>
+          <Text
+            numberOfLines={1}
+            color={theme.colors.textTertiary}
+            style={{ fontSize: 11.5 }}
+          >
             {[
               accountName,
               // Silent while the card is still asking: a placeholder there just
@@ -176,17 +193,12 @@ export function DebtDraftCard({
               )}
           </Text>
         </View>
-        <Text variant="bodyLarge" tabular style={{ fontWeight: '500' }}>
-          {formatMoney(debtDraft.amount)}
-        </Text>
       </View>
 
       {asksForDebt ? (
-        <View style={{ gap: 6, marginTop: 2 }}>
-          <Text variant="label" style={{ fontSize: 12 }}>
-            {t('assistant.debtDraft.whichDebt')}
-          </Text>
-          <View style={{ gap: 6 }}>
+        <View style={{ gap: 10 }}>
+          <AskLabel>{t('assistant.debtDraft.whichDebt')}</AskLabel>
+          <View style={{ gap: 8 }}>
             {openDebts.map((debt) => {
               const active = pickedDebt === debt.id;
               return (
@@ -196,24 +208,36 @@ export function DebtDraftCard({
                   accessibilityState={{ selected: active }}
                   onPress={() => setPickedDebt(debt.id)}
                   disabled={busy}
-                  style={{
+                  style={({ pressed }) => ({
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 10,
-                    paddingVertical: 9,
-                    paddingHorizontal: 12,
-                    borderRadius: 12,
+                    minHeight: 52,
+                    paddingVertical: 10,
+                    paddingHorizontal: 14,
+                    borderRadius: 14,
                     borderWidth: 1,
+                    backgroundColor: active
+                      ? withAlpha(theme.palette.acc, 0.15)
+                      : theme.colors.bgFloat,
                     borderColor: active
-                      ? theme.colors.accentMint
+                      ? withAlpha(theme.palette.acc, 0.3)
                       : theme.colors.borderSubtle,
-                  }}
+                    opacity: pressed ? 0.85 : 1,
+                  })}
                 >
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    <Text variant="label" numberOfLines={1} style={{ fontSize: 13 }}>
+                    <Text
+                      numberOfLines={1}
+                      color={active ? theme.palette.acc2 : theme.colors.textPrimary}
+                      style={{ fontSize: 14 }}
+                    >
                       {debt.name}
                     </Text>
-                    <Text variant="caption" muted style={{ fontSize: 11, marginTop: 1 }}>
+                    <Text
+                      color={theme.colors.textTertiary}
+                      style={{ fontSize: 11, marginTop: 2 }}
+                    >
                       {[
                         t(
                           debt.direction === 'incoming'
@@ -226,7 +250,11 @@ export function DebtDraftCard({
                         .join(' · ')}
                     </Text>
                   </View>
-                  <Text variant="caption" muted tabular style={{ fontSize: 11.5 }}>
+                  <Text
+                    tabular
+                    color={theme.colors.textSecondary}
+                    style={{ fontSize: 12 }}
+                  >
                     {t('assistant.debtDraft.remaining', {
                       amount: formatMoney(debt.remaining),
                     })}
@@ -237,7 +265,6 @@ export function DebtDraftCard({
           </View>
           {overpaying ? (
             <Text
-              variant="caption"
               color={theme.colors.accentCoral}
               style={{ fontSize: 11.5, lineHeight: 16 }}
             >
@@ -250,15 +277,15 @@ export function DebtDraftCard({
       ) : null}
 
       {asksForPerson ? (
-        <View style={{ gap: 6, marginTop: 2 }}>
-          <Text variant="label" style={{ fontSize: 12 }}>
+        <View style={{ gap: 10 }}>
+          <AskLabel>
             {t('assistant.debtDraft.personMissing', {
               name: debtDraft.counterpartyName,
             })}
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          </AskLabel>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             {people.map((person) => (
-              <Chip
+              <PickChip
                 key={person.id}
                 label={person.name}
                 active={pickedPerson === person.id}
@@ -273,17 +300,17 @@ export function DebtDraftCard({
       ) : null}
 
       {asksForAccount ? (
-        <View style={{ gap: 6, marginTop: 2 }}>
-          <Text variant="label" style={{ fontSize: 12 }}>
+        <View style={{ gap: 10 }}>
+          <AskLabel>
             {t(
               paysInto
                 ? 'assistant.debtDraft.accountIn'
                 : 'assistant.debtDraft.accountOut',
             )}
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          </AskLabel>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             {(accounts.data?.accounts ?? []).map((account) => (
-              <Chip
+              <PickChip
                 key={account.id}
                 label={account.name}
                 active={pickedAccount === account.id}
@@ -293,7 +320,7 @@ export function DebtDraftCard({
             ))}
             {/* A repayment always moves cash — there is nothing this could mean. */}
             {isPayment ? null : (
-              <Chip
+              <PickChip
                 label={t('assistant.debtDraft.noAccount')}
                 active={pickedAccount === NO_ACCOUNT}
                 disabled={busy}
@@ -301,7 +328,10 @@ export function DebtDraftCard({
               />
             )}
           </View>
-          <Text variant="caption" muted style={{ fontSize: 11.5, lineHeight: 16 }}>
+          <Text
+            color={theme.colors.textTertiary}
+            style={{ fontSize: 11.5, lineHeight: 16 }}
+          >
             {t(
               isPayment
                 ? 'assistant.debtDraft.paymentHint'
@@ -312,69 +342,26 @@ export function DebtDraftCard({
       ) : null}
 
       {pending ? (
-        <View
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 2 }}
-        >
-          <View style={{ flex: 1 }}>
-            <Button
-              label={t('assistant.draft.confirm')}
-              onPress={handleConfirm}
-              disabled={
-                busy ||
-                !onConfirm ||
-                (asksForAccount && pickedAccount === null) ||
-                (asksForDebt && pickedDebt === null) ||
-                overpaying
-              }
-              loading={busy}
-              full
-            />
-          </View>
-          <Pressable onPress={onDiscard} disabled={busy || !onDiscard} hitSlop={8}>
-            <Text variant="caption" color={theme.colors.accentCoral}>
-              {t('assistant.draft.discard')}
-            </Text>
-          </Pressable>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <ConfirmButton
+            label={t('assistant.draft.confirm')}
+            onPress={handleConfirm}
+            disabled={
+              busy ||
+              !onConfirm ||
+              (asksForAccount && pickedAccount === null) ||
+              (asksForDebt && pickedDebt === null) ||
+              overpaying
+            }
+          />
+          <QuietAction
+            label={t('assistant.draft.discard')}
+            onPress={onDiscard}
+            disabled={busy}
+            danger
+          />
         </View>
       ) : null}
-    </View>
-  );
-}
-
-function Chip({
-  label,
-  active,
-  disabled,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  disabled?: boolean;
-  onPress: () => void;
-}) {
-  const { theme } = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
-      onPress={onPress}
-      disabled={disabled}
-      style={{
-        backgroundColor: active ? theme.colors.accentMint : 'transparent',
-        borderColor: active ? theme.colors.accentMint : theme.colors.borderSubtle,
-        borderWidth: 1,
-        borderRadius: 999,
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-      }}
-    >
-      <Text
-        variant="caption"
-        color={active ? theme.colors.bgBase : theme.colors.textSecondary}
-        style={{ fontSize: 12.5 }}
-      >
-        {label}
-      </Text>
-    </Pressable>
+    </DraftShell>
   );
 }

@@ -1,4 +1,4 @@
-import { Pressable, ScrollView } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
@@ -14,41 +14,52 @@ type Props = {
   onPick: (chip: SuggestedChip) => void;
 };
 
+/**
+ * What you might ask next.
+ *
+ * They wrap instead of scrolling sideways. A horizontal strip hides its last
+ * chip off the edge, and a suggestion you cannot see is not a suggestion — the
+ * whole point is that the next question is visible without thinking of one.
+ */
 export function SuggestedChips({ chips, disabled = false, onPick }: Props) {
   const { theme } = useTheme();
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}
-      style={{ marginHorizontal: -16, marginBottom: 10 }}
+    <View
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        paddingHorizontal: 20,
+        paddingBottom: 10,
+      }}
     >
-      {chips.map((c) => (
+      {chips.map((chip) => (
         <Pressable
-          key={c.id}
-          onPress={() => onPick(c)}
+          key={chip.id}
+          accessibilityRole="button"
+          onPress={() => onPick(chip)}
           disabled={disabled}
           style={({ pressed }) => ({
-            paddingHorizontal: 12,
-            paddingVertical: 7,
-            borderRadius: 12,
+            minHeight: 40,
+            justifyContent: 'center',
+            paddingHorizontal: 14,
+            borderRadius: 999,
             backgroundColor: theme.colors.bgSurface,
-            borderColor: theme.colors.borderSubtle,
             borderWidth: 1,
-            opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
+            borderColor: theme.colors.borderSubtle,
+            opacity: disabled ? 0.5 : pressed ? 0.8 : 1,
           })}
         >
           <Text
-            variant="label"
-            color={theme.colors.textSecondary}
-            style={{ fontSize: 11.5 }}
             numberOfLines={1}
+            color={theme.colors.textSecondary}
+            style={{ fontSize: 12 }}
           >
-            {c.label}
+            {chip.label}
           </Text>
         </Pressable>
       ))}
-    </ScrollView>
+    </View>
   );
 }

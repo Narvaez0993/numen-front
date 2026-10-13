@@ -1,212 +1,193 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
-import { Icon, IconBox, ProgressBar, Text } from '@/shared/presentation/components';
+import type { CurrencyCode } from '@/shared/domain';
+import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
-import type { Deuda, SharedEvent } from '../../domain';
+import { type Deuda, type SharedEvent, initialOf } from '../../domain';
 import { useDebtsContext } from '../context/DebtsContext';
-
-import { DebtPill } from './DebtPill';
-import { PersonAvatar } from './PersonAvatar';
+import { debtAccent, debtAccentSoft } from '../utils/debtAccent';
 
 type Props = {
   event: SharedEvent;
   debts: Deuda[];
+  currency: CurrencyCode;
   expanded: boolean;
+  last?: boolean;
   onToggle: () => void;
-  onPersonPress: (d: Deuda) => void;
-  onBulk?: () => void;
+  onPersonPress: (debt: Deuda) => void;
 };
 
+/**
+ * A split, wearing the same line as everybody else.
+ *
+ * The design draws Deudas as one flat list and has no group in it, but a dinner
+ * shared four ways is not four unrelated loans — collapsing it would make the
+ * screen say something false about what happened. So the group keeps its row and
+ * its disclosure, and gives up the card: same disc, same two lines, same bar. It
+ * reads as one entry in the list rather than as a different kind of object, and
+ * the chevron is the only thing that marks it as openable.
+ */
 export function DeudaCardShared({
   event,
   debts,
+  currency,
   expanded,
+  last = false,
   onToggle,
   onPersonPress,
-  onBulk,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { counterpartyById } = useDebtsContext();
 
-  const totalPaid = debts.reduce((sum, d) => sum + d.paidTotal, 0);
-  const totalRem = debts.reduce((sum, d) => sum + d.remaining, 0);
-  const pendingCount = debts.filter((d) => d.status !== 'paid').length;
+  const paid = debts.reduce((sum, debt) => sum + debt.paidTotal, 0);
+  const left = debts.reduce((sum, debt) => sum + debt.remaining, 0);
   // Progress over what is actually owed: the user's own share needs no collecting.
-  const owedTotal = totalPaid + totalRem;
-  const pct = owedTotal > 0 ? totalPaid / owedTotal : 0;
+  const owed = paid + left;
+  const progress = owed > 0 ? paid / owed : 0;
+  const accent = debtAccent(theme);
 
   return (
     <View
       style={{
-        backgroundColor: theme.colors.bgSurface,
-        borderWidth: 1,
-        borderColor: theme.colors.borderSubtle,
-        borderRadius: 16,
-        overflow: 'hidden',
+        borderBottomWidth: last && !expanded ? 0 : 1,
+        borderBottomColor: theme.colors.borderSubtle,
       }}
     >
       <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
         onPress={onToggle}
-        style={({ pressed }) => ({ padding: 14, opacity: pressed ? 0.92 : 1 })}
+        style={({ pressed }) => ({
+          minHeight: 44,
+          paddingVertical: 13,
+          opacity: pressed ? 0.7 : 1,
+        })}
       >
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             gap: 12,
-            marginBottom: 10,
+            marginBottom: 9,
           }}
         >
-          <IconBox name="users" color="purple" size={40} iconSize={19} radius={12} />
+          <View
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 17,
+              backgroundColor: withAlpha(accent, 0.14),
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icon name="users" size={16} stroke={1.9} color={debtAccentSoft(theme)} />
+          </View>
+
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text
-              numberOfLines={1}
-              style={{ fontSize: 14.5, fontWeight: '500', letterSpacing: -0.145 }}
-            >
+            <Text numberOfLines={1} style={{ fontSize: 14.5 }}>
               {event.name}
             </Text>
             <Text
-              color={theme.colors.textTertiary}
               numberOfLines={1}
-              style={{ fontSize: 11.5, marginTop: 2 }}
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 11, marginTop: 2 }}
             >
               {t('deudas.card.sharedWith', { count: debts.length })}
             </Text>
           </View>
-          <View style={{ alignItems: 'flex-end', gap: 2 }}>
-            <Text
-              tabular
-              style={{ fontSize: 15, fontWeight: '500', letterSpacing: -0.15 }}
-            >
-              {formatMoney(event.total)}
-            </Text>
-            <View
-              style={{
-                transform: [{ rotate: expanded ? '180deg' : '0deg' }],
-              }}
-            >
-              <Icon name="chevron-down" size={14} color={theme.colors.textTertiary} />
-            </View>
+
+          <Text tabular style={{ fontSize: 15, fontWeight: '500' }}>
+            {formatMoney(left, currency)}
+          </Text>
+          <View style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }}>
+            <Icon name="chevron-down" size={14} color={theme.colors.textTertiary} />
           </View>
         </View>
 
-        <ProgressBar pct={pct} height={5} />
-
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: 8,
-            gap: 6,
+            height: 3,
+            borderRadius: 2,
+            backgroundColor: withAlpha(theme.colors.textPrimary, 0.09),
+            overflow: 'hidden',
           }}
         >
           <View
-            style={{ flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' }}
-          >
-            <Text
-              tabular
-              color={theme.colors.accentMint}
-              style={{ fontSize: 11, fontFamily: 'Geist_500Medium' }}
-            >
-              {formatMoney(totalPaid)}
-            </Text>
-            <Text color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
-              {' '}
-              {t('deudas.card.collected')}
-              {' · '}
-            </Text>
-            <Text tabular color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
-              {t('deudas.card.pending', { count: pendingCount })}
-            </Text>
-          </View>
-          <Text tabular color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
-            {t('deudas.card.remaining', { amount: formatMoney(totalRem) })}
-          </Text>
+            style={{
+              width: `${Math.min(100, Math.max(0, progress * 100))}%`,
+              height: '100%',
+              backgroundColor: accent,
+            }}
+          />
         </View>
       </Pressable>
 
       {expanded ? (
-        <View style={{ paddingHorizontal: 14, paddingBottom: 14 }}>
-          <View
-            style={{
-              borderTopWidth: 1,
-              borderTopColor: theme.colors.borderSubtle,
-              paddingTop: 12,
-              gap: 9,
-            }}
-          >
-            {debts.map((d) => {
-              const p = counterpartyById[d.counterpartyId];
-              if (!p) return null;
-              const isPartial = d.status === 'partial';
-              return (
-                <Pressable
-                  key={d.id}
-                  onPress={() => onPersonPress(d)}
-                  style={({ pressed }) => ({
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 10,
-                    paddingVertical: 6,
-                    opacity: pressed ? 0.85 : 1,
-                  })}
-                >
-                  <PersonAvatar person={p} size={26} fontSize={11} />
-                  <Text style={{ flex: 1, fontSize: 13 }} numberOfLines={1}>
-                    {p.name}
-                  </Text>
-                  <Text
-                    tabular
-                    color={theme.colors.textTertiary}
-                    style={{ fontSize: 12 }}
-                  >
-                    {isPartial
-                      ? `${formatMoney(d.paidTotal)} / ${formatMoney(d.amount)}`
-                      : formatMoney(d.amount)}
-                  </Text>
-                  <DebtPill status={d.status} />
-                </Pressable>
-              );
-            })}
-          </View>
-
-          {pendingCount > 0 && onBulk ? (
-            <Pressable
-              onPress={onBulk}
-              style={({ pressed }) => ({
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-                marginTop: 12,
-                paddingVertical: 9,
-                borderWidth: 1,
-                borderStyle: 'dashed',
-                borderColor: theme.colors.borderDefault,
-                borderRadius: 10,
-                opacity: pressed ? 0.85 : 1,
-              })}
-            >
-              <Icon
-                name="checks"
-                size={13}
-                stroke={2}
-                color={theme.colors.textSecondary}
-              />
-              <Text
-                variant="label"
-                color={theme.colors.textSecondary}
-                style={{ fontSize: 12 }}
+        // Enough that each name lands exactly under the event's own: the disc is
+        // 26 and its gap 10, against 34 and 12 on the row above. Indenting by the
+        // parent's whole 46 instead pushed the names to 82px, far enough that
+        // they read as a different list rather than as this one opened up. The
+        // smaller disc is what carries the nesting.
+        <View style={{ paddingBottom: 12, paddingLeft: 10 }}>
+          {debts.map((debt) => {
+            const person = counterpartyById[debt.counterpartyId];
+            if (!person) return null;
+            return (
+              <Pressable
+                key={debt.id}
+                accessibilityRole="button"
+                onPress={() => onPersonPress(debt)}
+                style={({ pressed }) => ({
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                  minHeight: 44,
+                  paddingVertical: 8,
+                  opacity: pressed ? 0.7 : 1,
+                })}
               >
-                {t('deudas.card.bulkMarkPaid')}
-              </Text>
-            </Pressable>
-          ) : null}
+                <View
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: 13,
+                    backgroundColor: withAlpha(accent, 0.14),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text
+                    color={debtAccentSoft(theme)}
+                    style={{ fontSize: 11, fontWeight: '600' }}
+                  >
+                    {initialOf(person.name)}
+                  </Text>
+                </View>
+                <Text numberOfLines={1} style={{ flex: 1, fontSize: 13 }}>
+                  {person.name}
+                </Text>
+                <Text
+                  tabular
+                  color={
+                    debt.remaining === 0
+                      ? theme.colors.textTertiary
+                      : theme.colors.textPrimary
+                  }
+                  style={{ fontSize: 12.5 }}
+                >
+                  {debt.remaining === 0
+                    ? t('deudas.status.paid')
+                    : formatMoney(debt.remaining, currency)}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
       ) : null}
     </View>

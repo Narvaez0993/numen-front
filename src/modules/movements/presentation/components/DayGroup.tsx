@@ -1,7 +1,9 @@
 import { View } from 'react-native';
 
-import { Card, Text } from '@/shared/presentation/components';
+import { Text } from '@/shared/presentation/components';
+import { useTheme } from '@/shared/presentation/theme';
 import type { CurrencyCode } from '@/shared/domain';
+import { capitalized } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Movement } from '../../domain';
@@ -19,32 +21,36 @@ type Props = {
 };
 
 export function DayGroup({ group, catalogs, currency, onItemPress }: Props) {
+  const { theme } = useTheme();
+  const borderColor = theme.colors.borderDefault;
+  const tertiary = theme.colors.textTertiary;
+
   return (
     <View>
+      {/* The day is a rule across the list, not a label above a card: the
+          heading and its total sit on the line the rows hang from. */}
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'baseline',
           justifyContent: 'space-between',
-          paddingHorizontal: 4,
-          paddingBottom: 8,
+          paddingTop: 18,
+          paddingBottom: 9,
+          borderBottomWidth: 1,
+          borderBottomColor: borderColor,
           gap: 12,
         }}
       >
-        <Text variant="micro" uppercase style={{ fontSize: 11, letterSpacing: 1.1 }}>
-          {group.label}
+        <Text style={{ fontSize: 13, fontWeight: '500' }}>
+          {capitalized(group.label)}
         </Text>
-        <Text
-          variant="caption"
-          muted
-          tabular
-          style={{ fontSize: 11.5, fontWeight: '500' }}
-        >
+        <Text tabular color={tertiary} style={{ fontSize: 11.5 }}>
+          {group.total >= 0 ? '+' : ''}
           {formatMoney(group.total, currency)}
         </Text>
       </View>
 
-      <Card padding={0}>
+      <View>
         {group.items.map((movement, i) => (
           <TxRow
             key={movement.id}
@@ -53,11 +59,12 @@ export function DayGroup({ group, catalogs, currency, onItemPress }: Props) {
               movement.categoryId ? catalogs.categoryById[movement.categoryId] : undefined
             }
             source={displaySource(catalogs, movement.source, movement.destination)}
+            from={catalogs.sourceById[movement.source.id]}
             last={i === group.items.length - 1}
             onPress={onItemPress ? () => onItemPress(movement) : undefined}
           />
         ))}
-      </Card>
+      </View>
     </View>
   );
 }

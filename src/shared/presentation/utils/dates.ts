@@ -146,6 +146,11 @@ export function monthName(iso: string, language = 'es'): string {
   return table(MONTHS_LONG, language)[fromIsoDate(iso).getMonth()]!;
 }
 
+/** `ago` / `aug` — the month alone, for a date badge that already shows the day. */
+export function monthShort(iso: string, language = 'es'): string {
+  return table(MONTHS, language)[fromIsoDate(iso).getMonth()]!;
+}
+
 const WEEKDAYS_LONG: Record<string, readonly string[]> = {
   es: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
   en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -170,6 +175,16 @@ export function dayLabel(
   if (iso === addDays(today, -1)) return labels.yesterday;
   const date = fromIsoDate(iso);
   return `${table(WEEKDAYS, language)[date.getDay()]} ${shortDate(iso, language)}`;
+}
+
+/**
+ * `Hoy`, `Agosto` — a day or month name that stands on its own: a header, a
+ * chip. The names above come lowercase because most of them sit mid-sentence
+ * («hoy · $196.800», «El Corte de julio»); alone, the design starts them with a
+ * capital.
+ */
+export function capitalized(label: string): string {
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 /** `today` first, then the previous days — the picker for "when did this happen". */

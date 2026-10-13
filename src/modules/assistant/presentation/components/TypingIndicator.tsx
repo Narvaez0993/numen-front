@@ -3,8 +3,6 @@ import { Animated, View } from 'react-native';
 
 import { useTheme } from '@/shared/presentation/theme';
 
-import { AssistantBubble } from './AssistantBubble';
-
 function Dot({ delay, color }: { delay: number; color: string }) {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
@@ -31,9 +29,9 @@ function Dot({ delay, color }: { delay: number; color: string }) {
   return (
     <Animated.View
       style={{
-        width: 6,
-        height: 6,
-        borderRadius: 3,
+        width: 7,
+        height: 7,
+        borderRadius: 4,
         backgroundColor: color,
         opacity,
       }}
@@ -41,15 +39,21 @@ function Dot({ delay, color }: { delay: number; color: string }) {
   );
 }
 
+/**
+ * Three dots while the agent thinks, with no bubble around them.
+ *
+ * They stand where the answer will be rather than at the end of a transcript,
+ * so the eye is already looking at the place the words will appear. The dots
+ * take the accent because waiting is the one moment the screen has nothing else
+ * to say.
+ */
 export function TypingIndicator() {
   const { theme } = useTheme();
   return (
-    <AssistantBubble>
-      <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 4 }}>
-        <Dot delay={0} color={theme.colors.textTertiary} />
-        <Dot delay={180} color={theme.colors.textTertiary} />
-        <Dot delay={360} color={theme.colors.textTertiary} />
-      </View>
-    </AssistantBubble>
+    <View style={{ flexDirection: 'row', gap: 5, paddingVertical: 4 }}>
+      <Dot delay={0} color={theme.palette.acc} />
+      <Dot delay={180} color={theme.palette.acc} />
+      <Dot delay={360} color={theme.palette.acc} />
+    </View>
   );
 }

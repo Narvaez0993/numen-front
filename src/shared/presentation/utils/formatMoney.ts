@@ -68,3 +68,17 @@ export function formatAmountDigits(digits: string, currency?: CurrencyCode): str
 export function currencySymbol(currency?: CurrencyCode): string {
   return SYMBOLS[activeCurrency(currency)];
 }
+
+/**
+ * The grouped digits alone, for the big figures that draw their own `$`.
+ *
+ * Every hero in the redesign sets the symbol small and light beside the number
+ * instead of letting it ride at 43px, so each one was stripping it by hand — and
+ * two of the five copies used a pattern that ate a leading minus along with it.
+ * A negative balance that silently prints as a positive one is not a rounding
+ * difference, so the sign is part of what this returns.
+ */
+export function amountDigits(minor: number, currency?: CurrencyCode): string {
+  const sign = minor < 0 ? '-' : '';
+  return `${sign}${splitMinor(minor, activeCurrency(currency))}`;
+}

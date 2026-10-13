@@ -1,17 +1,47 @@
 /**
  * Design tokens — Deshka.
  *
- * Values come from the official design bundle `tokens.css`. Do NOT diverge
- * without updating the bundle first.
+ * Values come from the official design bundle (`Deshka App.dc.html` /
+ * `Deshka App Dia.dc.html`). Do NOT diverge without updating the bundle first.
+ *
+ * A theme is composed, not looked up: `mode` gives the surfaces and the ink,
+ * `palette` gives the accent, the orb and the aurora. `buildTheme` puts them
+ * together. That is why `themes` is gone — there is no longer a fixed pair of
+ * themes to index, there are ten.
+ *
+ * The `ColorScheme` keys are deliberately unchanged. Every screen still reads
+ * `theme.colors.bgSurface` and `theme.colors.accentCoral`, so the app keeps
+ * running while it is redesigned one screen at a time — the alternative was a
+ * flag day across forty components, which is exactly the kind of all-at-once
+ * change this migration is trying not to make.
  */
 import type { AccentColor } from '@/shared/domain';
 
+import { modeColors, type ThemeMode } from './modes';
+import {
+  DEFAULT_PALETTE,
+  paletteFor,
+  type PaletteColors,
+  type PaletteId,
+} from './palettes';
+
 export type { AccentColor };
+export type { ThemeMode } from './modes';
+export type { PaletteColors, PaletteId } from './palettes';
+export {
+  DEFAULT_PALETTE,
+  isPaletteId,
+  PALETTE_IDS,
+  PALETTE_NAMES,
+  palettes,
+} from './palettes';
+export { modeColors } from './modes';
 
 export type ColorScheme = {
   bgBase: string;
   bgSurface: string;
   bgFloat: string;
+  bgSheet: string;
   bgElevated: string;
 
   borderSubtle: string;
@@ -23,6 +53,10 @@ export type ColorScheme = {
 
   accentMint: string;
   accentCoral: string;
+  /** Spending, said gently. The design uses it for a note ABOUT an overspend —
+   *  "pasada del tope" beside a number — where full coral would read as the
+   *  number itself being the alarm. */
+  accentCoralSoft: string;
   accentPurple: string;
   accentAmber: string;
   accentPink: string;
@@ -37,64 +71,69 @@ export type ColorScheme = {
   fabShadow: string;
 };
 
-const darkColors: ColorScheme = {
-  bgBase: '#0A0E1A',
-  bgSurface: '#141925',
-  bgFloat: '#1C2333',
-  bgElevated: '#252D3F',
+/** `#RRGGBB` → `rgba(r,g,b,a)`. Tints are computed, not pasted, so a palette
+ *  swap moves its own soft variants with it. */
+export function withAlpha(hex: string, alpha: number): string {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
-  borderSubtle: '#1C2333',
-  borderDefault: '#252D3F',
+/**
+ * The five named accents the app assigns to categories, accounts and people.
+ *
+ * The redesign is monochrome and does not use them — a screen is ink plus one
+ * accent. They stay because the data does: the API still carries a `color` per
+ * category and per account, and screens not yet redesigned still paint it. Each
+ * one now borrows from the palette family so a half-migrated app never shows a
+ * colour from the old system next to one from the new.
+ */
+function namedAccents(mode: ThemeMode, palette: PaletteColors) {
+  const m = modeColors[mode];
+  const warm = mode === 'dark' ? '#F0B489' : '#A85718';
+  const rose = mode === 'dark' ? '#F2A5C4' : '#A83568';
+  const tint = mode === 'dark' ? 0.16 : 0.12;
 
-  textPrimary: '#FFFFFF',
-  textSecondary: '#A8B2C8',
-  textTertiary: '#6B7688',
+  return {
+    accentMint: m.income,
+    accentCoral: m.spend,
+    accentCoralSoft: m.spendSoft,
+    accentPurple: palette.acc,
+    accentAmber: warm,
+    accentPink: rose,
 
-  accentMint: '#00E5A8',
-  accentCoral: '#FF6B47',
-  accentPurple: '#8B7FFF',
-  accentAmber: '#FFB547',
-  accentPink: '#FF99C8',
+    accentMintBg: withAlpha(m.income, tint),
+    accentCoralBg: withAlpha(m.spend, tint),
+    accentPurpleBg: withAlpha(palette.acc, tint),
+    accentAmberBg: withAlpha(warm, tint),
+    accentPinkBg: withAlpha(rose, tint),
+  };
+}
 
-  accentMintBg: 'rgba(0, 229, 168, 0.15)',
-  accentCoralBg: 'rgba(255, 107, 71, 0.15)',
-  accentPurpleBg: 'rgba(139, 127, 255, 0.15)',
-  accentAmberBg: 'rgba(255, 181, 71, 0.15)',
-  accentPinkBg: 'rgba(255, 153, 200, 0.15)',
+function colorsFor(mode: ThemeMode, palette: PaletteColors): ColorScheme {
+  const m = modeColors[mode];
+  return {
+    bgBase: m.bgBase,
+    bgSurface: m.bgSurface,
+    bgFloat: m.bgFloat,
+    bgSheet: m.bgSheet,
+    bgElevated: m.bgElevated,
 
-  scrim: 'rgba(0, 0, 0, 0.55)',
-  fabShadow: 'transparent',
-};
+    borderSubtle: m.borderSubtle,
+    borderDefault: m.borderDefault,
 
-const lightColors: ColorScheme = {
-  // Soft gray page so white cards read as a layer (mirrors dark's depth).
-  bgBase: '#F4F5F9',
-  bgSurface: '#FFFFFF',
-  bgFloat: '#F0F2F7',
-  bgElevated: '#E8EBF2',
+    textPrimary: m.textPrimary,
+    textSecondary: m.textSecondary,
+    textTertiary: m.textTertiary,
 
-  borderSubtle: '#E5E8F0',
-  borderDefault: '#D5D9E3',
+    ...namedAccents(mode, palette),
 
-  textPrimary: '#0A0E1A',
-  textSecondary: '#4C5568',
-  textTertiary: '#8A93A8',
-
-  accentMint: '#00B589',
-  accentCoral: '#E04D24',
-  accentPurple: '#5C4FE8',
-  accentAmber: '#D49000',
-  accentPink: '#D4477F',
-
-  accentMintBg: 'rgba(0, 181, 137, 0.12)',
-  accentCoralBg: 'rgba(224, 77, 36, 0.12)',
-  accentPurpleBg: 'rgba(92, 79, 232, 0.12)',
-  accentAmberBg: 'rgba(212, 144, 0, 0.12)',
-  accentPinkBg: 'rgba(212, 71, 127, 0.12)',
-
-  scrim: 'rgba(10, 14, 26, 0.35)',
-  fabShadow: 'rgba(224, 77, 36, 0.3)',
-};
+    scrim: m.scrim,
+    fabShadow: withAlpha(palette.acc, mode === 'dark' ? 0.38 : 0.28),
+  };
+}
 
 export const spacing = {
   xs: 4,
@@ -109,12 +148,16 @@ export const spacing = {
   '6xl': 26,
 } as const;
 
+/** The design's own scale: 14 is the card, 22 the hero, 2–3 the bars of a chart. */
 export const radius = {
+  bar: 2,
+  barLg: 3,
   pill: 7,
   sm: 10,
   md: 12,
   lg: 14,
-  card: 18,
+  card: 14,
+  panel: 18,
   hero: 22,
   full: 9999,
 } as const;
@@ -143,17 +186,33 @@ export const typography = {
 
 export type Theme = {
   colors: ColorScheme;
+  /** The raw palette, for the screens that paint the orb and the aurora. */
+  palette: PaletteColors;
+  paletteId: PaletteId;
+  mode: ThemeMode;
+  /** Everything the mode owns, including the aurora strength and the far stop. */
+  surfaces: (typeof modeColors)[ThemeMode];
   spacing: typeof spacing;
   radius: typeof radius;
   typography: typeof typography;
 };
 
-export type ThemeMode = 'light' | 'dark';
-
-export const themes: Record<ThemeMode, Theme> = {
-  light: { colors: lightColors, spacing, radius, typography },
-  dark: { colors: darkColors, spacing, radius, typography },
-};
+export function buildTheme(
+  mode: ThemeMode,
+  paletteId: PaletteId = DEFAULT_PALETTE,
+): Theme {
+  const palette = paletteFor(mode, paletteId);
+  return {
+    colors: colorsFor(mode, palette),
+    palette,
+    paletteId,
+    mode,
+    surfaces: modeColors[mode],
+    spacing,
+    radius,
+    typography,
+  };
+}
 
 export const accentColorKey = (
   accent: AccentColor,

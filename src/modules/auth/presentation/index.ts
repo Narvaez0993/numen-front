@@ -1,4 +1,5 @@
 export * from './stores/useAuthStore';
+export * from './hooks/useMe';
 export * from './hooks/useLogin';
 export * from './hooks/useRegister';
 export * from './hooks/useVerifyEmail';
@@ -7,7 +8,5 @@ export * from './hooks/useLogout';
 export * from './hooks/useUpdateName';
 export * from './hooks/useUpdatePreferences';
 export * from './components/CredentialsForm';
-export * from './components/OtpInput';
-export * from './components/VerifyCodeForm';
 export * from './screens/LoginScreen';
 export * from './screens/VerifyScreen';

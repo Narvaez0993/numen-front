@@ -2,17 +2,15 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TextInput, View } from 'react-native';
 
-import {
-  AmountField,
-  BottomSheet,
-  Button,
-  DeleteFlow,
-  FieldLabel,
-  Text,
-  TextField,
-} from '@/shared/presentation/components';
 import type { CurrencyCode } from '@/shared/domain';
+import {
+  AmountSheet,
+  SheetDangerAction,
+  SheetHeaderButton,
+  Text,
+} from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { CreditCard } from '../../domain';
 
@@ -36,51 +34,29 @@ type Props = {
   onDelete: () => void;
 };
 
-/** Day-of-month input: two digits, never a display string (see CreditCard). */
-function DayField({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
-  const { theme } = useTheme();
-  return (
-    <TextInput
-      value={value}
-      onChangeText={(v) => onChange(v.replace(/\D/g, '').slice(0, 2))}
-      keyboardType="number-pad"
-      placeholder={placeholder}
-      placeholderTextColor={theme.colors.textTertiary}
-      style={{
-        backgroundColor: theme.colors.bgFloat,
-        borderWidth: 1,
-        borderColor: theme.colors.borderSubtle,
-        borderRadius: 12,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        fontSize: 15,
-        color: theme.colors.textPrimary,
-        fontFamily: 'Geist_500Medium',
-        fontVariant: ['tabular-nums'],
-      }}
-    />
-  );
-}
+const onlyDigits = (value: string) => value.replace(/[^0-9]/g, '');
 
+/**
+ * A credit card — `CREAR`'s shape with the system keyboard under it.
+ *
+ * It briefly had the app's number pad and a trick where tapping a row promoted
+ * it to the hero, because there were four numbers and one pad. The trick was
+ * clever and wrong: it existed to work around a constraint that only made sense
+ * for sheets holding nothing but numbers, and this one also holds a name. Every
+ * field is live now, which needs no explaining to anybody.
+ *
+ * The debt keeps the hero because it is the number that changes — the limit and
+ * the two days are set once and read for years.
+ */
 export function CardFormSheet({
   visible,
   card,
   currency,
   submitting = false,
-  deleting = false,
   onClose,
   onSave,
   onDelete,
 }: Props) {
-  const { theme } = useTheme();
   const { t } = useTranslation();
   const editing = card != null;
 
@@ -89,7 +65,6 @@ export function CardFormSheet({
   const [limitDigits, setLimitDigits] = useState('');
   const [cutoff, setCutoff] = useState('');
   const [due, setDue] = useState('');
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
@@ -98,7 +73,6 @@ export function CardFormSheet({
     setLimitDigits(card ? String(card.limit) : '');
     setCutoff(card ? String(card.cutoffDay) : '');
     setDue(card?.dueDay ? String(card.dueDay) : '');
-    setConfirmingDelete(false);
   }, [visible, card]);
 
   const debt = Number(debtDigits || '0');
@@ -117,96 +91,139 @@ export function CardFormSheet({
     dayInMonth(cutoffDay) &&
     (dueDay === null ? !dueRequired : dayInMonth(dueDay));
 
-  const handleSave = () => {
-    if (!valid || submitting) return;
-    onSave({ name: name.trim(), debt, limit, cutoffDay, dueDay });
-  };
-
   return (
-    <BottomSheet visible={visible} onClose={onClose} maxHeight="88%">
-      <View style={{ paddingHorizontal: 22, paddingTop: 8, paddingBottom: 26, gap: 16 }}>
-        <View>
-          <Text variant="h1" style={{ fontSize: 16 }}>
+    <AmountSheet
+      visible={visible}
+      onClose={onClose}
+      digits={debtDigits}
+      onDigits={setDebtDigits}
+      currency={currency}
+      keyboard="system"
+      label={t('accounts.form.debt')}
+      help={debtExceedsLimit ? t('accounts.form.debtExceedsLimit') : undefined}
+      primaryLabel={t('accounts.form.save')}
+      primaryDisabled={!valid || submitting}
+      onPrimary={() => onSave({ name: name.trim(), debt, limit, cutoffDay, dueDay })}
+      header={
+        <>
+          <SheetHeaderButton icon="x" label={t('common.close')} onPress={onClose} />
+          <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, fontWeight: '500' }}>
             {editing ? t('accounts.form.editCard') : t('accounts.form.newCard')}
           </Text>
-          <Text
-            variant="caption"
-            color={theme.colors.textSecondary}
-            style={{ marginTop: 4 }}
-          >
-            {t('accounts.form.cardSubtitle')}
-          </Text>
-        </View>
-
-        <View>
-          <FieldLabel label={t('accounts.form.name')} />
-          <TextField
-            value={name}
-            onChangeText={setName}
-            placeholder={t('accounts.form.cardNamePlaceholder')}
-            autoFocus={!editing}
-          />
-        </View>
-
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={{ flex: 1 }}>
-            <FieldLabel label={t('accounts.form.debt')} />
-            <AmountField
-              digits={debtDigits}
-              onChangeDigits={setDebtDigits}
-              currency={currency}
+          {editing ? (
+            <SheetDangerAction
+              label={t('accounts.form.delete')}
+              confirmLabel={t('accounts.form.deleteConfirm')}
+              onConfirm={onDelete}
             />
-          </View>
-          <View style={{ flex: 1 }}>
-            <FieldLabel label={t('accounts.form.limit')} />
-            <AmountField
-              digits={limitDigits}
-              onChangeDigits={setLimitDigits}
-              currency={currency}
-            />
-          </View>
-        </View>
-        {debtExceedsLimit ? (
-          <Text
-            variant="caption"
-            color={theme.colors.accentCoral}
-            style={{ fontSize: 11.5, marginTop: -8 }}
-          >
-            {t('accounts.form.debtExceedsLimit')}
-          </Text>
-        ) : null}
-
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={{ flex: 1 }}>
-            <FieldLabel label={t('accounts.form.cutoffDay')} />
-            <DayField value={cutoff} onChange={setCutoff} placeholder="25" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <FieldLabel label={t('accounts.form.dueDay')} />
-            <DayField value={due} onChange={setDue} placeholder="5" />
-          </View>
-        </View>
-
-        <Button
-          label={t('accounts.form.save')}
-          full
-          disabled={!valid}
-          loading={submitting}
-          onPress={handleSave}
+          ) : null}
+        </>
+      }
+    >
+      <FieldRow label={t('accounts.form.name')}>
+        <RowInput
+          value={name}
+          placeholder={t('accounts.form.cardNamePlaceholder')}
+          onChangeText={setName}
         />
+      </FieldRow>
 
-        {editing ? (
-          <DeleteFlow
-            label={deleting ? t('accounts.form.deleting') : t('accounts.form.delete')}
-            confirmTitle={t('accounts.form.deleteConfirmTitle', { name: card.name })}
-            confirmLabel={t('accounts.form.deleteConfirm')}
-            cancelLabel={t('accounts.form.cancel')}
-            confirming={confirmingDelete}
-            onToggle={setConfirmingDelete}
-            onConfirm={onDelete}
-          />
-        ) : null}
+      <FieldRow label={t('accounts.form.limit')}>
+        <RowInput
+          value={limitDigits ? formatMoney(limit, currency) : ''}
+          placeholder="—"
+          numeric
+          onChangeText={(next) => setLimitDigits(onlyDigits(next))}
+        />
+      </FieldRow>
+
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <FieldRow label={t('accounts.form.cutoffDay')}>
+            <RowInput
+              value={cutoff}
+              placeholder="—"
+              numeric
+              maxLength={2}
+              onChangeText={(next) => setCutoff(onlyDigits(next).slice(0, 2))}
+            />
+          </FieldRow>
+        </View>
+        <View style={{ flex: 1 }}>
+          <FieldRow label={t('accounts.form.dueDay')}>
+            <RowInput
+              value={due}
+              placeholder="—"
+              numeric
+              maxLength={2}
+              onChangeText={(next) => setDue(onlyDigits(next).slice(0, 2))}
+            />
+          </FieldRow>
+        </View>
       </View>
-    </BottomSheet>
+    </AmountSheet>
+  );
+}
+
+/** A labelled row with a live field in it. */
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  const { theme } = useTheme();
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        minHeight: 44,
+        paddingHorizontal: 16,
+        paddingVertical: 13,
+        borderRadius: 16,
+        backgroundColor: theme.colors.bgSurface,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
+      }}
+    >
+      <Text color={theme.colors.textTertiary} style={{ fontSize: 13.5 }}>
+        {label}
+      </Text>
+      {children}
+    </View>
+  );
+}
+
+function RowInput({
+  value,
+  placeholder,
+  numeric = false,
+  maxLength = 40,
+  onChangeText,
+}: {
+  value: string;
+  placeholder: string;
+  numeric?: boolean;
+  maxLength?: number;
+  onChangeText: (next: string) => void;
+}) {
+  const { theme } = useTheme();
+
+  return (
+    <TextInput
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor={theme.colors.textTertiary}
+      keyboardType={numeric ? 'number-pad' : 'default'}
+      maxLength={maxLength}
+      selectionColor={theme.palette.acc}
+      style={{
+        flex: 1,
+        textAlign: 'right',
+        fontSize: 13.5,
+        color: theme.colors.textPrimary,
+        fontFamily: 'Geist_400Regular',
+        padding: 0,
+      }}
+    />
   );
 }

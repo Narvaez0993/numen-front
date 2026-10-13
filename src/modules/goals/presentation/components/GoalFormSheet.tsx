@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
+import { Pressable, TextInput } from 'react-native';
 
+import type { CurrencyCode } from '@/shared/domain';
 import {
-  AmountField,
-  BottomSheet,
-  Button,
+  AmountSheet,
   DatePickerSheet,
-  DeleteFlow,
-  FieldLabel,
-  Icon,
+  SheetDangerAction,
+  SheetFieldRow,
+  SheetHeaderButton,
   Text,
-  TextField,
 } from '@/shared/presentation/components';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { useTheme } from '@/shared/presentation/theme';
 import { shortDate } from '@/shared/presentation/utils/dates';
 
@@ -37,6 +36,18 @@ type Props = {
   onDelete: () => void;
 };
 
+/**
+ * Setting a goal — `CREAR`, with the target as the amount.
+ *
+ * It takes words, so it uses the phone's keyboard rather than the app's pad: a
+ * goal has a name, and a pad that cannot type it while sitting where it needs to
+ * be read is worse than no pad.
+ *
+ * The date is optional and that matters more than it looks. With one, the app
+ * can say what each month needs and put that number on the contribute button;
+ * without one it can only report the pace. The help line says so, because the
+ * difference is invisible until you have already skipped the field.
+ */
 export function GoalFormSheet({
   visible,
   goal,
@@ -49,152 +60,115 @@ export function GoalFormSheet({
 }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
+  const currency = useCurrencyStore((s) => s.currency) as CurrencyCode;
   const editing = goal != null;
 
   const [name, setName] = useState('');
   const [digits, setDigits] = useState('');
   const [targetDate, setTargetDate] = useState<string | null>(null);
   const [dateOpen, setDateOpen] = useState(false);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
     setName(goal?.name ?? '');
     setDigits(goal ? String(goal.target) : '');
     setTargetDate(goal?.targetDate ?? null);
-    setConfirmingDelete(false);
   }, [visible, goal]);
 
   const target = Number(digits || '0');
   const valid = name.trim().length >= 2 && target > 0;
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} maxHeight="88%">
-      <View style={{ paddingHorizontal: 22, paddingTop: 8, paddingBottom: 26, gap: 16 }}>
-        <View>
-          <Text variant="h1" style={{ fontSize: 16 }}>
-            {editing ? t('goals.form.editGoal') : t('goals.form.newGoal')}
-          </Text>
-          <Text
-            variant="caption"
-            color={theme.colors.textSecondary}
-            style={{ marginTop: 4 }}
-          >
-            {t('goals.form.subtitle')}
-          </Text>
-        </View>
-
-        <View>
-          <FieldLabel label={t('goals.form.name')} />
-          <TextField
+    <>
+      <AmountSheet
+        visible={visible}
+        onClose={onClose}
+        keyboard="system"
+        digits={digits}
+        onDigits={setDigits}
+        currency={currency}
+        label={t('goals.form.target')}
+        help={t('goals.form.help')}
+        primaryLabel={t('goals.form.save')}
+        primaryDisabled={!valid || saving}
+        onPrimary={() => onSave({ name: name.trim(), target, targetDate })}
+        header={
+          <>
+            <SheetHeaderButton icon="x" label={t('common.close')} onPress={onClose} />
+            <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, fontWeight: '500' }}>
+              {editing ? t('goals.form.editGoal') : t('goals.form.newGoal')}
+            </Text>
+            {editing ? (
+              <SheetDangerAction
+                label={t('goals.form.delete')}
+                confirmLabel={t('goals.form.deleteConfirm')}
+                onConfirm={onDelete}
+              />
+            ) : null}
+          </>
+        }
+        overlays={
+          <>
+            <DatePickerSheet
+              visible={dateOpen}
+              value={targetDate ?? today}
+              today={today}
+              allowFuture
+              title={t('goals.form.targetDate')}
+              language={i18n.language}
+              onSelect={setTargetDate}
+              onClose={() => setDateOpen(false)}
+            />
+          </>
+        }
+      >
+        <SheetFieldRow label={t('goals.form.name')} onPress={() => undefined}>
+          <TextInput
             value={name}
             onChangeText={setName}
             placeholder={t('goals.form.namePlaceholder')}
-            autoFocus={!editing}
+            placeholderTextColor={theme.colors.textTertiary}
+            maxLength={40}
+            selectionColor={theme.palette.acc}
+            style={{
+              flex: 1,
+              textAlign: 'right',
+              fontSize: 13.5,
+              color: theme.colors.textPrimary,
+              fontFamily: 'Geist_400Regular',
+              padding: 0,
+            }}
           />
-        </View>
+        </SheetFieldRow>
 
-        <View>
-          <FieldLabel label={t('goals.form.target')} />
-          <AmountField digits={digits} onChangeDigits={setDigits} />
-        </View>
-
-        <View>
-          <FieldLabel label={t('goals.form.targetDate')} />
-          <Pressable
-            onPress={() => setDateOpen(true)}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 10,
-              paddingVertical: 12,
-              paddingHorizontal: 14,
-              backgroundColor: theme.colors.bgSurface,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-              borderRadius: 12,
-              opacity: pressed ? 0.85 : 1,
-            })}
-          >
-            <Icon
-              name="calendar-event"
-              size={15}
-              stroke={1.9}
-              color={theme.colors.textSecondary}
-            />
-            <Text
-              style={{ flex: 1, fontSize: 13.5 }}
-              color={targetDate ? theme.colors.textPrimary : theme.colors.textTertiary}
-            >
-              {targetDate ? shortDate(targetDate, i18n.language) : t('goals.form.noDate')}
-            </Text>
-            {targetDate ? (
-              <Pressable
-                hitSlop={8}
-                onPress={() => setTargetDate(null)}
-                style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-              >
-                <Icon name="x" size={13} stroke={2.2} color={theme.colors.textTertiary} />
-              </Pressable>
-            ) : (
-              <Icon name="chevron-down" size={14} color={theme.colors.textTertiary} />
-            )}
-          </Pressable>
-        </View>
-
-        <Button
-          label={t('goals.form.save')}
-          full
-          disabled={!valid || saving}
-          onPress={() => onSave({ name: name.trim(), target, targetDate })}
+        <SheetFieldRow
+          label={t('goals.form.targetDate')}
+          value={
+            targetDate === null
+              ? t('goals.form.noDate')
+              : shortDate(targetDate, i18n.language)
+          }
+          chevron
+          onPress={() => setDateOpen(true)}
         />
 
         {editing ? (
-          <>
-            <Pressable
-              onPress={onArchive}
-              style={({ pressed }) => ({
-                width: '100%',
-                paddingVertical: 10,
-                alignItems: 'center',
-                opacity: pressed ? 0.7 : 1,
-              })}
-            >
-              <Text
-                variant="label"
-                color={theme.colors.textSecondary}
-                style={{ fontSize: 12.5 }}
-              >
-                {t(goal.archived ? 'goals.form.reopen' : 'goals.form.archive')}
-              </Text>
-            </Pressable>
-            <DeleteFlow
-              label={t('goals.form.delete')}
-              confirmTitle={t('goals.form.deleteConfirmTitle', { name: goal.name })}
-              confirmLabel={t('goals.form.deleteConfirm')}
-              cancelLabel={t('goals.form.cancel')}
-              confirming={confirmingDelete}
-              onToggle={setConfirmingDelete}
-              onConfirm={onDelete}
-            />
-          </>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onArchive}
+            style={({ pressed }) => ({
+              minHeight: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Text color={theme.colors.textSecondary} style={{ fontSize: 12.5 }}>
+              {t(goal.archived ? 'goals.form.reopen' : 'goals.form.archive')}
+            </Text>
+          </Pressable>
         ) : null}
-      </View>
-
-      <DatePickerSheet
-        visible={dateOpen}
-        value={targetDate ?? today}
-        today={today}
-        // A goal's deadline lives in the future — that is the point of one.
-        allowFuture
-        title={t('goals.form.targetDate')}
-        language={i18n.language}
-        onClose={() => setDateOpen(false)}
-        onSelect={(iso) => {
-          setTargetDate(iso);
-          setDateOpen(false);
-        }}
-      />
-    </BottomSheet>
+      </AmountSheet>
+    </>
   );
 }

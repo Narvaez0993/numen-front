@@ -76,19 +76,19 @@ export function SummariesScreen() {
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 16 }}>
           <Segmented
-            options={TABS}
             value={tab}
             onChange={setTab}
-            labels={{
-              monthly: countLabel(
-                t('assistant.summaries.tabMonthly'),
-                forTab(all, 'monthly'),
+            options={TABS.map((id) => ({
+              value: id,
+              label: countLabel(
+                t(
+                  id === 'monthly'
+                    ? 'assistant.summaries.tabMonthly'
+                    : 'assistant.summaries.tabWeekly',
+                ),
+                forTab(all, id),
               ),
-              weekly: countLabel(
-                t('assistant.summaries.tabWeekly'),
-                forTab(all, 'weekly'),
-              ),
-            }}
+            }))}
           />
 
           {featured === undefined ? (

@@ -1,5 +1,5 @@
-import type { PlanComparison } from '../../domain';
+import type { PlusOffer } from '../../domain';
 
 export interface PlanRepository {
-  getComparison(): Promise<PlanComparison>;
+  getPlusOffer(): Promise<PlusOffer>;
 }

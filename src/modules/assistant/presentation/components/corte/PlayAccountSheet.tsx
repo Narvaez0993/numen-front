@@ -1,16 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 
 import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
-import {
-  BottomSheet,
-  Button,
-  FieldLabel,
-  IconBox,
-  Text,
-} from '@/shared/presentation/components';
+import { BottomSheet, Icon, InkButton, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 type Props = {
@@ -24,7 +19,12 @@ type Props = {
 
 /**
  * A goal contribution is a real transfer: the user picks WHERE it leaves from.
- * Same picker the goals screen uses, minus the amount field — the play fixed it.
+ *
+ * Drawn as the design's `ELEGIR` — the title with «Cerrar» opposite, the rows
+ * with their well and the accent's check on the chosen one — because that is
+ * what picking looks like everywhere else in the app. It only adds what a
+ * picker does not have: the line saying how much will move, and the ink
+ * button, since choosing the account is not yet the decision. Confirming is.
  */
 export function PlayAccountSheet({
   visible,
@@ -42,71 +42,110 @@ export function PlayAccountSheet({
   const chosen = accountId ?? options[0]?.id ?? null;
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} maxHeight="80%">
-      <View style={{ paddingHorizontal: 22, paddingTop: 8, paddingBottom: 26, gap: 16 }}>
-        <View>
-          <Text variant="h1" style={{ fontSize: 16 }}>
-            {t('assistant.corte.play.sheetTitle', { name: goalName })}
+    <BottomSheet visible={visible} onClose={onClose} maxHeight="74%" showClose={false}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 12,
+          paddingHorizontal: 24,
+          paddingTop: 16,
+        }}
+      >
+        <Text numberOfLines={1} style={{ flex: 1, fontSize: 15, fontWeight: '500' }}>
+          {t('assistant.corte.play.sheetTitle', { name: goalName })}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onClose}
+          style={{ minHeight: 44, justifyContent: 'center' }}
+        >
+          <Text color={theme.colors.textTertiary} style={{ fontSize: 12.5 }}>
+            {t('common.close')}
           </Text>
-          <Text
-            variant="caption"
-            color={theme.colors.textSecondary}
-            style={{ marginTop: 4 }}
-          >
-            {t('assistant.corte.play.sheetBody', { amount: formatMoney(amount) })}
-          </Text>
-        </View>
+        </Pressable>
+      </View>
+      <Text
+        color={theme.colors.textTertiary}
+        style={{ fontSize: 12.5, lineHeight: 18, paddingHorizontal: 24 }}
+      >
+        {t('assistant.corte.play.sheetBody', { amount: formatMoney(amount) })}
+      </Text>
 
-        <View>
-          <FieldLabel label={t('assistant.corte.play.fromAccount')} />
-          <View style={{ gap: 8 }}>
-            {options.map((account) => {
-              const active = account.id === chosen;
-              return (
-                <Pressable
-                  key={account.id}
-                  onPress={() => setAccountId(account.id)}
-                  style={({ pressed }) => ({
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 10,
-                    paddingVertical: 10,
-                    paddingHorizontal: 12,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: active
-                      ? theme.colors.accentMint
-                      : theme.colors.borderSubtle,
-                    backgroundColor: theme.colors.bgSurface,
-                    opacity: pressed ? 0.85 : 1,
-                  })}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 26, paddingTop: 20 }}
+      >
+        <Text
+          variant="micro"
+          uppercase
+          color={theme.colors.textTertiary}
+          style={{ letterSpacing: 2.2, marginBottom: 4 }}
+        >
+          {t('assistant.corte.play.fromAccount')}
+        </Text>
+        {options.map((account, index) => {
+          const active = account.id === chosen;
+          return (
+            <Pressable
+              key={account.id}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: active }}
+              onPress={() => setAccountId(account.id)}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                minHeight: 44,
+                paddingVertical: 12,
+                borderBottomWidth: index === options.length - 1 ? 0 : 1,
+                borderBottomColor: theme.colors.borderSubtle,
+                opacity: pressed ? 0.7 : 1,
+              })}
+            >
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 11,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: active
+                    ? withAlpha(theme.palette.acc, 0.16)
+                    : theme.colors.bgFloat,
+                }}
+              >
+                <Icon
+                  name={account.icon}
+                  size={15}
+                  stroke={1.8}
+                  color={active ? theme.palette.acc2 : theme.colors.textSecondary}
+                />
+              </View>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text numberOfLines={1} style={{ fontSize: 14.5 }}>
+                  {account.name}
+                </Text>
+                <Text
+                  tabular
+                  color={theme.colors.textTertiary}
+                  style={{ fontSize: 11.5, marginTop: 2 }}
                 >
-                  <IconBox
-                    name={account.icon}
-                    color={account.color}
-                    size={30}
-                    iconSize={14}
-                    radius={9}
-                  />
-                  <Text
-                    variant="label"
-                    numberOfLines={1}
-                    style={{ flex: 1, fontSize: 13 }}
-                  >
-                    {account.name}
-                  </Text>
-                  <Text variant="caption" muted tabular style={{ fontSize: 11.5 }}>
-                    {formatMoney(account.balance)}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
+                  {formatMoney(account.balance, account.currency)}
+                </Text>
+              </View>
+              {active ? (
+                <Icon name="check" size={17} stroke={2.2} color={theme.palette.acc} />
+              ) : null}
+            </Pressable>
+          );
+        })}
+      </ScrollView>
 
-        <Button
+      <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 30 }}>
+        <InkButton
           label={t('assistant.corte.play.confirm')}
-          full
           disabled={chosen === null}
           onPress={() => chosen && onConfirm(chosen)}
         />

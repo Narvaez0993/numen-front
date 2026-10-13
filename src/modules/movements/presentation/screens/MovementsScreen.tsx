@@ -11,10 +11,12 @@ import {
   SubScreenHeader,
   Text,
   Toast,
+  Aurora,
 } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import {
+  capitalized,
   monthName,
   monthRange,
   shiftMonth,
@@ -26,6 +28,9 @@ import type { Movement, MovementPatch, MovementType } from '../../domain';
 import { DayGroup } from '../components/DayGroup';
 import { EmptyState } from '../components/EmptyState';
 import { MovementDetailSheet } from '../components/MovementDetailSheet';
+import { RhythmStrip } from '@/modules/home/presentation/components/RhythmStrip';
+import { useHomeOverview } from '@/modules/home/presentation/hooks/useHomeOverview';
+
 import { MovementsHeader } from '../components/MovementsHeader';
 import { SearchBar } from '../components/SearchBar';
 import { useMovementCatalogs } from '../hooks/useMovementCatalogs';
@@ -60,6 +65,7 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
   // Pinned once per mount: every date label and range is derived from it, so the
   // screen never disagrees with itself mid-render.
   const [today] = useState(() => toIsoDate(new Date()));
+  const overview = useHomeOverview(today);
   const [filters, setFilters] = useState<MovementsFilters>(() =>
     scopedSourceId ? { ...emptyFilters, sourceId: scopedSourceId } : emptyFilters,
   );
@@ -106,31 +112,23 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
 
   if (isError) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-        edges={['top']}
-      >
-        <RetryState
-          titleKey="movements.error.title"
-          retryKey="movements.error.retry"
-          onRetry={() => void refetch()}
-        />
-      </SafeAreaView>
+      <Aurora>
+        <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+          <RetryState
+            titleKey="movements.error.title"
+            retryKey="movements.error.retry"
+            onRetry={() => void refetch()}
+          />
+        </SafeAreaView>
+      </Aurora>
     );
   }
 
   if (isLoading || !data) {
     return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: theme.colors.bgBase,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <ActivityIndicator color={theme.colors.accentMint} />
-      </SafeAreaView>
+      <Aurora style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color={theme.palette.acc} />
+      </Aurora>
     );
   }
 
@@ -174,143 +172,163 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
   };
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-      edges={['top']}
-    >
-      <ScrollView
-        contentContainerStyle={{
-          paddingTop: 14,
-          // Pushed over the tabs there is no floating bar to clear.
-          paddingBottom: scopedSourceId ? 32 : tabBarClearance,
-          paddingHorizontal: 16,
-        }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={{ gap: 16 }}>
-          {scopedSourceId ? (
-            <SubScreenHeader
-              title={catalogs.sourceById[scopedSourceId]?.name ?? t('movements.title')}
-              onBack={() => router.back()}
-            />
-          ) : (
-            <MovementsHeader
-              monthLabel={monthName(month, language)}
-              monthTotal={monthTotal}
-              currency={currency}
-              onAvatarPress={() => router.push('/profile')}
-            />
-          )}
-
-          <SearchBar
-            value={filters.query}
-            onChangeText={(query) => setFilters((f) => ({ ...f, query }))}
-            placeholder={t('movements.searchPlaceholder')}
-          />
-
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <FilterChip
-              label={t('movements.filters.month')}
-              value={filters.month}
-              onChange={(value) => setFilters((f) => ({ ...f, month: value }))}
-              options={monthOptions}
-              allLabel={t('movements.filters.monthAll')}
-            />
-            {/* Scoped to one source, the source is not a filter — it is the
-                screen. Offering it as a chip would let the user "clear" their
-                way out of the very thing they opened. */}
-            {scopedSourceId ? null : (
-              <FilterChip
-                label={t('movements.filters.account')}
-                value={filters.sourceId}
-                onChange={(sourceId) => setFilters((f) => ({ ...f, sourceId }))}
-                options={sourceOptions}
+    <Aurora>
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingTop: 14,
+            // Pushed over the tabs there is no floating bar to clear.
+            paddingBottom: scopedSourceId ? 32 : tabBarClearance,
+            paddingHorizontal: 16,
+          }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ gap: 16 }}>
+            {scopedSourceId ? (
+              <SubScreenHeader
+                title={catalogs.sourceById[scopedSourceId]?.name ?? t('movements.title')}
+                onBack={() => router.back()}
+              />
+            ) : (
+              <MovementsHeader
+                monthLabel={capitalized(monthName(month, language))}
+                monthTotal={monthTotal}
+                currency={currency}
               />
             )}
-            <FilterChip
-              label={t('movements.filters.category')}
-              value={filters.categoryId}
-              onChange={(categoryId) => setFilters((f) => ({ ...f, categoryId }))}
-              options={categoryOptions}
-            />
-            <FilterChip
-              label={t('movements.filters.type')}
-              value={filters.type}
-              onChange={(value) =>
-                setFilters((f) => ({ ...f, type: value as MovementType | null }))
-              }
-              options={typeOptions}
-            />
-          </View>
 
-          {active ? (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 4,
-              }}
+            {/* The same strip Home draws, from the same read. Computing it here
+              from the filtered list would let the two screens disagree about
+              the same month. */}
+            {scopedSourceId || !overview.data ? null : (
+              <RhythmStrip
+                compact
+                byDay={overview.data.byDay}
+                spentToday={overview.data.month.spentToday}
+                dailyAverage={overview.data.pace?.dailyAverage ?? null}
+                language={language}
+              />
+            )}
+
+            <SearchBar
+              value={filters.query}
+              onChangeText={(query) => setFilters((f) => ({ ...f, query }))}
+              placeholder={t('movements.searchPlaceholder')}
+            />
+
+            {/* The bundle lays four chips across the width. Real labels are longer
+              than its mock ones — "Restaurantes", "Bancolombia" — so the row
+              scrolls instead of squeezing them into ellipsis. */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 7, paddingRight: 8 }}
             >
-              <Text variant="caption" muted>
-                {t(count === 1 ? 'movements.resultsOne' : 'movements.results', { count })}
-              </Text>
-              <Pressable
-                onPress={() =>
-                  setFilters((f) => ({
-                    ...emptyFilters,
-                    month: f.month,
-                    // The scope survives "Limpiar" — clearing your way out of
-                    // the screen you just opened is not clearing, it is a bug.
-                    sourceId: scopedSourceId ?? null,
-                  }))
-                }
-                hitSlop={6}
-              >
-                <Text
-                  variant="label"
-                  color={theme.colors.accentMint}
-                  style={{ fontSize: 11.5 }}
-                >
-                  {t('movements.clear')}
-                </Text>
-              </Pressable>
-            </View>
-          ) : null}
-
-          {groups.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <View style={{ gap: 18 }}>
-              {groups.map((group) => (
-                <DayGroup
-                  key={group.date}
-                  group={group}
-                  catalogs={catalogs}
-                  currency={currency}
-                  onItemPress={setDetail}
+              <FilterChip
+                label={t('movements.filters.month')}
+                value={filters.month}
+                onChange={(value) => setFilters((f) => ({ ...f, month: value }))}
+                options={monthOptions}
+                allLabel={t('movements.filters.monthAll')}
+              />
+              <FilterChip
+                label={t('movements.filters.category')}
+                value={filters.categoryId}
+                onChange={(categoryId) => setFilters((f) => ({ ...f, categoryId }))}
+                options={categoryOptions}
+              />
+              {/* Scoped to one source, the source is not a filter — it is the
+                screen. Offering it as a chip would let the user "clear" their
+                way out of the very thing they opened. */}
+              {scopedSourceId ? null : (
+                <FilterChip
+                  label={t('movements.filters.account')}
+                  value={filters.sourceId}
+                  onChange={(sourceId) => setFilters((f) => ({ ...f, sourceId }))}
+                  options={sourceOptions}
                 />
-              ))}
-            </View>
-          )}
-        </View>
-      </ScrollView>
+              )}
+              <FilterChip
+                label={t('movements.filters.type')}
+                value={filters.type}
+                onChange={(value) =>
+                  setFilters((f) => ({ ...f, type: value as MovementType | null }))
+                }
+                options={typeOptions}
+              />
+            </ScrollView>
 
-      <MovementDetailSheet
-        visible={detail !== null}
-        movement={detail}
-        catalogs={catalogs}
-        submitting={updateMovement.isPending || deleteMovement.isPending}
-        onClose={() => setDetail(null)}
-        onSave={handleSave}
-        onDelete={handleDelete}
-      />
-      <Toast
-        visible={toast !== null}
-        message={toast ?? ''}
-        onDismiss={() => setToast(null)}
-      />
-    </SafeAreaView>
+            {active ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 4,
+                }}
+              >
+                <Text variant="caption" muted>
+                  {t(count === 1 ? 'movements.resultsOne' : 'movements.results', {
+                    count,
+                  })}
+                </Text>
+                <Pressable
+                  onPress={() =>
+                    setFilters((f) => ({
+                      ...emptyFilters,
+                      month: f.month,
+                      // The scope survives "Limpiar" — clearing your way out of
+                      // the screen you just opened is not clearing, it is a bug.
+                      sourceId: scopedSourceId ?? null,
+                    }))
+                  }
+                  hitSlop={6}
+                >
+                  <Text
+                    variant="label"
+                    color={theme.palette.acc3}
+                    style={{ fontSize: 11.5 }}
+                  >
+                    {t('movements.clear')}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null}
+
+            {groups.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <View style={{ gap: 18 }}>
+                {groups.map((group) => (
+                  <DayGroup
+                    key={group.date}
+                    group={group}
+                    catalogs={catalogs}
+                    currency={currency}
+                    onItemPress={setDetail}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+
+        <MovementDetailSheet
+          visible={detail !== null}
+          movement={detail}
+          catalogs={catalogs}
+          submitting={updateMovement.isPending || deleteMovement.isPending}
+          onClose={() => setDetail(null)}
+          onSave={handleSave}
+          onDelete={handleDelete}
+        />
+        <Toast
+          visible={toast !== null}
+          message={toast ?? ''}
+          onDismiss={() => setToast(null)}
+        />
+      </SafeAreaView>
+    </Aurora>
   );
 }

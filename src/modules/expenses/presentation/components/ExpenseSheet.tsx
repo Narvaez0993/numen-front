@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, View, type DimensionValue } from 'react-native';
+import { Platform } from 'react-native';
 
 import type {
   CapturedRecord,
-  DebtDraft,
   DebtDraftOverrides,
   DraftOverrides,
-  MovementDraft,
 } from '@/modules/assistant/domain/types/Assistant';
 import { DebtPaymentAccountRequiredError } from '@/modules/assistant/domain';
 import {
@@ -16,42 +14,52 @@ import {
   useDiscardDebtDraft,
   useDiscardDraft,
 } from '@/modules/assistant/presentation/hooks/useAssistantMutations';
-import {
-  overridesFromMovement,
-  prefillFromDraft,
-} from '@/modules/assistant/presentation/utils/draftForm';
+import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
+import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
 import {
   useDeleteDebt,
   useRemoveDebtPayment,
 } from '@/modules/deudas/presentation/hooks/useDebtMutations';
+import {
+  overridesFromMovement,
+  prefillFromDraft,
+} from '@/modules/assistant/presentation/utils/draftForm';
 import { useCreateMovement } from '@/modules/movements/presentation/hooks/useCreateMovement';
 import { useDeleteMovement } from '@/modules/movements/presentation/hooks/useMovementMutations';
 import type { NewMovement } from '@/modules/movements/domain';
-import { BottomSheet, Icon, Toast } from '@/shared/presentation/components';
-import { useTheme } from '@/shared/presentation/theme';
-import { toIsoDate } from '@/shared/presentation/utils/dates';
+import { DatePickerSheet, Toast } from '@/shared/presentation/components';
+import { ChooseSheet } from '@/shared/presentation/components/ChooseSheet';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
+import { dayLabel, toIsoDate } from '@/shared/presentation/utils/dates';
+import { formatAmountDigits } from '@/shared/presentation/utils/formatMoney';
 
 import { useVoiceCapture } from '../hooks/useVoiceCapture';
-import { useExpenseSheetStore, type SheetFlow } from '../stores/useExpenseSheetStore';
+import { useExpenseSheetStore } from '../stores/useExpenseSheetStore';
 
-import { CaptureConfirmScreen } from './CaptureConfirmScreen';
-import { EntryState } from './EntryState';
-import { ManualState } from './ManualState';
-import { WritingState } from './WritingState';
+import { CaptureScreen, type DetectedCardModel } from './CaptureScreen';
+import { CorrectSheet } from './CorrectSheet';
+import { ManualSheet } from './ManualSheet';
 
-const MAX_HEIGHT: Record<SheetFlow, DimensionValue> = {
-  entry: '62%',
-  recording: '62%',
-  processing: '62%',
-  writing: '78%',
-  photo: '80%',
-  manual: '92%',
-  confirm: '88%',
+/** Local, per-card corrections made from the chips before anything is saved.
+ *  Nothing here has touched the server yet — Registrar is what commits them. */
+type Edit = {
+  digits?: string;
+  description?: string;
+  categoryId?: string;
+  sourceKey?: string;
+  occurredOn?: string;
 };
 
+/** Which inline picker a chip opened, and for which card. */
+type OpenPicker = { card: string; field: 'category' | 'source' } | null;
+
+const refKey = (type: string, id: string) => `${type}:${id}`;
+
 export function ExpenseSheet() {
-  const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
+  const currency = useCurrencyStore((s) => s.currency);
+  const language = i18n.language.startsWith('en') ? 'en' : 'es';
+
   const open = useExpenseSheetStore((s) => s.open);
   const flow = useExpenseSheetStore((s) => s.flow);
   const closeSheet = useExpenseSheetStore((s) => s.closeSheet);
@@ -61,16 +69,17 @@ export function ExpenseSheet() {
   const debtDrafts = useExpenseSheetStore((s) => s.debtDrafts);
   const editing = useExpenseSheetStore((s) => s.editing);
   const transcript = useExpenseSheetStore((s) => s.transcript);
-  const clarification = useExpenseSheetStore((s) => s.clarification);
   const notice = useExpenseSheetStore((s) => s.notice);
-  const settleDraft = useExpenseSheetStore((s) => s.settleDraft);
-  const settleDebtDraft = useExpenseSheetStore((s) => s.settleDebtDraft);
+  const freshIds = useExpenseSheetStore((s) => s.freshIds);
+  const setDrafts = useExpenseSheetStore((s) => s.setDrafts);
+  const setDebtDrafts = useExpenseSheetStore((s) => s.setDebtDrafts);
   const saved = useExpenseSheetStore((s) => s.saved);
   const setSaved = useExpenseSheetStore((s) => s.setSaved);
-  const setEditing = useExpenseSheetStore((s) => s.setEditing);
 
   const today = useMemo(() => toIsoDate(new Date()), []);
   const capture = useVoiceCapture();
+  const categories = useCategories();
+  const accounts = useAccounts();
   const createMovement = useCreateMovement();
   const confirmDraft = useConfirmDraft(today);
   const discardDraft = useDiscardDraft();
@@ -79,32 +88,260 @@ export function ExpenseSheet() {
   const deleteMovement = useDeleteMovement();
   const deleteDebt = useDeleteDebt();
   const removeDebtPayment = useRemoveDebtPayment(today);
+
   const [error, setError] = useState<string | null>(null);
-  /** Only the card being confirmed shows a spinner; its siblings stay usable. */
-  const [busyDraftId, setBusyDraftId] = useState<string | null>(null);
-  // The toast remembers what it just created so "undo" has something to remove.
-  // A confirmed draft offers no undo: its card in the chat shows what happened.
-  // What the toast can undo. A capture that saved itself carries the full list;
-  // a manual save carries the one movement it created.
+  const [saving, setSaving] = useState(false);
+  const [edits, setEdits] = useState<Record<string, Edit>>({});
+  const [correcting, setCorrecting] = useState<string | null>(null);
+  const [picker, setPicker] = useState<OpenPicker>(null);
+  const [datePickerFor, setDatePickerFor] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     message: string;
     records: CapturedRecord[];
   } | null>(null);
 
-  // The sheet stays mounted between captures, so a failure from the last one used
-  // to greet the next card before the user had pressed anything. The error belongs
-  // to an attempt, not to the sheet.
+  // The screen stays mounted between captures, so a failure from the last one
+  // used to greet the next card before the user had pressed anything.
   useEffect(() => {
     setError(null);
   }, [open, drafts, debtDrafts]);
 
-  const isSubScreen = flow === 'manual' || flow === 'writing';
+  // A new capture starts with no corrections carried over from the last one.
+  useEffect(() => {
+    if (!open) setEdits({});
+  }, [open]);
 
-  const handleSave = (movement: NewMovement) => {
+  // The capture screen and the manual sheet are SIBLING Modals, and iOS only
+  // presents one once the other has left the screen. Asked any earlier — the mic
+  // in the manual sheet, back to «¿Qué pasó?» — it dropped the new one and the
+  // old one stayed behind as an invisible layer: no tap answered anywhere, and a
+  // JS reload did not help. So the one coming in waits for the one going out to
+  // report itself gone. No timer: a delay is a race whichever number you pick.
+  const [captureUp, setCaptureUp] = useState(false);
+  const [manualUp, setManualUp] = useState(false);
+  const waits = Platform.OS === 'ios';
+  const captureVisible = open && flow !== 'manual' && !(waits && manualUp);
+  const manualVisible = open && flow === 'manual' && !(waits && captureUp);
+
+  useEffect(() => {
+    if (captureVisible) setCaptureUp(true);
+  }, [captureVisible]);
+
+  useEffect(() => {
+    if (manualVisible) setManualUp(true);
+  }, [manualVisible]);
+
+  const sourceOptions = useMemo(
+    () => [
+      ...(accounts.data?.accounts ?? []).map((account) => ({
+        value: refKey('account', account.id),
+        label: account.name,
+      })),
+      ...(accounts.data?.creditCards ?? []).map((card) => ({
+        value: refKey('credit_card', card.id),
+        label: card.name,
+      })),
+    ],
+    [accounts.data],
+  );
+
+  const editOf = (id: string): Edit => edits[id] ?? {};
+  const patch = (id: string, next: Edit) =>
+    setEdits((current) => ({ ...current, [id]: { ...current[id], ...next } }));
+
+  const understood = drafts.length + debtDrafts.length > 0;
+  // Recording wins over the card list, or adding a fourth thing to three would
+  // show the cards while the mic was open and never draw the words landing.
+  // Thinking does NOT win: the cards stay put while the new one is parsed, since
+  // blanking a list the user is reading to show a spinner loses their place.
+  const state = flow === 'recording' ? 'recording' : understood ? 'understood' : 'empty';
+
+  /** A movement draft, dressed as a card with its chips. */
+  const movementCards: DetectedCardModel[] = drafts.map((draft) => {
+    const edit = editOf(draft.id);
+    const categoryId = edit.categoryId ?? draft.categoryId;
+    const sourceKey =
+      edit.sourceKey ??
+      (draft.sourceId !== null && draft.sourceType !== null
+        ? refKey(draft.sourceType, draft.sourceId)
+        : null);
+    const occurredOn = edit.occurredOn ?? draft.occurredOn;
+    const digits = edit.digits ?? String(draft.amount);
+
+    return {
+      id: draft.id,
+      title: edit.description ?? draft.description,
+      amount: formatAmountDigits(digits, currency),
+      sign: draft.type === 'income' ? '+$' : draft.type === 'transfer' ? '$' : '−$',
+      income: draft.type === 'income',
+      fresh: freshIds.includes(draft.id),
+      onEdit: () => setCorrecting(draft.id),
+      onRemove: () => handleRemoveDraft(draft.id),
+      chips: [
+        ...(draft.type === 'transfer'
+          ? []
+          : [
+              {
+                key: 'category',
+                label:
+                  categories.data?.find((c) => c.id === categoryId)?.name ??
+                  t('expenses.capture.chip.category'),
+                onPress: () => setPicker({ card: draft.id, field: 'category' }),
+              },
+            ]),
+        {
+          key: 'source',
+          label:
+            sourceOptions.find((option) => option.value === sourceKey)?.label ??
+            t('expenses.capture.chip.source'),
+          onPress: () => setPicker({ card: draft.id, field: 'source' }),
+        },
+        {
+          key: 'date',
+          label: dayLabel(occurredOn, today, language, {
+            today: t('movements.days.today'),
+            yesterday: t('movements.days.yesterday'),
+          }),
+          onPress: () => setDatePickerFor(draft.id),
+        },
+      ],
+    };
+  });
+
+  /** A debt draft. Its direction is a statement, not a field: it is what the
+   *  sentence was, and changing it here would mean the app misheard, not that
+   *  the user changed their mind. */
+  const debtCards: DetectedCardModel[] = debtDrafts.map((draft) => {
+    const edit = editOf(draft.id);
+    const sourceKey =
+      edit.sourceKey ?? (draft.accountId ? refKey('account', draft.accountId) : null);
+    const digits = edit.digits ?? String(draft.amount);
+
+    return {
+      id: draft.id,
+      title:
+        edit.description ?? (draft.counterpartyName || t('assistant.debtDraft.someone')),
+      amount: formatAmountDigits(digits, currency),
+      sign: draft.direction === 'incoming' ? '+$' : '−$',
+      income: draft.direction === 'incoming',
+      fresh: freshIds.includes(draft.id),
+      onEdit: () => setCorrecting(draft.id),
+      onRemove: () => handleRemoveDebtDraft(draft.id),
+      chips: [
+        {
+          key: 'kind',
+          label: t(
+            draft.kind === 'payment'
+              ? 'assistant.debtDraft.paymentPill'
+              : `assistant.debtDraft.direction.${draft.direction}`,
+          ),
+          fixed: true,
+        },
+        {
+          key: 'source',
+          label:
+            sourceOptions.find((option) => option.value === sourceKey)?.label ??
+            t('expenses.capture.chip.source'),
+          onPress: () => setPicker({ card: draft.id, field: 'source' }),
+        },
+      ],
+    };
+  });
+
+  const cards = [...movementCards, ...debtCards];
+
+  const handleRemoveDraft = (id: string) => {
+    discardDraft.mutate(id, {
+      onError: () => setError(t('assistant.errors.discardFailed')),
+    });
+    setDrafts(drafts.filter((entry) => entry.id !== id));
+    setCorrecting(null);
+  };
+
+  const handleRemoveDebtDraft = (id: string) => {
+    discardDebtDraft.mutate(id, {
+      onError: () => setError(t('assistant.errors.discardFailed')),
+    });
+    setDebtDrafts(debtDrafts.filter((entry) => entry.id !== id));
+    setCorrecting(null);
+  };
+
+  /**
+   * One button, every card.
+   *
+   * The old screen confirmed them one at a time, which turned "un café y unas
+   * papitas" into two decisions about things the user had already decided when
+   * they spoke. The corrections made with the chips ride along here — they never
+   * touched the server before this, so nothing is half-applied if it fails.
+   */
+  const handleRegister = async () => {
+    setError(null);
+    setSaving(true);
+    const records: CapturedRecord[] = [];
+    let failed = false;
+
+    for (const draft of drafts) {
+      const edit = editOf(draft.id);
+      const overrides: DraftOverrides = {};
+      if (edit.digits !== undefined) overrides.amount = Number(edit.digits || '0');
+      if (edit.description !== undefined) overrides.description = edit.description;
+      if (edit.categoryId !== undefined) overrides.categoryId = edit.categoryId;
+      if (edit.occurredOn !== undefined) overrides.occurredOn = edit.occurredOn;
+      if (edit.sourceKey !== undefined) {
+        const [type, ...rest] = edit.sourceKey.split(':');
+        overrides.sourceType = type as 'account' | 'credit_card';
+        overrides.sourceId = rest.join(':');
+      }
+      try {
+        const done = await confirmDraft.mutateAsync({
+          draftId: draft.id,
+          overrides: Object.keys(overrides).length > 0 ? overrides : undefined,
+        });
+        records.push({ kind: 'movement', movementId: done.movementId });
+      } catch {
+        failed = true;
+      }
+    }
+
+    for (const draft of debtDrafts) {
+      const edit = editOf(draft.id);
+      const overrides: DebtDraftOverrides = {};
+      if (edit.digits !== undefined) overrides.amount = Number(edit.digits || '0');
+      if (edit.sourceKey !== undefined) {
+        overrides.accountId = edit.sourceKey.split(':').slice(1).join(':');
+      }
+      try {
+        const done = await confirmDebtDraft.mutateAsync({
+          draftId: draft.id,
+          overrides: Object.keys(overrides).length > 0 ? overrides : undefined,
+        });
+        records.push(
+          done.movementId !== null
+            ? { kind: 'payment', debtId: done.debtId, movementId: done.movementId }
+            : { kind: 'debt', debtId: done.debtId },
+        );
+      } catch (err) {
+        failed = true;
+        if (err instanceof DebtPaymentAccountRequiredError) {
+          setError(t('assistant.debtDraft.accountRequired'));
+        }
+      }
+    }
+
+    setSaving(false);
+    if (failed) {
+      setError((current) => current ?? t('assistant.errors.confirmFailed'));
+      return;
+    }
+    setSaved(records);
+    closeSheet();
+  };
+
+  const handleSaveManual = (movement: NewMovement) => {
     setError(null);
     if (editing !== null) {
-      // Editing an agent draft: the form's picture confirms THROUGH the draft,
-      // so it settles as `confirmed` in the chat instead of leaving a pending twin.
+      // Editing an agent draft: the form's picture confirms THROUGH the draft, so
+      // it settles as `confirmed` instead of leaving a pending twin.
       confirmDraft.mutate(
         { draftId: editing.id, overrides: overridesFromMovement(movement) },
         {
@@ -137,106 +374,12 @@ export function ExpenseSheet() {
     );
   };
 
-  /** The queue is empty once this draft leaves it — the caller already knows
-   * whether its own card was the last one standing. */
-  const wasLast = (draftId: string) =>
-    drafts.filter((entry) => entry.id !== draftId).length +
-      debtDrafts.filter((entry) => entry.id !== draftId).length ===
-    0;
-
-  const handleConfirmDraft = (draft: MovementDraft, overrides?: DraftOverrides) => {
-    setError(null);
-    setBusyDraftId(draft.id);
-    confirmDraft.mutate(
-      { draftId: draft.id, overrides },
-      {
-        onSuccess: () => {
-          setBusyDraftId(null);
-          // Several movements from one capture settle one by one; the sheet
-          // stays open until the last card is answered, so nothing is lost by
-          // confirming the coffee before deciding on the groceries.
-          if (wasLast(draft.id)) {
-            setToast({
-              message: t(`expenses.toast.saved.${draft.type}`),
-              records: [],
-            });
-            closeSheet();
-            return;
-          }
-          settleDraft(draft.id);
-        },
-        onError: () => {
-          setBusyDraftId(null);
-          setError(t('assistant.errors.confirmFailed'));
-        },
-      },
-    );
-  };
-
-  const handleDiscardDraft = (draft: MovementDraft) => {
-    discardDraft.mutate(draft.id, {
-      onError: () => setError(t('assistant.errors.discardFailed')),
-    });
-    // Discarding never touches money, so the card leaves immediately. With the
-    // queue empty there is nothing left to confirm: back to the capture loop.
-    if (wasLast(draft.id)) {
-      settleDraft(draft.id);
-      setFlow('entry');
-      return;
-    }
-    settleDraft(draft.id);
-  };
-
-  const handleConfirmDebtDraft = (draft: DebtDraft, overrides?: DebtDraftOverrides) => {
-    setBusyDraftId(draft.id);
-    confirmDebtDraft.mutate(
-      { draftId: draft.id, overrides },
-      {
-        onSuccess: () => {
-          setBusyDraftId(null);
-          if (wasLast(draft.id)) {
-            // No undo offered: unlike a movement, taking a debt back means
-            // deleting its transfer too, and that lives in Deudas.
-            setToast({ message: t('assistant.debtDraft.saved'), records: [] });
-            closeSheet();
-            return;
-          }
-          settleDebtDraft(draft.id);
-        },
-        onError: (error) => {
-          setBusyDraftId(null);
-          setError(
-            error instanceof DebtPaymentAccountRequiredError
-              ? t('assistant.debtDraft.accountRequired')
-              : t('assistant.debtDraft.confirmFailed'),
-          );
-        },
-      },
-    );
-  };
-
-  const handleDiscardDebtDraft = (draft: DebtDraft) => {
-    discardDebtDraft.mutate(draft.id, {
-      onError: () => setError(t('assistant.errors.discardFailed')),
-    });
-    if (wasLast(draft.id)) {
-      settleDebtDraft(draft.id);
-      setFlow('entry');
-      return;
-    }
-    settleDebtDraft(draft.id);
-  };
-
   /**
    * Undo is a real revert, and it is not one operation.
    *
-   * A movement is deleted. A new debt is deleted, which takes its loan transfer with
-   * it. An abono is undone by deleting the movement that carried it — the debt has
-   * to survive that one, or undoing a repayment would erase the whole loan.
-   *
-   * This is what makes saving without asking safe. An undo that only dismissed the
-   * toast would be the app moving money and then lying about being able to take it
-   * back.
+   * A movement is deleted. A new debt is deleted, which takes its loan transfer
+   * with it. An abono is undone by deleting the movement that carried it — the
+   * debt has to survive that one, or undoing a repayment would erase the loan.
    */
   const handleUndo = () => {
     if (!toast || toast.records.length === 0) return;
@@ -258,7 +401,6 @@ export function ExpenseSheet() {
     }
   };
 
-  // A capture that saved itself announces it once, with the way back out.
   useEffect(() => {
     if (saved === null || saved.length === 0) return;
     setToast({
@@ -271,92 +413,135 @@ export function ExpenseSheet() {
     setSaved(null);
   }, [saved, setSaved, t]);
 
+  const correctingDraft = drafts.find((draft) => draft.id === correcting) ?? null;
+  const correctingDebt = debtDrafts.find((draft) => draft.id === correcting) ?? null;
+  const correctingEdit = correcting !== null ? editOf(correcting) : {};
+
   return (
     <>
-      {/* The sheet steps aside for the confirm screen: answering questions earned a
-          screen of its own, and two stacked modals is nobody's idea of clarity. */}
-      <BottomSheet
-        visible={open && flow !== 'confirm'}
+      <CaptureScreen
+        visible={captureVisible}
+        onClosed={() => setCaptureUp(false)}
+        state={state}
+        text={capture.text}
+        onChangeText={capture.setText}
+        transcript={capture.liveTranscript}
+        phrase={transcript}
+        pending={capture.pending}
+        cards={cards}
+        level={capture.level}
+        elapsed={capture.elapsed}
+        notice={notice}
+        error={error ?? capture.inlineError}
+        busy={flow === 'processing'}
+        saving={saving}
+        onSend={capture.submitTyped}
+        onStartRecording={capture.onMicPress}
+        onStopRecording={capture.onMicPress}
+        onCancelRecording={capture.onCancelRecording}
+        onRegister={() => void handleRegister()}
+        onRetry={capture.onRetry}
+        onFillByHand={() => setFlow('manual')}
         onClose={closeSheet}
-        maxHeight={MAX_HEIGHT[flow]}
-      >
-        {isSubScreen ? (
-          <Pressable
-            onPress={() => setFlow('entry')}
-            accessibilityRole="button"
-            accessibilityLabel={t('expenses.sheet.back')}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              top: 16,
-              left: 16,
-              width: 32,
-              height: 32,
-              borderRadius: 16,
-              backgroundColor: theme.colors.bgFloat,
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 2,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Icon name="arrow-left" size={16} color={theme.colors.textSecondary} />
-          </Pressable>
-        ) : null}
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: 22,
-            paddingTop: 8,
-            paddingBottom: 26,
-          }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {flow === 'manual' ? (
-            <ManualState
-              key={editing?.id ?? 'blank'}
-              initialType={initialType}
-              initialValues={editing !== null ? prefillFromDraft(editing) : undefined}
-              onSave={handleSave}
-              saving={createMovement.isPending || confirmDraft.isPending}
-              errorMessage={error ?? notice}
+        overlays={
+          <>
+            <CorrectSheet
+              visible={correcting !== null}
+              digits={
+                correctingEdit.digits ??
+                String(correctingDraft?.amount ?? correctingDebt?.amount ?? 0)
+              }
+              description={
+                correctingEdit.description ??
+                correctingDraft?.description ??
+                correctingDebt?.counterpartyName ??
+                ''
+              }
+              currency={currency}
+              sign={
+                correctingDraft?.type === 'income' ||
+                correctingDebt?.direction === 'incoming'
+                  ? '+'
+                  : '−'
+              }
+              income={
+                correctingDraft?.type === 'income' ||
+                correctingDebt?.direction === 'incoming'
+              }
+              onClose={() => setCorrecting(null)}
+              onRemove={() => {
+                if (correctingDraft !== null) handleRemoveDraft(correctingDraft.id);
+                else if (correctingDebt !== null)
+                  handleRemoveDebtDraft(correctingDebt.id);
+              }}
+              onDone={(next) => {
+                if (correcting !== null) patch(correcting, next);
+                setCorrecting(null);
+              }}
             />
-          ) : flow === 'writing' ? (
-            <WritingState
-              clarification={clarification}
-              initialText={transcript ?? ''}
-              busy={capture.parsePending}
-              error={capture.inlineError}
-              onSubmit={capture.submitText}
-            />
-          ) : (
-            <EntryState
-              liveTranscript={capture.liveTranscript}
-              permissionDenied={capture.permissionDenied}
-              inlineError={capture.inlineError}
-              onMicPress={capture.onMicPress}
-            />
-          )}
-          <View style={{ height: 8 }} />
-        </ScrollView>
-      </BottomSheet>
 
-      <CaptureConfirmScreen
-        visible={open && flow === 'confirm' && drafts.length + debtDrafts.length > 0}
-        drafts={drafts}
-        debtDrafts={debtDrafts}
-        today={today}
-        transcript={transcript}
-        busyDraftId={busyDraftId}
-        error={error}
+            <ChooseSheet
+              visible={picker?.field === 'category'}
+              title={t('expenses.sheet.manualEntry.category')}
+              options={(categories.data ?? []).map((category) => ({
+                value: category.id,
+                label: category.name,
+              }))}
+              value={
+                picker !== null
+                  ? (editOf(picker.card).categoryId ??
+                    drafts.find((d) => d.id === picker.card)?.categoryId ??
+                    null)
+                  : null
+              }
+              onChange={(value: string) =>
+                picker !== null && patch(picker.card, { categoryId: value })
+              }
+              onClose={() => setPicker(null)}
+            />
+
+            <ChooseSheet
+              visible={picker?.field === 'source'}
+              title={t('expenses.sheet.manualEntry.source')}
+              options={sourceOptions}
+              value={picker !== null ? (editOf(picker.card).sourceKey ?? null) : null}
+              onChange={(value: string) =>
+                picker !== null && patch(picker.card, { sourceKey: value })
+              }
+              onClose={() => setPicker(null)}
+            />
+
+            <DatePickerSheet
+              visible={datePickerFor !== null}
+              value={
+                datePickerFor !== null
+                  ? (editOf(datePickerFor).occurredOn ?? today)
+                  : today
+              }
+              today={today}
+              title={t('expenses.sheet.manualEntry.date')}
+              language={language}
+              onSelect={(value: string) =>
+                datePickerFor !== null
+                  ? patch(datePickerFor, { occurredOn: value })
+                  : undefined
+              }
+              onClose={() => setDatePickerFor(null)}
+            />
+          </>
+        }
+      />
+
+      <ManualSheet
+        visible={manualVisible}
+        onClosed={() => setManualUp(false)}
+        initialType={initialType}
+        initialValues={editing !== null ? prefillFromDraft(editing) : undefined}
+        onSave={handleSaveManual}
+        onSpeak={() => setFlow('entry')}
         onClose={closeSheet}
-        onConfirm={handleConfirmDraft}
-        onEdit={(draft) => {
-          setEditing(draft);
-          setFlow('manual');
-        }}
-        onDiscard={handleDiscardDraft}
-        onConfirmDebt={handleConfirmDebtDraft}
-        onDiscardDebt={handleDiscardDebtDraft}
+        saving={createMovement.isPending || confirmDraft.isPending}
+        errorMessage={error}
       />
 
       <Toast

@@ -5,6 +5,61 @@ import Svg, { Path } from 'react-native-svg';
  * (`icons.jsx`). To add a new icon, paste its Tabler path here.
  */
 const TABLER_PATHS: Record<string, string[]> = {
+  // The chat's attach button, from the CHAT section of the bundle.
+  photo: [
+    'M15 8h.01',
+    'M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2H6a2 2 0 0 1 -2 -2z',
+    'M4 15l4 -4c.9 -.86 2 -.86 3 0l5 5',
+    'M14 14l1 -1c.9 -.86 2 -.86 3 0l2 2',
+  ],
+  // The five tabs. Paths verbatim from the redesign bundle, which picked a
+  // different metaphor for each: a pulse for the month's pace, two crossing
+  // arrows for money moving, bars for the year, a gauge for the cap.
+  'tab-inicio': ['M3 12h3.5l2.5 7l4 -14l2.5 7h5.5'],
+  'tab-movimientos': [
+    'M8 4v16M8 4l-3.5 3.5M8 4l3.5 3.5',
+    'M16 20V4M16 20l-3.5 -3.5M16 20l3.5 -3.5',
+  ],
+  'tab-historia': [
+    'M4 19V5',
+    'M4 19h16',
+    'M8 16V11',
+    'M12 16V7',
+    'M16 16v-6',
+    'M20 16v-9',
+  ],
+  'tab-presupuesto': [
+    'M12 21a9 9 0 1 1 9 -9',
+    'M12 12l5 -3',
+    'M12 12m-1.5 0a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0',
+  ],
+  'tab-chat': [
+    'M12 3l1.9 4.6l4.6 1.9l-4.6 1.9l-1.9 4.6l-1.9 -4.6l-4.6 -1.9l4.6 -1.9z',
+    'M18 17l.8 2.2l2.2 .8l-2.2 .8l-.8 2.2l-.8 -2.2l-2.2 -.8l2.2 -.8z',
+  ],
+
+  // Privacy: the eye that blurs every figure on the screen.
+  eye: [
+    'M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0',
+    'M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6',
+  ],
+  'eye-off': [
+    'M10.585 10.587a2 2 0 0 0 2.829 2.828',
+    'M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0-6.6-2-9-6c1.272-2.12 2.712-3.678 4.32-4.674m2.86-1.146a9.055 9.055 0 0 1 1.82-.18c3.6 0 6.6 2 9 6c-.666 1.11-1.379 2.067-2.138 2.87',
+    'M3 3l18 18',
+  ],
+
+  // Capture: typing, and a waveform for a note left to be read later.
+  typography: ['M4 7v-1h16v1', 'M9 18h6', 'M12 6v12'],
+  waveform: ['M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2'],
+  backspace: [
+    'M20 6a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-9.5l-5.5 -6l5.5 -6z',
+    'M12 10l4 4m0 -4l-4 4',
+  ],
+  // The sheet's own note field, and the arrow that sends what was typed.
+  'note-lines': ['M4 5h16v14H4z', 'M8 9h8', 'M8 13h5'],
+  'arrow-up': ['M12 19V5', 'M6 11l6 -6l6 6'],
+
   // Generic / nav
   plus: ['M12 5l0 14M5 12l14 0'],
   x: ['M18 6l-12 12M6 6l12 12'],
@@ -95,6 +150,8 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1',
     'M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2',
     'M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2',
+    'M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z',
+    'M16.746 16.726a3 3 0 1 0 .252 -5.555',
   ],
   movie: [
     'M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z',
@@ -110,6 +167,8 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4',
     'M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4',
   ],
+  // Money moving between your own accounts: the design's two opposed arrows.
+  transfer: ['M7 10h14l-4 -4', 'M17 14H3l4 4'],
 
   // Subscriptions / services
   'device-tv': [
@@ -285,6 +344,13 @@ const TABLER_PATHS: Record<string, string[]> = {
   ],
   'alert-circle': ['M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0', 'M12 8v4', 'M12 16h.01'],
   equal: ['M5 10h14', 'M5 14h14'],
+  // Tabler `user`, the head-and-shoulders of `user-up` without the arrow. The
+  // split step draws it for "yo", which is the one row that is not a person you
+  // picked.
+  user: [
+    'M12 10a4 4 0 1 0 0 -8a4 4 0 0 0 0 8z',
+    'M6 22v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2',
+  ],
   'user-up': [
     'M9 10a4 4 0 1 0 0 -8a4 4 0 0 0 0 8z',
     'M3 22v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2',
@@ -307,6 +373,23 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M8 3v4',
     'M4 11h16',
     'M8 15h2v2h-2z',
+  ],
+
+  // Perfil's own four, from the PERFIL section of the bundle. Subscriptions are
+  // two arrows swapping rather than one going round: a subscription comes back,
+  // it does not reload.
+  'switch-horizontal': [
+    'M4 12V9a3 3 0 0 1 3 -3h13l-3 -3',
+    'M20 12v3a3 3 0 0 1 -3 3H4l3 3',
+  ],
+  lock: [
+    'M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2H7a2 2 0 0 1 -2 -2z',
+    'M8 11V7a4 4 0 1 1 8 0v4',
+  ],
+  rotate: ['M20 11a8 8 0 1 0 -2.3 5.7', 'M20 5v6h-6'],
+  logout: [
+    'M14 8V6a2 2 0 0 0 -2 -2H6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2 -2v-2',
+    'M9 12h12l-3 -3m3 3l-3 3',
   ],
 };
 

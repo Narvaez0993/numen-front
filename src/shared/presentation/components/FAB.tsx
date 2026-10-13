@@ -1,9 +1,13 @@
 import { Pressable } from 'react-native';
 
-import { useTheme } from '../theme';
-
 import { Icon } from './Icon';
+import { Orb } from './Orb';
 
+/**
+ * `coral` and `pink` no longer pick a colour — the redesign has one FAB and it
+ * wears the palette. The prop stays so the screens that pass it keep compiling
+ * until they are redesigned; it is ignored.
+ */
 export type FabVariant = 'coral' | 'pink';
 
 type Props = {
@@ -12,38 +16,30 @@ type Props = {
   variant?: FabVariant;
 };
 
-export function FAB({ onPress, bottomOffset = 86, variant = 'coral' }: Props) {
-  const { theme, mode } = useTheme();
-  const iconColor = theme.colors.bgBase;
-  const bg = variant === 'pink' ? theme.colors.accentPink : theme.colors.accentCoral;
-
+/**
+ * The orb, floating. 60px at `right:12`, exactly where the bundle puts it.
+ *
+ * It used to be a solid coral disc. It is glass now because the design leans on
+ * one signature object rather than one signature colour: the same sphere carries
+ * the palette here, in the onboarding, and in the capture sheet, and it is what
+ * makes five different accents still look like the same app.
+ */
+export function FAB({ onPress, bottomOffset = 118 }: Props) {
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => ({
         position: 'absolute',
-        right: 18,
+        right: 12,
         bottom: bottomOffset,
-        width: 58,
-        height: 58,
-        borderRadius: 29,
-        backgroundColor: bg,
-        alignItems: 'center',
-        justifyContent: 'center',
         transform: [{ scale: pressed ? 0.94 : 1 }],
-        // shadow only in light mode (per design spec)
-        ...(mode === 'light'
-          ? {
-              shadowColor: bg,
-              shadowOpacity: 0.3,
-              shadowOffset: { width: 0, height: 4 },
-              shadowRadius: 16,
-              elevation: 8,
-            }
-          : {}),
+        zIndex: 4,
       })}
     >
-      <Icon name="plus" size={26} stroke={2.2} color={iconColor} />
+      <Orb size={60}>
+        <Icon name="plus" size={24} stroke={2} color="#FFFFFF" />
+      </Orb>
     </Pressable>
   );
 }

@@ -1,18 +1,21 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
 import {
+  Aurora,
+  DashedButton,
+  Icon,
   RetryState,
-  SubScreenHeader,
   Text,
   Toast,
 } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { toIsoDate } from '@/shared/presentation/utils/dates';
+import { amountDigits, formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import {
   ChargeAlreadySettledError,
@@ -20,10 +23,8 @@ import {
   SubscriptionSourceCurrencyMismatchError,
   type Subscription,
 } from '../../domain';
-import { AddSubscriptionButton } from '../components/AddSubscriptionButton';
-import { MonthlyTotalCard } from '../components/MonthlyTotalCard';
 import { PendingChargesCard } from '../components/PendingChargesCard';
-import { SubscriptionCard } from '../components/SubscriptionCard';
+import { SubscriptionRow } from '../components/SubscriptionRow';
 import {
   SubscriptionFormSheet,
   type SubscriptionFormInput,
@@ -38,9 +39,22 @@ import { useSubscriptions } from '../hooks/useSubscriptions';
 
 type Sheet = { open: boolean; subscription: Subscription | null };
 
+/**
+ * Every charge that happens without being asked for.
+ *
+ * The screen leads with the monthly total and says the yearly one under it,
+ * because the yearly figure is the one that changes minds — nobody cancels over
+ * $16.900 and plenty of people cancel over $202.800.
+ *
+ * The list is ordered as a calendar rather than an inventory: the day badge
+ * comes first, and what has already been charged reads at full contrast while
+ * what is coming steps back. Same rule as the rhythm strip's dashed projection —
+ * what happened is fact, what is coming is a forecast.
+ */
 export function SubscriptionsScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   // Pinned once per mount: a re-render must not move what "today" means.
   const today = useMemo(() => toIsoDate(new Date()), []);
 
@@ -112,7 +126,6 @@ export function SubscriptionsScreen() {
         edges={['top']}
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       >
-        <SubScreenHeader title={t('subscriptions.title')} onBack={() => router.back()} />
         <RetryState
           titleKey="subscriptions.error.title"
           retryKey="subscriptions.error.retry"
@@ -133,55 +146,138 @@ export function SubscriptionsScreen() {
           justifyContent: 'center',
         }}
       >
-        <ActivityIndicator color={theme.colors.accentMint} />
+        <ActivityIndicator color={theme.palette.acc} />
       </SafeAreaView>
     );
   }
 
+  const sourceOf = (subscription: Subscription) =>
+    catalogs.sourceById[subscription.source.id]?.name;
+
   return (
-    <SafeAreaView
-      edges={['top']}
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-    >
-      <SubScreenHeader title={t('subscriptions.title')} onBack={() => router.back()} />
+    <Aurora>
       <ScrollView
+        // The clock keeps its own strip: starting the scroll below it is what
+        // stops the content from sliding under the time.
+        style={{ marginTop: insets.top }}
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 8,
-          paddingBottom: 32,
+          paddingTop: 16,
+          paddingBottom: insets.bottom + 26,
         }}
         showsVerticalScrollIndicator={false}
       >
-        <MonthlyTotalCard
-          monthly={data.monthly}
-          yearly={data.yearly}
-          count={data.count}
-          currency={data.currency}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            paddingHorizontal: 22,
+          }}
+        >
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back')}
+            onPress={() => router.back()}
+            style={({ pressed }) => ({
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Icon
+              name="arrow-left"
+              size={16}
+              stroke={2}
+              color={theme.colors.textSecondary}
+            />
+          </Pressable>
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>
+            {t('subscriptions.title')}
+          </Text>
+        </View>
 
-        <PendingChargesCard
-          charges={pending.data ?? []}
-          subscriptions={data.subscriptions}
-          today={today}
-          busy={confirm.isPending || skip.isPending}
-          onConfirm={(id) => confirm.mutate({ id }, { onError: settleError })}
-          onSkip={(id) => skip.mutate(id, { onError: settleError })}
-        />
+        <View style={{ paddingHorizontal: 26, paddingTop: 26 }}>
+          <Text
+            variant="micro"
+            uppercase
+            color={theme.colors.textTertiary}
+            style={{ letterSpacing: 2.2, marginBottom: 9 }}
+          >
+            {t('subscriptions.hero.label')}
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}>
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 19, fontWeight: '300' }}
+            >
+              $
+            </Text>
+            <Text
+              tabular
+              style={{
+                fontSize: 43,
+                fontWeight: '500',
+                letterSpacing: -2.1,
+              }}
+            >
+              {amountDigits(data.monthly, data.currency)}
+            </Text>
+          </View>
+          {/* The yearly figure is the one that changes minds. */}
+          <Text
+            color={theme.colors.textTertiary}
+            style={{ fontSize: 12.5, marginTop: 10 }}
+          >
+            {t('subscriptions.hero.summary', {
+              count: data.count,
+              amount: formatMoney(data.yearly, data.currency),
+            })}
+          </Text>
+        </View>
 
-        <View style={{ gap: 10, marginBottom: 16 }}>
+        <View style={{ paddingHorizontal: 22, paddingTop: 22 }}>
+          <PendingChargesCard
+            charges={pending.data ?? []}
+            subscriptions={data.subscriptions}
+            sourceName={sourceOf}
+            today={today}
+            busy={confirm.isPending || skip.isPending}
+            onConfirm={(id) => confirm.mutate({ id }, { onError: settleError })}
+            onSkip={(id) => skip.mutate(id, { onError: settleError })}
+          />
+        </View>
+
+        <View style={{ paddingHorizontal: 26, paddingTop: 24 }}>
+          <Text
+            variant="micro"
+            uppercase
+            color={theme.colors.textTertiary}
+            style={{ letterSpacing: 2.2, marginBottom: 8 }}
+          >
+            {t('subscriptions.activeLabel')}
+          </Text>
+
           {data.subscriptions.length === 0 ? (
-            <View style={{ paddingVertical: 28, paddingHorizontal: 16 }}>
-              <Text variant="body" muted style={{ fontSize: 13, textAlign: 'center' }}>
-                {t('subscriptions.empty')}
-              </Text>
-            </View>
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 13, lineHeight: 19, paddingVertical: 16 }}
+            >
+              {t('subscriptions.empty')}
+            </Text>
           ) : (
-            data.subscriptions.map((subscription) => (
-              <SubscriptionCard
+            data.subscriptions.map((subscription, index) => (
+              <SubscriptionRow
                 key={subscription.id}
                 subscription={subscription}
                 today={today}
-                sourceName={catalogs.sourceById[subscription.source.id]?.name}
+                sourceName={sourceOf(subscription)}
+                last={index === data.subscriptions.length - 1}
                 onPress={() => {
                   setFormError(null);
                   setSheet({ open: true, subscription });
@@ -191,21 +287,21 @@ export function SubscriptionsScreen() {
           )}
         </View>
 
-        <AddSubscriptionButton
-          label={t('subscriptions.add')}
-          onPress={() => {
-            setFormError(null);
-            setSheet({ open: true, subscription: null });
-          }}
-        />
-
-        <Text
-          variant="caption"
-          muted
-          style={{ fontSize: 11, lineHeight: 16, textAlign: 'center', marginTop: 18 }}
-        >
-          {t('subscriptions.footer')}
-        </Text>
+        <View style={{ paddingHorizontal: 24, paddingTop: 18 }}>
+          <DashedButton
+            label={t('subscriptions.add')}
+            onPress={() => {
+              setFormError(null);
+              setSheet({ open: true, subscription: null });
+            }}
+          />
+          <Text
+            color={theme.colors.textTertiary}
+            style={{ fontSize: 11, textAlign: 'center', marginTop: 10, lineHeight: 16 }}
+          >
+            {t('subscriptions.footer')}
+          </Text>
+        </View>
       </ScrollView>
 
       <SubscriptionFormSheet
@@ -225,6 +321,6 @@ export function SubscriptionsScreen() {
         onDismiss={() => setToast(null)}
         durationMs={2500}
       />
-    </SafeAreaView>
+    </Aurora>
   );
 }
