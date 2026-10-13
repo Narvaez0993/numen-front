@@ -47,22 +47,21 @@
       "retry": "Reintentar"
     },
     "detail": {
-      "title": "Detalle del movimiento",
-      "subtitle": "Corrige lo que haga falta; los saldos se recalculan solos.",
-      "amount": "Monto",
+      "title": "Movimiento",
+      "subtitle": "Cambia lo que haga falta; se guarda al confirmar.",
       "description": "Descripción",
       "category": "Categoría",
-      "account": "Fuente",
-      "from": "Desde",
-      "to": "Hacia",
+      "account": "Cuenta",
+      "from": "De",
+      "to": "A",
       "date": "Fecha",
-      "pickSource": "Elegir fuente",
+      "pickSource": "Elige una cuenta",
       "datePickerTitle": "¿Cuándo pasó?",
       "save": "Guardar cambios",
-      "delete": "Eliminar movimiento",
-      "deleteConfirmTitle": "¿Eliminar \"{{name}}\"?",
-      "deleteConfirm": "Sí, eliminar",
-      "cancel": "Cancelar"
+      "delete": "Borrar movimiento",
+      "deleteConfirmTitle": "¿Borro «{{name}}»?",
+      "deleteConfirm": "Sí, bórralo",
+      "cancel": "Mejor no"
     },
     "errors": {
       "saveFailed": "No pudimos guardar el cambio. Intenta de nuevo.",

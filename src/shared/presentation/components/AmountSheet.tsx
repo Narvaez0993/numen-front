@@ -11,6 +11,7 @@ import { withAlpha } from '../theme/tokens';
 import { AmountKeypad, pressAmountKey } from './AmountKeypad';
 import { Icon } from './Icon';
 import { KeypadAmount } from './KeypadAmount';
+import { RiseIn } from './RiseIn';
 import { SHEET_TOP, SheetShell } from './SheetShell';
 import { Text } from './Text';
 
@@ -76,6 +77,9 @@ type Props = {
   overlays?: React.ReactNode;
   /** Once the sheet has fully left the screen. See `SheetShell`. */
   onClosed?: () => void;
+  /** Under the save button: the quiet way out of an existing thing — «Borrar
+   *  movimiento» — where the design keeps it, last and smallest. */
+  footerExtra?: React.ReactNode;
 };
 
 /**
@@ -118,6 +122,7 @@ export function AmountSheet({
   keyboard = 'pad',
   overlays,
   onClosed,
+  footerExtra,
 }: Props) {
   const { theme } = useTheme();
   const lift = useKeyboardInset();
@@ -188,6 +193,7 @@ export function AmountSheet({
               primaryDisabled={primaryDisabled}
               onMic={onMic}
               extraBottom={lift.raised ? 18 : 0}
+              extra={footerExtra}
             />
           </>
         ) : (
@@ -239,6 +245,7 @@ export function AmountSheet({
               onPrimary={onPrimary}
               primaryDisabled={primaryDisabled}
               onMic={onMic}
+              extra={footerExtra}
             />
           </>
         )}
@@ -254,69 +261,67 @@ function Footer({
   primaryDisabled,
   onMic,
   extraBottom = 0,
+  extra,
 }: {
   primaryLabel: string;
   onPrimary: () => void;
   primaryDisabled: boolean;
   onMic?: () => void;
   extraBottom?: number;
+  extra?: React.ReactNode;
 }) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        paddingHorizontal: 20,
-        paddingTop: 16,
-        paddingBottom: 32 + extraBottom,
-      }}
+      style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 + extraBottom }}
     >
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ disabled: primaryDisabled }}
-        onPress={onPrimary}
-        disabled={primaryDisabled}
-        style={({ pressed }) => ({
-          flex: 1,
-          minHeight: 52,
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 18,
-          // The one solid, un-tinted surface: the last thing you touch and the
-          // only one that changes anything.
-          backgroundColor: theme.colors.textPrimary,
-          opacity: primaryDisabled ? 0.4 : pressed ? 0.9 : 1,
-        })}
-      >
-        <Text color={theme.colors.bgBase} style={{ fontSize: 14, fontWeight: '600' }}>
-          {primaryLabel}
-        </Text>
-      </Pressable>
-
-      {onMic !== undefined ? (
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={t('expenses.voice.mic')}
-          onPress={onMic}
+          accessibilityState={{ disabled: primaryDisabled }}
+          onPress={onPrimary}
+          disabled={primaryDisabled}
           style={({ pressed }) => ({
-            width: 54,
-            height: 54,
-            borderRadius: 27,
+            flex: 1,
+            minHeight: 52,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: withAlpha(theme.palette.acc, 0.16),
-            borderWidth: 1,
-            borderColor: withAlpha(theme.palette.acc, 0.22),
-            opacity: pressed ? 0.8 : 1,
+            borderRadius: 18,
+            // The one solid, un-tinted surface: the last thing you touch and the
+            // only one that changes anything.
+            backgroundColor: theme.colors.textPrimary,
+            opacity: primaryDisabled ? 0.4 : pressed ? 0.9 : 1,
           })}
         >
-          <Icon name="microphone" size={22} stroke={1.8} color={theme.palette.acc} />
+          <Text color={theme.colors.bgBase} style={{ fontSize: 14, fontWeight: '600' }}>
+            {primaryLabel}
+          </Text>
         </Pressable>
-      ) : null}
+
+        {onMic !== undefined ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('expenses.voice.mic')}
+            onPress={onMic}
+            style={({ pressed }) => ({
+              width: 54,
+              height: 54,
+              borderRadius: 27,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: withAlpha(theme.palette.acc, 0.16),
+              borderWidth: 1,
+              borderColor: withAlpha(theme.palette.acc, 0.22),
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Icon name="microphone" size={22} stroke={1.8} color={theme.palette.acc} />
+          </Pressable>
+        ) : null}
+      </View>
+      {extra !== undefined ? <View style={{ paddingTop: 14 }}>{extra}</View> : null}
     </View>
   );
 }
@@ -442,6 +447,106 @@ export function SheetDangerAction({
         {asking ? confirmLabel : label}
       </Text>
     </Pressable>
+  );
+}
+
+/**
+ * The design's way to delete from inside a sheet: a coral line under the save
+ * button, and — touched — a card that asks by name, «¿Borro «Almuerzo»?», with
+ * the answer and the way back side by side. Nothing is lost on one tap.
+ */
+export function SheetDeleteConfirm({
+  label,
+  question,
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
+  busy = false,
+}: {
+  label: string;
+  question: string;
+  confirmLabel: string;
+  cancelLabel: string;
+  onConfirm: () => void;
+  busy?: boolean;
+}) {
+  const { theme } = useTheme();
+  const [asking, setAsking] = useState(false);
+  const coral = theme.colors.accentCoral;
+
+  if (!asking) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => setAsking(true)}
+        style={({ pressed }) => ({
+          minHeight: 44,
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
+        <Text color={coral} style={{ fontSize: 13 }}>
+          {label}
+        </Text>
+      </Pressable>
+    );
+  }
+
+  return (
+    <RiseIn duration={200}>
+      <View
+        style={{
+          padding: 16,
+          borderRadius: 18,
+          borderWidth: 1,
+          borderColor: withAlpha(coral, 0.28),
+          backgroundColor: withAlpha(coral, 0.08),
+        }}
+      >
+        <Text
+          color={theme.colors.accentCoralSoft}
+          style={{ fontSize: 13.5, marginBottom: 12 }}
+        >
+          {question}
+        </Text>
+        <View style={{ flexDirection: 'row', gap: 9 }}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onConfirm}
+            disabled={busy}
+            style={({ pressed }) => ({
+              flex: 1,
+              minHeight: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 14,
+              backgroundColor: coral,
+              opacity: busy ? 0.6 : pressed ? 0.85 : 1,
+            })}
+          >
+            <Text color={theme.colors.bgBase} style={{ fontSize: 13, fontWeight: '600' }}>
+              {confirmLabel}
+            </Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setAsking(false)}
+            style={({ pressed }) => ({
+              flex: 1,
+              minHeight: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 14,
+              backgroundColor: theme.colors.bgFloat,
+              opacity: pressed ? 0.85 : 1,
+            })}
+          >
+            <Text style={{ fontSize: 13, fontWeight: '500' }}>{cancelLabel}</Text>
+          </Pressable>
+        </View>
+      </View>
+    </RiseIn>
   );
 }
 

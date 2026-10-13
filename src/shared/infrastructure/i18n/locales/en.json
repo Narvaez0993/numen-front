@@ -47,22 +47,21 @@
       "retry": "Retry"
     },
     "detail": {
-      "title": "Movement detail",
-      "subtitle": "Fix whatever is off; balances are recalculated for you.",
-      "amount": "Amount",
+      "title": "Movement",
+      "subtitle": "Change whatever you need; it's saved when you confirm.",
       "description": "Description",
       "category": "Category",
-      "account": "Source",
+      "account": "Account",
       "from": "From",
       "to": "To",
       "date": "Date",
-      "pickSource": "Pick a source",
+      "pickSource": "Pick an account",
       "datePickerTitle": "When did it happen?",
       "save": "Save changes",
       "delete": "Delete movement",
-      "deleteConfirmTitle": "Delete \"{{name}}\"?",
-      "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+      "deleteConfirmTitle": "Delete “{{name}}”?",
+      "deleteConfirm": "Yes, delete it",
+      "cancel": "Never mind"
     },
     "errors": {
       "saveFailed": "We couldn't save the change. Try again.",
