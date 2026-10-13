@@ -735,33 +735,10 @@
   "onboarding": {
     "skip": "Skip",
     "welcome": {
-      "title1": "Forget Excel.",
-      "subtitle1": "Track expenses by saying them out loud. AI does the rest.",
-      "title2": "Speak. Don't type.",
-      "subtitle2": "Tell Deshka \"coffee three thousand five hundred\" and it lands instantly. No forms.",
-      "title3": "Your money, in real time.",
-      "subtitle3": "Balances, budgets and debts on a single screen. No Excel, no formulas.",
+      "title": "Hi.\nI'm <b>Deshka</b>.",
+      "body": "Tell me your expenses the way you'd tell a friend, and I'll keep the books. No forms, no spreadsheets.",
       "start": "Get started",
       "haveAccount": "I already have an account"
-    },
-    "auth": {
-      "signup": {
-        "title": "Create your account",
-        "subtitle": "In under a minute and without passwords."
-      },
-      "login": {
-        "title": "Welcome back",
-        "subtitle": "Let's continue where you left off."
-      },
-      "apple": "Continue with Apple",
-      "google": "Continue with Google",
-      "email": "Continue with email",
-      "signupHint": "Already have an account?",
-      "loginHint": "Don't have an account?",
-      "signupLink": "Sign in",
-      "loginLink": "Create one",
-      "terms": "By continuing you accept Deshka's Terms and Privacy policy.",
-      "emailSignup": "Sign up with email"
     },
     "perso": {
       "step1": "Step 1 of 3",
@@ -1521,14 +1498,12 @@
   },
   "auth": {
     "login": {
-      "title": "Sign in",
-      "subtitle": "Log in to your account",
-      "emailLabel": "Email",
+      "title": "Good to <b>see you again</b>.",
+      "subtitle": "Your email and your password, and you pick up where you left off.",
+      "label": "Sign in",
       "emailPlaceholder": "you@email.com",
-      "passwordLabel": "Password",
       "passwordPlaceholder": "Your password",
       "submit": "Sign in",
-      "submitting": "Signing in...",
       "errors": {
         "invalidEmail": "Invalid email",
         "passwordTooShort": "Password must be at least 8 characters",
@@ -1539,11 +1514,11 @@
       "createAccount": "Create one"
     },
     "register": {
-      "title": "Create your account",
-      "subtitle": "Get started in under a minute.",
+      "title": "First, <b>your account</b>.",
+      "label": "Create account",
+      "body": "With your email and a password, everything you tell me stays saved.",
       "or": "or",
       "submit": "Create account",
-      "submitting": "Creating...",
       "passwordPlaceholder": "At least 8 characters",
       "show": "Show",
       "hide": "Hide",
@@ -1551,15 +1526,16 @@
         "emailExists": "This email is already registered",
         "generic": "We couldn't create your account. Try again."
       },
-      "emailSubtitle": "Enter your email and a password."
+      "footnote": "We don't sell your movements to anyone. By continuing you accept the Terms and the Privacy Policy."
     },
     "verify": {
-      "title": "Verify your email",
-      "subtitle": "Enter the 6-digit code we sent to <b>{{email}}</b>.",
+      "title": "I sent you six numbers.",
+      "subtitle": "To {{email}}. If it doesn't arrive, check your spam.",
       "verifying": "Verifying...",
       "resend": "Resend code",
       "resending": "Resending...",
-      "resendIn": "Resend in {{seconds}}s",
+      "resendIn": "Resend in {{time}}",
+      "submit": "Continue",
       "errors": {
         "invalid": "Incorrect code",
         "expired": "The code expired. Request a new one.",
@@ -1569,7 +1545,9 @@
       }
     },
     "social": {
-      "comingSoon": "Coming very soon"
+      "comingSoon": "Coming very soon",
+      "apple": "Continue with Apple",
+      "google": "Continue with Google"
     }
   },
   "currency": {

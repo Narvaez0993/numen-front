@@ -31,6 +31,10 @@ export function pressAmountKey(digits: string, key: string, max = MAX_DIGITS): s
 
 type Props = {
   onKey: (key: string) => void;
+  /** The `000` key. Off for what is not money — a six-digit code — where the
+   *  design leaves that corner empty rather than offering a key that types
+   *  half the code at once. */
+  triple?: boolean;
 };
 
 /**
@@ -47,7 +51,7 @@ type Props = {
  * here, backspace, and nothing else. No decimal point — a cent has never been
  * typed into this app.
  */
-export function AmountKeypad({ onKey }: Props) {
+export function AmountKeypad({ onKey, triple = true }: Props) {
   const { theme } = useTheme();
 
   return (
@@ -59,6 +63,11 @@ export function AmountKeypad({ onKey }: Props) {
       }}
     >
       {KEYS.map((key) => {
+        if (key === TRIPLE && !triple) {
+          return (
+            <View key={key} style={{ width: '31.5%', flexGrow: 1, minHeight: 46 }} />
+          );
+        }
         const plain = key === TRIPLE || key === BACK;
         return (
           <Pressable

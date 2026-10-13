@@ -9,6 +9,7 @@ export * from './RiseIn';
 export * from './Scrim';
 export * from './Text';
 export * from './Button';
+export * from './InkButton';
 export * from './Input';
 export * from './Icon';
 export * from './Card';

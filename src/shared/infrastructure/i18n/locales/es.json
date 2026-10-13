@@ -735,33 +735,10 @@
   "onboarding": {
     "skip": "Saltar",
     "welcome": {
-      "title1": "Olvídate de Excel.",
-      "subtitle1": "Lleva tus gastos diciéndolos en voz alta. La IA hace el resto.",
-      "title2": "Habla. No escribas.",
-      "subtitle2": "Dile a Deshka \"café tres mil quinientos\" y queda registrado al instante. Sin formularios.",
-      "title3": "Tu plata, en tiempo real.",
-      "subtitle3": "Saldos, presupuestos y deudas en una sola pantalla. Sin Excel, sin fórmulas.",
+      "title": "Hola.\nSoy <b>Deshka</b>.",
+      "body": "Me cuentas tus gastos como se los contarías a alguien, y yo llevo las cuentas. Nada de formularios ni de Excel.",
       "start": "Empezar",
       "haveAccount": "Ya tengo cuenta"
-    },
-    "auth": {
-      "signup": {
-        "title": "Crea tu cuenta",
-        "subtitle": "En menos de un minuto y sin contraseñas."
-      },
-      "login": {
-        "title": "Bienvenido de vuelta",
-        "subtitle": "Continuemos donde lo dejaste."
-      },
-      "apple": "Continuar con Apple",
-      "google": "Continuar con Google",
-      "email": "Continuar con email",
-      "signupHint": "¿Ya tienes cuenta?",
-      "loginHint": "¿No tienes cuenta?",
-      "signupLink": "Iniciar sesión",
-      "loginLink": "Crear una",
-      "terms": "Al continuar aceptas los Términos y la Política de privacidad de Deshka.",
-      "emailSignup": "Crear cuenta con correo"
     },
     "perso": {
       "step1": "Paso 1 de 3",
@@ -1521,14 +1498,12 @@
   },
   "auth": {
     "login": {
-      "title": "Iniciar sesión",
-      "subtitle": "Ingresa con tu cuenta",
-      "emailLabel": "Correo electrónico",
+      "title": "Qué gusto <b>verte de nuevo</b>.",
+      "subtitle": "Tu correo y tu contraseña, y sigues donde ibas.",
+      "label": "Entrar",
       "emailPlaceholder": "tu@correo.com",
-      "passwordLabel": "Contraseña",
       "passwordPlaceholder": "Tu contraseña",
       "submit": "Entrar",
-      "submitting": "Entrando...",
       "errors": {
         "invalidEmail": "Correo no válido",
         "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
@@ -1539,11 +1514,11 @@
       "createAccount": "Crear una"
     },
     "register": {
-      "title": "Crea tu cuenta",
-      "subtitle": "Empieza en menos de un minuto.",
+      "title": "Primero, <b>tu cuenta</b>.",
+      "label": "Crear cuenta",
+      "body": "Con tu correo y una contraseña, todo lo que me cuentes queda guardado.",
       "or": "o",
       "submit": "Crear cuenta",
-      "submitting": "Creando...",
       "passwordPlaceholder": "Mínimo 8 caracteres",
       "show": "Mostrar",
       "hide": "Ocultar",
@@ -1551,15 +1526,16 @@
         "emailExists": "Este correo ya está registrado",
         "generic": "No pudimos crear tu cuenta. Intenta de nuevo."
       },
-      "emailSubtitle": "Ingresa tu correo y una contraseña."
+      "footnote": "Tus movimientos no se los vendemos a nadie. Al continuar aceptas los Términos y la Política de privacidad."
     },
     "verify": {
-      "title": "Verifica tu correo",
-      "subtitle": "Ingresa el código de 6 dígitos que enviamos a <b>{{email}}</b>.",
+      "title": "Te mandé seis números.",
+      "subtitle": "A {{email}}. Si no llega, mira en spam.",
       "verifying": "Verificando...",
       "resend": "Reenviar código",
       "resending": "Reenviando...",
-      "resendIn": "Reenviar en {{seconds}}s",
+      "resendIn": "Reenviar en {{time}}",
+      "submit": "Entrar",
       "errors": {
         "invalid": "Código incorrecto",
         "expired": "El código expiró. Solicita uno nuevo.",
@@ -1569,7 +1545,9 @@
       }
     },
     "social": {
-      "comingSoon": "Disponible muy pronto"
+      "comingSoon": "Disponible muy pronto",
+      "apple": "Seguir con Apple",
+      "google": "Seguir con Google"
     }
   },
   "currency": {
