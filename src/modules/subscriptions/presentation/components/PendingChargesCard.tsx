@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { Text } from '@/shared/presentation/components';
@@ -78,22 +78,24 @@ export function PendingChargesCard({
           >
             {/* The one gradient surface in the app, and it earns it: this is the
                 only card that is asking rather than reporting. */}
-            <Svg
-              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-              pointerEvents="none"
-            >
-              <Defs>
-                <LinearGradient id="pendingWash" x1="0" y1="0" x2="1" y2="0.4">
-                  <Stop offset="0" stopColor={theme.palette.acc} stopOpacity={0.13} />
-                  <Stop
-                    offset="1"
-                    stopColor={theme.colors.textPrimary}
-                    stopOpacity={0.05}
-                  />
-                </LinearGradient>
-              </Defs>
-              <Rect x="0" y="0" width="100%" height="100%" fill="url(#pendingWash)" />
-            </Svg>
+            {/* In a View pinned to the edges: an `Svg` placed directly sizes
+                itself to the card's content box and stops short of the padding
+                (see `PlanBanner`). */}
+            <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+              <Svg width="100%" height="100%">
+                <Defs>
+                  <LinearGradient id="pendingWash" x1="0" y1="0" x2="1" y2="0.4">
+                    <Stop offset="0" stopColor={theme.palette.acc} stopOpacity={0.13} />
+                    <Stop
+                      offset="1"
+                      stopColor={theme.colors.textPrimary}
+                      stopOpacity={0.05}
+                    />
+                  </LinearGradient>
+                </Defs>
+                <Rect x="0" y="0" width="100%" height="100%" fill="url(#pendingWash)" />
+              </Svg>
+            </View>
 
             <Text style={{ fontSize: 13.5, fontWeight: '500', marginBottom: 3 }}>
               {t('subscriptions.pending.question', { name: subscription.name })}

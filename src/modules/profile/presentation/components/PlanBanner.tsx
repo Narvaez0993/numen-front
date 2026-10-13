@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { Text } from '@/shared/presentation/components';
@@ -45,18 +45,22 @@ export function PlanBanner({ title, subtitle, cta, onPress }: Props) {
         opacity: pressed ? 0.85 : 1,
       })}
     >
-      <Svg
-        pointerEvents="none"
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      >
-        <Defs>
-          <LinearGradient id="planBanner" x1="0" y1="0" x2="0.98" y2="0.17">
-            <Stop offset="0" stopColor={theme.palette.acc} stopOpacity={0.15} />
-            <Stop offset="1" stopColor={theme.colors.textPrimary} stopOpacity={0.05} />
-          </LinearGradient>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill="url(#planBanner)" />
-      </Svg>
+      {/* The wash fills a View, not the card. An `Svg` takes `width/height:
+          100%` by default, and those win over the edges: a percentage resolves
+          against the card's content box, so the gradient stopped at the padding
+          — short of the right edge and of the subtitle. A View pinned to the
+          edges has no size of its own and spans the whole card. */}
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        <Svg width="100%" height="100%">
+          <Defs>
+            <LinearGradient id="planBanner" x1="0" y1="0" x2="0.98" y2="0.17">
+              <Stop offset="0" stopColor={theme.palette.acc} stopOpacity={0.15} />
+              <Stop offset="1" stopColor={theme.colors.textPrimary} stopOpacity={0.05} />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#planBanner)" />
+        </Svg>
+      </View>
 
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={{ fontSize: 13.5, fontFamily: 'Geist_500Medium' }}>{title}</Text>
@@ -74,10 +78,7 @@ export function PlanBanner({ title, subtitle, cta, onPress }: Props) {
           backgroundColor: theme.colors.textPrimary,
         }}
       >
-        <Text
-          color={theme.colors.bgBase}
-          style={{ fontSize: 12.5, fontFamily: 'Geist_500Medium' }}
-        >
+        <Text color={theme.colors.bgBase} style={{ fontSize: 12.5, fontWeight: '600' }}>
           {cta}
         </Text>
       </View>
