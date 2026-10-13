@@ -1,42 +1,41 @@
 import { router } from 'expo-router';
-import { useCallback, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useCallback, useRef, useState } from 'react';
 
+import { completeOnboardingUseCase } from '@/core/di/container';
+import type { Account } from '@/modules/accounts/domain';
 import {
-  useUpdatePreferences,
   useAuthStore,
   useUpdateName,
+  useUpdatePreferences,
 } from '@/modules/auth/presentation';
-import { useCreateAccount } from '@/modules/accounts/presentation/hooks/useAccountMutations';
-import { completeOnboardingUseCase } from '@/core/di/container';
-import { useTheme } from '@/shared/presentation/theme';
 
+import type { BankId } from '../../domain';
 import { SETUP_BACK_MAP, type SetupStep } from '../hooks/flowTransitions';
 import { useOnboardingFlow } from '../hooks/useOnboardingFlow';
 import { useOnboardingStore } from '../stores/useOnboardingStore';
 
-import { ConfirmScreen } from './ConfirmScreen';
-import { MagicMomentScreen } from './MagicMomentScreen';
-import { PersoGoalScreen } from './PersoGoalScreen';
-import { PersoNameScreen } from './PersoNameScreen';
-import { SetupScreen } from './SetupScreen';
+import { AccountStep } from './AccountStep';
+import { GoalStep } from './GoalStep';
+import { MagicStep } from './MagicStep';
+import { NameStep } from './NameStep';
 
 /**
- * Post-session setup #2: name → goal → account setup → magic moment → confirm.
+ * Post-session setup: name → objective → main account → the first expense.
  * Lives in the `(onboarding)` group and is only reachable with a session (the
  * gate guarantees it). Shown once, right after registration — never on login.
+ *
+ * Each answer goes to the server when it is given, not all at the end: the
+ * name and the objective as they are chosen, the account as it is created. The
+ * first expense needs the account to exist, and a setup abandoned halfway
+ * resumes without making a second one (HU-03).
  */
 export function SetupFlow() {
-  const { theme } = useTheme();
-  const { t } = useTranslation();
   const hasSession = useAuthStore((s) => s.session !== null);
   const flow = useOnboardingFlow<SetupStep>('name', SETUP_BACK_MAP);
   const markCompleted = useOnboardingStore((s) => s.markCompleted);
   const updateName = useUpdateName();
-  const createAccount = useCreateAccount();
   const updatePreferences = useUpdatePreferences();
+  const [account, setAccount] = useState<Account | null>(null);
   const finishingRef = useRef(false);
 
   const finish = useCallback(async () => {
@@ -50,145 +49,65 @@ export function SetupFlow() {
       balance: flow.ctx.balance,
     };
     const result = await completeOnboardingUseCase.execute(profile);
-    const persisted = result.ok ? result.value : profile;
-    markCompleted(persisted);
-
-    // Turn the source the user just described into their first real account, so
-    // they land in the app with their own balance instead of an empty screen.
-    //
-    // Awaited on purpose: navigating while the POST was still in flight made Home
-    // load before the account existed, so the user who had *just* created one landed
-    // on "create your first account" with a $0 net balance. Still best-effort — a
-    // failure must not trap them in the setup, so it only logs and moves on.
-    if (persisted.sourceName) {
-      const isCash = persisted.bankId === 'efectivo';
-      try {
-        await createAccount.mutateAsync({
-          kind: isCash ? 'cash' : 'debit',
-          name: persisted.sourceName,
-          sub: '',
-          icon: isCash ? 'cash' : 'building-bank',
-          color: 'mint',
-          balance: persisted.balance,
-        });
-      } catch (error) {
-        console.warn('onboarding: first account could not be created', error);
-      }
-    }
-    // The objective goes to the server, not just to the device: it is what Home uses
-    // to decide which figure to lead with, and what the agent will anchor to. Also
-    // best-effort — a failed preference must not trap anyone in the setup.
-    if (persisted.goal) {
-      try {
-        await updatePreferences.mutateAsync({ objective: persisted.goal });
-      } catch (error) {
-        console.warn('onboarding: objective could not be saved', error);
-      }
-    }
-    // Navigate explicitly to the tabs group. Expo Router v4 cross-group
-    // imperative navigation works best with an explicit group path.
+    markCompleted(result.ok ? result.value : profile);
+    // Explicit group path: cross-group imperative navigation works best so.
     router.replace('/(tabs)');
-  }, [flow.ctx, markCompleted, createAccount, updatePreferences]);
+  }, [flow.ctx, markCompleted]);
 
-  // Safety net: if we ever reach `confirm` without an expense (e.g. via dev
-  // tweaks), finish from an effect, not during render.
-  useEffect(() => {
-    if (flow.screen === 'confirm' && !flow.ctx.expense) {
-      void finish();
-    }
-  }, [flow.screen, flow.ctx.expense, finish]);
+  const { setCtx, go } = flow;
+  const onAccount = useCallback(
+    (created: Account, bankId: BankId | null) => {
+      setAccount(created);
+      setCtx({ bankId, sourceName: created.name, balance: created.balance });
+      go('magic');
+    },
+    [setCtx, go],
+  );
 
   // Impossible via the gate, but if the session is lost mid-setup render
   // nothing and let the gate route away instead of firing authed calls.
   if (!hasSession) return null;
 
-  const renderScreen = () => {
-    switch (flow.screen) {
-      case 'name':
-        return (
-          <PersoNameScreen
-            initialValue={flow.ctx.name}
-            onContinue={(name) => {
-              flow.setCtx({ name });
-              // Persist the name to the backend (best-effort) and continue.
-              updateName.mutate(name);
-              flow.go('goal');
-            }}
-          />
-        );
-      case 'goal':
-        return (
-          <PersoGoalScreen
-            name={flow.ctx.name}
-            initialGoal={flow.ctx.goal}
-            onBack={flow.goBack}
-            onContinue={(goal) => {
-              flow.setCtx({ goal });
-              flow.go('setup');
-            }}
-          />
-        );
-      case 'setup':
-        return (
-          <SetupScreen
-            initialBankId={flow.ctx.bankId}
-            initialSourceName={flow.ctx.sourceName}
-            initialBalance={flow.ctx.balance}
-            onBack={flow.goBack}
-            onContinue={({ bankId, sourceName, balance }) => {
-              flow.setCtx({ bankId, sourceName, balance });
-              flow.go('magic');
-            }}
-          />
-        );
-      case 'magic':
-        return (
-          <MagicMomentScreen
-            onDetected={({ transcript, expense }) => {
-              flow.setCtx({ transcript, expense });
-              flow.go('confirm');
-            }}
-            onSkip={() => {
-              void finish();
-            }}
-          />
-        );
-      case 'confirm': {
-        const expense = flow.ctx.expense;
-        if (!expense) {
-          // Safety effect above will finish; render nothing meanwhile.
-          return null;
-        }
-        return (
-          <ConfirmScreen
-            expense={expense}
-            transcript={flow.ctx.transcript ?? ''}
-            accountValue={
-              flow.ctx.sourceName ??
-              (flow.ctx.bankId ? t(`onboarding.setup.banks.${flow.ctx.bankId}`) : null)
-            }
-            onContinue={() => {
-              void finish();
-            }}
-          />
-        );
-      }
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <SafeAreaView
-      edges={['top', 'bottom']}
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ flex: 1 }}
-      >
-        <View style={{ flex: 1 }}>{renderScreen()}</View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
+  switch (flow.screen) {
+    case 'name':
+      return (
+        <NameStep
+          initialValue={flow.ctx.name}
+          onContinue={(name) => {
+            flow.setCtx({ name });
+            updateName.mutate(name);
+            flow.go('goal');
+          }}
+        />
+      );
+    case 'goal':
+      return (
+        <GoalStep
+          name={flow.ctx.name}
+          initialGoal={flow.ctx.goal}
+          onBack={flow.goBack}
+          onContinue={(goal) => {
+            flow.setCtx({ goal });
+            // It decides what Home leads with — best-effort, it can be changed
+            // in Perfil, and a failure must not trap anyone here.
+            updatePreferences.mutate({ objective: goal });
+            flow.go('account');
+          }}
+        />
+      );
+    case 'account':
+      return (
+        <AccountStep
+          onBack={flow.goBack}
+          onCreated={onAccount}
+          onSkip={() => void finish()}
+        />
+      );
+    case 'magic':
+      return account ? (
+        <MagicStep account={account} onDone={() => void finish()} />
+      ) : null;
+    default:
+      return null;
+  }
 }

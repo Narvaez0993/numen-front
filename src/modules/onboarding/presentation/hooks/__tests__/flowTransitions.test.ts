@@ -18,15 +18,14 @@ describe('AUTH flow (pre-session)', () => {
 });
 
 describe('SETUP flow (post-session)', () => {
-  it('runs name → goal → setup → magic → confirm', () => {
-    expect(SETUP_SCREEN_FLOW).toEqual(['name', 'goal', 'setup', 'magic', 'confirm']);
+  it('runs name → goal → account → the first expense', () => {
+    expect(SETUP_SCREEN_FLOW).toEqual(['name', 'goal', 'account', 'magic']);
   });
 
-  it('has no back from name, magic and confirm; chains goal and setup', () => {
+  it('has no back from name or the first expense; chains goal and account', () => {
     expect(SETUP_BACK_MAP.name).toBeNull();
     expect(SETUP_BACK_MAP.magic).toBeNull();
-    expect(SETUP_BACK_MAP.confirm).toBeNull();
     expect(SETUP_BACK_MAP.goal).toBe('name');
-    expect(SETUP_BACK_MAP.setup).toBe('goal');
+    expect(SETUP_BACK_MAP.account).toBe('goal');
   });
 });

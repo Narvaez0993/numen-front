@@ -10,10 +10,16 @@ type Props = {
   values?: Record<string, unknown>;
   /** The line under it: what is being asked for, and why. */
   body?: string;
-  /** 33 is the welcome's «Hola. Soy Deshka.»; every other entry screen is 29. */
-  size?: 29 | 33;
+  /** The design's three: 33 for «Hola. Soy Deshka.», 31 for the screens that
+   *  ask one thing («¿cómo te llamas?»), 29 for the rest. */
+  size?: 29 | 31 | 33;
   paddingTop?: number;
+  /** Space between the title and its line, which the design varies (12–18). */
+  bodyGap?: number;
 };
+
+/** Tracking tightens as the type grows, as the design sets it. */
+const TRACKING = { 29: -0.9, 31: -1, 33: -1.1 } as const;
 
 /**
  * The entry screens' title: big, light, left-aligned, with one part in medium
@@ -27,6 +33,7 @@ export function OnbHeadline({
   body,
   size = 29,
   paddingTop = 34,
+  bodyGap,
 }: Props) {
   const { theme } = useTheme();
   const welcome = size === 33;
@@ -38,7 +45,7 @@ export function OnbHeadline({
           fontSize: size,
           lineHeight: Math.round(size * (welcome ? 1.2 : 1.24)),
           fontWeight: '300',
-          letterSpacing: welcome ? -1.1 : -0.9,
+          letterSpacing: TRACKING[size],
           color: theme.colors.textPrimary,
         }}
       >
@@ -54,7 +61,7 @@ export function OnbHeadline({
           style={{
             fontSize: welcome ? 15 : 14,
             lineHeight: welcome ? 24 : 22,
-            marginTop: welcome ? 16 : 14,
+            marginTop: bodyGap ?? (welcome ? 16 : 14),
           }}
         >
           {body}

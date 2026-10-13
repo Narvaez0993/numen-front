@@ -766,80 +766,94 @@
         ]
       }
     },
-    "perso": {
-      "step1": "Paso 1 de 3",
-      "step2": "Paso 2 de 3",
-      "step3": "Paso 3 de 3",
-      "continue": "Continuar",
-      "skip": "Saltar este paso",
+    "setup": {
+      "step": "Nos falta poquito · {{step}} de 3",
       "name": {
-        "title": "¿Cómo te llamas?",
-        "subtitle": "Deshka te llamará así.",
-        "placeholder": "Tu nombre"
+        "title": "Ahora sí:\n<b>¿cómo te llamas?</b>",
+        "body": "Para no hablarte como un banco.",
+        "placeholder": "Tu nombre",
+        "submit": "Mucho gusto"
       },
       "goal": {
-        "title": "Hola, {{name}}. ¿Qué quieres lograr con Deshka?",
-        "subtitle": "Esto nos ayuda a darte sugerencias relevantes.",
-        "friend": "amigo",
-        "gastos": {
-          "title": "Saber dónde se va mi plata",
-          "sub": "Tengo ingresos OK pero no sé en qué gasto."
-        },
-        "ahorrar": {
-          "title": "Ahorrar para algo específico",
-          "sub": "Tengo una meta y quiero llegar a ella."
-        },
-        "deudas": {
-          "title": "Salir de deudas",
-          "sub": "Quiero pagar tarjetas y dejar de deber."
+        "title": "{{name}}, <b>¿qué te trae por acá?</b>",
+        "body": "Dime la verdad, no hay respuesta mala.",
+        "submit": "Seguir",
+        "options": {
+          "gastos": {
+            "title": "No sé en qué se me va",
+            "sub": "Te muestro el mes claro, sin sustos"
+          },
+          "ahorrar": {
+            "title": "Quiero ahorrar y nunca puedo",
+            "sub": "Te pongo metas y te aviso cómo vas"
+          },
+          "deudas": {
+            "title": "Tengo deudas regadas",
+            "sub": "Tarjetas, préstamos y quién te debe a ti"
+          }
         }
-      }
-    },
-    "setup": {
-      "title": "Tu cuenta principal",
-      "subtitle": "Para empezar a llevar el saldo. Puedes agregar más después.",
-      "banks": {
-        "banco": "Banco",
-        "billetera": "Billetera",
-        "efectivo": "Efectivo",
-        "otro": "Otro"
       },
-      "sheet": {
-        "hint": "Ponle el nombre que usas tú. El saldo estimado está bien.",
-        "save": "Guardar y continuar",
-        "skip": "No sé, saltar",
-        "nameLabel": "Nombre",
-        "namePlaceholder": "Bancolombia, Nequi, bolsillo…",
-        "balanceLabel": "Saldo aproximado"
-      },
-      "currency": "Tu moneda",
-      "sheetTitles": {
-        "banco": "Tu banco",
-        "billetera": "Tu billetera",
-        "efectivo": "Tu efectivo",
-        "otro": "Tu cuenta"
+      "account": {
+        "title": "¿Dónde tienes\n<b>tu plata</b>?",
+        "body": "La cuenta donde tienes la mayor parte. Ahí anoto lo que me cuentes; las demás las agregas después.",
+        "currency": "Moneda",
+        "submit": "Seguir",
+        "save": "Guardar y seguir",
+        "later": "Lo hago después",
+        "error": "No pude crear la cuenta. Inténtalo otra vez.",
+        "options": {
+          "banco": {
+            "title": "Un banco",
+            "sub": "Bancolombia, Davivienda, BBVA…"
+          },
+          "billetera": {
+            "title": "Una billetera digital",
+            "sub": "Nequi, Daviplata, Nu…"
+          },
+          "efectivo": {
+            "title": "Efectivo",
+            "sub": "Lo que cargas encima"
+          },
+          "otro": {
+            "title": "Otra",
+            "sub": "Un bolsillo, una cooperativa…"
+          }
+        },
+        "cashName": "Efectivo"
       }
     },
     "magic": {
-      "title": "Probemos la magia.",
-      "subtitle": "Toca el mic y dime un gasto que hiciste hoy.",
-      "recording": "Te escucho…",
-      "processing": "Procesando…",
-      "exampleLabel": "Ejemplo",
-      "example": "Café tres mil quinientos",
-      "preferText": "Saltar demo"
-    },
-    "confirm": {
-      "pill": "Registrado",
-      "title": "Así de fácil.",
-      "subtitle": "Deshka entendió lo que dijiste. Edita si algo está mal.",
-      "dijiste": "Dijiste",
-      "when": "Hoy · 9:41 a.m.",
-      "category": "Categoría",
-      "account": "Cuenta",
-      "defaultAccount": "Cuenta principal",
-      "continue": "Sigamos a Inicio",
-      "edit": "Editar este gasto"
+      "label": "Lo último",
+      "title": "Cuéntame algo que hayas gastado hoy.",
+      "body": "Habla como le hablarías a alguien. Yo me encargo del resto.",
+      "examples": [
+        "«me tomé un café de cinco mil»",
+        "«pagué 18 mil de almuerzo»",
+        "«compré mercado por 85 mil»"
+      ],
+      "tap": "Toca y habla",
+      "orType": "o escríbelo",
+      "later": "Después",
+      "starting": "Un segundo…",
+      "listening": "Te escucho",
+      "thinking": "Entendiendo…",
+      "done": "Ya, eso es todo",
+      "hint": "Habla normal. No tienes que decirlo bonito.",
+      "savedTitle": "Listo. <b>Ya quedó guardado</b>.",
+      "savedBody": "La categoría, la cuenta y la fecha las puse yo. <b>Eso es todo lo que tienes que hacer</b>, siempre.",
+      "more_one": "y {{count}} movimiento más",
+      "more_other": "y {{count}} movimientos más",
+      "continue": "Me gusta, sigamos",
+      "unclearTitle": "No te entendí un gasto.",
+      "unclearBody": "¿Lo intentamos otra vez? Algo como «un café de cinco mil».",
+      "nothingHeard": "No te escuché.",
+      "micError": "El micrófono se cortó.",
+      "failed": "No pude entenderte ahora.",
+      "typeTitle": "Escríbemelo.",
+      "typeBody": "Como se lo escribirías a alguien.",
+      "typeBodyNoMic": "Aquí no te puedo escuchar, pero puedes escribírmelo.",
+      "typePlaceholder": "un café de cinco mil",
+      "typeSubmit": "Listo"
     }
   },
   "tabs": {

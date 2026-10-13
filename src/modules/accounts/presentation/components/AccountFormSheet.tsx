@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 
@@ -30,6 +30,11 @@ type Props = {
   onClose: () => void;
   onSave: (input: AccountFormInput) => void;
   onDelete: () => void;
+  /** What a new account opens with — the onboarding's main account starts as
+   *  the kind and name of the option just picked. Ignored when editing. */
+  initial?: Partial<AccountFormInput>;
+  /** The button's label, when the sheet is one step of something bigger. */
+  saveLabel?: string;
 };
 
 const KINDS: AccountKind[] = ['debit', 'cash'];
@@ -60,6 +65,8 @@ export function AccountFormSheet({
   onClose,
   onSave,
   onDelete,
+  initial,
+  saveLabel,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -70,12 +77,24 @@ export function AccountFormSheet({
   const [sub, setSub] = useState('');
   const [digits, setDigits] = useState('');
 
+  // Read when the sheet opens, not on every render: a parent that re-renders
+  // while it is open must not wipe what is being typed.
+  const initialRef = useRef(initial);
+  initialRef.current = initial;
+
   useEffect(() => {
     if (!visible) return;
-    setKind(account?.kind ?? 'debit');
-    setName(account?.name ?? '');
-    setSub(account?.sub ?? '');
-    setDigits(account ? String(Math.max(0, account.balance)) : '');
+    const start = initialRef.current;
+    setKind(account?.kind ?? start?.kind ?? 'debit');
+    setName(account?.name ?? start?.name ?? '');
+    setSub(account?.sub ?? start?.sub ?? '');
+    setDigits(
+      account
+        ? String(Math.max(0, account.balance))
+        : start?.balance
+          ? String(start.balance)
+          : '',
+    );
   }, [visible, account]);
 
   const valid = name.trim().length >= 2;
@@ -90,7 +109,7 @@ export function AccountFormSheet({
       keyboard="system"
       label={t('accounts.form.balance')}
       help={t('accounts.form.balanceHelp')}
-      primaryLabel={t('accounts.form.save')}
+      primaryLabel={saveLabel ?? t('accounts.form.save')}
       primaryDisabled={!valid || submitting}
       onPrimary={() =>
         onSave({

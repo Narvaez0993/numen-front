@@ -1,7 +1,7 @@
 // The onboarding is split into two single-screen state machines by session
 // state:
 //   AUTH  (no session yet) → welcome, the account, the code
-//   SETUP (session issued)  → name, goal, account setup, magic moment, confirm
+//   SETUP (session issued)  → name, goal, main account, first expense
 // The session is issued at `verify`; from there the RootGate moves the user
 // into the SETUP group.
 
@@ -19,22 +19,22 @@ export const AUTH_BACK_MAP: Readonly<Record<AuthStep, AuthStep | null>> = {
 };
 
 // ── SETUP flow ──────────────────────────────────────────────────────────────
-export type SetupStep = 'name' | 'goal' | 'setup' | 'magic' | 'confirm';
+// The first expense closes it, and it is real: the account it lands on is
+// created one step before.
+export type SetupStep = 'name' | 'goal' | 'account' | 'magic';
 
 export const SETUP_SCREEN_FLOW: readonly SetupStep[] = [
   'name',
   'goal',
-  'setup',
+  'account',
   'magic',
-  'confirm',
 ];
 
 export const SETUP_BACK_MAP: Readonly<Record<SetupStep, SetupStep | null>> = {
-  // `name` is the resume entry point after verify, so it has no back; `magic`
-  // and `confirm` can't reverse into earlier steps.
+  // `name` is the resume entry point after verify, so it has no back; the first
+  // expense comes after an account that already exists, so it has none either.
   name: null,
   goal: 'name',
-  setup: 'goal',
+  account: 'goal',
   magic: null,
-  confirm: null,
 };

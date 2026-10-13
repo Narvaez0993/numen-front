@@ -15,6 +15,8 @@ import { RiseIn, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { withAlpha } from '@/shared/presentation/theme/tokens';
 
+import { RecordedCard } from './RecordedCard';
+
 /** One example, as the translation file writes it: the words, with the part
  *  the sentence leans on between asterisks — «almuerzo de *18 mil* con Nequi». */
 export type DemoExample = {
@@ -216,7 +218,13 @@ export function WelcomeDemo({
               duration={still ? 0 : 380}
               style={{ marginTop: 14 }}
             >
-              <DemoCard example={example} compact={compact} />
+              <RecordedCard
+                title={example.title}
+                amount={example.amount}
+                chips={example.chips}
+                income={example.income}
+                compact={compact}
+              />
             </RiseIn>
           ) : null}
         </>
@@ -282,67 +290,5 @@ function Caret({ size }: { size: number }) {
         |
       </Text>
     </Animated.View>
-  );
-}
-
-/** The movement as the design's «Ya quedó» draws it: what, how much, and the
- *  three things the app filled in by itself. */
-function DemoCard({ example, compact }: { example: DemoExample; compact: boolean }) {
-  const { theme } = useTheme();
-
-  return (
-    <View
-      style={{
-        paddingVertical: compact ? 13 : 16,
-        paddingHorizontal: compact ? 15 : 18,
-        borderRadius: 22,
-        backgroundColor: theme.colors.bgSurface,
-        borderWidth: 1,
-        borderColor: withAlpha(theme.palette.acc, 0.3),
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'baseline',
-          gap: 12,
-          marginBottom: compact ? 10 : 13,
-        }}
-      >
-        <Text
-          numberOfLines={1}
-          style={{ flex: 1, fontSize: compact ? 15 : 16, fontWeight: '500' }}
-        >
-          {example.title}
-        </Text>
-        <Text
-          tabular
-          color={example.income ? theme.colors.accentMint : theme.colors.textPrimary}
-          style={{ fontSize: compact ? 17 : 19, fontWeight: '500', letterSpacing: -0.5 }}
-        >
-          {example.amount}
-        </Text>
-      </View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
-        {example.chips.map((chip) => (
-          <View
-            key={chip}
-            style={{
-              minHeight: 30,
-              justifyContent: 'center',
-              paddingHorizontal: 11,
-              borderRadius: 12,
-              backgroundColor: theme.colors.bgSurface,
-              borderWidth: 1,
-              borderColor: theme.colors.borderSubtle,
-            }}
-          >
-            <Text color={theme.colors.textSecondary} style={{ fontSize: 12 }}>
-              {chip}
-            </Text>
-          </View>
-        ))}
-      </View>
-    </View>
   );
 }

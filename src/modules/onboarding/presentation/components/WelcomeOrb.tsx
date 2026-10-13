@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, ClipPath, Defs, G, RadialGradient, Stop } from 'react-native-svg';
 
-import { Orb } from '@/shared/presentation/components';
+import { Icon, Orb } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { withAlpha } from '@/shared/presentation/theme/tokens';
 
@@ -45,6 +45,9 @@ type Props = {
   compact?: boolean;
   /** Reduce Motion: the orb stands still. */
   still?: boolean;
+  /** What it holds: the voice bars, or the microphone that asks to be
+   *  touched — «Lo último», where the orb is the button. */
+  glyph?: 'bars' | 'mic';
 };
 
 /**
@@ -70,6 +73,7 @@ export const WelcomeOrb = memo(function WelcomeOrb({
   burst,
   compact = false,
   still = false,
+  glyph = 'bars',
 }: Props) {
   const { theme } = useTheme();
   const size = SIZES[compact ? 'compact' : 'regular'];
@@ -204,16 +208,25 @@ export const WelcomeOrb = memo(function WelcomeOrb({
             gap: size.gap,
           }}
         >
-          {BARS.map((share, index) => (
-            <Bar
-              key={index}
-              height={share * size.orb}
-              phase={BAR_PHASE[index] ?? 0}
-              bright={index === 2}
-              talk={talk}
-              beat={beat}
+          {glyph === 'mic' ? (
+            <Icon
+              name="microphone"
+              size={size.orb * 0.31}
+              stroke={1.6}
+              color={theme.palette.orbInk}
             />
-          ))}
+          ) : (
+            BARS.map((share, index) => (
+              <Bar
+                key={index}
+                height={share * size.orb}
+                phase={BAR_PHASE[index] ?? 0}
+                bright={index === 2}
+                talk={talk}
+                beat={beat}
+              />
+            ))
+          )}
         </View>
       </Animated.View>
     </View>

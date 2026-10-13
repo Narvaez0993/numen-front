@@ -766,80 +766,94 @@
         ]
       }
     },
-    "perso": {
-      "step1": "Step 1 of 3",
-      "step2": "Step 2 of 3",
-      "step3": "Step 3 of 3",
-      "continue": "Continue",
-      "skip": "Skip this step",
+    "setup": {
+      "step": "Almost there · {{step}} of 3",
       "name": {
-        "title": "What's your name?",
-        "subtitle": "Deshka will call you this.",
-        "placeholder": "Your name"
+        "title": "Now then:\n<b>what's your name?</b>",
+        "body": "So I don't talk to you like a bank.",
+        "placeholder": "Your name",
+        "submit": "Nice to meet you"
       },
       "goal": {
-        "title": "Hi, {{name}}. What do you want to achieve with Deshka?",
-        "subtitle": "This helps us give you relevant suggestions.",
-        "friend": "friend",
-        "gastos": {
-          "title": "Know where my money goes",
-          "sub": "Income is fine but I don't know what I spend on."
-        },
-        "ahorrar": {
-          "title": "Save for something specific",
-          "sub": "I have a goal and want to reach it."
-        },
-        "deudas": {
-          "title": "Get out of debt",
-          "sub": "I want to pay off cards and stop owing."
+        "title": "{{name}}, <b>what brings you here?</b>",
+        "body": "Be honest, there's no wrong answer.",
+        "submit": "Continue",
+        "options": {
+          "gastos": {
+            "title": "I don't know where it goes",
+            "sub": "I'll show you the month clearly, no surprises"
+          },
+          "ahorrar": {
+            "title": "I want to save and never manage to",
+            "sub": "I'll set goals and tell you how you're doing"
+          },
+          "deudas": {
+            "title": "My debts are all over the place",
+            "sub": "Cards, loans and who owes you"
+          }
         }
-      }
-    },
-    "setup": {
-      "title": "Your main account",
-      "subtitle": "To start tracking the balance. You can add more later.",
-      "banks": {
-        "banco": "Bank",
-        "billetera": "Wallet",
-        "efectivo": "Cash",
-        "otro": "Other"
       },
-      "sheet": {
-        "hint": "Name it the way you call it. An estimated balance is fine.",
+      "account": {
+        "title": "Where do you keep\n<b>your money</b>?",
+        "body": "The account with most of it. That's where I'll note what you tell me; add the others later.",
+        "currency": "Currency",
+        "submit": "Continue",
         "save": "Save and continue",
-        "skip": "Not sure, skip",
-        "nameLabel": "Name",
-        "namePlaceholder": "Chase, PayPal, pocket…",
-        "balanceLabel": "Approximate balance"
-      },
-      "currency": "Your currency",
-      "sheetTitles": {
-        "banco": "Your bank",
-        "billetera": "Your wallet",
-        "efectivo": "Your cash",
-        "otro": "Your account"
+        "later": "I'll do it later",
+        "error": "I couldn't create the account. Try again.",
+        "options": {
+          "banco": {
+            "title": "A bank",
+            "sub": "Checking or savings"
+          },
+          "billetera": {
+            "title": "A digital wallet",
+            "sub": "PayPal, Venmo, Cash App…"
+          },
+          "efectivo": {
+            "title": "Cash",
+            "sub": "What you carry"
+          },
+          "otro": {
+            "title": "Other",
+            "sub": "A pocket, a credit union…"
+          }
+        },
+        "cashName": "Cash"
       }
     },
     "magic": {
-      "title": "Let's try the magic.",
-      "subtitle": "Tap the mic and tell me an expense you made today.",
-      "recording": "Listening…",
-      "processing": "Processing…",
-      "exampleLabel": "Example",
-      "example": "Coffee three thousand five hundred",
-      "preferText": "Skip demo"
-    },
-    "confirm": {
-      "pill": "Logged",
-      "title": "Just like that.",
-      "subtitle": "Deshka understood what you said. Edit if something is off.",
-      "dijiste": "You said",
-      "when": "Today · 9:41 a.m.",
-      "category": "Category",
-      "account": "Account",
-      "defaultAccount": "Main account",
-      "continue": "On to Home",
-      "edit": "Edit this expense"
+      "label": "One last thing",
+      "title": "Tell me something you spent today.",
+      "body": "Talk the way you'd talk to anyone. I'll take care of the rest.",
+      "examples": [
+        "“I had a coffee for 5 dollars”",
+        "“I paid 18 for lunch”",
+        "“groceries, 85 dollars”"
+      ],
+      "tap": "Tap and talk",
+      "orType": "or type it",
+      "later": "Later",
+      "starting": "One second…",
+      "listening": "Listening",
+      "thinking": "Understanding…",
+      "done": "That's it",
+      "hint": "Talk normally. It doesn't have to sound nice.",
+      "savedTitle": "Done. <b>It's saved</b>.",
+      "savedBody": "I picked the category, the account and the date. <b>That's all you ever have to do</b>.",
+      "more_one": "and {{count}} more movement",
+      "more_other": "and {{count}} more movements",
+      "continue": "I like it, let's go",
+      "unclearTitle": "I didn't catch an expense.",
+      "unclearBody": "Shall we try again? Something like “a coffee for 5 dollars”.",
+      "nothingHeard": "I didn't hear you.",
+      "micError": "The microphone cut out.",
+      "failed": "I couldn't understand you right now.",
+      "typeTitle": "Write it to me.",
+      "typeBody": "The way you'd write it to anyone.",
+      "typeBodyNoMic": "I can't hear you here, but you can write it to me.",
+      "typePlaceholder": "a coffee for 5 dollars",
+      "typeSubmit": "Done"
     }
   },
   "tabs": {
