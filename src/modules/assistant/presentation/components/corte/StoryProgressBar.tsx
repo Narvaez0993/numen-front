@@ -1,6 +1,7 @@
 import { Animated, View } from 'react-native';
 
 import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 
 type Props = {
   count: number;
@@ -13,7 +14,7 @@ type Props = {
  * by the player's clock. Width animation, so `useNativeDriver` stays off. */
 export function StoryProgressBar({ count, index, progress }: Props) {
   const { theme } = useTheme();
-  const track = 'rgba(168,178,200,0.25)';
+  const track = withAlpha(theme.colors.textPrimary, 0.22);
 
   return (
     <View style={{ flexDirection: 'row', gap: 4 }}>
@@ -22,7 +23,7 @@ export function StoryProgressBar({ count, index, progress }: Props) {
           key={i}
           style={{
             flex: 1,
-            height: 3,
+            height: 2.5,
             borderRadius: 2,
             backgroundColor: track,
             overflow: 'hidden',

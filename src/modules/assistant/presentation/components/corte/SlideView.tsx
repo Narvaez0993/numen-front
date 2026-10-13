@@ -5,9 +5,9 @@ import { Animated, Easing, Pressable, useWindowDimensions, View } from 'react-na
 import { Ellipse, Svg } from 'react-native-svg';
 
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
-import type { AccentColor } from '@/shared/domain';
-import { Icon, IconBox, Text } from '@/shared/presentation/components';
-import { accentColorKey, useTheme } from '@/shared/presentation/theme';
+import { Icon, Text } from '@/shared/presentation/components';
+import { useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { monthName, shiftMonth, weekdayName } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
@@ -25,29 +25,16 @@ type Props = {
 /** The design's easing — every corte animation shares it. */
 const CURVE = Easing.bezier(0.32, 0.72, 0, 1);
 
-/** Dark navy from the tokens: the text that sits ON a mint button, any theme. */
-const ON_MINT = '#0A0E1A';
-
 /**
- * One accent per story — the design's whole color system. The wash, the
- * kicker and the protagonist number all wear it; everything else stays
- * bg-base and text ramps ("Restrained Wrapped").
+ * There is no accent per slide any more.
+ *
+ * Each story used to pick its own — coral for the big number, amber for the
+ * categories, mint or coral for the pulse depending on the sign — so seven
+ * screens in a row each announced a different mood, and the colour was making a
+ * judgement the sentence had not made. The redesign gives the whole Corte one
+ * accent, the palette's, and lets the number be ink. Which stories are good news
+ * is what the words are for.
  */
-function accentFor(slide: Slide): AccentColor {
-  switch (slide.type) {
-    case 'big_number':
-      return 'coral';
-    case 'category_bars':
-    case 'goal':
-      return 'amber';
-    case 'fun_fact':
-      return 'purple';
-    case 'pulse':
-      return slide.deltaPct <= 0 ? 'mint' : 'coral';
-    default:
-      return 'mint';
-  }
-}
 
 /**
  * One story slide, full screen, faithful to the Corte design: an atmospheric
@@ -60,12 +47,12 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const language = i18n.language;
-  const catalogs = useMovementCatalogs();
   const { width, height } = useWindowDimensions();
 
-  const accent = accentFor(slide);
-  const accentFg = theme.colors[accentColorKey(accent, 'fg')];
-  const accentBg = theme.colors[accentColorKey(accent, 'bg')];
+  // One accent for the whole Corte. `accentFg` is what the kicker, the links and
+  // the leading bar wear; `accentBg` is the wash behind the story.
+  const accentFg = theme.palette.acc;
+  const accentBg = withAlpha(theme.palette.acc, 0.12);
   const month = monthName(`${corte.period}-01`, language);
 
   const narration = (delay = 320) => (
@@ -86,17 +73,11 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
         return (
           <View style={{ gap: 30 }}>
             <NumIn delay={0}>
-              <CoverMark
-                stroke={theme.colors.textTertiary}
-                dot={theme.colors.accentMint}
-              />
+              <CoverMark stroke={theme.colors.textTertiary} dot={accentFg} />
             </NumIn>
             <View>
               <NumIn delay={200}>
-                <Text
-                  variant="display"
-                  style={{ fontSize: 44, lineHeight: 46, letterSpacing: -1.5 }}
-                >
+                <Text variant="display" style={{ fontSize: 44, letterSpacing: -1.5 }}>
                   {t('assistant.corte.stories.coverTitle', { month })}
                 </Text>
               </NumIn>
@@ -128,7 +109,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
               {t('assistant.corte.stories.kickerSpent', { month })}
             </Kicker>
             <View style={{ height: 18 }} />
-            <BigNum color={accentFg} size={54}>
+            <BigNum color={theme.colors.textPrimary} size={54}>
               {formatMoney(slide.amount)}
             </BigNum>
             <View style={{ height: 26 }} />
@@ -144,13 +125,13 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
             <View style={{ height: 24 }} />
             <View style={{ gap: 20 }}>
               {slide.bars.map((bar, position) => {
+                // The leader wears the accent; the rest are a tint to measure it
+                // against. Colouring each by its category turned the slide into
+                // the confetti Movimientos already gave up.
                 const color =
-                  theme.colors[
-                    accentColorKey(
-                      catalogs.categoryById[bar.categoryId]?.color ?? 'mint',
-                      'fg',
-                    )
-                  ];
+                  position === 0
+                    ? theme.palette.acc
+                    : withAlpha(theme.colors.textPrimary, 0.22);
                 return (
                   <Rise key={bar.categoryId} delay={140 + position * 130}>
                     <View
@@ -233,7 +214,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
               </Text>
             </Rise>
             <View style={{ height: 20 }} />
-            <BigNum color={accentFg} size={50} delay={300}>
+            <BigNum color={theme.colors.textPrimary} size={50} delay={300}>
               {formatMoney(slide.amount)}
             </BigNum>
             <View style={{ height: 22 }} />
@@ -255,7 +236,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
           <View>
             <Kicker color={accentFg}>{t('assistant.corte.stories.kickerPulse')}</Kicker>
             <View style={{ height: 18 }} />
-            <BigNum color={accentFg} size={62}>
+            <BigNum color={theme.colors.textPrimary} size={62}>
               {`${less ? '−' : '+'}${pct}%`}
             </BigNum>
             <View style={{ height: 24 }} />
@@ -336,7 +317,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
             </Rise>
             <View style={{ height: 22 }} />
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
-              <BigNum color={accentFg} size={64} delay={220}>
+              <BigNum color={theme.colors.textPrimary} size={64} delay={220}>
                 {`${pct}%`}
               </BigNum>
               <Rise delay={400}>
@@ -553,7 +534,7 @@ function Kicker({ color, children }: { color: string; children: ReactNode }) {
         variant="micro"
         uppercase
         color={color}
-        style={{ fontSize: 11, fontWeight: '500', letterSpacing: 1.54 }}
+        style={{ fontSize: 10.5, letterSpacing: 2.4 }}
       >
         {children}
       </Text>
@@ -561,7 +542,13 @@ function Kicker({ color, children }: { color: string; children: ReactNode }) {
   );
 }
 
-/** The number that owns the screen — always in the story's accent. */
+/**
+ * The number that owns the screen — in ink.
+ *
+ * No `lineHeight`. It was `size * 1.02`, which is a box the height of the font
+ * for a font that draws taller than that, so at 54px the tops of the digits came
+ * off. Computed, so the project's scan for this could not see it.
+ */
 function BigNum({
   color,
   size,
@@ -581,7 +568,6 @@ function BigNum({
         style={{
           fontFamily: 'Geist_500Medium',
           fontSize: size,
-          lineHeight: Math.round(size * 1.02),
           letterSpacing: -0.045 * size,
         }}
       >
@@ -698,7 +684,10 @@ function CoverMark({ stroke, dot }: { stroke: string; dot: string }) {
 // The play slide's pieces — before → after, then the action
 // ─────────────────────────────────────────────────────────────
 
-/** What the play proposes, as numbers: old cap struck through → new in mint. */
+/** What the play proposes, as numbers: old cap struck through → the new one.
+ *  The design's action card — glass, the icon in the accent's well, the number
+ *  in ink. It used to tint each play by its category's own colour and print the
+ *  amount in mint, the one colour this palette no longer has. */
 function PlayCard({ play }: { play: AgentPlay }) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -715,7 +704,6 @@ function PlayCard({ play }: { play: AgentPlay }) {
       : play.action === 'treat'
         ? 'sparkles'
         : 'target');
-  const color = category?.color ?? (play.action === 'treat' ? 'amber' : 'mint');
   const label =
     play.action === 'contribute_goal'
       ? play.goalName
@@ -733,15 +721,25 @@ function PlayCard({ play }: { play: AgentPlay }) {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
-        paddingVertical: 14,
-        paddingHorizontal: 16,
+        padding: 16,
         backgroundColor: theme.colors.bgSurface,
         borderWidth: 1,
         borderColor: theme.colors.borderSubtle,
-        borderRadius: 16,
+        borderRadius: 24,
       }}
     >
-      <IconBox name={icon} color={color} size={38} iconSize={18} />
+      <View
+        style={{
+          width: 38,
+          height: 38,
+          borderRadius: 13,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: withAlpha(theme.palette.acc, 0.14),
+        }}
+      >
+        <Icon name={icon} size={18} stroke={1.8} color={theme.palette.acc2} />
+      </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text
           variant="micro"
@@ -766,12 +764,7 @@ function PlayCard({ play }: { play: AgentPlay }) {
               <Icon name="chevron-right" size={12} color={theme.colors.textTertiary} />
             </>
           ) : null}
-          <Text
-            variant="label"
-            tabular
-            color={theme.colors.accentMint}
-            style={{ fontSize: 17 }}
-          >
+          <Text tabular style={{ fontSize: 17, fontWeight: '500' }}>
             {formatMoney(amount)}
           </Text>
         </View>
@@ -780,7 +773,8 @@ function PlayCard({ play }: { play: AgentPlay }) {
   );
 }
 
-/** The design's confirmation: check on mint, the play now lives in the app. */
+/** Done: the play now lives in the app. The same glass as the card above it,
+ *  with the check in the accent's well — a quiet confirmation, not a banner. */
 function AppliedCard({ play }: { play: AgentPlay }) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -792,23 +786,23 @@ function AppliedCard({ play }: { play: AgentPlay }) {
         gap: 10,
         paddingVertical: 14,
         paddingHorizontal: 16,
-        borderRadius: 14,
-        backgroundColor: theme.colors.accentMintBg,
+        borderRadius: 20,
+        backgroundColor: theme.colors.bgSurface,
         borderWidth: 1,
-        borderColor: 'rgba(0,229,168,0.25)',
+        borderColor: withAlpha(theme.palette.acc, 0.3),
       }}
     >
       <View
         style={{
-          width: 26,
-          height: 26,
-          borderRadius: 8,
-          backgroundColor: theme.colors.accentMint,
+          width: 28,
+          height: 28,
+          borderRadius: 10,
+          backgroundColor: withAlpha(theme.palette.acc, 0.16),
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Icon name="check" size={14} stroke={2.6} color={ON_MINT} />
+        <Icon name="check" size={15} stroke={2.4} color={theme.palette.acc2} />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text variant="body" style={{ fontWeight: '500', fontSize: 13.5 }}>

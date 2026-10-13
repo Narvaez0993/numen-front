@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Pressable } from 'react-native';
 
 import { useTheme } from '../theme';
+import { withAlpha } from '../theme/tokens';
 
-import { Icon } from './Icon';
+import { ChooseSheet, type ChooseOption } from './ChooseSheet';
 import { Text } from './Text';
 
-export type FilterOption = {
-  value: string;
-  label: string;
-};
+export type FilterOption = ChooseOption;
 
 type Props = {
   label: string;
@@ -20,6 +18,18 @@ type Props = {
   allLabel?: string;
 };
 
+/**
+ * A filter, and the list it opens.
+ *
+ * The chip is a pill that says either what it filters or what it is filtering
+ * BY — a chip reading "Mercado" is worth more than one reading "Categoría" with
+ * a tick somewhere, because the row of chips then reads as a sentence about what
+ * is on screen.
+ *
+ * The list itself is `ChooseSheet`, the same one every form field opens. The
+ * design draws that picker once for the whole app and this is one of its callers,
+ * not a variant of it.
+ */
 export function FilterChip({ label, value, options, onChange, allLabel }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -29,132 +39,52 @@ export function FilterChip({ label, value, options, onChange, allLabel }: Props)
   const displayLabel = active
     ? (options.find((o) => o.value === value)?.label ?? label)
     : label;
-  const resolvedAllLabel = allLabel ?? t('common.all', { defaultValue: 'Todas' });
 
   return (
-    <View style={{ flex: 1, minWidth: 0 }}>
+    <>
       <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ selected: active }}
         onPress={() => setOpen(true)}
         style={({ pressed }) => ({
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 4,
-          paddingHorizontal: 10,
-          paddingVertical: 8,
-          borderRadius: 12,
-          backgroundColor: active ? theme.colors.accentMintBg : theme.colors.bgSurface,
-          borderColor: active ? 'transparent' : theme.colors.borderSubtle,
+          gap: 6,
+          minHeight: 36,
+          paddingHorizontal: 13,
+          borderRadius: 999,
+          backgroundColor: active
+            ? withAlpha(theme.palette.acc, 0.15)
+            : theme.colors.bgSurface,
+          borderColor: active
+            ? withAlpha(theme.palette.acc, 0.3)
+            : theme.colors.borderSubtle,
           borderWidth: 1,
           opacity: pressed ? 0.85 : 1,
         })}
       >
+        {/* No arrow: the design draws these as plain pills. Four of them in a
+            row already read as a set of filters, and an arrow on each one was
+            four extra marks saying the same thing. */}
         <Text
-          variant="label"
-          color={active ? theme.colors.accentMint : theme.colors.textSecondary}
           numberOfLines={1}
-          style={{ fontSize: 12, flex: 1 }}
+          color={active ? theme.palette.acc2 : theme.colors.textSecondary}
+          style={{ fontSize: 12 }}
         >
           {displayLabel}
         </Text>
-        <Icon
-          name="chevron-down"
-          size={11}
-          color={active ? theme.colors.accentMint : theme.colors.textSecondary}
-        />
       </Pressable>
 
-      <Modal
+      <ChooseSheet
         visible={open}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={() => setOpen(false)}
-      >
-        <Pressable
-          onPress={() => setOpen(false)}
-          style={{
-            flex: 1,
-            backgroundColor: theme.colors.scrim,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 32,
-          }}
-        >
-          <Pressable
-            onPress={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: 320,
-              backgroundColor: theme.colors.bgFloat,
-              borderColor: theme.colors.borderDefault,
-              borderWidth: 1,
-              borderRadius: 16,
-              padding: 8,
-              maxHeight: 360,
-            }}
-          >
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Option
-                label={resolvedAllLabel}
-                selected={!active}
-                onPress={() => {
-                  onChange(null);
-                  setOpen(false);
-                }}
-              />
-              {options.map((o) => (
-                <Option
-                  key={o.value}
-                  label={o.label}
-                  selected={o.value === value}
-                  onPress={() => {
-                    onChange(o.value);
-                    setOpen(false);
-                  }}
-                />
-              ))}
-            </ScrollView>
-          </Pressable>
-        </Pressable>
-      </Modal>
-    </View>
-  );
-}
-
-function Option({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  const { theme } = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        borderRadius: 10,
-        backgroundColor: selected ? theme.colors.accentMintBg : 'transparent',
-        opacity: pressed && !selected ? 0.6 : 1,
-      })}
-    >
-      <Text
-        variant="label"
-        color={selected ? theme.colors.accentMint : theme.colors.textPrimary}
-        style={{ fontSize: 12.5 }}
-      >
-        {label}
-      </Text>
-      {selected ? <Icon name="check" size={13} color={theme.colors.accentMint} /> : null}
-    </Pressable>
+        title={label}
+        options={options}
+        value={value}
+        onChange={onChange}
+        onClose={() => setOpen(false)}
+        allLabel={allLabel ?? t('common.all', { defaultValue: 'Todas' })}
+        onClear={() => onChange(null)}
+      />
+    </>
   );
 }

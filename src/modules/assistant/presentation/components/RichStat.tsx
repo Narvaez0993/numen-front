@@ -1,59 +1,59 @@
 import { View } from 'react-native';
 
 import { Text } from '@/shared/presentation/components';
-import { accentColorKey, useTheme } from '@/shared/presentation/theme';
-
-import type { AccentColor } from '@/shared/domain';
+import { useTheme } from '@/shared/presentation/theme';
 
 type Props = {
   label: string;
   value: string;
-  color?: AccentColor | 'primary';
   sub?: string;
 };
 
-export function RichStat({ label, value, color = 'primary', sub }: Props) {
+/**
+ * One figure the answer leans on.
+ *
+ * It used to take a colour per stat, which put a green number beside an amber
+ * one in the same answer and made the pair look like a verdict. The redesign is
+ * monochrome: the figure is ink, and whether it is good news is what the
+ * sentence above it is for.
+ */
+export function RichStat({ label, value, sub }: Props) {
   const { theme } = useTheme();
-  const valueColor =
-    color === 'primary'
-      ? theme.colors.textPrimary
-      : theme.colors[accentColorKey(color, 'fg')];
 
   return (
     <View
       style={{
         flex: 1,
         minWidth: 0,
+        padding: 16,
+        paddingVertical: 14,
+        borderRadius: 20,
         backgroundColor: theme.colors.bgFloat,
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        borderWidth: 1,
+        borderColor: theme.colors.borderSubtle,
       }}
     >
       <Text
         variant="micro"
-        muted
         uppercase
-        style={{ fontSize: 10, letterSpacing: 0.8, marginBottom: 4 }}
+        color={theme.colors.textTertiary}
         numberOfLines={1}
+        style={{ letterSpacing: 1.6, marginBottom: 8 }}
       >
         {label}
       </Text>
       <Text
-        variant="label"
-        color={valueColor}
         tabular
         numberOfLines={1}
-        style={{ fontSize: 16, letterSpacing: -0.16, lineHeight: 18 }}
+        style={{ fontSize: 23, fontWeight: '500', letterSpacing: -1 }}
       >
         {value}
       </Text>
       {sub ? (
         <Text
-          variant="micro"
-          muted
+          color={theme.colors.textTertiary}
           numberOfLines={1}
-          style={{ fontSize: 10.5, marginTop: 3, letterSpacing: 0 }}
+          style={{ fontSize: 11, marginTop: 6 }}
         >
           {sub}
         </Text>

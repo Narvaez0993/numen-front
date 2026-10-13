@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import { VerifyScreen } from '@/modules/auth/presentation';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
@@ -9,6 +9,7 @@ export default function VerifyRoute() {
   return (
     <VerifyScreen
       email={email ?? ''}
+      onBack={() => router.back()}
       onVerified={(session) => {
         // Returning user verifying from login: complete onboarding so the
         // gate routes to tabs.

@@ -1,16 +1,24 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
 import type { ResolvedSource } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
-import { Button, Pill, Text } from '@/shared/presentation/components';
+import { Pill, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { shortDate } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { DraftOverrides, MovementDraft } from '../../domain/types/Assistant';
 import { sourceOptions } from '../utils/draftSources';
+
+import {
+  AskLabel,
+  ConfirmButton,
+  DraftShell,
+  PickChip,
+  QuietAction,
+} from './draftChrome';
 
 type Props = {
   draft: MovementDraft;
@@ -21,16 +29,20 @@ type Props = {
   busy?: boolean;
 };
 
-const TYPE_PILL: Record<MovementDraft['type'], 'coral' | 'mint' | 'purple'> = {
-  expense: 'coral',
-  income: 'mint',
-  transfer: 'purple',
-};
+/** The real minus sign — it lines up with digits in a tabular font. */
+const MINUS = '−';
 
 /**
  * The agent's understanding, waiting for a human yes. Nothing is saved until
  * Confirmar — and after it settles, the card keeps showing what happened
  * (the server hydrates the draft's current status into the history forever).
+ *
+ * Redesigned to the same rules as the movements list, for the same reasons.
+ * The card used to open with a coloured GASTO/INGRESO/TRANSFERENCIA pill and a
+ * mint button, which put three colours above the number the user is actually
+ * being asked to check. Now **the amount leads** at the size it leads with
+ * everywhere else, direction rides on its sign, and the only colour is the
+ * accent — plus mint on money coming IN, which is the one case worth marking.
  */
 export function DraftCard({ draft, onConfirm, onEdit, onDiscard, busy = false }: Props) {
   const { t, i18n } = useTranslation();
@@ -43,6 +55,8 @@ export function DraftCard({ draft, onConfirm, onEdit, onDiscard, busy = false }:
   const asksForSource = draft.sourceId === null && draft.status === 'pending';
   const chosen = draft.sourceId !== null ? catalogs.sourceById[draft.sourceId] : picked;
 
+  const isIncome = draft.type === 'income';
+  const isTransfer = draft.type === 'transfer';
   const source = chosen?.name ?? '—';
   const destination =
     draft.destinationId !== null
@@ -51,21 +65,46 @@ export function DraftCard({ draft, onConfirm, onEdit, onDiscard, busy = false }:
   const category =
     draft.categoryId !== null ? catalogs.categoryById[draft.categoryId]?.name : undefined;
 
+  const meta = [
+    // While the card is still asking, the source is a question below — printing
+    // a placeholder for it here would just read as a bug.
+    asksForSource && chosen === null
+      ? null
+      : destination !== null
+        ? `${source} → ${destination}`
+        : source,
+    category,
+    shortDate(draft.occurredOn, i18n.language),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
-    <View
-      style={{
-        backgroundColor: theme.colors.bgFloat,
-        borderColor: theme.colors.borderSubtle,
-        borderWidth: 1,
-        borderRadius: 14,
-        padding: 12,
-        gap: 8,
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Pill variant={TYPE_PILL[draft.type]} uppercase>
-          {t(`assistant.draft.type.${draft.type}`)}
-        </Pill>
+    <DraftShell>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
+        <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
+          <Text
+            tabular
+            color={isIncome ? theme.colors.accentMint : theme.colors.textPrimary}
+            style={{ fontSize: 29, fontWeight: '300', letterSpacing: -0.9 }}
+          >
+            {isIncome ? '+' : isTransfer ? '' : MINUS}
+            {formatMoney(draft.amount)}
+          </Text>
+          <Text numberOfLines={1} style={{ fontSize: 14.5 }}>
+            {draft.description || t('assistant.draft.transferFallback')}
+          </Text>
+          {meta ? (
+            <Text
+              numberOfLines={1}
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 11.5 }}
+            >
+              {meta}
+            </Text>
+          ) : null}
+        </View>
+
         {draft.status !== 'pending' ? (
           <Pill variant="neutral" uppercase>
             {t(`assistant.draft.status.${draft.status}`)}
@@ -73,111 +112,60 @@ export function DraftCard({ draft, onConfirm, onEdit, onDiscard, busy = false }:
         ) : null}
       </View>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
-        <View style={{ flexShrink: 1 }}>
-          <Text variant="body" style={{ fontWeight: '500' }} numberOfLines={1}>
-            {draft.description || t('assistant.draft.transferFallback')}
-          </Text>
-          <Text variant="caption" muted numberOfLines={1}>
-            {[
-              // While the card is still asking, the source is a question below —
-              // printing a placeholder for it here would just read as a bug.
-              asksForSource && chosen === null
-                ? null
-                : destination !== null
-                  ? `${source} → ${destination}`
-                  : source,
-              category,
-              shortDate(draft.occurredOn, i18n.language),
-            ]
-              .filter(Boolean)
-              .join(' · ')}
-          </Text>
-        </View>
-        <Text variant="bodyLarge" tabular style={{ fontWeight: '500' }}>
-          {formatMoney(draft.amount)}
-        </Text>
-      </View>
-
       {asksForSource ? (
-        <View style={{ gap: 6, marginTop: 2 }}>
-          <Text variant="label" style={{ fontSize: 12 }}>
-            {/* An income does not "come from" anywhere — it lands. Asking the
-                expense question over a green INGRESO pill reads as a bug. */}
-            {t(`assistant.draft.sourceMissing.${draft.type}`)}
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-            {sourceOptions(catalogs.sourceById, draft.type).map((option) => {
-              const active = picked?.id === option.id;
-              return (
-                <Pressable
-                  key={option.id}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}
-                  onPress={() => setPicked(option)}
-                  disabled={busy}
-                  style={{
-                    backgroundColor: active ? theme.colors.accentMint : 'transparent',
-                    borderColor: active
-                      ? theme.colors.accentMint
-                      : theme.colors.borderSubtle,
-                    borderWidth: 1,
-                    borderRadius: 999,
-                    paddingVertical: 6,
-                    paddingHorizontal: 12,
-                  }}
-                >
-                  <Text
-                    variant="caption"
-                    color={active ? theme.colors.bgBase : theme.colors.textSecondary}
-                    style={{ fontSize: 12.5 }}
-                  >
-                    {option.name}
-                  </Text>
-                </Pressable>
-              );
-            })}
+        <View style={{ gap: 10 }}>
+          {/* An income does not "come from" anywhere — it lands. Asking the
+              expense question over money that is arriving reads as a bug. */}
+          <AskLabel>{t(`assistant.draft.sourceMissing.${draft.type}`)}</AskLabel>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {sourceOptions(catalogs.sourceById, draft.type).map((option) => (
+              <PickChip
+                key={option.id}
+                label={option.name}
+                active={picked?.id === option.id}
+                disabled={busy}
+                onPress={() => setPicked(option)}
+              />
+            ))}
           </View>
-          <Text variant="caption" muted style={{ fontSize: 11.5, lineHeight: 16 }}>
+          <Text
+            color={theme.colors.textTertiary}
+            style={{ fontSize: 11.5, lineHeight: 16 }}
+          >
             {t(`assistant.draft.sourceHint.${draft.type}`)}
           </Text>
         </View>
       ) : null}
 
       {draft.status === 'pending' ? (
-        <View
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 2 }}
-        >
-          <View style={{ flex: 1 }}>
-            <Button
-              label={t('assistant.draft.confirm')}
-              onPress={() =>
-                onConfirm?.(
-                  picked !== null
-                    ? {
-                        sourceId: picked.id,
-                        sourceType: picked.type as 'account' | 'credit_card',
-                      }
-                    : undefined,
-                )
-              }
-              disabled={busy || !onConfirm || (asksForSource && picked === null)}
-              loading={busy}
-              full
-            />
-          </View>
-          <Pressable onPress={onEdit} disabled={busy || !onEdit} hitSlop={8}>
-            <Text variant="caption" color={theme.colors.textSecondary}>
-              {t('assistant.draft.edit')}
-            </Text>
-          </Pressable>
-          <Pressable onPress={onDiscard} disabled={busy || !onDiscard} hitSlop={8}>
-            <Text variant="caption" color={theme.colors.accentCoral}>
-              {t('assistant.draft.discard')}
-            </Text>
-          </Pressable>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <ConfirmButton
+            label={t('assistant.draft.confirm')}
+            onPress={() =>
+              onConfirm?.(
+                picked !== null
+                  ? {
+                      sourceId: picked.id,
+                      sourceType: picked.type as 'account' | 'credit_card',
+                    }
+                  : undefined,
+              )
+            }
+            disabled={busy || !onConfirm || (asksForSource && picked === null)}
+          />
+          <QuietAction
+            label={t('assistant.draft.edit')}
+            onPress={onEdit}
+            disabled={busy}
+          />
+          <QuietAction
+            label={t('assistant.draft.discard')}
+            onPress={onDiscard}
+            disabled={busy}
+            danger
+          />
         </View>
       ) : null}
-    </View>
+    </DraftShell>
   );
 }

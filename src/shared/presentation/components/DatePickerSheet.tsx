@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { useTheme } from '../theme';
+import { withAlpha } from '../theme/tokens';
 import {
   isAfter,
   monthMatrix,
@@ -186,17 +187,22 @@ function DayCell({
         aspectRatio: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 10,
-        backgroundColor: selected ? theme.colors.accentMintBg : 'transparent',
-        borderWidth: isToday && !selected ? 1 : 0,
-        borderColor: theme.colors.borderDefault,
+        borderRadius: 12,
+        // The accent at 15% with a 30% edge — the same "this one is chosen" the
+        // filter chips, the icon grid and the cap picker all use. It used to be
+        // mint, which said nothing except that this component was written first.
+        backgroundColor: selected ? withAlpha(theme.palette.acc, 0.15) : 'transparent',
+        borderWidth: isToday || selected ? 1 : 0,
+        borderColor: selected
+          ? withAlpha(theme.palette.acc, 0.3)
+          : theme.colors.borderDefault,
         opacity: disabled ? 0.25 : pressed ? 0.6 : 1,
       })}
     >
       <Text
         variant="label"
         tabular
-        color={selected ? theme.colors.accentMint : theme.colors.textPrimary}
+        color={selected ? theme.palette.acc2 : theme.colors.textPrimary}
         style={{ fontSize: 13 }}
       >
         {day}

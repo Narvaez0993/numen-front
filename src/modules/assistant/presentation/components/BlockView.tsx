@@ -18,24 +18,27 @@ import { FormattedText } from './FormattedText';
 import { MiniBarChart } from './MiniBarChart';
 import { RichStat } from './RichStat';
 
-type DraftHandlers = {
+export type DraftHandlers = {
   onConfirm: (draft: MovementDraft, overrides?: DraftOverrides) => void;
   onEdit: (draft: MovementDraft) => void;
   onDiscard: (draft: MovementDraft) => void;
   busyDraftId: string | null;
 };
 
-type DebtDraftHandlers = {
+export type DebtDraftHandlers = {
   today: string;
   onConfirm: (draft: DebtDraft, overrides?: DebtDraftOverrides) => void;
   onDiscard: (draft: DebtDraft) => void;
   busyDraftId: string | null;
 };
 
-type Props = {
-  block: AssistantBlock;
+export type BlockHandlers = {
   draftHandlers?: DraftHandlers;
   debtDraftHandlers?: DebtDraftHandlers;
+};
+
+type Props = BlockHandlers & {
+  block: AssistantBlock;
 };
 
 /** One agent block → the component that already knew how to draw it. */

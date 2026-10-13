@@ -1,22 +1,30 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { OnbHeader } from '@/modules/onboarding/presentation/components/OnbHeader';
-import { OnbPage } from '@/modules/onboarding/presentation/components/OnbPage';
-import { Wordmark } from '@/modules/onboarding/presentation/components/Wordmark';
+import { OnbFrame } from '@/modules/onboarding/presentation/components/OnbFrame';
+import { OnbHeadline } from '@/modules/onboarding/presentation/components/OnbHeadline';
+import { OnbTopBar } from '@/modules/onboarding/presentation/components/OnbTopBar';
+import { SocialSignIn } from '@/modules/onboarding/presentation/components/SocialSignIn';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
 import type { DomainError } from '@/shared/domain';
+import { Text, Toast } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 
 import { CredentialsForm } from '../components/CredentialsForm';
 import { useLogin } from '../hooks/useLogin';
 
+/**
+ * Coming back: «Qué gusto verte de nuevo». The design draws it as the same
+ * screen as creating the account, told to someone it already knows — so it is
+ * the same layout with its own title, and the way to an account at the bottom.
+ */
 export function LoginScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [pendingEmail, setPendingEmail] = useState('');
+  const [soon, setSoon] = useState(false);
 
   const login = useLogin({
     onSuccess: (session) => {
@@ -62,41 +70,9 @@ export function LoginScreen() {
   };
 
   return (
-    <OnbPage paddingTop={14} paddingHorizontal={22} paddingBottom={24}>
-      <OnbHeader onBack={goBack} />
-
-      <View style={{ height: 22 }} />
-      <View style={{ alignItems: 'center', marginBottom: 28 }}>
-        <Wordmark size={22} />
-      </View>
-
-      <View style={{ alignItems: 'center', maxWidth: 320, alignSelf: 'center' }}>
-        <Text
-          style={{
-            fontSize: 26,
-            fontFamily: 'Geist_500Medium',
-            color: theme.colors.textPrimary,
-            letterSpacing: -0.52,
-            marginBottom: 10,
-            textAlign: 'center',
-          }}
-        >
-          {t('auth.login.title')}
-        </Text>
-        <Text
-          style={{
-            fontSize: 14,
-            color: theme.colors.textSecondary,
-            lineHeight: 20,
-            textAlign: 'center',
-            fontFamily: 'Geist_400Regular',
-          }}
-        >
-          {t('auth.login.subtitle')}
-        </Text>
-      </View>
-
-      <View style={{ height: 40 }} />
+    <OnbFrame scroll>
+      <OnbTopBar onBack={goBack} label={t('auth.login.label')} />
+      <OnbHeadline i18nKey="auth.login.title" body={t('auth.login.subtitle')} />
 
       <CredentialsForm
         onSubmit={(values) => {
@@ -105,60 +81,43 @@ export function LoginScreen() {
           login.mutate({ email: values.email.trim(), password: values.password });
         }}
         submitLabel={t('auth.login.submit')}
-        submittingLabel={t('auth.login.submitting')}
         loading={login.isPending}
+        formError={errorMessage}
         passwordPlaceholder={t('auth.login.passwordPlaceholder')}
         passwordAutoComplete="current-password"
+        between={<SocialSignIn onPress={() => setSoon(true)} />}
+        footnote={
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 5,
+              minHeight: 44,
+              marginTop: 6,
+            }}
+          >
+            <Text color={theme.colors.textTertiary} style={{ fontSize: 12.5 }}>
+              {t('auth.login.noAccount')}
+            </Text>
+            <Pressable accessibilityRole="button" onPress={createAccount} hitSlop={10}>
+              <Text
+                color={theme.palette.acc3}
+                style={{ fontSize: 12.5, fontWeight: '500' }}
+              >
+                {t('auth.login.createAccount')}
+              </Text>
+            </Pressable>
+          </View>
+        }
       />
 
-      {errorMessage ? (
-        <Text
-          style={{
-            fontSize: 12.5,
-            color: theme.colors.accentCoral,
-            fontFamily: 'Geist_400Regular',
-            textAlign: 'center',
-            marginTop: 12,
-          }}
-        >
-          {errorMessage}
-        </Text>
-      ) : null}
-
-      <View style={{ flex: 1 }} />
-
-      <View style={styles.footer}>
-        <Text
-          style={{
-            fontSize: 12.5,
-            color: theme.colors.textSecondary,
-            fontFamily: 'Geist_400Regular',
-          }}
-        >
-          {t('auth.login.noAccount')}
-        </Text>
-        <Text
-          onPress={createAccount}
-          style={{
-            fontSize: 12.5,
-            color: theme.colors.accentMint,
-            fontFamily: 'Geist_500Medium',
-          }}
-        >
-          {t('auth.login.createAccount')}
-        </Text>
-      </View>
-    </OnbPage>
+      <Toast
+        visible={soon}
+        message={t('auth.social.comingSoon')}
+        onDismiss={() => setSoon(false)}
+        durationMs={2500}
+      />
+    </OnbFrame>
   );
 }
-
-const styles = StyleSheet.create({
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 5,
-    marginTop: 16,
-    marginBottom: 12,
-  },
-});

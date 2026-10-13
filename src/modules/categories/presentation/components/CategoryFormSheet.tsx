@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Alert,
   Pressable,
   ScrollView,
   type TextInput as TextInputType,
@@ -12,9 +11,10 @@ import {
 import type { AccentColor } from '@/shared/domain';
 import {
   BottomSheet,
-  Button,
   Icon,
   type IconName,
+  SheetDangerAction,
+  SheetHeaderButton,
   Text,
 } from '@/shared/presentation/components';
 import {
@@ -22,6 +22,7 @@ import {
   CATEGORY_ICON_OPTIONS,
 } from '@/shared/presentation/constants/categoryOptions';
 import { accentColorKey, useTheme } from '@/shared/presentation/theme';
+import { withAlpha } from '@/shared/presentation/theme/tokens';
 
 import type { Category, CategoryFlow } from '../../domain';
 
@@ -45,6 +46,19 @@ type Props = {
 
 const FLOWS: readonly CategoryFlow[] = ['expense', 'income'];
 
+/**
+ * Naming a category.
+ *
+ * Restyled to the app's one vocabulary: the header carries the title and the
+ * destructive action, the switch is the same one the manual capture uses, and
+ * choosing something is the accent at 15% rather than a two-pixel ring in a
+ * different colour per row.
+ *
+ * The preview at the top is now **exactly how the row will look** — a
+ * monochrome well with the icon in the accent. It used to preview the category's
+ * own colour, which was an honest preview of the old design and a promise the
+ * new one does not keep.
+ */
 export function CategoryFormSheet({
   visible,
   initial,
@@ -76,114 +90,110 @@ export function CategoryFormSheet({
   }, [visible, initial]);
 
   const valid = name.trim().length >= 2;
-  const previewBg = theme.colors[accentColorKey(color, 'bg')];
-  const previewFg = theme.colors[accentColorKey(color, 'fg')];
 
   const handleSubmit = () => {
     if (!valid || submitting) return;
     onSubmit({ name: name.trim(), icon: String(icon), color, flow });
   };
 
-  const confirmDelete = () => {
-    if (!onDelete) return;
-    Alert.alert(
-      t('categories.form.deleteConfirm.title'),
-      t('categories.form.deleteConfirm.body'),
-      [
-        { text: t('categories.form.deleteConfirm.cancel'), style: 'cancel' },
-        {
-          text: t('categories.form.deleteConfirm.confirm'),
-          style: 'destructive',
-          onPress: onDelete,
-        },
-      ],
-    );
-  };
-
   return (
-    <BottomSheet visible={visible} onClose={onClose} maxHeight="90%">
+    <BottomSheet visible={visible} onClose={onClose} maxHeight="90%" showClose={false}>
       <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 22,
-          paddingTop: 8,
-          paddingBottom: 26,
-        }}
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 26 }}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <View style={{ paddingTop: 8, paddingBottom: 16, paddingRight: 40 }}>
-          <Text variant="h1" style={{ fontSize: 19, marginBottom: 8 }}>
-            {isEdit ? t('categories.form.editTitle') : t('categories.form.createTitle')}
-          </Text>
-          <Text
-            variant="body"
-            color={theme.colors.textSecondary}
-            style={{ fontSize: 13, lineHeight: 18.9 }}
-          >
-            {t('categories.form.subtitle')}
-          </Text>
-        </View>
-
-        {/* Preview */}
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             gap: 12,
-            paddingVertical: 14,
-            paddingHorizontal: 14,
-            backgroundColor: theme.colors.bgFloat,
-            borderWidth: 1,
-            borderColor: theme.colors.borderSubtle,
-            borderRadius: 14,
-            marginBottom: 18,
+            paddingHorizontal: 20,
+            paddingTop: 8,
           }}
         >
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: previewBg,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Icon name={icon} size={19} color={previewFg} stroke={1.8} />
-          </View>
-          <Text variant="bodyLarge" style={{ flex: 1, fontSize: 14.5 }} numberOfLines={1}>
-            {name.trim() || t('categories.form.previewPlaceholder')}
+          <SheetHeaderButton icon="x" label={t('common.close')} onPress={onClose} />
+          <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, fontWeight: '500' }}>
+            {isEdit ? t('categories.form.editTitle') : t('categories.form.createTitle')}
           </Text>
+          {isEdit && onDelete ? (
+            <SheetDangerAction
+              label={t('categories.form.delete')}
+              confirmLabel={t('categories.form.deleteConfirm.confirm')}
+              onConfirm={onDelete}
+            />
+          ) : null}
         </View>
 
-        {/* Flow toggle (create only — flow is fixed after creation) */}
+        {/* What the row will actually look like. */}
+        <View style={{ paddingHorizontal: 22, paddingTop: 20 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              paddingVertical: 14,
+              paddingHorizontal: 14,
+              backgroundColor: theme.colors.bgSurface,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              borderRadius: 16,
+            }}
+          >
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 14,
+                backgroundColor: withAlpha(theme.palette.acc, 0.14),
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon name={icon} size={19} stroke={1.8} color={theme.palette.acc2} />
+            </View>
+            <Text numberOfLines={1} style={{ flex: 1, fontSize: 14.5 }}>
+              {name.trim() || t('categories.form.previewPlaceholder')}
+            </Text>
+          </View>
+        </View>
+
+        {/* Flow is fixed after creation — a category that changes side would
+            rewrite what every movement on it meant. */}
         {!isEdit ? (
-          <View style={{ marginBottom: 18 }}>
+          <View style={{ paddingHorizontal: 22, paddingTop: 18 }}>
             <FieldLabel>{t('categories.form.flowLabel')}</FieldLabel>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 6,
+                padding: 3,
+                borderRadius: 14,
+                backgroundColor: theme.colors.bgSurface,
+              }}
+            >
               {FLOWS.map((f) => {
                 const active = f === flow;
                 return (
                   <Pressable
                     key={f}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
                     onPress={() => setFlow(f)}
-                    style={{
+                    style={({ pressed }) => ({
                       flex: 1,
-                      paddingVertical: 11,
-                      borderRadius: 11,
                       alignItems: 'center',
-                      backgroundColor: active ? theme.colors.bgFloat : 'transparent',
-                      borderWidth: active ? 2 : 1,
-                      borderColor: active
-                        ? theme.colors.accentMint
-                        : theme.colors.borderSubtle,
-                    }}
+                      paddingVertical: 8,
+                      borderRadius: 11,
+                      backgroundColor: active ? theme.colors.bgElevated : 'transparent',
+                      opacity: pressed ? 0.8 : 1,
+                    })}
                   >
                     <Text
-                      variant="label"
                       color={
-                        active ? theme.colors.textPrimary : theme.colors.textSecondary
+                        active ? theme.colors.textPrimary : theme.colors.textTertiary
                       }
-                      style={{ fontSize: 13 }}
+                      style={{ fontSize: 12.5, fontWeight: '500' }}
                     >
                       {t(`categories.form.flow.${f}`)}
                     </Text>
@@ -194,8 +204,7 @@ export function CategoryFormSheet({
           </View>
         ) : null}
 
-        {/* Name */}
-        <View style={{ marginBottom: 6 }}>
+        <View style={{ paddingHorizontal: 22, paddingTop: 18 }}>
           <FieldLabel>{t('categories.form.nameLabel')}</FieldLabel>
           <TextInput
             ref={inputRef}
@@ -206,37 +215,33 @@ export function CategoryFormSheet({
             placeholder={t('categories.form.namePlaceholder')}
             placeholderTextColor={theme.colors.textTertiary}
             maxLength={24}
+            selectionColor={theme.palette.acc}
             onSubmitEditing={handleSubmit}
             style={{
-              backgroundColor: theme.colors.bgFloat,
+              backgroundColor: theme.colors.bgSurface,
               borderWidth: 1,
               borderColor: errorMessage
                 ? theme.colors.accentCoral
                 : focused
-                  ? theme.colors.accentMint
+                  ? withAlpha(theme.palette.acc, 0.4)
                   : theme.colors.borderSubtle,
-              borderRadius: 12,
-              paddingHorizontal: 14,
-              paddingVertical: 12,
-              fontSize: 14,
+              borderRadius: 16,
+              paddingHorizontal: 16,
+              paddingVertical: 13,
+              minHeight: 44,
+              fontSize: 13.5,
               color: theme.colors.textPrimary,
               fontFamily: 'Geist_400Regular',
             }}
           />
-        </View>
-        <View style={{ minHeight: 18, marginBottom: 12 }}>
           {errorMessage ? (
-            <Text
-              variant="caption"
-              style={{ color: theme.colors.accentCoral, fontSize: 12 }}
-            >
+            <Text color={theme.colors.accentCoral} style={{ fontSize: 12, marginTop: 8 }}>
               {errorMessage}
             </Text>
           ) : null}
         </View>
 
-        {/* Icon grid */}
-        <View style={{ marginBottom: 18 }}>
+        <View style={{ paddingHorizontal: 22, paddingTop: 18 }}>
           <FieldLabel>{t('categories.form.iconLabel')}</FieldLabel>
           <View style={{ gap: 8 }}>
             {[0, 1].map((row) => (
@@ -246,23 +251,30 @@ export function CategoryFormSheet({
                   return (
                     <Pressable
                       key={ic}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active }}
                       onPress={() => setIcon(ic as IconName)}
-                      style={{
+                      style={({ pressed }) => ({
                         flex: 1,
                         aspectRatio: 1,
-                        backgroundColor: active ? theme.colors.bgFloat : 'transparent',
-                        borderWidth: active ? 2 : 1,
-                        borderColor: active ? previewFg : theme.colors.borderSubtle,
-                        borderRadius: 11,
+                        borderRadius: 14,
                         alignItems: 'center',
                         justifyContent: 'center',
-                      }}
+                        backgroundColor: active
+                          ? withAlpha(theme.palette.acc, 0.15)
+                          : theme.colors.bgSurface,
+                        borderWidth: 1,
+                        borderColor: active
+                          ? withAlpha(theme.palette.acc, 0.3)
+                          : theme.colors.borderSubtle,
+                        opacity: pressed ? 0.8 : 1,
+                      })}
                     >
                       <Icon
                         name={ic as IconName}
                         size={17}
-                        color={active ? previewFg : theme.colors.textSecondary}
                         stroke={1.8}
+                        color={active ? theme.palette.acc2 : theme.colors.textSecondary}
                       />
                     </Pressable>
                   );
@@ -272,30 +284,40 @@ export function CategoryFormSheet({
           </View>
         </View>
 
-        {/* Color picker */}
-        <View style={{ marginBottom: 22 }}>
+        {/* The colour is stored but no longer drawn anywhere in the redesign —
+            every well in the app is the accent now. Kept because removing a
+            field is not a styling decision. */}
+        <View style={{ paddingHorizontal: 22, paddingTop: 18 }}>
           <FieldLabel>{t('categories.form.colorLabel')}</FieldLabel>
           <View style={{ flexDirection: 'row', gap: 10 }}>
             {CATEGORY_COLOR_OPTIONS.map((col) => {
               const active = col === color;
-              const swatchFg = theme.colors[accentColorKey(col, 'fg')];
+              const swatch = theme.colors[accentColorKey(col, 'fg')];
               return (
                 <Pressable
                   key={col}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
                   onPress={() => setColor(col)}
-                  style={{
+                  style={({ pressed }) => ({
                     width: 38,
                     height: 38,
                     borderRadius: 19,
-                    backgroundColor: swatchFg,
+                    backgroundColor: swatch,
                     borderWidth: 2,
                     borderColor: active ? theme.colors.textPrimary : 'transparent',
                     alignItems: 'center',
                     justifyContent: 'center',
-                  }}
+                    opacity: pressed ? 0.8 : 1,
+                  })}
                 >
                   {active ? (
-                    <Icon name="check" size={15} color="#0A0E1A" stroke={2.4} />
+                    <Icon
+                      name="check"
+                      size={15}
+                      stroke={2.4}
+                      color={theme.colors.bgBase}
+                    />
                   ) : null}
                 </Pressable>
               );
@@ -303,34 +325,26 @@ export function CategoryFormSheet({
           </View>
         </View>
 
-        <Button
-          full
-          label={isEdit ? t('categories.form.saveEdit') : t('categories.form.saveCreate')}
-          disabled={!valid}
-          loading={submitting}
-          onPress={handleSubmit}
-        />
-
-        {isEdit && onDelete ? (
+        <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
           <Pressable
             accessibilityRole="button"
-            onPress={confirmDelete}
+            accessibilityState={{ disabled: !valid || submitting }}
+            onPress={handleSubmit}
+            disabled={!valid || submitting}
             style={({ pressed }) => ({
+              minHeight: 52,
               alignItems: 'center',
-              paddingVertical: 12,
-              marginTop: 4,
-              opacity: pressed ? 0.6 : 1,
+              justifyContent: 'center',
+              borderRadius: 18,
+              backgroundColor: theme.colors.textPrimary,
+              opacity: !valid || submitting ? 0.4 : pressed ? 0.9 : 1,
             })}
           >
-            <Text
-              variant="label"
-              color={theme.colors.accentCoral}
-              style={{ fontSize: 13 }}
-            >
-              {t('categories.form.delete')}
+            <Text color={theme.colors.bgBase} style={{ fontSize: 14, fontWeight: '600' }}>
+              {isEdit ? t('categories.form.saveEdit') : t('categories.form.saveCreate')}
             </Text>
           </Pressable>
-        ) : null}
+        </View>
       </ScrollView>
     </BottomSheet>
   );
@@ -338,12 +352,13 @@ export function CategoryFormSheet({
 
 function FieldLabel({ children }: { children: string }) {
   const { theme } = useTheme();
+
   return (
     <Text
       variant="micro"
-      color={theme.colors.textTertiary}
       uppercase
-      style={{ fontSize: 10.5, letterSpacing: 1.05, marginBottom: 8, fontWeight: '500' }}
+      color={theme.colors.textTertiary}
+      style={{ letterSpacing: 2.2, marginBottom: 9 }}
     >
       {children}
     </Text>

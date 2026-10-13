@@ -1,131 +1,116 @@
-import { router } from 'expo-router';
-import { useMemo } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PanResponder, View } from 'react-native';
+import { Pressable, useWindowDimensions, View } from 'react-native';
+import { useReducedMotion, useSharedValue } from 'react-native-reanimated';
 
-import { Text } from '@/shared/presentation/components';
+import { InkButton, Text } from '@/shared/presentation/components';
+import { useTheme } from '@/shared/presentation/theme';
 
-import { CircleHero } from '../components/CircleHero';
-import { DotsIndicator } from '../components/DotsIndicator';
-import { OnbCTA } from '../components/OnbCTA';
-import { OnbPage } from '../components/OnbPage';
-import { OnbTextLink } from '../components/OnbTextLink';
-import { OrbitalHero } from '../components/OrbitalHero';
-import { SkipLink } from '../components/SkipLink';
-import { Wordmark } from '../components/Wordmark';
-import type { AuthStep } from '../hooks/flowTransitions';
+import { OnbFrame } from '../components/OnbFrame';
+import { TypedGreeting } from '../components/TypedGreeting';
+import { WelcomeDemo } from '../components/WelcomeDemo';
+import { WelcomeOrb } from '../components/WelcomeOrb';
 
 type Props = {
-  idx: 0 | 1 | 2;
-  onAdvance: (next: AuthStep) => void;
+  onStart: () => void;
+  onHaveAccount: () => void;
 };
 
-export function WelcomeScreen({ idx, onAdvance }: Props) {
+/**
+ * «Hola. Soy Deshka.» — and then it shows what it does, instead of saying it.
+ *
+ * The orb speaks: the greeting types itself out, and a phrase arrives word by
+ * word and becomes the movement it records, over and over — a purchase, a
+ * salary, a loan. The first screen used to be a still orb over empty space
+ * explaining the idea in a paragraph.
+ *
+ * It has to run on the cheapest phone that installs the app, so the work is
+ * split by cost. Everything that moves all the time is the orb's, on the UI
+ * thread, composited from cached layers (see `WelcomeOrb`). React state lives
+ * in two small pieces — the greeting's letters and the demo's steps — and this
+ * screen renders twice: on mount and when the greeting hands over to the demo.
+ *
+ * The design's button starts a first expense right here, before any account.
+ * Deshka creates the account first (HU-01), so this one starts that, and the
+ * first real expense comes at the end of the setup, where it can be saved.
+ */
+export function WelcomeScreen({ onStart, onHaveAccount }: Props) {
+  const { theme } = useTheme();
   const { t } = useTranslation();
+  const { height } = useWindowDimensions();
+  const still = useReducedMotion();
+  // Short screens — most low-cost Androids, an iPhone SE or mini — get the
+  // compact sizes, so the whole welcome fits without scrolling.
+  const compact = height < 820;
 
-  const titleKey = `onboarding.welcome.title${idx + 1}` as const;
-  const subtitleKey = `onboarding.welcome.subtitle${idx + 1}` as const;
-
-  const next = (): AuthStep => {
-    if (idx === 0) return 'welcome2';
-    if (idx === 1) return 'welcome3';
-    return 'account';
-  };
-  const prev = (): AuthStep | null => {
-    if (idx === 0) return null;
-    if (idx === 1) return 'welcome1';
-    return 'welcome2';
-  };
-
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gesture) =>
-          Math.abs(gesture.dx) > 18 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
-        onPanResponderRelease: (_, gesture) => {
-          if (Math.abs(gesture.dx) < 40) return;
-          if (gesture.dx < 0) onAdvance(next());
-          else {
-            const back = prev();
-            if (back) onAdvance(back);
-          }
-        },
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [idx, onAdvance],
-  );
+  const talk = useSharedValue(0);
+  const burst = useSharedValue(1);
+  const [demoStarted, setDemoStarted] = useState(false);
+  const startDemo = useCallback(() => setDemoStarted(true), []);
 
   return (
-    <OnbPage paddingTop={16} paddingHorizontal={20} paddingBottom={24}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingVertical: 2,
-        }}
-      >
-        <Wordmark size={17} />
-        <SkipLink onPress={() => onAdvance('account')} label={t('onboarding.skip')} />
-      </View>
+    <OnbFrame>
+      <View style={{ height: compact ? 4 : 36 }} />
+      <WelcomeOrb talk={talk} burst={burst} compact={compact} still={still} />
 
-      <View
-        {...panResponder.panHandlers}
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingHorizontal: 8,
-          paddingVertical: 20,
-        }}
-      >
-        <View style={{ marginBottom: 38 }}>
-          {idx === 0 ? (
-            <OrbitalHero />
-          ) : idx === 1 ? (
-            <CircleHero icon="microphone" color="mint" />
-          ) : (
-            <CircleHero icon="sparkles" color="purple" />
-          )}
-        </View>
+      <View style={{ paddingHorizontal: 30, paddingTop: compact ? 14 : 26 }}>
+        <TypedGreeting
+          i18nKey="onboarding.welcome.title"
+          size={compact ? 30 : 33}
+          onDone={startDemo}
+          still={still}
+        />
         <Text
-          variant="display"
+          color={theme.colors.textSecondary}
           style={{
-            fontSize: 30,
-            lineHeight: 35,
-            letterSpacing: -0.9,
-            textAlign: 'center',
-            marginBottom: 14,
+            fontSize: compact ? 14 : 15,
+            lineHeight: compact ? 22 : 24,
+            marginTop: compact ? 8 : 12,
           }}
         >
-          {t(titleKey)}
+          {t('onboarding.welcome.body')}
         </Text>
-        <Text
-          variant="body"
-          muted
-          style={{
-            fontSize: 14.5,
-            lineHeight: 22,
-            textAlign: 'center',
-            maxWidth: 280,
-          }}
-        >
-          {t(subtitleKey)}
-        </Text>
-        <View style={{ marginTop: 28 }}>
-          <DotsIndicator total={3} current={idx} />
-        </View>
       </View>
 
-      <View>
-        <OnbCTA onPress={() => onAdvance(next())}>{t('onboarding.welcome.start')}</OnbCTA>
-        <OnbTextLink
-          onPress={() => router.push('/(auth)/login')}
-          style={{ marginTop: 6 }}
-        >
-          {t('onboarding.welcome.haveAccount')}
-        </OnbTextLink>
+      {/* Allowed to shrink, and clipped if it must: on the shortest screen the
+          demo loses its bottom edge before the button loses its place. */}
+      <View
+        style={{
+          paddingHorizontal: 30,
+          paddingTop: compact ? 18 : 26,
+          flexShrink: 1,
+          overflow: 'hidden',
+        }}
+      >
+        <WelcomeDemo
+          start={demoStarted}
+          talk={talk}
+          burst={burst}
+          compact={compact}
+          still={still}
+        />
       </View>
-    </OnbPage>
+
+      <View style={{ flex: 1 }} />
+
+      <View style={{ paddingHorizontal: 22, paddingBottom: 8 }}>
+        <InkButton label={t('onboarding.welcome.start')} onPress={onStart} height={56} />
+        <Pressable
+          accessibilityRole="button"
+          onPress={onHaveAccount}
+          style={({ pressed }) => ({
+            minHeight: 48,
+            marginTop: 4,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text color={theme.colors.textSecondary} style={{ fontSize: 13 }}>
+            {t('onboarding.welcome.haveAccount')}
+          </Text>
+        </Pressable>
+      </View>
+    </OnbFrame>
   );
 }

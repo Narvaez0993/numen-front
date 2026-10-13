@@ -2,18 +2,21 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useAuthStore } from '@/modules/auth/presentation';
+import { useTier } from '@/modules/plan/presentation/hooks/useTier';
+import { useBudgets } from '@/modules/budgets/presentation/hooks/useBudgets';
 import { useMovementsSummary } from '@/modules/movements/presentation/hooks/useMovementsSummary';
+import type { CurrencyCode } from '@/shared/domain';
 import {
+  Aurora,
+  DashedButton,
   Icon,
   RetryState,
-  SectionLabel,
-  SubScreenHeader,
   Text,
   Toast,
 } from '@/shared/presentation/components';
+import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { useTheme } from '@/shared/presentation/theme';
 import { monthRange, toIsoDate } from '@/shared/presentation/utils/dates';
 
@@ -25,8 +28,6 @@ import {
 } from '../components/CategoryFormSheet';
 import { CategoryRow } from '../components/CategoryRow';
 import { CategorySearchBar } from '../components/CategorySearchBar';
-import { CustomCategoriesUpsell } from '../components/CustomCategoriesUpsell';
-import { ThisMonthCard } from '../components/ThisMonthCard';
 import { useCategories } from '../hooks/useCategories';
 import { useCreateCategory } from '../hooks/useCreateCategory';
 import { useDeleteCategory } from '../hooks/useDeleteCategory';
@@ -38,14 +39,34 @@ const FREE_CUSTOM_LIMIT = 2;
 
 type Sheet = { mode: 'create' } | { mode: 'edit'; category: Category };
 
+/**
+ * Every category, and what each one cost this month.
+ *
+ * The redesign folded two lists into one. It used to separate standard from
+ * custom, which is a fact about where a category CAME FROM and no help at all
+ * in answering the question the screen is opened with — what am I spending on.
+ * Now it is one list ordered by that, with the untouched ones stepping back at
+ * the end.
+ *
+ * The plan's capacity moved too, and this is the design's own answer to
+ * something that was wrong everywhere: it is stated calmly UNDER the create
+ * button, before you press it. The gate used to fire afterwards, as an error,
+ * about a rule that had not changed since you opened the screen.
+ */
 export function CategoriesScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const currency = useCurrencyStore((s) => s.currency) as CurrencyCode;
+
   const { data, isLoading, isError, refetch } = useCategories();
   // The month is pinned once per mount: a re-render must not move the range.
-  const month = useMemo(() => monthRange(toIsoDate(new Date())), []);
+  const today = useMemo(() => toIsoDate(new Date()), []);
+  const month = useMemo(() => monthRange(today), [today]);
   const summary = useMovementsSummary(month);
-  const tier = useAuthStore((s) => s.session?.tier);
+  // Only for the caps in each row's subtitle — the numbers themselves come from
+  // the summary, exactly as Presupuesto reads them.
+  const budgets = useBudgets(today);
 
   const [query, setQuery] = useState('');
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -63,28 +84,27 @@ export function CategoriesScreen() {
     [data, summary.data],
   );
 
-  const standard = useMemo(
-    () =>
-      [
-        ...filterCategories(
-          query,
-          categories.filter((c) => c.isStandard),
-        ),
-      ].sort((a, b) => b.spent - a.spent),
-    [query, categories],
-  );
+  const capsByCategory = useMemo(() => {
+    const caps: Record<string, { target: number; over: boolean }> = {};
+    for (const cap of budgets.data?.categories ?? []) {
+      caps[cap.categoryId] = { target: cap.target, over: cap.remaining < 0 };
+    }
+    return caps;
+  }, [budgets.data]);
 
-  const custom = useMemo(
-    () =>
-      filterCategories(
-        query,
-        categories.filter((c) => !c.isStandard),
-      ),
-    [query, categories],
-  );
+  /** Most spent first; anything untouched falls to the end, alphabetical. */
+  const shown = useMemo(() => {
+    const list = filterCategories(query, categories);
+    return [...list].sort((a, b) => {
+      if (a.count > 0 !== b.count > 0) return a.count > 0 ? -1 : 1;
+      if (a.count > 0) return b.spent - a.spent;
+      return a.name.localeCompare(b.name);
+    });
+  }, [query, categories]);
 
   const customCount = categories.filter((c) => !c.isStandard).length;
-  const atLimit = tier !== 'plus' && customCount >= FREE_CUSTOM_LIMIT;
+  const isPlus = useTier() === 'plus';
+  const atLimit = !isPlus && customCount >= FREE_CUSTOM_LIMIT;
   const submitting = create.isPending || update.isPending;
 
   const closeSheet = () => {
@@ -110,9 +130,9 @@ export function CategoriesScreen() {
         },
         { onSuccess: closeSheet, onError: handleFormError },
       );
-    } else {
-      create.mutate(values, { onSuccess: closeSheet, onError: handleFormError });
+      return;
     }
+    create.mutate(values, { onSuccess: closeSheet, onError: handleFormError });
   };
 
   const handleDelete = () => {
@@ -129,7 +149,6 @@ export function CategoriesScreen() {
         edges={['top']}
         style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
       >
-        <SubScreenHeader title={t('categories.title')} onBack={() => router.back()} />
         <RetryState
           titleKey="categories.error.title"
           retryKey="categories.error.retry"
@@ -152,124 +171,139 @@ export function CategoriesScreen() {
           justifyContent: 'center',
         }}
       >
-        <ActivityIndicator color={theme.colors.accentMint} />
+        <ActivityIndicator color={theme.palette.acc} />
       </SafeAreaView>
     );
   }
 
-  const groupBox = {
-    backgroundColor: theme.colors.bgSurface,
-    borderColor: theme.colors.borderSubtle,
-    borderWidth: 1,
-    borderRadius: 16,
-    overflow: 'hidden' as const,
-  };
-
   return (
-    <SafeAreaView
-      edges={['top']}
-      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
-    >
-      <SubScreenHeader title={t('categories.title')} onBack={() => router.back()} />
+    <Aurora>
       <ScrollView
+        // The clock keeps its own strip: starting the scroll below it is what
+        // stops the content from sliding under the time.
+        style={{ marginTop: insets.top }}
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 8,
-          paddingBottom: 32,
+          paddingTop: 16,
+          paddingBottom: insets.bottom + 26,
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <ThisMonthCard
-          // The month total, unclassified spend included, so it matches Home.
-          totalSpent={summary.data?.expenseTotal ?? 0}
-          activeCount={categories.filter((c) => c.count > 0).length}
-          totalCount={categories.length}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            paddingHorizontal: 22,
+          }}
+        >
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back')}
+            onPress={() => router.back()}
+            style={({ pressed }) => ({
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.colors.bgFloat,
+              borderWidth: 1,
+              borderColor: theme.colors.borderSubtle,
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <Icon
+              name="arrow-left"
+              size={16}
+              stroke={2}
+              color={theme.colors.textSecondary}
+            />
+          </Pressable>
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>{t('categories.title')}</Text>
+        </View>
 
-        <CategorySearchBar value={query} onChange={setQuery} />
+        <View style={{ paddingHorizontal: 22, paddingTop: 20 }}>
+          <CategorySearchBar value={query} onChange={setQuery} />
+        </View>
 
-        <SectionLabel style={{ marginBottom: 10 }}>
-          {t('categories.groups.standard', { count: standard.length })}
-        </SectionLabel>
-        <View style={[groupBox, { marginBottom: 18 }]}>
-          {standard.length === 0 ? (
-            <View style={{ paddingHorizontal: 16, paddingVertical: 32 }}>
-              <Text variant="body" muted style={{ fontSize: 13, textAlign: 'center' }}>
-                {t('categories.empty')}
-              </Text>
-            </View>
+        <View style={{ paddingHorizontal: 26, paddingTop: 2 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              marginBottom: 8,
+              gap: 12,
+            }}
+          >
+            <Text
+              variant="micro"
+              uppercase
+              color={theme.colors.textTertiary}
+              style={{ letterSpacing: 2.2 }}
+            >
+              {t('categories.list.label')}
+            </Text>
+            <Text color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
+              {t('categories.list.period')}
+            </Text>
+          </View>
+
+          {shown.length === 0 ? (
+            <Text
+              color={theme.colors.textTertiary}
+              style={{ fontSize: 13, paddingVertical: 26, textAlign: 'center' }}
+            >
+              {t('categories.empty')}
+            </Text>
           ) : (
-            standard.map((category, i) => (
+            shown.map((category, index) => (
               <CategoryRow
                 key={category.id}
                 category={category}
-                last={i === standard.length - 1}
+                target={capsByCategory[category.id]?.target}
+                over={capsByCategory[category.id]?.over}
+                currency={currency}
+                last={index === shown.length - 1}
+                // Only the user's own can be renamed; a standard one is a fixed
+                // part of the catalog and a tap that opened an uneditable form
+                // would be a promise the sheet cannot keep.
+                onPress={
+                  category.isStandard
+                    ? undefined
+                    : () => {
+                        setFormError(null);
+                        setSheet({ mode: 'edit', category });
+                      }
+                }
               />
             ))
           )}
         </View>
 
-        <SectionLabel style={{ marginBottom: 10 }}>
-          {t('categories.groups.custom')}
-        </SectionLabel>
-
-        {custom.length > 0 ? (
-          <View style={[groupBox, { marginBottom: 10 }]}>
-            {custom.map((category, i) => (
-              <CategoryRow
-                key={category.id}
-                category={category}
-                last={i === custom.length - 1}
-                onPress={() => {
-                  setFormError(null);
-                  setSheet({ mode: 'edit', category });
-                }}
-              />
-            ))}
-          </View>
-        ) : null}
-
-        {atLimit ? (
-          <CustomCategoriesUpsell />
-        ) : (
-          <Pressable
-            accessibilityRole="button"
+        <View style={{ paddingHorizontal: 24, paddingTop: 18 }}>
+          <DashedButton
+            label={t('categories.custom.createButton')}
             onPress={() => {
               setFormError(null);
               setSheet({ mode: 'create' });
             }}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              paddingVertical: 13,
-              borderRadius: 14,
-              borderWidth: 1,
-              borderStyle: 'dashed',
-              borderColor: theme.colors.borderSubtle,
-              opacity: pressed ? 0.7 : 1,
-            })}
+          />
+          {/* Said before you press, not after. The gate used to fire as an error
+              about a rule that had not changed since the screen opened. */}
+          <Text
+            color={atLimit ? theme.colors.accentCoralSoft : theme.colors.textTertiary}
+            style={{ fontSize: 11, textAlign: 'center', marginTop: 10 }}
           >
-            <Icon name="plus" size={16} color={theme.colors.accentMint} />
-            <Text
-              variant="label"
-              color={theme.colors.accentMint}
-              style={{ fontSize: 13 }}
-            >
-              {t('categories.custom.createButton')}
-            </Text>
-          </Pressable>
-        )}
-
-        <Text
-          variant="caption"
-          muted
-          style={{ fontSize: 11, lineHeight: 16, textAlign: 'center', marginTop: 18 }}
-        >
-          {t('categories.footer')}
-        </Text>
+            {isPlus
+              ? t('categories.capacity.plus', { count: customCount })
+              : t('categories.capacity.free', {
+                  count: customCount,
+                  limit: FREE_CUSTOM_LIMIT,
+                })}
+          </Text>
+        </View>
       </ScrollView>
 
       <CategoryFormSheet
@@ -288,6 +322,6 @@ export function CategoriesScreen() {
         onDismiss={() => setToast(null)}
         durationMs={2500}
       />
-    </SafeAreaView>
+    </Aurora>
   );
 }

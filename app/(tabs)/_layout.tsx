@@ -37,7 +37,7 @@ export default function TabsLayout() {
         screenOptions={{
           headerShown: false,
           sceneStyle: { backgroundColor: theme.colors.bgBase },
-          tabBarActiveTintColor: theme.colors.accentMint,
+          tabBarActiveTintColor: theme.palette.acc2,
           tabBarInactiveTintColor: theme.colors.textTertiary,
         }}
       >
@@ -45,9 +45,9 @@ export default function TabsLayout() {
           name="index"
           options={{
             title: t('tabs.home'),
-            tabBarIcon: ({ color, focused }) => (
+            tabBarIcon: ({ color, size }) => (
               <View>
-                <Icon name="home" size={22} stroke={focused ? 2.2 : 1.8} color={color} />
+                <Icon name="tab-inicio" size={size} stroke={1.9} color={color} />
                 {unseen ? (
                   <View
                     style={{
@@ -57,7 +57,7 @@ export default function TabsLayout() {
                       width: 7,
                       height: 7,
                       borderRadius: 3.5,
-                      backgroundColor: theme.colors.accentMint,
+                      backgroundColor: theme.palette.acc2,
                     }}
                   />
                 ) : null}
@@ -69,13 +69,8 @@ export default function TabsLayout() {
           name="movements"
           options={{
             title: t('tabs.movements'),
-            tabBarIcon: ({ color, focused }) => (
-              <Icon
-                name="list-details"
-                size={22}
-                stroke={focused ? 2.2 : 1.8}
-                color={color}
-              />
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="tab-movimientos" size={size} stroke={1.9} color={color} />
             ),
           }}
         />
@@ -83,8 +78,8 @@ export default function TabsLayout() {
           name="budgets"
           options={{
             title: t('tabs.budgets'),
-            tabBarIcon: ({ color, focused }) => (
-              <Icon name="target" size={22} stroke={focused ? 2.2 : 1.8} color={color} />
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="tab-presupuesto" size={size} stroke={1.9} color={color} />
             ),
           }}
         />
@@ -92,18 +87,14 @@ export default function TabsLayout() {
           name="assistant"
           options={{
             title: t('tabs.assistant'),
-            tabBarIcon: ({ color, focused }) => (
-              <Icon
-                name="sparkles"
-                size={22}
-                stroke={focused ? 2.2 : 1.8}
-                color={color}
-              />
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="tab-chat" size={size} stroke={1.9} color={color} />
             ),
           }}
         />
       </Tabs>
-      {!hideFab ? <FAB onPress={openSheet} bottomOffset={clearance + 4} /> : null}
+      {!hideFab ? <FAB onPress={() => openSheet()} bottomOffset={clearance + 4} /> : null}
+
       <ExpenseSheet />
     </>
   );

@@ -60,6 +60,7 @@ type HomeOverviewResponse = {
     cap: { target: number; used: number } | null;
   }[];
   recent: MovementResponse[];
+  by_day: { day: string; spent: number }[];
   upcoming: {
     subscription_id: string;
     charge_on: string;
@@ -137,6 +138,7 @@ export class HttpHomeRepository implements HomeRepository {
               },
         topCategories: data.top_categories.map(toTopCategory),
         recent: data.recent.map(toMovement),
+        byDay: (data.by_day ?? []).map((d) => ({ day: d.day, spent: d.spent })),
         upcoming: data.upcoming.map(toUpcomingCharge),
       };
     } catch (error) {

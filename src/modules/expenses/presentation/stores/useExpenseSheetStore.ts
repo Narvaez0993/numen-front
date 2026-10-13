@@ -41,6 +41,10 @@ type State = {
   clarification: string | null;
   /** An honest one-liner for the manual form (e.g. the AI quota ran out). */
   notice: string | null;
+  /** Ids from the most recent parse, when it ADDED to a list that already had
+   *  cards. They get the accent border, which is the only way to tell what just
+   *  landed in a list you are already reading. */
+  freshIds: string[];
   /** What a capture just saved without asking — the toast's undo works off this.
    *  Survives `closeSheet`, because the toast outlives the sheet by design. */
   saved: CapturedRecord[] | null;
@@ -61,6 +65,7 @@ type State = {
   setEditing: (draft: MovementDraft | null) => void;
   setClarification: (clarification: string | null) => void;
   setNotice: (notice: string | null) => void;
+  setFreshIds: (ids: string[]) => void;
   setSaved: (saved: CapturedRecord[] | null) => void;
 };
 
@@ -75,6 +80,7 @@ export const useExpenseSheetStore = create<State>((set) => ({
   editing: null,
   clarification: null,
   notice: null,
+  freshIds: [],
   saved: null,
   openSheet: (flow = 'entry', initialType = 'expense', draft) =>
     set({
@@ -88,6 +94,7 @@ export const useExpenseSheetStore = create<State>((set) => ({
       editing: draft ?? null,
       clarification: null,
       notice: null,
+      freshIds: [],
       saved: null,
     }),
   closeSheet: () =>
@@ -102,6 +109,7 @@ export const useExpenseSheetStore = create<State>((set) => ({
       editing: null,
       clarification: null,
       notice: null,
+      freshIds: [],
     }),
   setFlow: (flow) => set({ flow }),
   setMethod: (method) => set({ method }),
@@ -117,5 +125,6 @@ export const useExpenseSheetStore = create<State>((set) => ({
   setEditing: (draft) => set({ editing: draft }),
   setClarification: (clarification) => set({ clarification }),
   setNotice: (notice) => set({ notice }),
+  setFreshIds: (freshIds) => set({ freshIds }),
   setSaved: (saved) => set({ saved }),
 }));

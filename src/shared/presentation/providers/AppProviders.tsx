@@ -1,4 +1,10 @@
-import { Geist_400Regular, Geist_500Medium, useFonts } from '@expo-google-fonts/geist';
+import {
+  Geist_300Light,
+  Geist_400Regular,
+  Geist_500Medium,
+  Geist_600SemiBold,
+  useFonts,
+} from '@expo-google-fonts/geist';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as SplashScreen from 'expo-splash-screen';
 import { ReactNode, useEffect, useState } from 'react';
@@ -24,9 +30,14 @@ export function AppProviders({ children }: Props) {
       }),
   );
 
+  // The four weights the design writes in: 300 for the big sentences, 400 for
+  // text, 500 for figures and emphasis, 600 for buttons. A weight that is not
+  // loaded does not fall back to a nearby one — it renders as 400.
   const [fontsLoaded] = useFonts({
+    Geist_300Light,
     Geist_400Regular,
     Geist_500Medium,
+    Geist_600SemiBold,
   });
 
   useEffect(() => {
