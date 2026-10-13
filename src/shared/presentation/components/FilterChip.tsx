@@ -6,7 +6,6 @@ import { useTheme } from '../theme';
 import { withAlpha } from '../theme/tokens';
 
 import { ChooseSheet, type ChooseOption } from './ChooseSheet';
-import { Icon } from './Icon';
 import { Text } from './Text';
 
 export type FilterOption = ChooseOption;
@@ -64,6 +63,9 @@ export function FilterChip({ label, value, options, onChange, allLabel }: Props)
           opacity: pressed ? 0.85 : 1,
         })}
       >
+        {/* No arrow: the design draws these as plain pills. Four of them in a
+            row already read as a set of filters, and an arrow on each one was
+            four extra marks saying the same thing. */}
         <Text
           numberOfLines={1}
           color={active ? theme.palette.acc2 : theme.colors.textSecondary}
@@ -71,11 +73,6 @@ export function FilterChip({ label, value, options, onChange, allLabel }: Props)
         >
           {displayLabel}
         </Text>
-        <Icon
-          name="chevron-down"
-          size={11}
-          color={active ? theme.palette.acc2 : theme.colors.textTertiary}
-        />
       </Pressable>
 
       <ChooseSheet

@@ -24,7 +24,7 @@
     "filters": {
       "month": "Month",
       "monthAll": "This month",
-      "account": "Source",
+      "account": "Account",
       "category": "Category",
       "type": "Type"
     },
@@ -37,7 +37,7 @@
       "title": "No movements this month",
       "hint": "Tap + to record your first expense or income"
     },
-    "transferTag": "Transfer · not an expense",
+    "transferNote": "Doesn't count as spending",
     "days": {
       "today": "today",
       "yesterday": "yesterday"
@@ -75,7 +75,7 @@
     "net": "Net"
   },
   "budgets": {
-    "title": "Budgets",
+    "title": "Budget",
     "subtitle": "{{month}} · live tracking",
     "noActiveBudget": "No active budget",
     "month": {
@@ -106,7 +106,7 @@
     "topMerchants": "Top merchants",
     "viewAll": "View all",
     "editTope": "Edit cap",
-    "addCategory": "Add category",
+    "addCategory": "Watch another category",
     "plusUpsell": {
       "text": "Create custom categories with",
       "label": "Plus",
@@ -120,7 +120,7 @@
     "emptyB": {
       "title": "Watch specific categories",
       "body": "Get alerts when a category gets close to its cap.",
-      "cta": "Add a category to watch"
+      "cta": "Watch a category"
     },
     "editTecho": {
       "title": "Your {{month}} cap",
@@ -865,7 +865,7 @@
       "movements_other": "{{count}} mov"
     },
     "categories": {
-      "title": "Your categories",
+      "title": "Where it goes",
       "thisMonth": "this month",
       "unclassified": "Unclassified",
       "noCapShare": "no cap · {{pct}}% of spending",
@@ -985,7 +985,30 @@
       "lighter": "You're <b>{{pct}}% lighter</b>\nthan last month.",
       "heavier": "You're <b>{{pct}}% heavier</b>\nthan last month.",
       "spent": "Spent",
-      "corte": "{{month}}'s Corte"
+      "corte": "{{month}}'s Corte",
+      "goal": "You're <b>{{pct}}%</b> of the way\nto {{name}}.",
+      "goalDone": "<b>{{name}}</b>\nis complete.",
+      "saved": "Saved",
+      "goals": "Your goals",
+      "of": "of {{amount}}",
+      "keeps": "You keep <b>{{pct}}%</b>\nof what comes in.",
+      "overspent": "This month you <b>spent more</b>\nthan came in.",
+      "savedMonth": "Saved this month",
+      "newGoal": "Create a goal",
+      "debtCards_one": "Your card is at <b>{{pct}}%</b>\nof its limit.",
+      "debtCards_other": "Your cards are at <b>{{pct}}%</b>\nof their limit.",
+      "debtCardsPlain": "This is what you owe\non <b>your cards</b>.",
+      "debtPeople": "This is what you <b>owe</b>\nto other people.",
+      "debtBoth": "Between <b>cards and people</b>,\nthis is what you owe.",
+      "owe": "You owe",
+      "debts": "Debts",
+      "cards": "Your cards",
+      "owedToMe": "And you're owed {{amount}}",
+      "invite": {
+        "ahorrar": "Give a name to\n<b>what you're saving for</b>.",
+        "deudas": "Write down <b>what you owe</b>\nand I'll show you it going down.",
+        "gastos": "Log an expense\nand <b>we'll see where it goes</b>."
+      }
     },
     "accounts": {
       "label": "In your accounts",
@@ -1362,7 +1385,7 @@
         "account": "Source",
         "from": "From",
         "to": "To",
-        "date": "Date",
+        "date": "When it was",
         "type": {
           "expense": "Expense",
           "income": "Income",
@@ -1379,8 +1402,15 @@
         },
         "pickDate": "Another date…",
         "description": "Description",
-        "source": "Source",
-        "destination": "Destination"
+        "source": "Where it comes from",
+        "destination": "Which account it goes into",
+        "transferTo": "Which account it goes to",
+        "row": {
+          "expense": "Paid from",
+          "income": "Goes into",
+          "transfer": "From",
+          "to": "To"
+        }
       },
       "voiceHint": "Tap the mic and tell me the expense",
       "voiceExample": "e.g. “a $5 coffee on Chase”",
@@ -1454,7 +1484,7 @@
     "capture": {
       "title": "What happened?",
       "subtitle": "Write it or say it the way you would tell someone. It can be more than one thing in the same sentence.",
-      "placeholder": "Tell me…",
+      "placeholder": "Type, or tap the microphone",
       "byHand": "Fill it in by hand",
       "send": "Send",
       "understood": "Here is what I understood",
@@ -1472,7 +1502,7 @@
         "source": "Source"
       },
       "foot": {
-        "idle": "Type, or tap the microphone",
+        "idle": "Typing it or saying it, either works",
         "recording": "Tap the arrow when you are done",
         "thinking": "One second…",
         "more": "Forgot something? Say it or type it"

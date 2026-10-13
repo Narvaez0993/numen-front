@@ -16,6 +16,7 @@ import {
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
 import {
+  capitalized,
   monthName,
   monthRange,
   shiftMonth,
@@ -191,7 +192,7 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
               />
             ) : (
               <MovementsHeader
-                monthLabel={monthName(month, language)}
+                monthLabel={capitalized(monthName(month, language))}
                 monthTotal={monthTotal}
                 currency={currency}
               />
@@ -231,6 +232,12 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
                 options={monthOptions}
                 allLabel={t('movements.filters.monthAll')}
               />
+              <FilterChip
+                label={t('movements.filters.category')}
+                value={filters.categoryId}
+                onChange={(categoryId) => setFilters((f) => ({ ...f, categoryId }))}
+                options={categoryOptions}
+              />
               {/* Scoped to one source, the source is not a filter — it is the
                 screen. Offering it as a chip would let the user "clear" their
                 way out of the very thing they opened. */}
@@ -242,12 +249,6 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
                   options={sourceOptions}
                 />
               )}
-              <FilterChip
-                label={t('movements.filters.category')}
-                value={filters.categoryId}
-                onChange={(categoryId) => setFilters((f) => ({ ...f, categoryId }))}
-                options={categoryOptions}
-              />
               <FilterChip
                 label={t('movements.filters.type')}
                 value={filters.type}
@@ -286,7 +287,7 @@ export function MovementsScreen({ scopedSourceId }: Props = {}) {
                 >
                   <Text
                     variant="label"
-                    color={theme.colors.accentMint}
+                    color={theme.palette.acc3}
                     style={{ fontSize: 11.5 }}
                   >
                     {t('movements.clear')}

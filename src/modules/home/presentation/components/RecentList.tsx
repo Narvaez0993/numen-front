@@ -72,6 +72,7 @@ export function RecentList({ items, today, onSeeAll }: Props) {
                   : undefined
               }
               source={displaySource(catalogs, movement.source, movement.destination)}
+              from={catalogs.sourceById[movement.source.id]}
               last={i === todays.length - 1}
               onPress={onSeeAll}
             />

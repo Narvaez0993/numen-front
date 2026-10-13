@@ -13,6 +13,8 @@ type Props = {
   movement: Movement;
   category: ResolvedCategory | undefined;
   source: ResolvedSource | undefined;
+  /** Where a transfer left from; `source` is where it landed. */
+  from?: ResolvedSource;
   last: boolean;
   onPress?: () => void;
 };
@@ -38,17 +40,24 @@ const MINUS = '−';
  * the direction, and colour is saved for money coming IN, which is the rarer and
  * genuinely good news.
  */
-export function TxRow({ movement, category, source, last, onPress }: Props) {
+export function TxRow({ movement, category, source, from, last, onPress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
   const isTransfer = movement.type === 'transfer';
   const isIncome = movement.type === 'income';
 
-  const icon = isTransfer ? 'refresh' : (category?.icon ?? source?.icon ?? UNKNOWN_ICON);
+  const icon = isTransfer ? 'transfer' : (category?.icon ?? source?.icon ?? UNKNOWN_ICON);
+  // A transfer is named by its route, as the design writes it: «Bancolombia →
+  // Nequi» says what happened; the description usually just repeats it.
+  const title =
+    isTransfer && from && source ? `${from.name} → ${source.name}` : movement.description;
   const subtitle = isTransfer
-    ? t('movements.transferTag')
+    ? t('movements.transferNote')
     : [category?.name, source?.name].filter(Boolean).join(' · ');
+  // A transfer moved no money in or out, so it sits back — in the secondary ink,
+  // the way the design draws it, instead of fading the whole row.
+  const ink = isTransfer ? theme.colors.textSecondary : theme.colors.textPrimary;
 
   return (
     <Pressable
@@ -63,8 +72,7 @@ export function TxRow({ movement, category, source, last, onPress }: Props) {
         minHeight: 44,
         borderBottomWidth: last ? 0 : 1,
         borderBottomColor: theme.colors.borderSubtle,
-        // A transfer moved no money in or out; it sits back so the eye skips it.
-        opacity: isTransfer ? 0.65 : pressed ? 0.85 : 1,
+        opacity: pressed ? 0.85 : 1,
       })}
     >
       <View
@@ -74,17 +82,42 @@ export function TxRow({ movement, category, source, last, onPress }: Props) {
           borderRadius: 13,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: withAlpha(theme.palette.acc, 0.14),
+          backgroundColor: isTransfer
+            ? withAlpha(theme.colors.textPrimary, 0.07)
+            : withAlpha(theme.palette.acc, 0.14),
         }}
       >
-        <Icon name={icon} size={18} stroke={1.8} color={theme.palette.acc2} />
+        <Icon
+          name={icon}
+          size={18}
+          stroke={1.8}
+          color={isTransfer ? theme.colors.textTertiary : theme.palette.acc2}
+        />
       </View>
 
       <View style={{ flex: 1, minWidth: 0 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text numberOfLines={1} style={{ fontSize: 14, flexShrink: 1 }}>
-            {movement.description}
+          <Text numberOfLines={1} color={ink} style={{ fontSize: 14, flexShrink: 1 }}>
+            {title}
           </Text>
+          {isTransfer ? (
+            <View
+              style={{
+                paddingHorizontal: 7,
+                paddingVertical: 2,
+                borderRadius: 6,
+                backgroundColor: withAlpha(theme.colors.textPrimary, 0.09),
+              }}
+            >
+              <Text
+                uppercase
+                color={theme.colors.textSecondary}
+                style={{ fontSize: 9.5, letterSpacing: 0.6 }}
+              >
+                {t('expenses.sheet.manualEntry.type.transfer')}
+              </Text>
+            </View>
+          ) : null}
           {/* Derived from the subscription link: no `tag` field that could disagree. */}
           {movement.subscriptionId !== null ? (
             <Pill variant="neutral">{t('common.recurring')}</Pill>
@@ -103,8 +136,8 @@ export function TxRow({ movement, category, source, last, onPress }: Props) {
 
       <Text
         tabular
-        color={isIncome ? theme.colors.accentMint : theme.colors.textPrimary}
-        style={{ fontSize: 15, fontWeight: '500' }}
+        color={isIncome ? theme.colors.accentMint : ink}
+        style={{ fontSize: 15, fontWeight: isTransfer ? '400' : '500' }}
       >
         {isIncome ? '+' : isTransfer ? '' : MINUS}
         {formatMoney(movement.amount, movement.currency)}

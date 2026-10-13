@@ -24,7 +24,7 @@
     "filters": {
       "month": "Mes",
       "monthAll": "Este mes",
-      "account": "Fuente",
+      "account": "Cuenta",
       "category": "Categoría",
       "type": "Tipo"
     },
@@ -37,7 +37,7 @@
       "title": "Sin movimientos este mes",
       "hint": "Toca + para registrar tu primer gasto o ingreso"
     },
-    "transferTag": "Transferencia · no es gasto",
+    "transferNote": "No cuenta como gasto",
     "days": {
       "today": "hoy",
       "yesterday": "ayer"
@@ -75,7 +75,7 @@
     "net": "Neto"
   },
   "budgets": {
-    "title": "Presupuestos",
+    "title": "Presupuesto",
     "subtitle": "{{month}} · seguimiento en vivo",
     "noActiveBudget": "Sin presupuesto activo",
     "month": {
@@ -106,7 +106,7 @@
     "topMerchants": "Merchants principales",
     "viewAll": "Ver todos",
     "editTope": "Editar tope",
-    "addCategory": "Agregar categoría",
+    "addCategory": "Vigilar otra categoría",
     "plusUpsell": {
       "text": "Crea categorías custom con",
       "label": "Plus",
@@ -120,7 +120,7 @@
     "emptyB": {
       "title": "Vigila categorías específicas",
       "body": "Recibe alertas cuando una categoría se acerque a su tope.",
-      "cta": "Agregar categoría a vigilar"
+      "cta": "Vigilar una categoría"
     },
     "editTecho": {
       "title": "Tu techo de {{month}}",
@@ -865,7 +865,7 @@
       "movements_other": "{{count}} mov"
     },
     "categories": {
-      "title": "Tus categorías",
+      "title": "En qué se te va",
       "thisMonth": "este mes",
       "unclassified": "Sin clasificar",
       "noCapShare": "sin tope · {{pct}}% del gasto",
@@ -985,7 +985,30 @@
       "lighter": "Vas <b>{{pct}}% más liviana</b>\nque el mes pasado.",
       "heavier": "Vas <b>{{pct}}% más pesada</b>\nque el mes pasado.",
       "spent": "Gastado",
-      "corte": "El Corte de {{month}}"
+      "corte": "El Corte de {{month}}",
+      "goal": "Llevas el <b>{{pct}}%</b>\nde {{name}}.",
+      "goalDone": "<b>{{name}}</b>\nya está completa.",
+      "saved": "Ahorrado",
+      "goals": "Tus metas",
+      "of": "de {{amount}}",
+      "keeps": "Guardas el <b>{{pct}}%</b>\nde lo que te entra.",
+      "overspent": "Este mes <b>gastaste más</b>\nde lo que te entró.",
+      "savedMonth": "Guardado este mes",
+      "newGoal": "Crear una meta",
+      "debtCards_one": "Tu tarjeta va en el <b>{{pct}}%</b>\ndel cupo.",
+      "debtCards_other": "Tus tarjetas van en el <b>{{pct}}%</b>\ndel cupo.",
+      "debtCardsPlain": "Esto es lo que debes\nen <b>tus tarjetas</b>.",
+      "debtPeople": "Esto es lo que <b>le debes</b>\na otras personas.",
+      "debtBoth": "Entre <b>tarjetas y personas</b>,\nesto es lo que debes.",
+      "owe": "Debes",
+      "debts": "Deudas",
+      "cards": "Tus tarjetas",
+      "owedToMe": "Y a ti te deben {{amount}}",
+      "invite": {
+        "ahorrar": "Ponle nombre a\n<b>lo que estás ahorrando</b>.",
+        "deudas": "Anota <b>lo que debes</b>\ny te muestro cómo baja.",
+        "gastos": "Registra un gasto\ny <b>vemos en qué se te va</b>."
+      }
     },
     "accounts": {
       "label": "En tus cuentas",
@@ -1362,7 +1385,7 @@
         "account": "Fuente",
         "from": "Desde",
         "to": "Hacia",
-        "date": "Fecha",
+        "date": "Cuándo fue",
         "type": {
           "expense": "Gasto",
           "income": "Ingreso",
@@ -1379,8 +1402,15 @@
         },
         "pickDate": "Otra fecha…",
         "description": "Descripción",
-        "source": "Fuente",
-        "destination": "Destino"
+        "source": "De dónde sale",
+        "destination": "A qué cuenta entra",
+        "transferTo": "A qué cuenta va",
+        "row": {
+          "expense": "Sale de",
+          "income": "Entra a",
+          "transfer": "De",
+          "to": "A"
+        }
       },
       "voiceHint": "Toca el mic y cuéntame el gasto",
       "voiceExample": "Ej.: «un café de 5.000 con Nequi»",
@@ -1454,7 +1484,7 @@
     "capture": {
       "title": "¿Qué pasó?",
       "subtitle": "Escríbelo o dilo como se lo contarías a alguien. Puede ser más de una cosa en la misma frase.",
-      "placeholder": "Cuéntame…",
+      "placeholder": "Escribe o toca el micrófono",
       "byHand": "Llenarlo a mano",
       "send": "Enviar",
       "understood": "Entendí esto",
@@ -1472,7 +1502,7 @@
         "source": "Fuente"
       },
       "foot": {
-        "idle": "Escribe o toca el micrófono",
+        "idle": "Da igual si lo escribes o lo dices",
         "recording": "Toca la flecha cuando termines",
         "thinking": "Un segundo…",
         "more": "¿Se te olvidó algo? Dilo o escríbelo"

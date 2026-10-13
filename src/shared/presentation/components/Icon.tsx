@@ -165,6 +165,8 @@ const TABLER_PATHS: Record<string, string[]> = {
     'M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4',
     'M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4',
   ],
+  // Money moving between your own accounts: the design's two opposed arrows.
+  transfer: ['M7 10h14l-4 -4', 'M17 14H3l4 4'],
 
   // Subscriptions / services
   'device-tv': [

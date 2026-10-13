@@ -130,7 +130,7 @@ describe('watching a new category', () => {
     mount();
 
     // The test locale is English.
-    fireEvent.press(screen.getByText('Add category'));
+    fireEvent.press(screen.getByText('Watch another category'));
     // Transporte is the only unwatched candidate; Mercado already has a cap.
     fireEvent.press(screen.getByText('Transporte'));
 

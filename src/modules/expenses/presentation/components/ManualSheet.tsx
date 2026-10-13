@@ -15,7 +15,7 @@ import {
 } from '@/shared/presentation/components';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
 import { useTheme } from '@/shared/presentation/theme';
-import { dayLabel, toIsoDate } from '@/shared/presentation/utils/dates';
+import { capitalized, dayLabel, toIsoDate } from '@/shared/presentation/utils/dates';
 
 /** Values the form opens with — how an agent draft lands here already filled in,
  * instead of making the user retype it. */
@@ -181,7 +181,8 @@ export function ManualSheet({
     categoryOptions.find((option) => option.value === categoryId)?.label ?? '—';
   // Derived, not looked up in a quick list: a date picked from the calendar is
   // usually older than the shortcuts and would otherwise render blank.
-  const dateLabel = labelFor(occurredOn);
+  // «Hoy»: alone on its chip, so it starts with a capital.
+  const dateLabel = capitalized(labelFor(occurredOn));
 
   const handleSave = () => {
     if (!valid || saving || source === null) return;
@@ -204,7 +205,9 @@ export function ManualSheet({
       : type === 'transfer'
         ? theme.colors.textSecondary
         : theme.colors.textPrimary;
-  const sign = type === 'income' ? '+' : type === 'transfer' ? '' : '−';
+  // Only income carries a sign. The tab already says «Gasto», and a minus in
+  // front of a number still being typed reads as an error (the design: «$48.500»).
+  const sign = type === 'income' ? '+' : '';
 
   const noSources = accounts.data && accounts.data.accounts.length === 0;
 
@@ -334,7 +337,7 @@ export function ManualSheet({
             />
             <ChooseSheet
               visible={picker === 'destination'}
-              title={t('expenses.sheet.manualEntry.destination')}
+              title={t('expenses.sheet.manualEntry.transferTo')}
               options={destinationOptions}
               value={destinationKey}
               onChange={setDestinationKey}
@@ -395,11 +398,7 @@ export function ManualSheet({
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <View style={{ flex: 1 }}>
             <SheetFieldRow
-              label={t(
-                type === 'income'
-                  ? 'expenses.sheet.manualEntry.destination'
-                  : 'expenses.sheet.manualEntry.source',
-              )}
+              label={t(`expenses.sheet.manualEntry.row.${type}`)}
               value={sourceLabel}
               chevron
               onPress={() => setPicker('source')}
@@ -410,7 +409,7 @@ export function ManualSheet({
 
         {needsDestination ? (
           <SheetFieldRow
-            label={t('expenses.sheet.manualEntry.destination')}
+            label={t('expenses.sheet.manualEntry.row.to')}
             value={destinationLabel}
             chevron
             onPress={() => setPicker('destination')}

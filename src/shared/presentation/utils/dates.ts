@@ -177,6 +177,16 @@ export function dayLabel(
   return `${table(WEEKDAYS, language)[date.getDay()]} ${shortDate(iso, language)}`;
 }
 
+/**
+ * `Hoy`, `Agosto` — a day or month name that stands on its own: a header, a
+ * chip. The names above come lowercase because most of them sit mid-sentence
+ * («hoy · $196.800», «El Corte de julio»); alone, the design starts them with a
+ * capital.
+ */
+export function capitalized(label: string): string {
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 /** `today` first, then the previous days — the picker for "when did this happen". */
 export function recentDays(count: number, today: string): string[] {
   return Array.from({ length: count }, (_, index) => addDays(today, -index));

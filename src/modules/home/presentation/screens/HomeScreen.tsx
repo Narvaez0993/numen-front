@@ -22,7 +22,7 @@ import { monthName, toIsoDate } from '@/shared/presentation/utils/dates';
 
 import { HomeHeader } from '../components/HomeHeader';
 import { RecentList } from '../components/RecentList';
-import { HomeHero } from '../components/HomeHero';
+import { HomeHero, type HeroFace } from '../components/HomeHero';
 import { AccountsRow } from '../components/AccountsRow';
 import { AutoCharges } from '../components/AutoCharges';
 import { BudgetPulse } from '../components/BudgetPulse';
@@ -120,6 +120,62 @@ export function HomeScreen() {
     },
   ];
 
+  // HU-25: the hero answers the objective. The server already chose the face
+  // (`focus`, from the objective and the data that exists); this only dresses it
+  // in the design's shape.
+  const heroFace = ((): HeroFace => {
+    switch (data.focus) {
+      case 'saving':
+        return data.goal !== null
+          ? { kind: 'goal', goal: data.goal, onPress: () => router.push('/goals') }
+          : {
+              kind: 'saved',
+              saved: data.month.saved,
+              savingsRate: data.month.savingsRate,
+              onNewGoal: () => router.push('/goals'),
+            };
+      case 'debt':
+        return {
+          kind: 'debt',
+          cardDebt: data.cardDebt,
+          cardLimit: data.cardLimit,
+          cardsCount: data.creditCardsCount,
+          iOwe: data.debts.iOwe,
+          owedToMe: data.debts.owedToMe,
+          onPeoplePress: () => router.push('/deudas'),
+          onCardsPress: () => router.push('/accounts'),
+        };
+      case 'invite':
+        return {
+          kind: 'invite',
+          objective: data.objective,
+          spent: data.month.spent,
+          // Every invitation points at something that exists today: the debts
+          // ledger, the first goal, or an expense.
+          onPress:
+            data.objective === 'deudas'
+              ? () => router.push('/deudas')
+              : data.objective === 'ahorrar'
+                ? () => router.push('/goals')
+                : () => openSheet('manual', 'expense'),
+        };
+      default:
+        return {
+          kind: 'spend',
+          spent: data.month.spent,
+          change: data.month.change,
+          corteMonth: lastCorte
+            ? monthName(`${lastCorte.period}-01`, i18n.language)
+            : null,
+          // Straight into the Corte the link names, as the design's `irCorte`
+          // does — not to the list of all of them.
+          onCortePress: () => {
+            if (lastCorte) router.push(`/corte/${lastCorte.id}`);
+          },
+        };
+    }
+  })();
+
   return (
     <Aurora>
       <SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -142,7 +198,7 @@ export function HomeScreen() {
             {/* The bundle draws Home for a user who already has a month. A
                 first-timer still gets the checklist — dropping it would leave
                 them a screen of zeros with nothing to do. */}
-            {data.recent.length === 0 ? (
+            {data.focus === 'start' ? (
               <TodayHero
                 focus={data.focus}
                 objective={data.objective}
@@ -161,30 +217,9 @@ export function HomeScreen() {
                 // The month's spend is the movements that made it, not a budget.
                 onMonthPress={goMovements}
                 start={{ steps: startSteps, firstTime: true }}
-                // Every invitation points at something that exists today: the debts
-                // ledger, the first goal, or the month's income.
-                onInvite={
-                  data.objective === 'deudas'
-                    ? () => router.push('/deudas')
-                    : data.objective === 'ahorrar'
-                      ? () => router.push('/goals')
-                      : () => openSheet('manual', 'income')
-                }
-                onGoalPress={() => router.push('/goals')}
               />
             ) : (
-              <HomeHero
-                spent={data.month.spent}
-                change={data.month.change}
-                corteMonth={
-                  lastCorte ? monthName(`${lastCorte.period}-01`, i18n.language) : null
-                }
-                // Straight into the Corte the link names, as the design's
-                // `irCorte` does — not to the list of all of them.
-                onCortePress={() => {
-                  if (lastCorte) router.push(`/corte/${lastCorte.id}`);
-                }}
-              />
+              <HomeHero face={heroFace} />
             )}
             <RhythmStrip
               byDay={data.byDay}

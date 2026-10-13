@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import type { CurrencyCode } from '@/shared/domain';
+import { capitalized } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { Movement } from '../../domain';
@@ -40,7 +41,9 @@ export function DayGroup({ group, catalogs, currency, onItemPress }: Props) {
           gap: 12,
         }}
       >
-        <Text style={{ fontSize: 13, fontWeight: '500' }}>{group.label}</Text>
+        <Text style={{ fontSize: 13, fontWeight: '500' }}>
+          {capitalized(group.label)}
+        </Text>
         <Text tabular color={tertiary} style={{ fontSize: 11.5 }}>
           {group.total >= 0 ? '+' : ''}
           {formatMoney(group.total, currency)}
@@ -56,6 +59,7 @@ export function DayGroup({ group, catalogs, currency, onItemPress }: Props) {
               movement.categoryId ? catalogs.categoryById[movement.categoryId] : undefined
             }
             source={displaySource(catalogs, movement.source, movement.destination)}
+            from={catalogs.sourceById[movement.source.id]}
             last={i === group.items.length - 1}
             onPress={onItemPress ? () => onItemPress(movement) : undefined}
           />
