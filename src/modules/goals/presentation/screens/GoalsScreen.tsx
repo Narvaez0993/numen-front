@@ -172,8 +172,11 @@ export function GoalsScreen() {
   return (
     <Aurora>
       <ScrollView
+        // The clock keeps its own strip: starting the scroll below it is what
+        // stops the content from sliding under the time.
+        style={{ marginTop: insets.top }}
         contentContainerStyle={{
-          paddingTop: insets.top + 16,
+          paddingTop: 16,
           paddingBottom: insets.bottom + 26,
         }}
         showsVerticalScrollIndicator={false}

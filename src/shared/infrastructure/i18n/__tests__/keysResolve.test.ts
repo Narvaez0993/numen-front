@@ -49,6 +49,16 @@ function resolves(tree: Tree, key: string): boolean {
   );
 }
 
+/**
+ * A key can exist and still not be a label. Asking for a group renders
+ * «key '…' returned an object instead of string.» on screen — which is how the
+ * manual form's save button shipped, past the check above.
+ */
+function isGroup(tree: Tree, key: string): boolean {
+  const node = at(tree, key);
+  return typeof node === 'object' && node !== null;
+}
+
 function sources(dir: string): string[] {
   const root = path.join(ROOT, dir);
   if (!fs.existsSync(root)) return [];
@@ -91,5 +101,22 @@ describe.each(LOCALES)('%s translations', (language) => {
     }
 
     expect(missing).toEqual([]);
+  });
+
+  it('asks for a text, never for a group of keys', () => {
+    const groups: string[] = [];
+
+    for (const file of files) {
+      const code = fs.readFileSync(file, 'utf8');
+      const where = path.relative(ROOT, file);
+
+      for (const match of code.matchAll(CALL)) {
+        const [, key, options] = match;
+        if (options?.includes('returnObjects')) continue;
+        if (key && isGroup(tree, key)) groups.push(`${where} → ${key}`);
+      }
+    }
+
+    expect(groups).toEqual([]);
   });
 });

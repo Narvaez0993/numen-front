@@ -74,6 +74,8 @@ type Props = {
    * silently dropped. Tapping a row did nothing at all, with no error.
    */
   overlays?: React.ReactNode;
+  /** Once the sheet has fully left the screen. See `SheetShell`. */
+  onClosed?: () => void;
 };
 
 /**
@@ -115,6 +117,7 @@ export function AmountSheet({
   replaceBody,
   keyboard = 'pad',
   overlays,
+  onClosed,
 }: Props) {
   const { theme } = useTheme();
   const lift = useKeyboardInset();
@@ -130,6 +133,7 @@ export function AmountSheet({
       onLayout={lift.onLayout}
       header={header}
       overlays={overlays}
+      onClosed={onClosed}
     >
       <>
         {replaceBody !== undefined ? (

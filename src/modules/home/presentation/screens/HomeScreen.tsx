@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import type { AgentOutput } from '@/modules/assistant/domain/types/AgentFeed';
+import { useSummaries } from '@/modules/assistant/presentation/hooks/useCortes';
 import { useAuthStore } from '@/modules/auth/presentation';
 import { useExpenseSheetStore } from '@/modules/expenses/presentation/stores/useExpenseSheetStore';
 import { useOnboardingStore } from '@/modules/onboarding/presentation/stores/useOnboardingStore';
@@ -41,6 +43,21 @@ export function HomeScreen() {
   // endpoint over, and this screen already talked to it for the shelf.
   const subscriptions = useSubscriptions(today);
   const { data, isLoading, isError, refetch } = useHomeOverview(today);
+  // The hero's link names the last Corte there is. Built from the month in
+  // progress it promised «El Corte de octubre» in October — one that does not
+  // exist until November.
+  const summaries = useSummaries();
+  const lastCorte = useMemo(
+    () =>
+      (summaries.data ?? [])
+        .filter((output) => output.kind === 'monthly_summary')
+        .reduce<AgentOutput | null>(
+          (latest, output) =>
+            latest === null || output.period > latest.period ? output : latest,
+          null,
+        ),
+    [summaries.data],
+  );
   const displayName = useAuthStore((s) => s.session?.displayName);
   const onboardingName = useOnboardingStore((s) => s.profile?.name);
   const openSheet = useExpenseSheetStore((s) => s.openSheet);
@@ -159,8 +176,14 @@ export function HomeScreen() {
               <HomeHero
                 spent={data.month.spent}
                 change={data.month.change}
-                monthName={monthName(`${data.period}-01`, i18n.language)}
-                onCortePress={() => router.push('/resumenes')}
+                corteMonth={
+                  lastCorte ? monthName(`${lastCorte.period}-01`, i18n.language) : null
+                }
+                // Straight into the Corte the link names, as the design's
+                // `irCorte` does — not to the list of all of them.
+                onCortePress={() => {
+                  if (lastCorte) router.push(`/corte/${lastCorte.id}`);
+                }}
               />
             )}
             <RhythmStrip

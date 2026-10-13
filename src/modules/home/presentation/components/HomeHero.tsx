@@ -10,7 +10,10 @@ type Props = {
   /** Signed share against the same stretch of last month. `null` on a first
    *  month — a zero there would read as "you spent the same". */
   change: number | null;
-  monthName: string;
+  /** The month of the last Corte that exists — the one that already closed,
+   *  never the month in progress, which has no Corte yet. `null` before the
+   *  first one, and then there is no link: it would open an empty list. */
+  corteMonth: string | null;
   onCortePress: () => void;
 };
 
@@ -26,7 +29,7 @@ type Props = {
  * the month itself. Inventing a trend from one data point would be the app
  * pretending to know the user better than it does.
  */
-export function HomeHero({ spent, change, monthName, onCortePress }: Props) {
+export function HomeHero({ spent, change, corteMonth, onCortePress }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -72,24 +75,31 @@ export function HomeHero({ spent, change, monthName, onCortePress }: Props) {
           >
             {t('home.hero.spent')}
           </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={onCortePress}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 6,
-              opacity: pressed ? 0.7 : 1,
-            })}
-          >
-            <Text
-              color={theme.palette.acc3}
-              style={{ fontSize: 11.5, fontWeight: '500' }}
+          {corteMonth !== null ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={onCortePress}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                opacity: pressed ? 0.7 : 1,
+              })}
             >
-              {t('home.hero.corte', { month: monthName })}
-            </Text>
-            <Icon name="chevron-right" size={13} stroke={2.2} color={theme.palette.acc} />
-          </Pressable>
+              <Text
+                color={theme.palette.acc3}
+                style={{ fontSize: 11.5, fontWeight: '500' }}
+              >
+                {t('home.hero.corte', { month: corteMonth })}
+              </Text>
+              <Icon
+                name="chevron-right"
+                size={13}
+                stroke={2.2}
+                color={theme.palette.acc}
+              />
+            </Pressable>
+          ) : null}
         </View>
 
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}>

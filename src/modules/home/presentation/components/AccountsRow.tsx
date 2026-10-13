@@ -28,6 +28,17 @@ export function AccountsRow({
   const { theme } = useTheme();
   const { t } = useTranslation();
 
+  // Each count says itself in singular or plural, and a zero is left out:
+  // «1 cuenta», not «1 cuentas · 0 tarjeta».
+  const spread = [
+    accountsCount > 0 ? t('home.accounts.accountsCount', { count: accountsCount }) : null,
+    creditCardsCount > 0
+      ? t('home.accounts.cardsCount', { count: creditCardsCount })
+      : null,
+  ]
+    .filter((part) => part !== null)
+    .join(' · ');
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -74,12 +85,11 @@ export function AccountsRow({
       </View>
 
       <View style={{ alignItems: 'flex-end' }}>
-        <Text color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
-          {t('home.accounts.spread', {
-            accounts: accountsCount,
-            cards: creditCardsCount,
-          })}
-        </Text>
+        {spread ? (
+          <Text color={theme.colors.textTertiary} style={{ fontSize: 11 }}>
+            {spread}
+          </Text>
+        ) : null}
         {owedToMe > 0 ? (
           <Text
             tabular

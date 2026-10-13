@@ -440,6 +440,7 @@
     "tc": {
       "debt": "Current debt",
       "usage": "{{pct}}% of limit",
+      "available": "{{amount}} available",
       "limit": "{{amount}} limit",
       "cutoff": "Cutoff {{day}}",
       "due": "Payment {{day}}",
@@ -988,7 +989,10 @@
     },
     "accounts": {
       "label": "In your accounts",
-      "spread": "{{accounts}} accounts · {{cards}} card",
+      "accountsCount_one": "{{count}} account",
+      "accountsCount_other": "{{count}} accounts",
+      "cardsCount_one": "{{count}} card",
+      "cardsCount_other": "{{count}} cards",
       "owedToMe": "{{amount}} owed to you"
     },
     "autoCharges": {

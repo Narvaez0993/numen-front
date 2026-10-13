@@ -36,6 +36,8 @@ type Props = {
   /** Back to speaking — the arrow in the header and the mic beside Guardar. */
   onSpeak: () => void;
   onClose: () => void;
+  /** Once the sheet has fully left the screen — see `SheetShell`. */
+  onClosed?: () => void;
   saving?: boolean;
   errorMessage?: string | null;
 };
@@ -74,6 +76,7 @@ export function ManualSheet({
   onSave,
   onSpeak,
   onClose,
+  onClosed,
   saving = false,
   errorMessage,
 }: Props) {
@@ -210,6 +213,7 @@ export function ManualSheet({
       <AmountSheet
         visible={visible}
         onClose={onClose}
+        onClosed={onClosed}
         digits=""
         onDigits={() => undefined}
         primaryLabel={t('common.close')}
@@ -229,12 +233,13 @@ export function ManualSheet({
       <AmountSheet
         visible={visible}
         onClose={onClose}
+        onClosed={onClosed}
         digits={digits}
         onDigits={setDigits}
         currency={currency}
         sign={sign}
         amountColor={amountColor}
-        primaryLabel={t('expenses.sheet.manualEntry.save')}
+        primaryLabel={t(`expenses.sheet.manualEntry.save.${type}`)}
         onPrimary={handleSave}
         primaryDisabled={!valid || saving}
         onMic={onSpeak}

@@ -59,6 +59,9 @@ export function CredentialsForm({
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
+              // An address is not a word: no red underline under «ana».
+              autoCorrect={false}
+              spellCheck={false}
               value={field.value}
               onChangeText={field.onChange}
               error={

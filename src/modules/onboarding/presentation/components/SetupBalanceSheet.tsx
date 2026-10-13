@@ -84,7 +84,7 @@ export function SetupBalanceSheet({
         />
         <View
           style={{
-            backgroundColor: theme.colors.bgSurface,
+            backgroundColor: theme.colors.bgSheet,
             borderTopLeftRadius: 26,
             borderTopRightRadius: 26,
             paddingHorizontal: 22,

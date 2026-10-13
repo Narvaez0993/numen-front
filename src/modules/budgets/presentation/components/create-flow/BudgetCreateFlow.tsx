@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
@@ -42,6 +42,9 @@ export function BudgetCreateFlow({
   onSave,
 }: Props) {
   const { theme } = useTheme();
+  // Read out here, where the provider is: inside a statusBarTranslucent Modal a
+  // SafeAreaView gets a top inset of zero and the bar lands on the clock.
+  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -94,8 +97,12 @@ export function BudgetCreateFlow({
       onRequestClose={handleRequestClose}
     >
       <SafeAreaView
-        edges={['top', 'bottom']}
-        style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
+        edges={['bottom']}
+        style={{
+          flex: 1,
+          backgroundColor: theme.colors.bgBase,
+          paddingTop: Math.max(insets.top, 44) + 8,
+        }}
       >
         {/* Top bar */}
         <View

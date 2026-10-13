@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { OnbHeader } from '@/modules/onboarding/presentation/components/OnbHeader';
 import { OnbPage } from '@/modules/onboarding/presentation/components/OnbPage';
@@ -61,94 +62,106 @@ export function LoginScreen() {
     router.replace('/(auth)/signup');
   };
 
+  // The same frame the sign-up flow gets from AuthFlow. Without it the back
+  // arrow sits on the clock.
   return (
-    <OnbPage paddingTop={14} paddingHorizontal={22} paddingBottom={24}>
-      <OnbHeader onBack={goBack} />
+    <SafeAreaView
+      edges={['top', 'bottom']}
+      style={{ flex: 1, backgroundColor: theme.colors.bgBase }}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        <OnbPage paddingTop={14} paddingHorizontal={22} paddingBottom={24}>
+          <OnbHeader onBack={goBack} />
 
-      <View style={{ height: 22 }} />
-      <View style={{ alignItems: 'center', marginBottom: 28 }}>
-        <Wordmark size={22} />
-      </View>
+          <View style={{ height: 22 }} />
+          <View style={{ alignItems: 'center', marginBottom: 28 }}>
+            <Wordmark size={22} />
+          </View>
 
-      <View style={{ alignItems: 'center', maxWidth: 320, alignSelf: 'center' }}>
-        <Text
-          style={{
-            fontSize: 26,
-            fontFamily: 'Geist_500Medium',
-            color: theme.colors.textPrimary,
-            letterSpacing: -0.52,
-            marginBottom: 10,
-            textAlign: 'center',
-          }}
-        >
-          {t('auth.login.title')}
-        </Text>
-        <Text
-          style={{
-            fontSize: 14,
-            color: theme.colors.textSecondary,
-            lineHeight: 20,
-            textAlign: 'center',
-            fontFamily: 'Geist_400Regular',
-          }}
-        >
-          {t('auth.login.subtitle')}
-        </Text>
-      </View>
+          <View style={{ alignItems: 'center', maxWidth: 320, alignSelf: 'center' }}>
+            <Text
+              style={{
+                fontSize: 26,
+                fontFamily: 'Geist_500Medium',
+                color: theme.colors.textPrimary,
+                letterSpacing: -0.52,
+                marginBottom: 10,
+                textAlign: 'center',
+              }}
+            >
+              {t('auth.login.title')}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: theme.colors.textSecondary,
+                lineHeight: 20,
+                textAlign: 'center',
+                fontFamily: 'Geist_400Regular',
+              }}
+            >
+              {t('auth.login.subtitle')}
+            </Text>
+          </View>
 
-      <View style={{ height: 40 }} />
+          <View style={{ height: 40 }} />
 
-      <CredentialsForm
-        onSubmit={(values) => {
-          if (login.isError) login.reset();
-          setPendingEmail(values.email.trim());
-          login.mutate({ email: values.email.trim(), password: values.password });
-        }}
-        submitLabel={t('auth.login.submit')}
-        submittingLabel={t('auth.login.submitting')}
-        loading={login.isPending}
-        passwordPlaceholder={t('auth.login.passwordPlaceholder')}
-        passwordAutoComplete="current-password"
-      />
+          <CredentialsForm
+            onSubmit={(values) => {
+              if (login.isError) login.reset();
+              setPendingEmail(values.email.trim());
+              login.mutate({ email: values.email.trim(), password: values.password });
+            }}
+            submitLabel={t('auth.login.submit')}
+            submittingLabel={t('auth.login.submitting')}
+            loading={login.isPending}
+            passwordPlaceholder={t('auth.login.passwordPlaceholder')}
+            passwordAutoComplete="current-password"
+          />
 
-      {errorMessage ? (
-        <Text
-          style={{
-            fontSize: 12.5,
-            color: theme.colors.accentCoral,
-            fontFamily: 'Geist_400Regular',
-            textAlign: 'center',
-            marginTop: 12,
-          }}
-        >
-          {errorMessage}
-        </Text>
-      ) : null}
+          {errorMessage ? (
+            <Text
+              style={{
+                fontSize: 12.5,
+                color: theme.colors.accentCoral,
+                fontFamily: 'Geist_400Regular',
+                textAlign: 'center',
+                marginTop: 12,
+              }}
+            >
+              {errorMessage}
+            </Text>
+          ) : null}
 
-      <View style={{ flex: 1 }} />
+          <View style={{ flex: 1 }} />
 
-      <View style={styles.footer}>
-        <Text
-          style={{
-            fontSize: 12.5,
-            color: theme.colors.textSecondary,
-            fontFamily: 'Geist_400Regular',
-          }}
-        >
-          {t('auth.login.noAccount')}
-        </Text>
-        <Text
-          onPress={createAccount}
-          style={{
-            fontSize: 12.5,
-            color: theme.colors.accentMint,
-            fontFamily: 'Geist_500Medium',
-          }}
-        >
-          {t('auth.login.createAccount')}
-        </Text>
-      </View>
-    </OnbPage>
+          <View style={styles.footer}>
+            <Text
+              style={{
+                fontSize: 12.5,
+                color: theme.colors.textSecondary,
+                fontFamily: 'Geist_400Regular',
+              }}
+            >
+              {t('auth.login.noAccount')}
+            </Text>
+            <Text
+              onPress={createAccount}
+              style={{
+                fontSize: 12.5,
+                color: theme.colors.accentMint,
+                fontFamily: 'Geist_500Medium',
+              }}
+            >
+              {t('auth.login.createAccount')}
+            </Text>
+          </View>
+        </OnbPage>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

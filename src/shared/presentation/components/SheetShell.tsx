@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Modal, Pressable, View } from 'react-native';
+import { Dimensions, Modal, Platform, Pressable, View } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -65,6 +65,16 @@ type Props = {
    * silently dropped. Tapping a row did nothing at all, with no error.
    */
   overlays?: React.ReactNode;
+  /**
+   * Called once the sheet has fully left the screen — the native `Modal`
+   * included, not just the animation.
+   *
+   * It is for whoever shows a SIBLING `Modal` next. iOS only presents one after
+   * the other is gone: asked any earlier, it drops the newcomer, and the one on
+   * its way out stays behind as an invisible layer that swallows every touch.
+   * The whole app froze that way, and reloading the JS did not bring it back.
+   */
+  onClosed?: () => void;
 };
 
 /**
@@ -87,6 +97,7 @@ export function SheetShell({
   header,
   children,
   overlays,
+  onClosed,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -94,12 +105,43 @@ export function SheetShell({
   // The Modal outlives `visible` by exactly one animation, so the sheet can be
   // seen leaving instead of blinking out.
   const [mounted, setMounted] = useState(visible);
+  // And on iOS by one step more: with the panel off screen the Modal is hidden,
+  // and it is only unmounted when iOS reports it dismissed. `onClosed` waits for
+  // that report, because the animation ending is not the same as being gone.
+  const [presented, setPresented] = useState(visible);
   const scrim = useSharedValue(0);
   const slide = useSharedValue(SCREEN_HEIGHT);
+
+  const visibleRef = useRef(visible);
+  const onClosedRef = useRef(onClosed);
+  useEffect(() => {
+    visibleRef.current = visible;
+    onClosedRef.current = onClosed;
+  });
+
+  // The panel is off screen. Android has no dismissal to wait for — a dialog
+  // stacks over another without trouble — so it is done there.
+  const finishClosing = () => {
+    if (Platform.OS === 'ios') {
+      setPresented(false);
+      return;
+    }
+    setMounted(false);
+    onClosedRef.current?.();
+  };
+
+  const handleDismiss = () => {
+    // Opened again while the old one was still leaving: that one is gone, but
+    // this sheet is wanted, so it stays.
+    if (visibleRef.current) return;
+    setMounted(false);
+    onClosedRef.current?.();
+  };
 
   useEffect(() => {
     if (visible) {
       setMounted(true);
+      setPresented(true);
       scrim.value = withTiming(1, {
         duration: IN.scrim,
         easing: Easing.out(Easing.quad),
@@ -118,7 +160,7 @@ export function SheetShell({
       SCREEN_HEIGHT,
       { duration: OUT.panel, easing: Easing.in(Easing.cubic) },
       (finished) => {
-        if (finished) runOnJS(setMounted)(false);
+        if (finished) runOnJS(finishClosing)();
       },
     );
   }, [visible, scrim, slide]);
@@ -132,13 +174,14 @@ export function SheetShell({
 
   return (
     <Modal
-      visible
+      visible={presented}
       transparent
       // Driven here instead: the platform's fade cannot rise, and running both
       // would be two animations disagreeing about when the sheet has arrived.
       animationType="none"
       statusBarTranslucent
       onRequestClose={onClose}
+      onDismiss={handleDismiss}
     >
       <View style={{ flex: 1 }}>
         <Animated.View style={[{ flex: 1 }, scrimStyle]}>

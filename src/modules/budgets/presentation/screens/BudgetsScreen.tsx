@@ -261,8 +261,11 @@ export function BudgetsScreen() {
     // screen and leaves the scroll the other half.
     <Aurora>
       <ScrollView
+        // The clock keeps its own strip: starting the scroll below it is what
+        // stops the content from sliding under the time.
+        style={{ marginTop: insets.top }}
         contentContainerStyle={{
-          paddingTop: insets.top + 18,
+          paddingTop: 18,
           paddingBottom: tabBarClearance + 40,
         }}
         showsVerticalScrollIndicator={false}

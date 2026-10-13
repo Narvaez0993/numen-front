@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
 
 import type {
   CapturedRecord,
@@ -109,6 +110,26 @@ export function ExpenseSheet() {
   useEffect(() => {
     if (!open) setEdits({});
   }, [open]);
+
+  // The capture screen and the manual sheet are SIBLING Modals, and iOS only
+  // presents one once the other has left the screen. Asked any earlier — the mic
+  // in the manual sheet, back to «¿Qué pasó?» — it dropped the new one and the
+  // old one stayed behind as an invisible layer: no tap answered anywhere, and a
+  // JS reload did not help. So the one coming in waits for the one going out to
+  // report itself gone. No timer: a delay is a race whichever number you pick.
+  const [captureUp, setCaptureUp] = useState(false);
+  const [manualUp, setManualUp] = useState(false);
+  const waits = Platform.OS === 'ios';
+  const captureVisible = open && flow !== 'manual' && !(waits && manualUp);
+  const manualVisible = open && flow === 'manual' && !(waits && captureUp);
+
+  useEffect(() => {
+    if (captureVisible) setCaptureUp(true);
+  }, [captureVisible]);
+
+  useEffect(() => {
+    if (manualVisible) setManualUp(true);
+  }, [manualVisible]);
 
   const sourceOptions = useMemo(
     () => [
@@ -399,7 +420,8 @@ export function ExpenseSheet() {
   return (
     <>
       <CaptureScreen
-        visible={open && flow !== 'manual'}
+        visible={captureVisible}
+        onClosed={() => setCaptureUp(false)}
         state={state}
         text={capture.text}
         onChangeText={capture.setText}
@@ -511,7 +533,8 @@ export function ExpenseSheet() {
       />
 
       <ManualSheet
-        visible={open && flow === 'manual'}
+        visible={manualVisible}
+        onClosed={() => setManualUp(false)}
         initialType={initialType}
         initialValues={editing !== null ? prefillFromDraft(editing) : undefined}
         onSave={handleSaveManual}

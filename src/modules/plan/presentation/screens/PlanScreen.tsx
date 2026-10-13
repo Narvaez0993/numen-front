@@ -72,9 +72,12 @@ export function PlanScreen() {
   return (
     <Aurora>
       <ScrollView
+        // The clock keeps its own strip: starting the scroll below it is what
+        // stops the content from sliding under the time.
+        style={{ marginTop: insets.top }}
         contentContainerStyle={{
           flexGrow: 1,
-          paddingTop: insets.top + 14,
+          paddingTop: 14,
           paddingBottom: insets.bottom + 16,
         }}
         showsVerticalScrollIndicator={false}

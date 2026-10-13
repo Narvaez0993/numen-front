@@ -55,6 +55,9 @@ type Props = {
   onRetry: () => void;
   onFillByHand: () => void;
   onClose: () => void;
+  /** Once the screen has fully left — iOS's own report, after the slide. The
+   *  manual sheet waits for it before presenting; see `SheetShell`. */
+  onClosed?: () => void;
   /** Pickers opened from the cards. Rendered inside this Modal, because a
    *  sibling one never presents on iOS — see AmountSheet. */
   overlays?: React.ReactNode;
@@ -104,6 +107,7 @@ export function CaptureScreen({
   onRetry,
   onFillByHand,
   onClose,
+  onClosed,
   overlays,
 }: Props) {
   const { theme } = useTheme();
@@ -123,6 +127,7 @@ export function CaptureScreen({
       animationType="slide"
       statusBarTranslucent
       onRequestClose={onClose}
+      onDismiss={onClosed}
     >
       <View style={{ flex: 1, backgroundColor: theme.colors.bgBase }}>
         {/* The design's one light on this screen: a bloom low and centred, under

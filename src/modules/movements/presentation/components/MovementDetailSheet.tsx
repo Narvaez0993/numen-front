@@ -112,7 +112,7 @@ export function MovementDetailSheet({
     });
   };
 
-  const typeLabel = t(`movements.types.${movement.type}`);
+  const typeLabel = t(`expenses.sheet.manualEntry.type.${movement.type}`);
   const categoryName = categoryId ? catalogs.categoryById[categoryId]?.name : undefined;
   const sourceLabel = sourceKey
     ? (catalogs.sourceById[parseRefKey(sourceKey).id]?.name ?? '—')

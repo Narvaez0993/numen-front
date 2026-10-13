@@ -440,6 +440,7 @@
     "tc": {
       "debt": "Deuda actual",
       "usage": "{{pct}}% del cupo",
+      "available": "Disponible {{amount}}",
       "limit": "{{amount}} de cupo",
       "cutoff": "Corte {{day}}",
       "due": "Pago {{day}}",
@@ -988,7 +989,10 @@
     },
     "accounts": {
       "label": "En tus cuentas",
-      "spread": "{{accounts}} cuentas · {{cards}} tarjeta",
+      "accountsCount_one": "{{count}} cuenta",
+      "accountsCount_other": "{{count}} cuentas",
+      "cardsCount_one": "{{count}} tarjeta",
+      "cardsCount_other": "{{count}} tarjetas",
       "owedToMe": "{{amount}} a tu favor"
     },
     "autoCharges": {

@@ -34,6 +34,9 @@ export function CardTile({ card, onPress, onEdit, editLabel }: Props) {
   const { t } = useTranslation();
 
   const usage = card.limit > 0 ? Math.min(card.debt / card.limit, 1) : 0;
+  // What the card still lets you spend — the figure people check before paying
+  // with it. Past the limit there is nothing left, not a negative.
+  const available = Math.max(card.limit - card.debt, 0);
 
   return (
     <Pressable
@@ -58,9 +61,23 @@ export function CardTile({ card, onPress, onEdit, editLabel }: Props) {
           marginBottom: 9,
         }}
       >
-        <Text numberOfLines={1} style={{ flex: 1, fontSize: 14 }}>
-          {card.name}
-        </Text>
+        {/* The available amount sits where an account row keeps its type,
+            «Ahorros»: same size, same tint, one line under the name. */}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text numberOfLines={1} style={{ fontSize: 14 }}>
+            {card.name}
+          </Text>
+          <Text
+            tabular
+            numberOfLines={1}
+            color={theme.colors.textTertiary}
+            style={{ fontSize: 11, marginTop: 2 }}
+          >
+            {t('accounts.tc.available', {
+              amount: formatMoney(available, card.currency),
+            })}
+          </Text>
+        </View>
         {/* A card you owe nothing on is not a warning. The minus and the coral
             both mean "this is a debt", and at zero neither is true. */}
         <Text
