@@ -122,75 +122,24 @@
       "cta": "Watch a category"
     },
     "editTecho": {
-      "title": "Your {{month}} cap",
+      "title": "Your {{month}} ceiling",
       "subtitle": "Change it whenever you want. It applies right away, this month included.",
-      "helper": "Your cap stays in place month after month until you change it, so you will not have to set it again next {{month}}.",
+      "helper": "Your ceiling stays in place month after month until you change it, so you will not have to set it again in {{month}}.",
       "save": "Save",
       "delete": "Delete budget"
     },
     "editTopeSheet": {
       "title": "Cap for {{name}}",
-      "subtitle": "Deshka will warn you when you're close to this amount.",
       "carry": "You've spent {{amount}} this month",
       "save": "Save cap",
-      "activate": "Activate cap",
-      "delete": "Delete cap"
+      "activate": "Activate cap"
     },
     "addVigilance": {
       "title": "Watch a category",
-      "subtitle": "Pick a category and set its cap.",
-      "spent": "{{amount}} spent · no cap",
-      "add": "Add",
       "allWatchedTitle": "You're already watching every category",
-      "allWatchedHint": "Tap them in the Budgets list to edit the caps."
-    },
-    "confirmSheet": {
-      "techoTitle": "Delete your {{month}} budget?",
-      "techoBody": "We stop measuring the month against a cap. Your category caps stay as they are.",
-      "techoCta": "Delete budget",
-      "topeTitle": "Delete the cap for {{name}}?",
-      "topeBody": "The category will keep showing under 'No cap' this month. You can turn it back on whenever you want.",
-      "topeCta": "Delete cap",
-      "cancel": "Cancel"
-    },
-    "create": {
-      "step": "Step {{current}} of {{total}}",
-      "skip": "Skip",
-      "next": "Continue",
-      "save": "Save budget",
-      "step1": {
-        "title": "Your {{month}} budget",
-        "subtitle": "How much don't you want to spend this month?",
-        "helper": "You can adjust it later if you need."
-      },
-      "step2": {
-        "title": "Want to watch any category?",
-        "subtitle": "Turn on caps for categories where you want extra self-control. It's optional.",
-        "infoPart1": "Caps ",
-        "infoBold": "aren't additional",
-        "infoPart2": " — every expense counts toward your cap of ",
-        "infoPart3": ". Caps just warn you when a specific category gets close to its limit.",
-        "categoriesLabel": "Categories",
-        "tope": "Cap {{amount}}",
-        "noTope": "No cap",
-        "createCategory": "Don't see one? Create category",
-        "exitTitle": "Leave without creating the budget?",
-        "exitBody": "You'll lose the changes you've made.",
-        "exitCta": "Leave"
-      }
-    },
-    "createCategory": {
-      "title": "New category",
-      "plus": "Plus",
-      "subtitle": "Name it however you want, pick an icon and color.",
-      "preview": "Preview",
-      "previewPlaceholder": "Your category",
-      "nameLabel": "Name",
-      "namePlaceholder": "e.g. Pets, Gym, Courses",
-      "iconLabel": "Icon",
-      "colorLabel": "Color",
-      "save": "Create category",
-      "footnote": "Custom categories are part of Plus."
+      "allWatchedHint": "Tap them in the Budgets list to edit the caps.",
+      "listLabel": "No cap yet",
+      "spentLabel": "spent this month"
     },
     "limitReached": "Free watches 2 categories. Go Plus to watch as many as you like.",
     "alreadyExists": "You already have a cap for that — tap it to change it.",
@@ -216,7 +165,9 @@
     "capSheet": {
       "label": "Monthly cap",
       "category": "Category"
-    }
+    },
+    "remove": "Remove",
+    "removeConfirm": "Yes, remove"
   },
   "plan": {
     "eyebrow": "deshka Plus",

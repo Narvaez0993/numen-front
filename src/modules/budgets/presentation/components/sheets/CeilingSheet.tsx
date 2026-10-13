@@ -14,6 +14,8 @@ type Props = {
   /** `null` when no ceiling has ever been set. */
   current: number | null;
   monthName: string;
+  /** Named in the help line: the month that will not need it set again. */
+  nextMonthName: string;
   currency: CurrencyCode;
   saving?: boolean;
   onClose: () => void;
@@ -37,6 +39,7 @@ export function CeilingSheet({
   visible,
   current,
   monthName,
+  nextMonthName,
   currency,
   saving = false,
   onClose,
@@ -61,7 +64,7 @@ export function CeilingSheet({
       onDigits={setDigits}
       currency={currency}
       label={t('budgets.hero.ceiling')}
-      help={t('budgets.editTecho.helper', { month: monthName })}
+      help={t('budgets.editTecho.helper', { month: nextMonthName })}
       primaryLabel={t('budgets.editTecho.save')}
       onPrimary={() => onSave(amount)}
       primaryDisabled={saving || amount <= 0}
@@ -73,7 +76,8 @@ export function CeilingSheet({
           </Text>
           {current !== null && onDelete ? (
             <SheetDangerAction
-              label={t('expenses.correct.remove')}
+              label={t('budgets.remove')}
+              confirmLabel={t('budgets.removeConfirm')}
               onConfirm={onDelete}
             />
           ) : null}

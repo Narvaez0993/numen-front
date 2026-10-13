@@ -1,14 +1,16 @@
 /**
- * Starting to watch a category.
+ * Presupuesto's sheets, and the one rule they share: each act happens in ONE
+ * sheet. No step opens a second `Modal` once the first has gone.
  *
- * It broke silently once: picking a candidate closed the picker and opened
- * nothing, so the only way to cap a category was a dead end with no error. Every
- * part passed in isolation — the picker fired its callback, the cap form
- * rendered when handed a category — because the break was in the choreography
- * between two `Modal`s on a timer.
+ * Watching a category broke silently once: picking a candidate closed the
+ * picker and opened nothing, so the only way to cap a category was a dead end
+ * with no error. Every part passed in isolation — the picker fired its
+ * callback, the cap form rendered when handed a category — because the break
+ * was in the choreography between two `Modal`s on a timer. Removing had the
+ * same shape: the cap's sheet closed, and a confirmation opened on a timer.
  *
- * There is no timer now, and this test proves it: it advances no clock. If a
- * future change reintroduces a handoff, this goes red.
+ * There is no timer now, and these tests prove it: they advance no clock. If a
+ * future change reintroduces a handoff, they go red.
  */
 
 import { fireEvent, render, screen } from '@testing-library/react-native';
@@ -20,12 +22,6 @@ import { ThemeProvider } from '@/shared/presentation/theme/ThemeProvider';
 import { BudgetsScreen } from '../BudgetsScreen';
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }));
-
-// The create flow reaches the DI container, which wants a configured API URL.
-// It is not part of this flow — stub the whole thing out.
-jest.mock('../../components/create-flow/BudgetCreateFlow', () => ({
-  BudgetCreateFlow: () => null,
-}));
 
 jest.mock('@/shared/presentation/components/GlassTabBar', () => ({
   useFloatingTabBarClearance: () => 0,
@@ -45,25 +41,31 @@ const CAP = {
   topMerchants: [],
 };
 
+const MONTH = {
+  id: 'cap-month',
+  target: 3_000_000,
+  spent: 117_000,
+  remaining: 2_883_000,
+  used: 0.039,
+  perDay: 137_285,
+  projected: 302_250,
+  over: null,
+};
+
+// A test that needs the account before any budget swaps this out.
+let mockSnapshot: Record<string, unknown> = {};
+const withBudget = () => ({
+  currency: 'COP',
+  period: '2026-08',
+  daysLeft: 21,
+  daysElapsed: 10,
+  month: MONTH,
+  categories: [CAP],
+});
+
 jest.mock('../../hooks/useBudgets', () => ({
   useBudgets: () => ({
-    data: {
-      currency: 'COP',
-      period: '2026-08',
-      daysLeft: 21,
-      daysElapsed: 10,
-      month: {
-        id: 'cap-month',
-        target: 3_000_000,
-        spent: 117_000,
-        remaining: 2_883_000,
-        used: 0.039,
-        perDay: 137_285,
-        projected: 302_250,
-        over: null,
-      },
-      categories: [CAP],
-    },
+    data: mockSnapshot,
     isLoading: false,
     isError: false,
     refetch: jest.fn(),
@@ -99,16 +101,24 @@ jest.mock('@/modules/categories/presentation/hooks/useCategories', () => ({
   }),
 }));
 
-const noopMutation = () => ({
-  mutateAsync: jest.fn(),
+const mockCreate = jest.fn();
+const mockDelete = jest.fn();
+const mutation = (mutateAsync: jest.Mock) => ({
+  mutateAsync,
   mutate: jest.fn(),
   isPending: false,
 });
 jest.mock('../../hooks/useBudgetMutations', () => ({
-  useCreateBudget: () => noopMutation(),
-  useUpdateBudget: () => noopMutation(),
-  useDeleteBudget: () => noopMutation(),
+  useCreateBudget: () => mutation(mockCreate),
+  useUpdateBudget: () => mutation(jest.fn()),
+  useDeleteBudget: () => mutation(mockDelete),
 }));
+
+beforeEach(() => {
+  mockSnapshot = withBudget();
+  mockCreate.mockReset();
+  mockDelete.mockReset();
+});
 
 function mount() {
   return render(
@@ -141,5 +151,35 @@ describe('watching a new category', () => {
     expect(screen.queryByText('Activate cap')).not.toBeNull();
     // And the picker is gone rather than layered behind it.
     expect(screen.queryByText('Watch a category')).toBeNull();
+  });
+});
+
+describe('starting a budget', () => {
+  it('asks for the ceiling, in the sheet that will later edit it', () => {
+    mockSnapshot = { ...withBudget(), month: null, categories: [] };
+    mount();
+
+    fireEvent.press(screen.getByText('Create monthly budget'));
+
+    // The design's ceiling sheet, not a wizard: its title and its one button.
+    expect(screen.queryByText('Your August ceiling')).not.toBeNull();
+    // Standing, not monthly: the help names the month that will not need it.
+    expect(screen.queryByText(/set it again in September/)).not.toBeNull();
+    expect(screen.queryByText('Save')).not.toBeNull();
+    expect(screen.queryByText(/Step 1/)).toBeNull();
+  });
+});
+
+describe('removing a cap', () => {
+  it('asks in its own sheet, then removes it', () => {
+    mount();
+
+    fireEvent.press(screen.getByText('Mercado'));
+    fireEvent.press(screen.getByText('Remove'));
+    // The first tap only asks.
+    expect(mockDelete).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByText('Yes, remove'));
+    expect(mockDelete).toHaveBeenCalledWith('cap-mercado');
   });
 });

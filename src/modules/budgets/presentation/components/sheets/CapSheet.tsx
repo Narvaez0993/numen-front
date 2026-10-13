@@ -115,7 +115,8 @@ export function CapSheet({
           </Text>
           {editing && onDelete ? (
             <SheetDangerAction
-              label={t('expenses.correct.remove')}
+              label={t('budgets.remove')}
+              confirmLabel={t('budgets.removeConfirm')}
               onConfirm={onDelete}
             />
           ) : null}
@@ -126,6 +127,7 @@ export function CapSheet({
         picked === null ? (
           <AddVigilanceBody
             candidates={candidates}
+            currency={currency}
             onPick={(category) =>
               setPicked({
                 categoryId: category.id,

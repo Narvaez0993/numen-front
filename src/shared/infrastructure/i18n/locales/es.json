@@ -124,73 +124,22 @@
     "editTecho": {
       "title": "Tu techo de {{month}}",
       "subtitle": "Cámbialo cuando quieras. Aplica desde ya, incluido este mes.",
-      "helper": "Tu tope sigue vigente mes a mes hasta que lo cambies, así que no tienes que volver a ponerlo en {{month}} que viene.",
+      "helper": "Tu techo sigue vigente mes a mes hasta que lo cambies, así que en {{month}} no tienes que volver a ponerlo.",
       "save": "Guardar",
       "delete": "Eliminar presupuesto"
     },
     "editTopeSheet": {
       "title": "Tope para {{name}}",
-      "subtitle": "Deshka te avisará cuando te acerques a este monto.",
       "carry": "Llevas {{amount}} este mes",
       "save": "Guardar tope",
-      "activate": "Activar tope",
-      "delete": "Eliminar tope"
+      "activate": "Activar tope"
     },
     "addVigilance": {
       "title": "Vigilar una categoría",
-      "subtitle": "Elige una categoría y define el tope.",
-      "spent": "{{amount}} gastado · sin tope",
-      "add": "Agregar",
       "allWatchedTitle": "Ya estás vigilando todas las categorías",
-      "allWatchedHint": "Tócalas en la lista de Presupuestos para editar los topes."
-    },
-    "confirmSheet": {
-      "techoTitle": "¿Eliminar tu presupuesto de {{month}}?",
-      "techoBody": "Dejamos de medir el mes contra un tope. Tus topes por categoría se quedan como están.",
-      "techoCta": "Eliminar presupuesto",
-      "topeTitle": "¿Eliminar el tope de {{name}}?",
-      "topeBody": "La categoría seguirá apareciendo en 'Sin tope' este mes. Puedes activarlo de nuevo cuando quieras.",
-      "topeCta": "Eliminar tope",
-      "cancel": "Cancelar"
-    },
-    "create": {
-      "step": "Paso {{current}} de {{total}}",
-      "skip": "Saltar",
-      "next": "Continuar",
-      "save": "Guardar presupuesto",
-      "step1": {
-        "title": "Tu presupuesto de {{month}}",
-        "subtitle": "¿Cuánto no quieres pasar este mes?",
-        "helper": "Puedes ajustarlo después si necesitas."
-      },
-      "step2": {
-        "title": "¿Quieres vigilar alguna categoría?",
-        "subtitle": "Activa topes en categorías donde quieras autocontrol específico. Es opcional.",
-        "infoPart1": "Los topes ",
-        "infoBold": "no son adicionales",
-        "infoPart2": " — todo gasto cuenta a tu techo de ",
-        "infoPart3": ". Los topes solo te avisan cuando una categoría específica se acerca a su límite.",
-        "categoriesLabel": "Categorías",
-        "tope": "Tope {{amount}}",
-        "noTope": "Sin tope",
-        "createCategory": "¿No ves la que buscas? Crear categoría",
-        "exitTitle": "¿Salir sin crear presupuesto?",
-        "exitBody": "Perderás los cambios que has hecho.",
-        "exitCta": "Salir"
-      }
-    },
-    "createCategory": {
-      "title": "Nueva categoría",
-      "plus": "Plus",
-      "subtitle": "Llámala como quieras, elige ícono y color.",
-      "preview": "Vista previa",
-      "previewPlaceholder": "Tu categoría",
-      "nameLabel": "Nombre",
-      "namePlaceholder": "ej: Mascotas, Gym, Cursos",
-      "iconLabel": "Ícono",
-      "colorLabel": "Color",
-      "save": "Crear categoría",
-      "footnote": "Las categorías personalizadas son parte de Plus."
+      "allWatchedHint": "Tócalas en la lista de Presupuestos para editar los topes.",
+      "listLabel": "Sin tope",
+      "spentLabel": "gastado este mes"
     },
     "limitReached": "Con Free vigilas 2 categorías. Hazte Plus para vigilar todas las que quieras.",
     "alreadyExists": "Ya tienes un tope para eso: tócalo para cambiarlo.",
@@ -216,7 +165,9 @@
     "capSheet": {
       "label": "Tope del mes",
       "category": "Categoría"
-    }
+    },
+    "remove": "Quitar",
+    "removeConfirm": "Sí, quitar"
   },
   "plan": {
     "eyebrow": "deshka Plus",

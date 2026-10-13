@@ -10,7 +10,12 @@ import { DomainError, type CurrencyCode } from '@/shared/domain';
 import { Aurora, DashedButton, RetryState, Text } from '@/shared/presentation/components';
 import { useFloatingTabBarClearance } from '@/shared/presentation/components/GlassTabBar';
 import { useTheme } from '@/shared/presentation/theme';
-import { monthName, monthRange, toIsoDate } from '@/shared/presentation/utils/dates';
+import {
+  monthName,
+  monthRange,
+  shiftMonth,
+  toIsoDate,
+} from '@/shared/presentation/utils/dates';
 
 import { BudgetHero } from '../components/BudgetHero';
 import { BudgetsHeader } from '../components/BudgetsHeader';
@@ -18,10 +23,8 @@ import { EmptyState } from '../components/EmptyState';
 import { GoalsLink } from '../components/GoalsLink';
 import { ProjectionCallout } from '../components/ProjectionCallout';
 import { WatchedRow } from '../components/WatchedRow';
-import { BudgetCreateFlow } from '../components/create-flow/BudgetCreateFlow';
 import { CapSheet } from '../components/sheets/CapSheet';
 import { CeilingSheet } from '../components/sheets/CeilingSheet';
-import { ConfirmSheet } from '../components/sheets/ConfirmSheet';
 import {
   useCreateBudget,
   useDeleteBudget,
@@ -33,21 +36,10 @@ import {
   useWatchedCategories,
 } from '../hooks/useWatchedCategories';
 
-type Confirm = { kind: 'techo' } | { kind: 'tope'; budgetId: string; name: string };
-
 const COPY_BY_CODE: Record<string, string> = {
   'budgets.limit_reached': 'budgets.limitReached',
   'budgets.already_exists': 'budgets.alreadyExists',
 };
-
-// Time to wait for one BottomSheet to fully close before opening another.
-// React Native only shows a single Modal at a time on iOS, so deleting from
-// inside a sheet has to let that sheet leave before the confirmation arrives.
-// Matches BottomSheet's 240ms close animation plus a small buffer.
-//
-// It is used for confirmations only. Chaining two sheets of a FLOW this way was
-// a race that lost — see `WatchCategoryFlow`.
-const SHEET_CLOSE_MS = 280;
 
 /**
  * Presupuestos, running on the API.
@@ -67,6 +59,17 @@ const SHEET_CLOSE_MS = 280;
  * cards. Four cards read as four things each asking for attention; four rows
  * read as a list, and a list is scannable, which is the entire job: notice the
  * one misbehaving without reading the other three.
+ *
+ * A budget starts the way the design draws it: the ceiling, in the very sheet
+ * that later edits it. There used to be a two-step wizard of its own — a page
+ * with a progress bar, preset pills, a green button — and it was the one place
+ * left where making a budget looked like a different app. Categories are
+ * watched afterwards, one at a time, from the list they will live in.
+ *
+ * Removing asks in the sheet's own header, never in a second sheet. A
+ * confirmation that opened once the first sheet had gone was two `Modal`s
+ * handing over on a timer, and on iOS that handover can leave an invisible
+ * layer that swallows every touch.
  */
 export function BudgetsScreen() {
   const tabBarClearance = useFloatingTabBarClearance();
@@ -102,11 +105,9 @@ export function BudgetsScreen() {
   const updateBudget = useUpdateBudget(today);
   const deleteBudget = useDeleteBudget();
 
-  const [createOpen, setCreateOpen] = useState(false);
   const [editTechoOpen, setEditTechoOpen] = useState(false);
   const [topeEdit, setTopeEdit] = useState<WatchedCategory | null>(null);
   const [addVigOpen, setAddVigOpen] = useState(false);
-  const [confirm, setConfirm] = useState<Confirm | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
 
   if (isError) {
@@ -141,6 +142,7 @@ export function BudgetsScreen() {
 
   const currency = data.currency as CurrencyCode;
   const name = monthName(`${data.period}-01`, i18n.language);
+  const nextName = monthName(shiftMonth(`${data.period}-01`, 1), i18n.language);
   const state: 'A' | 'B' | 'C' =
     data.month === null ? 'A' : watched.length === 0 ? 'B' : 'C';
 
@@ -156,21 +158,6 @@ export function BudgetsScreen() {
       return;
     }
     setFailed(error instanceof Error ? error.message : t('common.error'));
-  };
-
-  const handleCreate = async (techo: number, topes: Record<string, number>) => {
-    setFailed(null);
-    setCreateOpen(false);
-    try {
-      await createBudget.mutateAsync({ scope: 'global', target: techo });
-      // Sequential on purpose: the Free gate counts what is already there, so two
-      // caps racing could both read "one watched" and slip past it.
-      for (const [categoryId, target] of Object.entries(topes)) {
-        await createBudget.mutateAsync({ scope: 'category', categoryId, target });
-      }
-    } catch (error) {
-      report(error);
-    }
   };
 
   const handleSaveTecho = async (amount: number) => {
@@ -210,49 +197,26 @@ export function BudgetsScreen() {
     }
   };
 
-  const requestDeleteTope = () => {
-    if (!topeEdit) return;
-    const { id, name: categoryName } = topeEdit;
-    setTopeEdit(null);
-    setTimeout(
-      () => setConfirm({ kind: 'tope', budgetId: id, name: categoryName }),
-      SHEET_CLOSE_MS,
-    );
-  };
-
-  const requestDeleteTecho = () => {
-    setEditTechoOpen(false);
-    setTimeout(() => setConfirm({ kind: 'techo' }), SHEET_CLOSE_MS);
-  };
-
-  const confirmDelete = async () => {
-    if (!confirm) return;
-    const target = confirm.kind === 'techo' ? data.month?.id : confirm.budgetId;
-    setConfirm(null);
-    if (!target) return;
+  // The sheet has already asked; closing it and removing are one gesture.
+  const remove = async (id: string | undefined) => {
+    if (!id) return;
     setFailed(null);
     try {
-      await deleteBudget.mutateAsync(target);
+      await deleteBudget.mutateAsync(id);
     } catch (error) {
       report(error);
     }
   };
 
-  const confirmCopy = {
-    title:
-      confirm?.kind === 'techo'
-        ? t('budgets.confirmSheet.techoTitle', { month: name })
-        : confirm?.kind === 'tope'
-          ? t('budgets.confirmSheet.topeTitle', { name: confirm.name })
-          : '',
-    body:
-      confirm?.kind === 'techo'
-        ? t('budgets.confirmSheet.techoBody')
-        : t('budgets.confirmSheet.topeBody'),
-    cta:
-      confirm?.kind === 'techo'
-        ? t('budgets.confirmSheet.techoCta')
-        : t('budgets.confirmSheet.topeCta'),
+  const handleDeleteTope = () => {
+    const id = topeEdit?.id;
+    setTopeEdit(null);
+    void remove(id);
+  };
+
+  const handleDeleteTecho = () => {
+    setEditTechoOpen(false);
+    void remove(data.month?.id);
   };
 
   return (
@@ -290,7 +254,7 @@ export function BudgetsScreen() {
 
         {state === 'A' && (
           <View style={{ paddingHorizontal: 24, paddingTop: 24 }}>
-            <EmptyState onCreate={() => setCreateOpen(true)} />
+            <EmptyState onCreate={() => setEditTechoOpen(true)} />
           </View>
         )}
 
@@ -364,24 +328,16 @@ export function BudgetsScreen() {
       </ScrollView>
 
       {/* Sheets */}
-      <BudgetCreateFlow
-        visible={createOpen}
-        categories={candidates}
-        monthName={name}
-        saving={createBudget.isPending}
-        onClose={() => setCreateOpen(false)}
-        onSave={handleCreate}
-      />
-
       <CeilingSheet
         visible={editTechoOpen}
         current={data.month?.target ?? null}
         monthName={name}
+        nextMonthName={nextName}
         currency={currency}
         saving={updateBudget.isPending || createBudget.isPending}
         onClose={() => setEditTechoOpen(false)}
         onSave={handleSaveTecho}
-        onDelete={data.month ? requestDeleteTecho : undefined}
+        onDelete={data.month ? handleDeleteTecho : undefined}
       />
 
       {/* One component for both: capping a category is the same act whether the
@@ -403,7 +359,7 @@ export function BudgetsScreen() {
         saving={updateBudget.isPending}
         onClose={() => setTopeEdit(null)}
         onSave={(_, amount) => void handleSaveTope(amount)}
-        onDelete={requestDeleteTope}
+        onDelete={handleDeleteTope}
       />
 
       <CapSheet
@@ -415,15 +371,6 @@ export function BudgetsScreen() {
         saving={createBudget.isPending}
         onClose={() => setAddVigOpen(false)}
         onSave={(categoryId, amount) => void handleWatchCategory(categoryId, amount)}
-      />
-
-      <ConfirmSheet
-        visible={confirm != null}
-        title={confirmCopy.title}
-        body={confirmCopy.body}
-        confirmLabel={confirmCopy.cta}
-        onConfirm={confirmDelete}
-        onClose={() => setConfirm(null)}
       />
     </Aurora>
   );
