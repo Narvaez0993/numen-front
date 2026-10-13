@@ -494,7 +494,7 @@
         "confirm": "Confirm contribution",
         "sheetTitle": "Contribution to {{name}}",
         "sheetBody": "{{amount}} moves from the account you pick.",
-        "fromAccount": "Which account does it leave from?",
+        "fromAccount": "Leaves from",
         "planLimit": "Your Free plan already uses its 2 category caps.",
         "seePlus": "See Plus",
         "failedBody": "It could not be applied. The proposal stays here in case the context changes."

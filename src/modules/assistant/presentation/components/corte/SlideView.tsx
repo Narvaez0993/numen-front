@@ -5,7 +5,7 @@ import { Animated, Easing, Pressable, useWindowDimensions, View } from 'react-na
 import { Ellipse, Svg } from 'react-native-svg';
 
 import { useMovementCatalogs } from '@/modules/movements/presentation/hooks/useMovementCatalogs';
-import { Icon, IconBox, Text } from '@/shared/presentation/components';
+import { Icon, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { withAlpha } from '@/shared/presentation/theme/tokens';
 import { monthName, shiftMonth, weekdayName } from '@/shared/presentation/utils/dates';
@@ -24,9 +24,6 @@ type Props = {
 
 /** The design's easing — every corte animation shares it. */
 const CURVE = Easing.bezier(0.32, 0.72, 0, 1);
-
-/** Dark navy from the tokens: the text that sits ON a mint button, any theme. */
-const ON_MINT = '#0A0E1A';
 
 /**
  * There is no accent per slide any more.
@@ -76,10 +73,7 @@ export function SlideView({ slide, corte, playAction, onClose }: Props) {
         return (
           <View style={{ gap: 30 }}>
             <NumIn delay={0}>
-              <CoverMark
-                stroke={theme.colors.textTertiary}
-                dot={theme.colors.accentMint}
-              />
+              <CoverMark stroke={theme.colors.textTertiary} dot={accentFg} />
             </NumIn>
             <View>
               <NumIn delay={200}>
@@ -690,7 +684,10 @@ function CoverMark({ stroke, dot }: { stroke: string; dot: string }) {
 // The play slide's pieces — before → after, then the action
 // ─────────────────────────────────────────────────────────────
 
-/** What the play proposes, as numbers: old cap struck through → new in mint. */
+/** What the play proposes, as numbers: old cap struck through → the new one.
+ *  The design's action card — glass, the icon in the accent's well, the number
+ *  in ink. It used to tint each play by its category's own colour and print the
+ *  amount in mint, the one colour this palette no longer has. */
 function PlayCard({ play }: { play: AgentPlay }) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -707,7 +704,6 @@ function PlayCard({ play }: { play: AgentPlay }) {
       : play.action === 'treat'
         ? 'sparkles'
         : 'target');
-  const color = category?.color ?? (play.action === 'treat' ? 'amber' : 'mint');
   const label =
     play.action === 'contribute_goal'
       ? play.goalName
@@ -725,15 +721,25 @@ function PlayCard({ play }: { play: AgentPlay }) {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
-        paddingVertical: 14,
-        paddingHorizontal: 16,
+        padding: 16,
         backgroundColor: theme.colors.bgSurface,
         borderWidth: 1,
         borderColor: theme.colors.borderSubtle,
-        borderRadius: 16,
+        borderRadius: 24,
       }}
     >
-      <IconBox name={icon} color={color} size={38} iconSize={18} />
+      <View
+        style={{
+          width: 38,
+          height: 38,
+          borderRadius: 13,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: withAlpha(theme.palette.acc, 0.14),
+        }}
+      >
+        <Icon name={icon} size={18} stroke={1.8} color={theme.palette.acc2} />
+      </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text
           variant="micro"
@@ -758,12 +764,7 @@ function PlayCard({ play }: { play: AgentPlay }) {
               <Icon name="chevron-right" size={12} color={theme.colors.textTertiary} />
             </>
           ) : null}
-          <Text
-            variant="label"
-            tabular
-            color={theme.colors.accentMint}
-            style={{ fontSize: 17 }}
-          >
+          <Text tabular style={{ fontSize: 17, fontWeight: '500' }}>
             {formatMoney(amount)}
           </Text>
         </View>
@@ -772,7 +773,8 @@ function PlayCard({ play }: { play: AgentPlay }) {
   );
 }
 
-/** The design's confirmation: check on mint, the play now lives in the app. */
+/** Done: the play now lives in the app. The same glass as the card above it,
+ *  with the check in the accent's well — a quiet confirmation, not a banner. */
 function AppliedCard({ play }: { play: AgentPlay }) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -784,23 +786,23 @@ function AppliedCard({ play }: { play: AgentPlay }) {
         gap: 10,
         paddingVertical: 14,
         paddingHorizontal: 16,
-        borderRadius: 14,
-        backgroundColor: theme.colors.accentMintBg,
+        borderRadius: 20,
+        backgroundColor: theme.colors.bgSurface,
         borderWidth: 1,
-        borderColor: 'rgba(0,229,168,0.25)',
+        borderColor: withAlpha(theme.palette.acc, 0.3),
       }}
     >
       <View
         style={{
-          width: 26,
-          height: 26,
-          borderRadius: 8,
-          backgroundColor: theme.colors.accentMint,
+          width: 28,
+          height: 28,
+          borderRadius: 10,
+          backgroundColor: withAlpha(theme.palette.acc, 0.16),
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Icon name="check" size={14} stroke={2.6} color={ON_MINT} />
+        <Icon name="check" size={15} stroke={2.4} color={theme.palette.acc2} />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text variant="body" style={{ fontWeight: '500', fontSize: 13.5 }}>

@@ -494,7 +494,7 @@
         "confirm": "Confirmar aporte",
         "sheetTitle": "Aporte a {{name}}",
         "sheetBody": "Se transfieren {{amount}} de la cuenta que elijas.",
-        "fromAccount": "¿De qué cuenta sale?",
+        "fromAccount": "Sale de",
         "planLimit": "Tu plan Free ya usa sus 2 topes por categoría.",
         "seePlus": "Ver Plus",
         "failedBody": "No se pudo aplicar. La propuesta sigue aquí por si cambia el contexto."
