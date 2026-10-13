@@ -832,15 +832,6 @@
       "night": "Buenas noches",
       "you": "Tú"
     },
-    "saldo": {
-      "label": "Saldo neto"
-    },
-    "month": {
-      "label": "{{month}} · {{daysLeft}} días",
-      "labelOne": "{{month}} · {{daysLeft}} día",
-      "movements_one": "{{count}} mov",
-      "movements_other": "{{count}} mov"
-    },
     "categories": {
       "title": "En qué se te va",
       "thisMonth": "este mes",
@@ -862,17 +853,6 @@
       "title": "No pudimos cargar tu inicio.",
       "retry": "Reintentar"
     },
-    "start": {
-      "title": "Empieza aquí",
-      "titleReturning": "Para calcular tu cupo",
-      "progress": "{{done}} de {{total}}",
-      "steps": {
-        "source": "Crea tu primera cuenta",
-        "expense": "Registra un gasto",
-        "income": "Registra tu ingreso de {{month}}"
-      },
-      "footer": "Con tu ingreso del mes calculamos cuánto puedes gastar cada día."
-    },
     "upcoming": {
       "title": "Próximos cobros",
       "seeAll": "Ver todos",
@@ -884,68 +864,23 @@
       "skip": "No pasó",
       "unknown": "Suscripción"
     },
-    "pace": {
-      "label": "Este mes",
-      "spent": "gastado",
-      "rate": "{{amount}} al día",
-      "projection": "a este ritmo cierras {{month}} en {{amount}}",
-      "less": "{{pct}}% menos que en {{month}} a esta fecha",
-      "more": "{{pct}}% más que en {{month}} a esta fecha",
-      "same": "vas igual que en {{month}} a esta fecha"
-    },
-    "debt": {
-      "label": "Salir de deudas",
-      "caption": "en tus tarjetas",
-      "utilization": "{{pct}}% de tu cupo de {{amount}}",
-      "breakdown": "tarjetas {{cards}} · a personas {{people}}",
-      "onlyPeople_one": "a {{count}} persona, sin deuda de tarjetas",
-      "onlyPeople_other": "entre {{count}} deudas con personas",
-      "owedToMe": "y a ti te deben {{amount}}"
-    },
-    "saving": {
-      "label": "Ahorrando",
-      "thisMonth": "guardado este mes",
-      "negative": "de más este mes",
-      "rate": "{{pct}}% de tus ingresos"
-    },
     "invite": {
       "deudas": {
-        "title": "Tu objetivo: salir de deudas",
-        "body": "Aún no registras ninguna deuda: ni tarjetas ni lo que le debes a alguien. Regístralas y te muestro cuánto debes y cómo va bajando.",
         "action": "Registrar una deuda"
       },
       "ahorrar": {
-        "title": "Tu objetivo: ahorrar",
-        "body": "Ponle nombre a lo que estás ahorrando y aparta la plata de verdad, como un bolsillo.",
         "action": "Crear mi primera meta"
       },
       "gastos": {
-        "title": "Tu objetivo",
-        "body": "Registra un gasto para empezar a ver en qué se te va la plata.",
         "action": "Registrar un gasto"
-      },
-      "meanwhile": "Mientras tanto vas gastando {{amount}} al día"
+      }
     },
     "budget": {
       "left": "Te queda",
       "over": "Te pasaste",
       "label": "Presupuesto",
       "perDay_one": "por día · {{count}} día",
-      "perDay_other": "por día · {{count}} días",
-      "row": "{{pct}}% del presupuesto",
-      "spent": "Sin margen",
-      "of": "de {{amount}}",
-      "ceiling_one": "{{amount}} por día · queda {{count}} día",
-      "ceiling_other": "{{amount}} por día · quedan {{count}} días",
-      "willFit": "Cierras en {{amount}}. Cabes por {{gap}}.",
-      "willBust": "Cierras en {{amount}}. Te pasas por {{gap}}."
-    },
-    "goal": {
-      "of": "de {{amount}}",
-      "projection": "A este ritmo llegas en {{month}}",
-      "start": "El primer aporte la pone en marcha",
-      "achieved": "¡Meta lograda! Retira la plata cuando quieras",
-      "monthSupport": "Guardaste {{amount}} este mes"
+      "perDay_other": "por día · {{count}} días"
     },
     "daysLeft_one": "queda {{count}} día",
     "daysLeft_other": "quedan {{count}} días",
@@ -985,7 +920,11 @@
         "ahorrar": "Ponle nombre a\n<b>lo que estás ahorrando</b>.",
         "deudas": "Anota <b>lo que debes</b>\ny te muestro cómo baja.",
         "gastos": "Registra un gasto\ny <b>vemos en qué se te va</b>."
-      }
+      },
+      "start": "Cuéntame tu <b>primer gasto</b>\ny empiezo a contar tu mes.",
+      "startLink": "Cuéntame uno",
+      "startSource": "Primero, dime <b>dónde tienes\ntu plata</b>.",
+      "startSourceLink": "Agregar una cuenta"
     },
     "accounts": {
       "label": "En tus cuentas",

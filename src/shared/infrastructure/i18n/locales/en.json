@@ -832,15 +832,6 @@
       "night": "Good evening",
       "you": "You"
     },
-    "saldo": {
-      "label": "Net balance"
-    },
-    "month": {
-      "label": "{{month}} · {{daysLeft}} days",
-      "labelOne": "{{month}} · {{daysLeft}} day",
-      "movements_one": "{{count}} mov",
-      "movements_other": "{{count}} mov"
-    },
     "categories": {
       "title": "Where it goes",
       "thisMonth": "this month",
@@ -862,17 +853,6 @@
       "title": "We could not load your home.",
       "retry": "Try again"
     },
-    "start": {
-      "title": "Start here",
-      "titleReturning": "To work out your daily figure",
-      "progress": "{{done}} of {{total}}",
-      "steps": {
-        "source": "Create your first account",
-        "expense": "Register an expense",
-        "income": "Register your {{month}} income"
-      },
-      "footer": "With this month's income we work out how much you can spend each day."
-    },
     "upcoming": {
       "title": "Upcoming charges",
       "seeAll": "See all",
@@ -884,68 +864,23 @@
       "skip": "Did not happen",
       "unknown": "Subscription"
     },
-    "pace": {
-      "label": "This month",
-      "spent": "spent",
-      "rate": "{{amount}} a day",
-      "projection": "at this rate {{month}} closes at {{amount}}",
-      "less": "{{pct}}% less than in {{month}} by this date",
-      "more": "{{pct}}% more than in {{month}} by this date",
-      "same": "same as {{month}} by this date"
-    },
-    "debt": {
-      "label": "Getting out of debt",
-      "caption": "on your cards",
-      "utilization": "{{pct}}% of your {{amount}} limit",
-      "breakdown": "cards {{cards}} · to people {{people}}",
-      "onlyPeople_one": "to {{count}} person, no card debt",
-      "onlyPeople_other": "across {{count}} personal debts",
-      "owedToMe": "and you are owed {{amount}}"
-    },
-    "saving": {
-      "label": "Saving",
-      "thisMonth": "kept this month",
-      "negative": "over this month",
-      "rate": "{{pct}}% of your income"
-    },
     "invite": {
       "deudas": {
-        "title": "Your goal: get out of debt",
-        "body": "No debt registered yet — no cards, nothing owed to anyone. Add them and I will show you what you owe and how it goes down.",
         "action": "Add a debt"
       },
       "ahorrar": {
-        "title": "Your goal: save",
-        "body": "Name what you are saving for and truly set the money aside, like a pocket.",
         "action": "Create my first goal"
       },
       "gastos": {
-        "title": "Your goal",
-        "body": "Register an expense to start seeing where your money goes.",
         "action": "Add an expense"
-      },
-      "meanwhile": "Meanwhile you are spending {{amount}} a day"
+      }
     },
     "budget": {
       "left": "You have left",
       "over": "You went over",
       "label": "Budget",
       "perDay_one": "per day · {{count}} day",
-      "perDay_other": "per day · {{count}} days",
-      "row": "{{pct}}% of the budget",
-      "spent": "Nothing left",
-      "of": "of {{amount}}",
-      "ceiling_one": "{{amount}} a day · {{count}} day left",
-      "ceiling_other": "{{amount}} a day · {{count}} days left",
-      "willFit": "You close at {{amount}}. That fits, by {{gap}}.",
-      "willBust": "You close at {{amount}}. That is {{gap}} over."
-    },
-    "goal": {
-      "of": "of {{amount}}",
-      "projection": "At this pace you get there by {{month}}",
-      "start": "The first contribution sets it in motion",
-      "achieved": "Goal reached! Withdraw the money whenever you like",
-      "monthSupport": "You kept {{amount}} this month"
+      "perDay_other": "per day · {{count}} days"
     },
     "daysLeft_one": "{{count}} day left",
     "daysLeft_other": "{{count}} days left",
@@ -985,7 +920,11 @@
         "ahorrar": "Give a name to\n<b>what you're saving for</b>.",
         "deudas": "Write down <b>what you owe</b>\nand I'll show you it going down.",
         "gastos": "Log an expense\nand <b>we'll see where it goes</b>."
-      }
+      },
+      "start": "Tell me your <b>first expense</b>\nand I'll start counting your month.",
+      "startLink": "Tell me one",
+      "startSource": "First, tell me <b>where\nyour money is</b>.",
+      "startSourceLink": "Add an account"
     },
     "accounts": {
       "label": "In your accounts",

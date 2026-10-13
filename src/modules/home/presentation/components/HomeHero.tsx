@@ -50,6 +50,14 @@ export type HeroFace =
       objective: Objective | null;
       spent: number;
       onPress: () => void;
+    }
+  | {
+      /** Nothing recorded yet. The hero asks for the first movement — or, with
+       *  no account to put it in, for that first. */
+      kind: 'start';
+      hasSources: boolean;
+      onCapture: () => void;
+      onAddSource: () => void;
     };
 
 type Props = { face: HeroFace };
@@ -70,6 +78,11 @@ type Props = { face: HeroFace };
  * On a first month there is nothing to compare against, so the sentence is about
  * the month itself. Inventing a trend from one data point would be the app
  * pretending to know the user better than it does.
+ *
+ * And before the first movement there is no month at all, so the hero asks for
+ * one, in the same shape. It replaces the «Empieza aquí» checklist, which was a
+ * card from the design before this one and the only thing on Home that still
+ * looked like it.
  */
 export function HomeHero({ face }: Props) {
   const { theme } = useTheme();
@@ -182,6 +195,21 @@ export function HomeHero({ face }: Props) {
         />
       );
     }
+
+    case 'start':
+      return (
+        <Shape
+          sentence={
+            <Sentence
+              i18nKey={face.hasSources ? 'home.hero.start' : 'home.hero.startSource'}
+            />
+          }
+          label={t('home.hero.spent')}
+          link={t(face.hasSources ? 'home.hero.startLink' : 'home.hero.startSourceLink')}
+          onLink={face.hasSources ? face.onCapture : face.onAddSource}
+          amount={0}
+        />
+      );
 
     case 'invite': {
       const key = face.objective ?? 'gastos';

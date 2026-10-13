@@ -27,7 +27,6 @@ import { AccountsRow } from '../components/AccountsRow';
 import { AutoCharges } from '../components/AutoCharges';
 import { BudgetPulse } from '../components/BudgetPulse';
 import { RhythmStrip } from '../components/RhythmStrip';
-import { TodayHero } from '../components/TodayHero';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
 import { useHomeOverview } from '../hooks/useHomeOverview';
 
@@ -94,37 +93,19 @@ export function HomeScreen() {
 
   const goMovements = () => router.push('/movements');
 
-  // The three things that turn the daily figure on, each answered by the payload
-  // itself — nothing is remembered on the device, so this cannot drift from what
-  // the user actually has.
-  const startSteps = [
-    {
-      key: 'source',
-      label: t('home.start.steps.source'),
-      done: data.accountsCount + data.creditCardsCount > 0,
-      onPress: () => router.push('/accounts'),
-    },
-    {
-      key: 'expense',
-      label: t('home.start.steps.expense'),
-      done: data.month.spent > 0 || data.recent.some((m) => m.type === 'expense'),
-      onPress: () => openSheet('manual', 'expense'),
-    },
-    {
-      key: 'income',
-      label: t('home.start.steps.income', {
-        month: monthName(`${data.period}-01`, i18n.language),
-      }),
-      done: data.month.income > 0,
-      onPress: () => openSheet('manual', 'income'),
-    },
-  ];
-
   // HU-25: the hero answers the objective. The server already chose the face
   // (`focus`, from the objective and the data that exists); this only dresses it
   // in the design's shape.
   const heroFace = ((): HeroFace => {
     switch (data.focus) {
+      case 'start':
+        return {
+          kind: 'start',
+          hasSources: data.accountsCount + data.creditCardsCount > 0,
+          // The capture menu, as the orb opens it: speaking, writing, by hand.
+          onCapture: () => openSheet(),
+          onAddSource: () => router.push('/accounts'),
+        };
       case 'saving':
         return data.goal !== null
           ? { kind: 'goal', goal: data.goal, onPress: () => router.push('/goals') }
@@ -195,32 +176,7 @@ export function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={{ gap: 18 }}>
-            {/* The bundle draws Home for a user who already has a month. A
-                first-timer still gets the checklist — dropping it would leave
-                them a screen of zeros with nothing to do. */}
-            {data.focus === 'start' ? (
-              <TodayHero
-                focus={data.focus}
-                objective={data.objective}
-                month={data.month}
-                pace={data.pace}
-                budget={data.budget}
-                debts={data.debts}
-                goal={data.goal}
-                netBalance={data.netBalance}
-                cardDebt={data.cardDebt}
-                cardLimit={data.cardLimit}
-                period={data.period}
-                daysLeft={data.daysLeft}
-                onSaldoPress={() => router.push('/accounts')}
-                onBudgetPress={() => router.push('/(tabs)/budgets')}
-                // The month's spend is the movements that made it, not a budget.
-                onMonthPress={goMovements}
-                start={{ steps: startSteps, firstTime: true }}
-              />
-            ) : (
-              <HomeHero face={heroFace} />
-            )}
+            <HomeHero face={heroFace} />
             <RhythmStrip
               byDay={data.byDay}
               spentToday={data.month.spentToday}

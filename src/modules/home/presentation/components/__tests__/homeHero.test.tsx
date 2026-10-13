@@ -7,7 +7,7 @@
  * opened the app and read a spending screen.
  */
 
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { i18n } from '@/shared/infrastructure/i18n';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
@@ -137,6 +137,36 @@ describe('HomeHero', () => {
     expect(screen.getByText('lo que estás ahorrando')).toBeTruthy();
     expect(screen.getByText('Crear mi primera meta')).toBeTruthy();
     expect(screen.getByText('320.000')).toBeTruthy();
+  });
+
+  it('asks for the first movement instead of drawing a checklist', () => {
+    const onCapture = jest.fn();
+    renderFace({
+      kind: 'start',
+      hasSources: true,
+      onCapture,
+      onAddSource: jest.fn(),
+    });
+
+    expect(screen.getByText('primer gasto')).toBeTruthy();
+    expect(screen.getByText('Gastado')).toBeTruthy();
+    expect(screen.getByText('0')).toBeTruthy();
+    fireEvent.press(screen.getByText('Cuéntame uno'));
+    expect(onCapture).toHaveBeenCalled();
+    expect(screen.queryByText(/Empieza aquí/i)).toBeNull();
+  });
+
+  it('asks for an account first when there is nowhere to put a movement', () => {
+    const onAddSource = jest.fn();
+    renderFace({
+      kind: 'start',
+      hasSources: false,
+      onCapture: jest.fn(),
+      onAddSource,
+    });
+
+    fireEvent.press(screen.getByText('Agregar una cuenta'));
+    expect(onAddSource).toHaveBeenCalled();
   });
 
   it('puts the minus before the symbol when the month kept nothing', () => {
