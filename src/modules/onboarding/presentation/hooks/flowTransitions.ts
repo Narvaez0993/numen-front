@@ -1,3 +1,5 @@
+import type { Objective } from '@/shared/domain';
+
 // The onboarding is split into two single-screen state machines by session
 // state:
 //   AUTH  (no session yet) → welcome, the account, the code
@@ -38,3 +40,25 @@ export const SETUP_BACK_MAP: Readonly<Record<SetupStep, SetupStep | null>> = {
   account: 'goal',
   magic: null,
 };
+
+/** What the server already holds of the setup — each step saves its answer as
+ *  it is given, so this is the truth about how far a user got. */
+export type SetupProgress = {
+  /** Empty until the name step: registration does not ask for one. */
+  displayName: string;
+  objective: Objective | null;
+  hasAccount: boolean;
+};
+
+/**
+ * Where a setup left halfway picks up (HU-03): the first step whose answer the
+ * server does not have yet, so nothing already answered is asked again. With
+ * everything answered only the first expense is left — it is an invitation, and
+ * the step itself lets the user leave it for later.
+ */
+export function resumeSetupStep(progress: SetupProgress): SetupStep {
+  if (progress.displayName.trim() === '') return 'name';
+  if (progress.objective === null) return 'goal';
+  if (!progress.hasAccount) return 'account';
+  return 'magic';
+}
