@@ -72,3 +72,52 @@ describe('HU-14 · La categoría de ingreso es opcional', () => {
     expect(screen.getByText('Bancolombia')).toBeTruthy();
   });
 });
+
+describe('HU-23 · Los movimientos especiales quedan señalados', () => {
+  const NEQUI: ResolvedSource = {
+    id: 'acc-2',
+    type: 'account',
+    name: 'Nequi',
+    icon: 'wallet',
+    color: 'mint',
+  };
+
+  it('marks a transfer as a transfer that does not count as spending', () => {
+    renderRow(
+      movement({
+        type: 'transfer',
+        description: 'Bancolombia → Nequi',
+        source: { type: 'account', id: 'acc-1' },
+        destination: { type: 'account', id: 'acc-2' },
+      }),
+      NEQUI,
+    );
+
+    expect(screen.getByText('Transferencia')).toBeTruthy();
+    expect(screen.getByText('No cuenta como gasto')).toBeTruthy();
+    // Neither sign: it moved money between the user's own sources.
+    expect(screen.getByText('$25.000')).toBeTruthy();
+    expect(screen.queryByText('recurrente')).toBeNull();
+  });
+
+  it('marks an expense a subscription charged as recurring', () => {
+    renderRow(
+      movement({
+        description: 'Netflix',
+        capturedVia: 'recurring',
+        subscriptionId: 'sub-netflix',
+      }),
+    );
+
+    expect(screen.getByText('recurrente')).toBeTruthy();
+    expect(screen.getByText('−$25.000')).toBeTruthy();
+    expect(screen.queryByText('Transferencia')).toBeNull();
+  });
+
+  it('marks neither on an ordinary expense', () => {
+    renderRow(movement({ description: 'Almuerzo' }));
+
+    expect(screen.queryByText('recurrente')).toBeNull();
+    expect(screen.queryByText('Transferencia')).toBeNull();
+  });
+});

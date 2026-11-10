@@ -2,7 +2,7 @@
  * The detail of one movement — the design's `DETALLE`.
  */
 
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { i18n } from '@/shared/infrastructure/i18n';
@@ -80,5 +80,40 @@ describe('HU-14 · La categoría de ingreso es opcional', () => {
 
     expect(screen.getByText('Ingreso sin categoría')).toBeTruthy();
     expect(screen.getByText('Bancolombia')).toBeTruthy();
+  });
+});
+
+describe('HU-24 · Confirmación antes de borrar', () => {
+  const LUNCH: Movement = {
+    ...INCOME,
+    id: 'mov-2',
+    type: 'expense',
+    description: 'Almuerzo',
+    amount: 25_000,
+  };
+
+  it('asks by name first, and only the confirmation deletes', () => {
+    const onDelete = jest.fn();
+    mountDetail(LUNCH, { onDelete });
+
+    fireEvent.press(screen.getByText('Borrar movimiento'));
+
+    expect(screen.getByText('¿Borro «Almuerzo»?')).toBeTruthy();
+    expect(onDelete).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByText('Sí, bórralo'));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it('deletes nothing when the answer is «Mejor no»', () => {
+    const onDelete = jest.fn();
+    mountDetail(LUNCH, { onDelete });
+
+    fireEvent.press(screen.getByText('Borrar movimiento'));
+    fireEvent.press(screen.getByText('Mejor no'));
+
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(screen.queryByText('¿Borro «Almuerzo»?')).toBeNull();
+    expect(screen.getByText('Borrar movimiento')).toBeTruthy();
   });
 });
