@@ -7,6 +7,7 @@
 
 import type { TFunction } from 'i18next';
 
+import { categoryName } from '@/modules/categories/presentation/utils/categoryName';
 import type { AccentColor } from '@/shared/domain';
 import { daysBetween } from '@/shared/presentation/utils/dates';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
@@ -30,7 +31,10 @@ export function presentInsight(
 ): PresentedInsight {
   switch (insight.kind) {
     case 'cap_alert': {
-      const name = insight.categoryName ?? t('assistant.insights.cap.global');
+      const name =
+        insight.categoryName !== null
+          ? categoryName(insight.categoryId, insight.categoryName, t)
+          : t('assistant.insights.cap.global');
       const broken = insight.over !== null || insight.used >= 1;
       return {
         key: insight.key,

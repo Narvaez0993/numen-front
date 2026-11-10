@@ -11,13 +11,18 @@ import { ReactNode, useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import { i18n } from '../../infrastructure/i18n';
+import { useResetOnSessionChange } from '../query/useResetOnSessionChange';
 import { ThemeProvider } from '../theme';
 
 void SplashScreen.preventAutoHideAsync();
 
-type Props = { children: ReactNode };
+type Props = {
+  children: ReactNode;
+  /** Who is signed in (null when nobody is). The cache is emptied when it changes. */
+  sessionKey?: string | null;
+};
 
-export function AppProviders({ children }: Props) {
+export function AppProviders({ children, sessionKey = null }: Props) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -29,6 +34,7 @@ export function AppProviders({ children }: Props) {
         },
       }),
   );
+  useResetOnSessionChange(queryClient, sessionKey);
 
   // The four weights the design writes in: 300 for the big sentences, 400 for
   // text, 500 for figures and emphasis, 600 for buttons. A weight that is not

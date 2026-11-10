@@ -130,9 +130,11 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  // The cache is per user: signing out or switching accounts empties it.
+  const userId = useAuthStore((s) => s.session?.userId ?? null);
   return (
     <SafeAreaProvider>
-      <AppProviders>
+      <AppProviders sessionKey={userId}>
         <RootNavigator />
       </AppProviders>
     </SafeAreaProvider>

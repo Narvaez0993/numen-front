@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TextInput, View } from 'react-native';
 
+import type { SourceMovementCount } from '@/modules/movements/application';
 import type { CurrencyCode } from '@/shared/domain';
 import {
   AmountSheet,
@@ -13,6 +14,7 @@ import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
 
 import type { CreditCard } from '../../domain';
+import { sourceDeleteWarning } from '../utils/deleteWarning';
 
 export type CardFormInput = {
   name: string;
@@ -32,6 +34,10 @@ type Props = {
   onClose: () => void;
   onSave: (input: CardFormInput) => void;
   onDelete: () => void;
+  /** Called when «Eliminar» is first tapped: time to count its movements. */
+  onAskDelete?: () => void;
+  /** That count, so the sheet can say what deleting would do to them. */
+  deleteCheck?: SourceMovementCount;
 };
 
 const onlyDigits = (value: string) => value.replace(/[^0-9]/g, '');
@@ -56,8 +62,11 @@ export function CardFormSheet({
   onClose,
   onSave,
   onDelete,
+  onAskDelete,
+  deleteCheck,
 }: Props) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const editing = card != null;
 
   const [name, setName] = useState('');
@@ -65,6 +74,7 @@ export function CardFormSheet({
   const [limitDigits, setLimitDigits] = useState('');
   const [cutoff, setCutoff] = useState('');
   const [due, setDue] = useState('');
+  const [askingDelete, setAskingDelete] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
@@ -73,6 +83,7 @@ export function CardFormSheet({
     setLimitDigits(card ? String(card.limit) : '');
     setCutoff(card ? String(card.cutoffDay) : '');
     setDue(card?.dueDay ? String(card.dueDay) : '');
+    setAskingDelete(false);
   }, [visible, card]);
 
   const debt = Number(debtDigits || '0');
@@ -90,6 +101,11 @@ export function CardFormSheet({
     !debtExceedsLimit &&
     dayInMonth(cutoffDay) &&
     (dueDay === null ? !dueRequired : dayInMonth(dueDay));
+  // HU-07: what deleting the card does to its movements, before the second tap.
+  const deleteWarning =
+    askingDelete && card && deleteCheck
+      ? sourceDeleteWarning('card', card.name, deleteCheck, t)
+      : undefined;
 
   return (
     <AmountSheet
@@ -100,7 +116,11 @@ export function CardFormSheet({
       currency={currency}
       keyboard="system"
       label={t('accounts.form.debt')}
-      help={debtExceedsLimit ? t('accounts.form.debtExceedsLimit') : undefined}
+      help={
+        deleteWarning ??
+        (debtExceedsLimit ? t('accounts.form.debtExceedsLimit') : undefined)
+      }
+      helpColor={deleteWarning ? theme.colors.accentCoral : undefined}
       primaryLabel={t('accounts.form.save')}
       primaryDisabled={!valid || submitting}
       onPrimary={() => onSave({ name: name.trim(), debt, limit, cutoffDay, dueDay })}
@@ -115,6 +135,11 @@ export function CardFormSheet({
               label={t('accounts.form.delete')}
               confirmLabel={t('accounts.form.deleteConfirm')}
               onConfirm={onDelete}
+              onAsk={() => {
+                setAskingDelete(true);
+                onAskDelete?.();
+              }}
+              confirmDisabled={deleteCheck?.checking ?? false}
             />
           ) : null}
         </>

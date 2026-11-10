@@ -71,7 +71,8 @@
     "actions": {
       "undo": "Deshacer"
     },
-    "net": "Neto"
+    "net": "Neto",
+    "uncategorizedIncome": "Ingreso sin categoría"
   },
   "budgets": {
     "title": "Presupuesto",
@@ -274,6 +275,23 @@
       "free_other": "Llevas {{count}} propias de {{limit}} en el plan gratis",
       "plus_one": "{{count}} categoría propia · sin límite con Plus",
       "plus_other": "{{count}} categorías propias · sin límite con Plus"
+    },
+    "standard": {
+      "mercado": "Mercado",
+      "domi": "Domicilios",
+      "transporte": "Transporte",
+      "comida": "Comida fuera",
+      "cafe": "Café",
+      "entret": "Entretenimiento",
+      "subs": "Suscripciones",
+      "servicios": "Servicios",
+      "salud": "Salud",
+      "educacion": "Educación",
+      "hogar": "Hogar",
+      "otros": "Otros",
+      "salario": "Salario",
+      "freelance": "Freelance",
+      "otro_ingreso": "Otro"
     }
   },
   "subscriptions": {
@@ -456,6 +474,17 @@
       "iOwe": "Debes",
       "count_one": "{{count}} persona",
       "count_other": "{{count}} personas"
+    },
+    "deleteWarning": {
+      "checking": "Revisando sus movimientos…",
+      "account_one": "«{{name}}» tiene 1 movimiento. Si la eliminas, se queda en tu historial sin cuenta y sigue contando en los gastos e ingresos del mes, pero su saldo deja de sumar en tu saldo neto.",
+      "account_other": "«{{name}}» tiene {{count}} movimientos. Si la eliminas, se quedan en tu historial sin cuenta y siguen contando en los gastos e ingresos del mes, pero su saldo deja de sumar en tu saldo neto.",
+      "accountMore": "«{{name}}» tiene más de {{count}} movimientos. Si la eliminas, se quedan en tu historial sin cuenta y siguen contando en los gastos e ingresos del mes, pero su saldo deja de sumar en tu saldo neto.",
+      "accountUnknown": "No pudimos revisar sus movimientos. Si tiene, se quedan en tu historial sin cuenta y siguen contando en los gastos e ingresos del mes, pero el saldo de «{{name}}» deja de sumar en tu saldo neto.",
+      "card_one": "«{{name}}» tiene 1 movimiento. Si la eliminas, se queda en tu historial sin tarjeta y, si es un gasto, sigue contando en el mes, pero su deuda deja de restar en tu saldo neto.",
+      "card_other": "«{{name}}» tiene {{count}} movimientos. Si la eliminas, se quedan en tu historial sin tarjeta y sus gastos siguen contando en el mes, pero su deuda deja de restar en tu saldo neto.",
+      "cardMore": "«{{name}}» tiene más de {{count}} movimientos. Si la eliminas, se quedan en tu historial sin tarjeta y sus gastos siguen contando en el mes, pero su deuda deja de restar en tu saldo neto.",
+      "cardUnknown": "No pudimos revisar sus movimientos. Si tiene, se quedan en tu historial sin tarjeta y sus gastos siguen contando en el mes, pero la deuda de «{{name}}» deja de restar en tu saldo neto."
     }
   },
   "assistant": {
@@ -870,7 +899,12 @@
       "over": "Te pasaste",
       "label": "Presupuesto",
       "perDay_one": "por día · {{count}} día",
-      "perDay_other": "por día · {{count}} días"
+      "perDay_other": "por día · {{count}} días",
+      "none": {
+        "body": "Aún no tienes un techo para el mes. Si le pones uno, te digo cuánto puedes gastar cada día.",
+        "cta": "Ponerle un techo al mes",
+        "failed": "No pudimos guardar tu techo. Intenta de nuevo."
+      }
     },
     "daysLeft_one": "queda {{count}} día",
     "daysLeft_other": "quedan {{count}} días",
@@ -1316,7 +1350,9 @@
           "income": "Entra a",
           "transfer": "De",
           "to": "A"
-        }
+        },
+        "amountInvalid": "Escribe un monto mayor que cero.",
+        "noCategory": "Sin categoría"
       },
       "voiceHint": "Toca el mic y cuéntame el gasto",
       "voiceExample": "Ej.: «un café de 5.000 con Nequi»",

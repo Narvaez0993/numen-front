@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Typecheck, lint and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # The git hooks are for commits made by people; CI only installs.
+      HUSKY: '0'
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # package.json sets no engines, but the dev tooling does: lint-staged asks
+      # for Node >= 22.22.1 and commitlint for >= 22.12, so Node 20 is too old.
+      # 24 is the LTS the project is developed and tested on.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Tests
+        run: npx jest --ci

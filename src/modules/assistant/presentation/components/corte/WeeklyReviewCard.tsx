@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
+import { categoryName } from '@/modules/categories/presentation/utils/categoryName';
 import { Icon, Pill, ProgressBar, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { addDays, shortDate, weekdayInitials } from '@/shared/presentation/utils/dates';
@@ -157,7 +158,9 @@ export function WeeklyReviewCard({ review, today, onDismiss }: Props) {
                 numberOfLines={1}
                 style={{ fontSize: 12.5, flex: 1 }}
               >
-                {category.name ?? t('assistant.weekly.unclassified')}
+                {category.name !== null
+                  ? categoryName(category.categoryId, category.name, t)
+                  : t('assistant.weekly.unclassified')}
               </Text>
               <Text
                 variant="caption"
@@ -185,7 +188,9 @@ export function WeeklyReviewCard({ review, today, onDismiss }: Props) {
           color={theme.colors.textTertiary}
           style={{ fontSize: 12 }}
         >
-          {t('assistant.weekly.topCategory', { name: weekly.topCategoryName })}
+          {t('assistant.weekly.topCategory', {
+            name: categoryName(weekly.topCategoryId, weekly.topCategoryName, t),
+          })}
         </Text>
       ) : null}
 

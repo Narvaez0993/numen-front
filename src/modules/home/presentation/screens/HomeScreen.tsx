@@ -25,7 +25,7 @@ import { RecentList } from '../components/RecentList';
 import { HomeHero, type HeroFace } from '../components/HomeHero';
 import { AccountsRow } from '../components/AccountsRow';
 import { AutoCharges } from '../components/AutoCharges';
-import { BudgetPulse } from '../components/BudgetPulse';
+import { MonthBudget } from '../components/MonthBudget';
 import { RhythmStrip } from '../components/RhythmStrip';
 import { TopCategoriesCard } from '../components/TopCategoriesCard';
 import { useHomeOverview } from '../hooks/useHomeOverview';
@@ -183,14 +183,14 @@ export function HomeScreen() {
               dailyAverage={data.pace?.dailyAverage ?? null}
               language={i18n.language}
             />
-            {data.budget ? (
-              <BudgetPulse
-                budget={data.budget}
-                daysLeft={data.daysLeft}
-                elapsed={data.daysElapsed / (data.daysElapsed + data.daysLeft)}
-                onPress={() => router.push('/(tabs)/budgets')}
-              />
-            ) : null}
+            <MonthBudget
+              budget={data.budget}
+              daysLeft={data.daysLeft}
+              elapsed={data.daysElapsed / (data.daysElapsed + data.daysLeft)}
+              today={today}
+              currency={data.currency}
+              onOpenBudgets={() => router.push('/(tabs)/budgets')}
+            />
             <AccountsRow
               netBalance={data.netBalance}
               accountsCount={data.accountsCount}

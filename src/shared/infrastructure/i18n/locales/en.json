@@ -71,7 +71,8 @@
     "actions": {
       "undo": "Undo"
     },
-    "net": "Net"
+    "net": "Net",
+    "uncategorizedIncome": "Uncategorized income"
   },
   "budgets": {
     "title": "Budget",
@@ -274,6 +275,23 @@
       "free_other": "{{count}} of your own, of {{limit}} on the free plan",
       "plus_one": "{{count}} of your own · no limit with Plus",
       "plus_other": "{{count}} of your own · no limit with Plus"
+    },
+    "standard": {
+      "mercado": "Groceries",
+      "domi": "Delivery",
+      "transporte": "Transport",
+      "comida": "Eating out",
+      "cafe": "Coffee",
+      "entret": "Entertainment",
+      "subs": "Subscriptions",
+      "servicios": "Utilities",
+      "salud": "Health",
+      "educacion": "Education",
+      "hogar": "Home",
+      "otros": "Other",
+      "salario": "Salary",
+      "freelance": "Freelance",
+      "otro_ingreso": "Other"
     }
   },
   "subscriptions": {
@@ -456,6 +474,17 @@
       "iOwe": "You owe",
       "count_one": "{{count}} person",
       "count_other": "{{count}} people"
+    },
+    "deleteWarning": {
+      "checking": "Checking its movements…",
+      "account_one": "“{{name}}” has 1 movement. If you delete it, it stays in your history without an account and still counts toward the month’s spending and income, but its balance stops adding to your net balance.",
+      "account_other": "“{{name}}” has {{count}} movements. If you delete it, they stay in your history without an account and still count toward the month’s spending and income, but its balance stops adding to your net balance.",
+      "accountMore": "“{{name}}” has more than {{count}} movements. If you delete it, they stay in your history without an account and still count toward the month’s spending and income, but its balance stops adding to your net balance.",
+      "accountUnknown": "We couldn't check its movements. If it has any, they stay in your history without an account and still count toward the month’s spending and income, but the balance of “{{name}}” stops adding to your net balance.",
+      "card_one": "“{{name}}” has 1 movement. If you delete it, it stays in your history without a card and, if it is an expense, still counts toward the month, but its debt stops being subtracted from your net balance.",
+      "card_other": "“{{name}}” has {{count}} movements. If you delete it, they stay in your history without a card and its expenses still count toward the month, but its debt stops being subtracted from your net balance.",
+      "cardMore": "“{{name}}” has more than {{count}} movements. If you delete it, they stay in your history without a card and its expenses still count toward the month, but its debt stops being subtracted from your net balance.",
+      "cardUnknown": "We couldn't check its movements. If it has any, they stay in your history without a card and its expenses still count toward the month, but the debt of “{{name}}” stops being subtracted from your net balance."
     }
   },
   "assistant": {
@@ -870,7 +899,12 @@
       "over": "You went over",
       "label": "Budget",
       "perDay_one": "per day · {{count}} day",
-      "perDay_other": "per day · {{count}} days"
+      "perDay_other": "per day · {{count}} days",
+      "none": {
+        "body": "You haven't set a ceiling for the month yet. Set one and I'll tell you how much you can spend each day.",
+        "cta": "Set a ceiling for the month",
+        "failed": "We couldn't save your ceiling. Try again."
+      }
     },
     "daysLeft_one": "{{count}} day left",
     "daysLeft_other": "{{count}} days left",
@@ -1316,7 +1350,9 @@
           "income": "Goes into",
           "transfer": "From",
           "to": "To"
-        }
+        },
+        "amountInvalid": "Enter an amount greater than zero.",
+        "noCategory": "No category"
       },
       "voiceHint": "Tap the mic and tell me the expense",
       "voiceExample": "e.g. “a $5 coffee on Chase”",
