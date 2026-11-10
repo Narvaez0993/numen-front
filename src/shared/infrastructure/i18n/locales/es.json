@@ -899,7 +899,12 @@
       "over": "Te pasaste",
       "label": "Presupuesto",
       "perDay_one": "por día · {{count}} día",
-      "perDay_other": "por día · {{count}} días"
+      "perDay_other": "por día · {{count}} días",
+      "none": {
+        "body": "Aún no tienes un techo para el mes. Si le pones uno, te digo cuánto puedes gastar cada día.",
+        "cta": "Ponerle un techo al mes",
+        "failed": "No pudimos guardar tu techo. Intenta de nuevo."
+      }
     },
     "daysLeft_one": "queda {{count}} día",
     "daysLeft_other": "quedan {{count}} días",

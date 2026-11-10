@@ -899,7 +899,12 @@
       "over": "You went over",
       "label": "Budget",
       "perDay_one": "per day · {{count}} day",
-      "perDay_other": "per day · {{count}} days"
+      "perDay_other": "per day · {{count}} days",
+      "none": {
+        "body": "You haven't set a ceiling for the month yet. Set one and I'll tell you how much you can spend each day.",
+        "cta": "Set a ceiling for the month",
+        "failed": "We couldn't save your ceiling. Try again."
+      }
     },
     "daysLeft_one": "{{count}} day left",
     "daysLeft_other": "{{count}} days left",
