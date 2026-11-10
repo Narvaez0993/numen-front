@@ -61,6 +61,14 @@ const account: Account = {
 
 const today = toIsoDate(new Date());
 
+/**
+ * The tests that press «Toca y habla» get their own time budget. Alone they take
+ * a few milliseconds; on a loaded machine (a CI runner, the whole suite in
+ * parallel) the first press through the voice path went past jest's 5 s default
+ * and failed by timeout, not by what it asserts. The assertions stay the same.
+ */
+const VOICE_PATH_TIMEOUT = 30_000;
+
 function draft(overrides: Record<string, unknown> = {}) {
   return {
     id: 'draft-1',
@@ -125,79 +133,95 @@ describe('MagicStep', () => {
     expect(onDone).toHaveBeenCalled();
   });
 
-  it('without a microphone, offers to write it', async () => {
-    renderMagic();
-    await act(async () => {
-      fireEvent.press(screen.getByText('Toca y habla'));
-    });
-    expect(
-      screen.getByText('Aquí no te puedo escuchar, pero puedes escribírmelo.'),
-    ).toBeTruthy();
-  });
+  it(
+    'without a microphone, offers to write it',
+    async () => {
+      renderMagic();
+      await act(async () => {
+        fireEvent.press(screen.getByText('Toca y habla'));
+      });
+      expect(
+        await screen.findByText('Aquí no te puedo escuchar, pero puedes escribírmelo.'),
+      ).toBeTruthy();
+    },
+    VOICE_PATH_TIMEOUT,
+  );
 
-  it('saves what it understood and shows it as «Ya quedó»', async () => {
-    mockParse.mockResolvedValue({
-      drafts: [draft()],
-      debtDrafts: [],
-      clarification: null,
-      notice: null,
-    });
-    mockConfirm.mockImplementation(async ({ draftId }: { draftId: string }) => ({
-      draft: draft({ id: draftId, status: 'confirmed', movementId: 'mov-1' }),
-      movementId: 'mov-1',
-    }));
+  it(
+    'saves what it understood and shows it as «Ya quedó»',
+    async () => {
+      mockParse.mockResolvedValue({
+        drafts: [draft()],
+        debtDrafts: [],
+        clarification: null,
+        notice: null,
+      });
+      mockConfirm.mockImplementation(async ({ draftId }: { draftId: string }) => ({
+        draft: draft({ id: draftId, status: 'confirmed', movementId: 'mov-1' }),
+        movementId: 'mov-1',
+      }));
 
-    renderMagic();
-    await writeIt('un café de cinco mil');
+      renderMagic();
+      await writeIt('un café de cinco mil');
 
-    expect(mockParse).toHaveBeenCalledWith({
-      text: 'un café de cinco mil',
-      source: 'text',
-    });
-    expect(mockConfirm).toHaveBeenCalledWith({
-      draftId: 'draft-1',
-      overrides: undefined,
-    });
-    expect(screen.getByText('Ya quedó guardado')).toBeTruthy();
-    expect(screen.getByText('«un café de cinco mil»')).toBeTruthy();
-    expect(screen.getByText('−$5.000')).toBeTruthy();
-    expect(screen.getByText('Bancolombia')).toBeTruthy();
-    expect(screen.getByText('Hoy')).toBeTruthy();
-  });
+      expect(mockParse).toHaveBeenCalledWith({
+        text: 'un café de cinco mil',
+        source: 'text',
+      });
+      expect(mockConfirm).toHaveBeenCalledWith({
+        draftId: 'draft-1',
+        overrides: undefined,
+      });
+      expect(screen.getByText('Ya quedó guardado')).toBeTruthy();
+      expect(screen.getByText('«un café de cinco mil»')).toBeTruthy();
+      expect(screen.getByText('−$5.000')).toBeTruthy();
+      expect(screen.getByText('Bancolombia')).toBeTruthy();
+      expect(screen.getByText('Hoy')).toBeTruthy();
+    },
+    VOICE_PATH_TIMEOUT,
+  );
 
-  it('puts a movement the agent left without an account on the new one', async () => {
-    mockParse.mockResolvedValue({
-      drafts: [draft({ sourceType: null, sourceId: null })],
-      debtDrafts: [],
-      clarification: null,
-      notice: null,
-    });
-    mockConfirm.mockResolvedValue({
-      draft: draft({ status: 'confirmed', movementId: 'mov-1' }),
-      movementId: 'mov-1',
-    });
+  it(
+    'puts a movement the agent left without an account on the new one',
+    async () => {
+      mockParse.mockResolvedValue({
+        drafts: [draft({ sourceType: null, sourceId: null })],
+        debtDrafts: [],
+        clarification: null,
+        notice: null,
+      });
+      mockConfirm.mockResolvedValue({
+        draft: draft({ status: 'confirmed', movementId: 'mov-1' }),
+        movementId: 'mov-1',
+      });
 
-    renderMagic();
-    await writeIt('un café de cinco mil');
+      renderMagic();
+      await writeIt('un café de cinco mil');
 
-    expect(mockConfirm).toHaveBeenCalledWith({
-      draftId: 'draft-1',
-      overrides: { sourceType: 'account', sourceId: 'acc-1' },
-    });
-  });
+      expect(mockConfirm).toHaveBeenCalledWith({
+        draftId: 'draft-1',
+        overrides: { sourceType: 'account', sourceId: 'acc-1' },
+      });
+    },
+    VOICE_PATH_TIMEOUT,
+  );
 
-  it('asks again when it understood no expense', async () => {
-    mockParse.mockResolvedValue({
-      drafts: [],
-      debtDrafts: [],
-      clarification: null,
-      notice: null,
-    });
+  it(
+    'asks again when it understood no expense',
+    async () => {
+      mockParse.mockResolvedValue({
+        drafts: [],
+        debtDrafts: [],
+        clarification: null,
+        notice: null,
+      });
 
-    renderMagic();
-    await writeIt('hola');
+      renderMagic();
+      await writeIt('hola');
 
-    expect(screen.getByText('No te entendí un gasto.')).toBeTruthy();
-    expect(mockConfirm).not.toHaveBeenCalled();
-  });
+      expect(screen.getByText('No te entendí un gasto.')).toBeTruthy();
+      expect(mockConfirm).not.toHaveBeenCalled();
+    },
+    VOICE_PATH_TIMEOUT,
+  );
 });
