@@ -50,7 +50,13 @@ export function SetupFlow() {
   if (session === null) return null;
   if (me.isPending || accounts.isPending) return <OnbFrame>{null}</OnbFrame>;
 
-  const { displayName, objective } = me.data?.user ?? session;
+  // Both are the server's answer: the profile asked now, and the one each step
+  // saved into the session when it was answered (the profile can be a minute
+  // old). A name or an objective, once given, cannot be taken back from the
+  // app, so whichever of the two has it is right.
+  const user = me.data?.user;
+  const displayName = user?.displayName.trim() ? user.displayName : session.displayName;
+  const objective = user?.objective ?? session.objective;
   const account = accounts.data?.accounts[0] ?? null;
 
   return (

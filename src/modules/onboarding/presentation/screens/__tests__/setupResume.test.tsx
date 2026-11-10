@@ -17,6 +17,7 @@ import { SetupFlow } from '../SetupFlow';
 type Profile = { displayName: string; objective: string | null };
 
 let mockServer: Profile = { displayName: '', objective: null };
+let mockSession: Profile = { displayName: '', objective: null };
 let mockAccounts: Account[] = [];
 
 jest.mock('expo-router', () => ({ router: { replace: jest.fn() } }));
@@ -26,9 +27,8 @@ jest.mock('@/core/di/container', () => ({
 }));
 
 jest.mock('@/modules/auth/presentation', () => ({
-  // The snapshot stored at sign-in: from before any step was answered.
-  useAuthStore: (select: (state: unknown) => unknown) =>
-    select({ session: { displayName: '', objective: null } }),
+  // The session the steps save their answers into.
+  useAuthStore: (select: (state: unknown) => unknown) => select({ session: mockSession }),
   useMe: () => ({ isPending: false, data: { user: mockServer } }),
   useUpdateName: () => ({ mutate: jest.fn() }),
   useUpdatePreferences: () => ({ mutate: jest.fn() }),
@@ -68,6 +68,7 @@ const NOMINA: Account = {
 
 beforeEach(() => {
   mockServer = { displayName: '', objective: null };
+  mockSession = { displayName: '', objective: null };
   mockAccounts = [];
 });
 
@@ -98,5 +99,13 @@ describe('HU-03 · Onboarding incompleto', () => {
     render(<SetupFlow />);
 
     expect(screen.getByText('step:magic Nómina')).toBeTruthy();
+  });
+
+  it('trusts a name saved in this session while the profile is a minute old', () => {
+    mockServer = { displayName: '', objective: null };
+    mockSession = { displayName: 'Laura', objective: null };
+    render(<SetupFlow />);
+
+    expect(screen.getByText('step:goal Laura')).toBeTruthy();
   });
 });
