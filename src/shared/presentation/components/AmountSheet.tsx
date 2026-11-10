@@ -417,20 +417,39 @@ export function SheetDangerAction({
   label,
   confirmLabel,
   onConfirm,
+  onAsk,
+  confirmDisabled = false,
 }: {
   label: string;
   confirmLabel?: string;
   onConfirm: () => void;
+  /** The pill just turned into the question — the moment to find out what the
+   *  answer would cost, so the sheet can say it before the second tap. */
+  onAsk?: () => void;
+  /** Holds the second tap while that is still being found out. */
+  confirmDisabled?: boolean;
 }) {
   const { theme } = useTheme();
   const [asking, setAsking] = useState(false);
 
   const armed = confirmLabel === undefined || asking;
+  const held = armed && confirmDisabled;
+
+  const press = () => {
+    if (held) return;
+    if (armed) {
+      onConfirm();
+      return;
+    }
+    setAsking(true);
+    onAsk?.();
+  };
 
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => (armed ? onConfirm() : setAsking(true))}
+      accessibilityState={{ disabled: held }}
+      onPress={press}
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
@@ -439,7 +458,7 @@ export function SheetDangerAction({
         paddingHorizontal: 14,
         borderRadius: 14,
         backgroundColor: withAlpha(theme.colors.accentCoral, asking ? 0.22 : 0.12),
-        opacity: pressed ? 0.8 : 1,
+        opacity: held ? 0.5 : pressed ? 0.8 : 1,
       })}
     >
       <Icon name="trash" size={14} stroke={1.9} color={theme.colors.accentCoral} />

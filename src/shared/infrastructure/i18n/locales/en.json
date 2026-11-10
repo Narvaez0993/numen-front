@@ -474,6 +474,17 @@
       "iOwe": "You owe",
       "count_one": "{{count}} person",
       "count_other": "{{count}} people"
+    },
+    "deleteWarning": {
+      "checking": "Checking its movements…",
+      "account_one": "“{{name}}” has 1 movement. If you delete it, it stays in your history without an account and still counts toward the month’s spending and income, but its balance stops adding to your net balance.",
+      "account_other": "“{{name}}” has {{count}} movements. If you delete it, they stay in your history without an account and still count toward the month’s spending and income, but its balance stops adding to your net balance.",
+      "accountMore": "“{{name}}” has more than {{count}} movements. If you delete it, they stay in your history without an account and still count toward the month’s spending and income, but its balance stops adding to your net balance.",
+      "accountUnknown": "We couldn't check its movements. If it has any, they stay in your history without an account and still count toward the month’s spending and income, but the balance of “{{name}}” stops adding to your net balance.",
+      "card_one": "“{{name}}” has 1 movement. If you delete it, it stays in your history without a card and, if it is an expense, still counts toward the month, but its debt stops being subtracted from your net balance.",
+      "card_other": "“{{name}}” has {{count}} movements. If you delete it, they stay in your history without a card and its expenses still count toward the month, but its debt stops being subtracted from your net balance.",
+      "cardMore": "“{{name}}” has more than {{count}} movements. If you delete it, they stay in your history without a card and its expenses still count toward the month, but its debt stops being subtracted from your net balance.",
+      "cardUnknown": "We couldn't check its movements. If it has any, they stay in your history without a card and its expenses still count toward the month, but the debt of “{{name}}” stops being subtracted from your net balance."
     }
   },
   "assistant": {
