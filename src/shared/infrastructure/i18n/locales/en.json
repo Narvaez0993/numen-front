@@ -275,6 +275,23 @@
       "free_other": "{{count}} of your own, of {{limit}} on the free plan",
       "plus_one": "{{count}} of your own · no limit with Plus",
       "plus_other": "{{count}} of your own · no limit with Plus"
+    },
+    "standard": {
+      "mercado": "Groceries",
+      "domi": "Delivery",
+      "transporte": "Transport",
+      "comida": "Eating out",
+      "cafe": "Coffee",
+      "entret": "Entertainment",
+      "subs": "Subscriptions",
+      "servicios": "Utilities",
+      "salud": "Health",
+      "educacion": "Education",
+      "hogar": "Home",
+      "otros": "Other",
+      "salario": "Salary",
+      "freelance": "Freelance",
+      "otro_ingreso": "Other"
     }
   },
   "subscriptions": {

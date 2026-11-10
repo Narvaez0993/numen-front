@@ -275,6 +275,23 @@
       "free_other": "Llevas {{count}} propias de {{limit}} en el plan gratis",
       "plus_one": "{{count}} categoría propia · sin límite con Plus",
       "plus_other": "{{count}} categorías propias · sin límite con Plus"
+    },
+    "standard": {
+      "mercado": "Mercado",
+      "domi": "Domicilios",
+      "transporte": "Transporte",
+      "comida": "Comida fuera",
+      "cafe": "Café",
+      "entret": "Entretenimiento",
+      "subs": "Suscripciones",
+      "servicios": "Servicios",
+      "salud": "Salud",
+      "educacion": "Educación",
+      "hogar": "Hogar",
+      "otros": "Otros",
+      "salario": "Salario",
+      "freelance": "Freelance",
+      "otro_ingreso": "Otro"
     }
   },
   "subscriptions": {
