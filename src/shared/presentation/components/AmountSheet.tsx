@@ -35,6 +35,8 @@ type Props = {
   maxDigits?: number;
   /** One line under the amount explaining what the number will do. */
   help?: string;
+  /** Tints that line — coral when it is the reason the amount was refused. */
+  helpColor?: string;
   /** Field rows between the amount and the keypad. */
   children?: React.ReactNode;
   primaryLabel: string;
@@ -113,6 +115,7 @@ export function AmountSheet({
   symbol,
   maxDigits,
   help,
+  helpColor,
   children,
   primaryLabel,
   onPrimary,
@@ -172,7 +175,7 @@ export function AmountSheet({
                 />
                 {help !== undefined ? (
                   <Text
-                    color={theme.colors.textTertiary}
+                    color={helpColor ?? theme.colors.textTertiary}
                     style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
                   >
                     {help}
@@ -218,7 +221,7 @@ export function AmountSheet({
               />
               {help !== undefined ? (
                 <Text
-                  color={theme.colors.textTertiary}
+                  color={helpColor ?? theme.colors.textTertiary}
                   style={{ fontSize: 12, lineHeight: 17, marginTop: 10 }}
                 >
                   {help}

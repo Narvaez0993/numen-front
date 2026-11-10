@@ -52,9 +52,15 @@ export function TxRow({ movement, category, source, from, last, onPress }: Props
   // Nequi» says what happened; the description usually just repeats it.
   const title =
     isTransfer && from && source ? `${from.name} → ${source.name}` : movement.description;
+  // HU-14: an income saved without a category says so, instead of leaving a gap
+  // that reads like a category failed to load.
+  const categoryName =
+    isIncome && movement.categoryId === null
+      ? t('movements.uncategorizedIncome')
+      : category?.name;
   const subtitle = isTransfer
     ? t('movements.transferNote')
-    : [category?.name, source?.name].filter(Boolean).join(' · ');
+    : [categoryName, source?.name].filter(Boolean).join(' · ');
   // A transfer moved no money in or out, so it sits back — in the secondary ink,
   // the way the design draws it, instead of fading the whole row.
   const ink = isTransfer ? theme.colors.textSecondary : theme.colors.textPrimary;

@@ -71,7 +71,8 @@
     "actions": {
       "undo": "Undo"
     },
-    "net": "Net"
+    "net": "Net",
+    "uncategorizedIncome": "Uncategorized income"
   },
   "budgets": {
     "title": "Budget",
@@ -1316,7 +1317,9 @@
           "income": "Goes into",
           "transfer": "From",
           "to": "To"
-        }
+        },
+        "amountInvalid": "Enter an amount greater than zero.",
+        "noCategory": "No category"
       },
       "voiceHint": "Tap the mic and tell me the expense",
       "voiceExample": "e.g. “a $5 coffee on Chase”",

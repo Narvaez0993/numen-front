@@ -71,7 +71,8 @@
     "actions": {
       "undo": "Deshacer"
     },
-    "net": "Neto"
+    "net": "Neto",
+    "uncategorizedIncome": "Ingreso sin categoría"
   },
   "budgets": {
     "title": "Presupuesto",
@@ -1316,7 +1317,9 @@
           "income": "Entra a",
           "transfer": "De",
           "to": "A"
-        }
+        },
+        "amountInvalid": "Escribe un monto mayor que cero.",
+        "noCategory": "Sin categoría"
       },
       "voiceHint": "Toca el mic y cuéntame el gasto",
       "voiceExample": "Ej.: «un café de 5.000 con Nequi»",
