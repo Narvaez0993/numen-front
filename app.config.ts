@@ -19,7 +19,7 @@ const config: ExpoConfig = {
   splash: {
     image: './assets/splash-icon.png',
     resizeMode: 'contain',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F4F2F7',
   },
   ios: {
     supportsTablet: true,
@@ -31,7 +31,8 @@ const config: ExpoConfig = {
     package: 'app.deshka',
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: '#ffffff',
+      backgroundImage: './assets/adaptive-icon-background.png',
+      backgroundColor: '#F4F2F7',
     },
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
