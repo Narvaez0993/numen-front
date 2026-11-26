@@ -4,7 +4,12 @@ import { Pressable, TextInput, View } from 'react-native';
 
 import { useAccounts } from '@/modules/accounts/presentation/hooks/useAccounts';
 import { useCategories } from '@/modules/categories/presentation/hooks/useCategories';
-import type { MovementType, NewMovement, SourceRef } from '@/modules/movements/domain';
+import type {
+  MovementField,
+  MovementType,
+  NewMovement,
+  SourceRef,
+} from '@/modules/movements/domain';
 import {
   AmountSheet,
   ChooseSheet,
@@ -40,6 +45,8 @@ type Props = {
   onClosed?: () => void;
   saving?: boolean;
   errorMessage?: string | null;
+  /** A field the API refused on the last save — today only the amount. */
+  rejectedField?: MovementField | null;
 };
 
 type Picker = 'category' | 'source' | 'destination' | null;
@@ -79,6 +86,7 @@ export function ManualSheet({
   onClosed,
   saving = false,
   errorMessage,
+  rejectedField = null,
 }: Props) {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -107,6 +115,18 @@ export function ManualSheet({
   const [occurredOn, setOccurredOn] = useState(initialValues?.occurredOn ?? today);
   const [picker, setPicker] = useState<Picker>(null);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  // HU-13: an amount of zero is refused when the user tries to save it, and the
+  // amount itself says so — a disabled button never told anyone what was wrong.
+  const [amountFlagged, setAmountFlagged] = useState(false);
+
+  useEffect(() => {
+    if (rejectedField === 'amount') setAmountFlagged(true);
+  }, [rejectedField]);
+
+  const typeDigits = (next: string) => {
+    setDigits(next);
+    setAmountFlagged(false);
+  };
 
   // An income lands on an account; a card is somewhere you owe, not somewhere you
   // get paid (a refund is handled by adjusting the card's debt).
@@ -159,7 +179,9 @@ export function ManualSheet({
     // this pass would wipe a prefilled category before it had a chance to exist.
     if (categoryOptions.length === 0) return;
     if (!categoryOptions.some((option) => option.value === categoryId)) {
-      setCategoryId(categoryOptions[0]?.value ?? null);
+      // HU-14: an income needs no category, so none is picked for it — guessing
+      // «Salario» for a refund would be filing it wrong on the user's behalf.
+      setCategoryId(type === 'income' ? null : (categoryOptions[0]?.value ?? null));
     }
   }, [type, categoryOptions, categoryId]);
 
@@ -168,8 +190,9 @@ export function ManualSheet({
   const source = sourceKey ? parseRefKey(sourceKey) : null;
   const destination = destinationKey ? parseRefKey(destinationKey) : null;
   const needsDestination = type === 'transfer';
-  const valid =
-    amount > 0 &&
+  // The amount is not part of this: with it the button stayed grey and never
+  // said why. It is checked on the tap instead, where it can point at itself.
+  const ready =
     source !== null &&
     (needsDestination ? destination !== null : description.trim().length >= 2);
 
@@ -178,14 +201,19 @@ export function ManualSheet({
   const destinationLabel =
     destinationOptions.find((option) => option.value === destinationKey)?.label ?? '—';
   const categoryLabel =
-    categoryOptions.find((option) => option.value === categoryId)?.label ?? '—';
+    categoryOptions.find((option) => option.value === categoryId)?.label ??
+    (type === 'income' ? t('expenses.sheet.manualEntry.noCategory') : '—');
   // Derived, not looked up in a quick list: a date picked from the calendar is
   // usually older than the shortcuts and would otherwise render blank.
   // «Hoy»: alone on its chip, so it starts with a capital.
   const dateLabel = capitalized(labelFor(occurredOn));
 
   const handleSave = () => {
-    if (!valid || saving || source === null) return;
+    if (!ready || saving || source === null) return;
+    if (amount <= 0) {
+      setAmountFlagged(true);
+      return;
+    }
     onSave({
       type,
       description:
@@ -199,8 +227,9 @@ export function ManualSheet({
     });
   };
 
-  const amountColor =
-    type === 'income'
+  const amountColor = amountFlagged
+    ? theme.colors.accentCoral
+    : type === 'income'
       ? theme.colors.accentMint
       : type === 'transfer'
         ? theme.colors.textSecondary
@@ -238,13 +267,15 @@ export function ManualSheet({
         onClose={onClose}
         onClosed={onClosed}
         digits={digits}
-        onDigits={setDigits}
+        onDigits={typeDigits}
         currency={currency}
         sign={sign}
         amountColor={amountColor}
+        help={amountFlagged ? t('expenses.sheet.manualEntry.amountInvalid') : undefined}
+        helpColor={theme.colors.accentCoral}
         primaryLabel={t(`expenses.sheet.manualEntry.save.${type}`)}
         onPrimary={handleSave}
-        primaryDisabled={!valid || saving}
+        primaryDisabled={!ready || saving}
         onMic={onSpeak}
         header={
           <>
@@ -322,6 +353,12 @@ export function ManualSheet({
               value={categoryId}
               onChange={setCategoryId}
               onClose={() => setPicker(null)}
+              // An income may stay without one (HU-14); an expense keeps the
+              // list it always had.
+              allLabel={
+                type === 'income' ? t('expenses.sheet.manualEntry.noCategory') : undefined
+              }
+              onClear={type === 'income' ? () => setCategoryId(null) : undefined}
             />
             <ChooseSheet
               visible={picker === 'source'}

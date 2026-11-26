@@ -17,14 +17,19 @@ type FlowState<S extends string> = {
 /**
  * Generic single-screen state machine shared by the auth and setup flows. The
  * caller supplies the entry screen and a back-edge map (stable module constants
- * like `AUTH_BACK_MAP` / `SETUP_BACK_MAP`).
+ * like `AUTH_BACK_MAP` / `SETUP_BACK_MAP`), and — for a setup picked up halfway
+ * — the answers already given, read once on mount like the entry screen.
  */
 export function useOnboardingFlow<S extends string>(
   initialScreen: S,
   backMap: Readonly<Record<S, S | null>>,
+  initialCtx: Partial<OnboardingContext> = {},
 ): FlowState<S> {
   const [screen, setScreen] = useState<S>(initialScreen);
-  const [ctx, setCtx] = useState<OnboardingContext>(EMPTY_ONBOARDING_CONTEXT);
+  const [ctx, setCtx] = useState<OnboardingContext>(() => ({
+    ...EMPTY_ONBOARDING_CONTEXT,
+    ...initialCtx,
+  }));
 
   const go = useCallback((target: S) => setScreen(target), []);
 

@@ -26,7 +26,11 @@ import {
 } from '@/modules/assistant/presentation/utils/draftForm';
 import { useCreateMovement } from '@/modules/movements/presentation/hooks/useCreateMovement';
 import { useDeleteMovement } from '@/modules/movements/presentation/hooks/useMovementMutations';
-import type { NewMovement } from '@/modules/movements/domain';
+import {
+  InvalidMovementError,
+  type MovementField,
+  type NewMovement,
+} from '@/modules/movements/domain';
 import { DatePickerSheet, Toast } from '@/shared/presentation/components';
 import { ChooseSheet } from '@/shared/presentation/components/ChooseSheet';
 import { useCurrencyStore } from '@/shared/presentation/currency/useCurrencyStore';
@@ -90,6 +94,8 @@ export function ExpenseSheet() {
   const removeDebtPayment = useRemoveDebtPayment(today);
 
   const [error, setError] = useState<string | null>(null);
+  // A field the API refused, for the manual form to point at (HU-13).
+  const [rejectedField, setRejectedField] = useState<MovementField | null>(null);
   const [saving, setSaving] = useState(false);
   const [edits, setEdits] = useState<Record<string, Edit>>({});
   const [correcting, setCorrecting] = useState<string | null>(null);
@@ -104,6 +110,7 @@ export function ExpenseSheet() {
   // used to greet the next card before the user had pressed anything.
   useEffect(() => {
     setError(null);
+    setRejectedField(null);
   }, [open, drafts, debtDrafts]);
 
   // A new capture starts with no corrections carried over from the last one.
@@ -339,6 +346,7 @@ export function ExpenseSheet() {
 
   const handleSaveManual = (movement: NewMovement) => {
     setError(null);
+    setRejectedField(null);
     if (editing !== null) {
       // Editing an agent draft: the form's picture confirms THROUGH the draft, so
       // it settles as `confirmed` instead of leaving a pending twin.
@@ -369,7 +377,15 @@ export function ExpenseSheet() {
           });
           closeSheet();
         },
-        onError: () => setError(t('expenses.toast.saveFailed')),
+        onError: (failure) => {
+          // The amount says it itself, next to the number; a second, generic
+          // line under the fields would only repeat it less precisely.
+          if (failure instanceof InvalidMovementError && failure.field !== null) {
+            setRejectedField(failure.field);
+            return;
+          }
+          setError(t('expenses.toast.saveFailed'));
+        },
       },
     );
   };
@@ -542,6 +558,7 @@ export function ExpenseSheet() {
         onClose={closeSheet}
         saving={createMovement.isPending || confirmDraft.isPending}
         errorMessage={error}
+        rejectedField={rejectedField}
       />
 
       <Toast

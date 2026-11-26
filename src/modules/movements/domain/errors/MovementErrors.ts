@@ -21,9 +21,16 @@ export class MovementCategoryNotFoundError extends DomainError {
   }
 }
 
+/** The one field the form can point at when the API refuses a movement. */
+export type MovementField = 'amount';
+
 export class InvalidMovementError extends DomainError {
   readonly code = 'movements.invalid';
-  constructor(message = 'Invalid movement') {
+  /** Which field the API refused, when its message names one — so the form can
+   *  mark that field instead of showing a generic failure. */
+  readonly field: MovementField | null;
+  constructor(message = 'Invalid movement', field: MovementField | null = null) {
     super(message);
+    this.field = field;
   }
 }
