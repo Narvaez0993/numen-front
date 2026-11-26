@@ -158,7 +158,9 @@ export function MovementDetailSheet({
     key ? (catalogs.sourceById[parseRefKey(key).id]?.name ?? '—') : null;
   const categoryName = categoryId
     ? (catalogs.categoryById[categoryId]?.name ?? '—')
-    : '—';
+    : type === 'income'
+      ? t('movements.uncategorizedIncome')
+      : '—';
 
   return (
     <AmountSheet

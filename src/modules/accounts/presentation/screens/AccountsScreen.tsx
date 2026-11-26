@@ -6,6 +6,7 @@ import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context'
 
 import { useTier } from '@/modules/plan/presentation/hooks/useTier';
 import { useDeudas } from '@/modules/deudas/presentation/hooks/useDeudas';
+import { useSourceMovementCount } from '@/modules/movements/presentation/hooks/useSourceMovementCount';
 import { GateSheet } from '@/modules/plan/presentation/components/GateSheet';
 import type { AccentColor } from '@/shared/domain';
 import {
@@ -89,6 +90,10 @@ export function AccountsScreen() {
   }>({ open: false, card: null });
   const [gate, setGate] = useState<'account' | 'card' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // The source whose movements are being counted because its sheet asked to
+  // delete it (HU-07). Only one sheet is open at a time, so one is enough.
+  const [deleteCheckFor, setDeleteCheckFor] = useState<string | null>(null);
+  const deleteCheck = useSourceMovementCount(deleteCheckFor);
 
   const isPlus = useTier() === 'plus';
 
@@ -137,8 +142,14 @@ export function AccountsScreen() {
   const iOwe = debts.data?.iOwe;
   const hasPeople = (owedToMe?.count ?? 0) + (iOwe?.count ?? 0) > 0;
 
-  const closeAccountSheet = () => setAccountSheet({ open: false, account: null });
-  const closeCardSheet = () => setCardSheet({ open: false, card: null });
+  const closeAccountSheet = () => {
+    setAccountSheet({ open: false, account: null });
+    setDeleteCheckFor(null);
+  };
+  const closeCardSheet = () => {
+    setCardSheet({ open: false, card: null });
+    setDeleteCheckFor(null);
+  };
 
   /** Capacity errors open the gate; anything else surfaces as a toast. */
   const handleMutationError = (error: Error) => {
@@ -431,6 +442,8 @@ export function AccountsScreen() {
         onClose={closeAccountSheet}
         onSave={handleSaveAccount}
         onDelete={handleDeleteAccount}
+        onAskDelete={() => setDeleteCheckFor(accountSheet.account?.id ?? null)}
+        deleteCheck={deleteCheck}
       />
       <CardFormSheet
         visible={cardSheet.open}
@@ -441,6 +454,8 @@ export function AccountsScreen() {
         onClose={closeCardSheet}
         onSave={handleSaveCard}
         onDelete={handleDeleteCard}
+        onAskDelete={() => setDeleteCheckFor(cardSheet.card?.id ?? null)}
+        deleteCheck={deleteCheck}
       />
       <GateSheet
         visible={gate !== null}

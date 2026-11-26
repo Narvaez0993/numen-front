@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { categoryName } from '@/modules/categories/presentation/utils/categoryName';
 import { Pill, Text } from '@/shared/presentation/components';
 import { useTheme } from '@/shared/presentation/theme';
 import { formatMoney } from '@/shared/presentation/utils/formatMoney';
@@ -18,12 +19,12 @@ export function playAmountLine(play: AgentPlay, t: TFunction): string {
   switch (play.action) {
     case 'set_category_cap':
       return t('assistant.corte.play.setCap', {
-        name: play.categoryName,
+        name: categoryName(play.categoryId, play.categoryName, t),
         amount: formatMoney(play.target),
       });
     case 'raise_category_cap':
       return t('assistant.corte.play.raiseCap', {
-        name: play.categoryName,
+        name: categoryName(play.categoryId, play.categoryName, t),
         from: formatMoney(play.currentTarget),
         to: formatMoney(play.target),
       });

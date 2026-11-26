@@ -5,3 +5,4 @@ export * from './use-cases/UpdateMovementUseCase';
 export * from './use-cases/DeleteMovementUseCase';
 export * from './use-cases/SummarizeMovementsUseCase';
 export * from './dto/MovementsFilters';
+export * from './dto/SourceMovementCount';

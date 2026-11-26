@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 
+import type { SourceMovementCount } from '@/modules/movements/application';
 import type { CurrencyCode } from '@/shared/domain';
 import {
   AmountSheet,
@@ -12,6 +13,7 @@ import {
 import { useTheme } from '@/shared/presentation/theme';
 
 import type { Account, AccountKind } from '../../domain';
+import { sourceDeleteWarning } from '../utils/deleteWarning';
 
 export type AccountFormInput = {
   kind: AccountKind;
@@ -35,6 +37,10 @@ type Props = {
   initial?: Partial<AccountFormInput>;
   /** The button's label, when the sheet is one step of something bigger. */
   saveLabel?: string;
+  /** Called when «Eliminar» is first tapped: time to count its movements. */
+  onAskDelete?: () => void;
+  /** That count, so the sheet can say what deleting would do to them. */
+  deleteCheck?: SourceMovementCount;
 };
 
 const KINDS: AccountKind[] = ['debit', 'cash'];
@@ -67,6 +73,8 @@ export function AccountFormSheet({
   onDelete,
   initial,
   saveLabel,
+  onAskDelete,
+  deleteCheck,
 }: Props) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -76,6 +84,7 @@ export function AccountFormSheet({
   const [name, setName] = useState('');
   const [sub, setSub] = useState('');
   const [digits, setDigits] = useState('');
+  const [askingDelete, setAskingDelete] = useState(false);
 
   // Read when the sheet opens, not on every render: a parent that re-renders
   // while it is open must not wipe what is being typed.
@@ -95,9 +104,16 @@ export function AccountFormSheet({
           ? String(start.balance)
           : '',
     );
+    setAskingDelete(false);
   }, [visible, account]);
 
   const valid = name.trim().length >= 2;
+  // HU-07: once «Eliminar» has asked, the line under the balance says what
+  // happens to the account's movements — before «Sí, eliminar», not after.
+  const deleteWarning =
+    askingDelete && account && deleteCheck
+      ? sourceDeleteWarning('account', account.name, deleteCheck, t)
+      : undefined;
 
   return (
     <AmountSheet
@@ -108,7 +124,8 @@ export function AccountFormSheet({
       currency={currency}
       keyboard="system"
       label={t('accounts.form.balance')}
-      help={t('accounts.form.balanceHelp')}
+      help={deleteWarning ?? t('accounts.form.balanceHelp')}
+      helpColor={deleteWarning ? theme.colors.accentCoral : undefined}
       primaryLabel={saveLabel ?? t('accounts.form.save')}
       primaryDisabled={!valid || submitting}
       onPrimary={() =>
@@ -134,6 +151,11 @@ export function AccountFormSheet({
                 label={t('accounts.form.delete')}
                 confirmLabel={t('accounts.form.deleteConfirm')}
                 onConfirm={onDelete}
+                onAsk={() => {
+                  setAskingDelete(true);
+                  onAskDelete?.();
+                }}
+                confirmDisabled={deleteCheck?.checking ?? false}
               />
             </>
           ) : (
